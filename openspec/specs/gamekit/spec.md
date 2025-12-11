@@ -674,7 +674,7 @@ window.onunhandledrejection = (event) => {
 |------|----------|-------------|
 | `index.html` | ✅ | Entry point |
 | `game.js` | ✅ | Game code |
-| `manifest.json` | ✅ | Game metadata (see [Manifests](../manifests/spec.md)) |
+| `game.json` | ✅ | Game metadata (see [Manifests](../manifests/spec.md)) |
 | `thumb.png` | ✅ | Thumbnail for catalog |
 
 ## See Also

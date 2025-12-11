@@ -4,23 +4,25 @@
 
 **Playlab42** est une plateforme pédagogique de mini-jeux et outils collaboratifs pour la formation dev assistée par IA.
 
+**Version actuelle** : Standalone (100% frontend, pas de backend).
+
 ### Architecture
 
 | Composant | Description |
 |-----------|-------------|
 | **Tools** | Outils HTML standalone (un fichier, pas de backend) |
-| **Games** | Jeux autonomes (moteur isomorphe, multi-joueur possible) |
-| **Core** | Types partagés, SDK optionnel, utilitaires (SeededRandom) |
-| **Platform** | Catalogue unifié tools + games (charge en iframe) |
-| **Server** | Backend multi-joueur (virtualisable en localStorage) |
+| **Games** | Jeux autonomes avec moteur isomorphe et bots |
+| **Portal** | Catalogue unifié, charge tools/games en iframe |
+| **GameKit** | SDK pour les jeux (assets, scores, hooks) |
+| **Lib** | Utilitaires partagés (SeededRandom) |
 
 ### Concepts clés
 
 - **Tool** : Outil HTML standalone (un fichier, ouvrable directement)
-- **Game** : Mini-app standalone avec moteur de règles
-- **Game Engine** : Moteur isomorphe, TypeScript pur, déterministe, seedé
-- **SDK (optionnel)** : `window.playlab` injecté pour le multi-joueur
-- **Backend virtualisable** : Mode localStorage (solo) ou serveur (multi)
+- **Game** : Mini-app standalone avec moteur de règles et bots
+- **GameEngine** : Moteur isomorphe, TypeScript/JS pur, déterministe
+- **Bot** : IA pluggable pour remplacer les joueurs humains
+- **GameKit** : SDK pour communication portail ↔ jeu
 
 ### Objectif pédagogique
 
@@ -29,7 +31,7 @@ Le projet s'enrichit des contributions de chaque session.
 
 **Qualité code** : Ce projet étant un support de cours, le code doit être exemplaire :
 - Bien commenté en français
-- Nommage explicite (pas d'abréviations obscures)
+- Nommage explicite
 - Tests unitaires systématiques
 - Types TypeScript exhaustifs
 
@@ -50,6 +52,9 @@ make npm CMD="run test"
 
 # Serveur de dev
 make dev
+
+# Build du catalogue
+make build:catalogue
 ```
 
 **Ne jamais exécuter npm, node, ou autres outils directement sur le host.**
@@ -77,7 +82,7 @@ Utiliser `@/openspec/AGENTS.md` pour apprendre :
 ## Conventions
 
 - **Langue** : Commentaires et commits en français
-- **Code** : TypeScript strict, fonctions pures quand possible
+- **Code** : TypeScript/JavaScript, fonctions pures quand possible
 - **Nommage** : camelCase (variables), PascalCase (types), kebab-case (fichiers)
 - **Simplicité** : Préférer solutions simples, éviter over-engineering
 - **Isomorphisme** : Les moteurs de jeux doivent tourner client ET serveur
@@ -85,43 +90,64 @@ Utiliser `@/openspec/AGENTS.md` pour apprendre :
 
 ## Stack technique
 
-- TypeScript strict + Node.js 20+
-- Jest pour les tests
-- Docker pour **tout** l'environnement
-- WebSocket pour le temps réel
-- OpenSpec pour le workflow
+| Aspect | Choix |
+|--------|-------|
+| Langage | TypeScript / JavaScript |
+| Runtime | Node.js 20+ |
+| Tests | Jest |
+| Infra | Docker |
+| Hébergement | GitHub Pages, Netlify, S3 |
+| Workflow | OpenSpec |
 
 ## Structure du projet
 
 ```
 playlab42/
-├── tools/                   # Outils HTML standalone
-│   └── [tool-name].html     # Un fichier = un outil
-├── games/                   # Jeux autonomes
+├── index.html                # Portail principal
+├── style.css                 # Styles du portail
+├── app.js                    # Logique du portail
+├── lib/                      # Bibliothèques partagées
+│   ├── gamekit.js            # SDK pour les jeux
+│   ├── assets.js             # Loader d'assets
+│   └── seeded-random.js      # PRNG déterministe
+├── tools/                    # Outils HTML standalone
+│   ├── [tool-name].html      # Un fichier = un outil
+│   └── [tool-name].json      # Manifest
+├── games/                    # Jeux autonomes
 │   └── [game-id]/
-│       ├── index.html       # Point d'entrée standalone
-│       ├── engine.ts        # Moteur isomorphe (optionnel si inline)
-│       └── game.json        # Manifest
-├── src/
-│   ├── core/                # Partagé
-│   │   ├── types/           # Interfaces communes
-│   │   ├── sdk/             # PlayLabSDK (optionnel)
-│   │   └── utils/           # SeededRandom, helpers
-│   ├── platform/            # Catalogue (optionnel)
-│   │   └── index.html       # Liste tools + games
-│   └── server/              # Backend (optionnel)
-│       ├── api/             # Routes REST
-│       ├── ws/              # WebSocket
-│       └── sessions/        # Gestion parties
-└── docs/                    # Documentation
+│       ├── index.html        # Point d'entrée standalone
+│       ├── game.js           # Code du jeu
+│       ├── game.json         # Manifest
+│       ├── thumb.png         # Vignette
+│       └── bots/             # Bots IA
+├── data/                     # Données générées
+│   └── catalogue.json        # DB des tools/games
+├── src/                      # Code source (build)
+│   └── scripts/              # Scripts de build
+├── docs/                     # Documentation
+└── openspec/                 # Specs et proposals
 ```
+
+## Spécifications techniques
+
+Les specs détaillées sont dans `openspec/specs/` :
+
+| Spec | Description |
+|------|-------------|
+| [platform](openspec/specs/platform/spec.md) | Architecture, structure projet |
+| [catalogue](openspec/specs/catalogue/spec.md) | Format JSON, script de build |
+| [seeded-random](openspec/specs/seeded-random/spec.md) | PRNG déterministe Mulberry32 |
+| [game-engine](openspec/specs/game-engine/spec.md) | Interface moteur de jeu |
+| [bot](openspec/specs/bot/spec.md) | Interface IA, slots joueurs |
+| [manifests](openspec/specs/manifests/spec.md) | Formats tool.json, game.json |
+| [portal](openspec/specs/portal/spec.md) | Interface utilisateur |
+| [gamekit](openspec/specs/gamekit/spec.md) | SDK pour les jeux |
 
 ## Références documentation
 
-- `docs/FEATURES.md` - Liste complète des features MVP
+- `docs/FEATURES.md` - Liste des features MVP par phase
 - `docs/CONCEPTS.md` - Définitions et glossaire
-- `docs/guides/create-tool.md` - Guide création d'outil
-- `docs/guides/create-game.md` - Guide création de jeu
+- `openspec/project.md` - Conventions du projet
 
 ## Contexte utilisateur
 

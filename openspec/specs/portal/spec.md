@@ -297,7 +297,7 @@ window.addEventListener('message', (event) => {
 
 ```javascript
 async function loadCatalog() {
-  const response = await fetch('/dist/catalogue.json');
+  const response = await fetch('/data/catalogue.json');
   const catalogue = await response.json();
 
   renderGames(catalogue.games);
@@ -386,7 +386,7 @@ function renderCard(entry, type) {
 ```javascript
 async function loadCatalog() {
   try {
-    const response = await fetch('/dist/catalogue.json');
+    const response = await fetch('/data/catalogue.json');
     if (!response.ok) throw new Error('Catalog not found');
     // ...
   } catch (error) {

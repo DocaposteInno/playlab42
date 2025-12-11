@@ -2,6 +2,8 @@
 
 Définitions des termes et concepts utilisés dans le projet.
 
+> **Specs techniques** : Voir `openspec/specs/` pour les spécifications détaillées.
+
 ---
 
 ## Entités principales
@@ -21,20 +23,7 @@ tools/json-formatter.html    # Double-clic = ça marche !
 
 **Exemples** : JSON formatter, Base64 encoder, Color picker, Regex tester...
 
-#### Tool Manifest (optionnel)
-
-Si le tool est dans un dossier :
-
-```typescript
-interface ToolManifest {
-  id: string;           // "json-formatter"
-  name: string;         // "JSON Formatter"
-  description: string;
-  author: string;
-  tags: string[];       // ["json", "dev-tools"]
-  icon?: string;        // Emoji ou URL
-}
-```
+> **Spec** : [manifests/spec.md](../openspec/specs/manifests/spec.md) - Format `tool.json`
 
 ---
 
@@ -44,8 +33,13 @@ Un jeu est un module complet comprenant :
 - Un **moteur** (engine) : logique et règles
 - Un **client** : interface utilisateur
 - Un **manifest** : métadonnées et configuration
+- Des **bots** (optionnel) : IA pour jouer en solo
 
-Chaque jeu est identifié par un `gameId` unique (kebab-case).
+Chaque jeu est identifié par un `id` unique (kebab-case).
+
+> **Spec** : [manifests/spec.md](../openspec/specs/manifests/spec.md) - Format `game.json`
+
+---
 
 ### Game Engine (Moteur de jeu)
 
@@ -58,370 +52,107 @@ Le moteur contient toute la logique du jeu :
 - **Isomorphe** : tourne côté client ET serveur
 - **Pur** : pas d'effets de bord, pas d'I/O
 - **Déterministe** : même input = même output
-- **Seedé** : utilise un générateur aléatoire fourni
+- **Seedé** : utilise `SeededRandom` pour l'aléatoire
 
-### Game Client (Client de jeu)
-
-L'interface utilisateur du jeu :
-- Affiche l'état du jeu
-- Capture les inputs utilisateur
-- Envoie les actions (localement ou via SDK)
-
-**Important** : Un jeu est **autonome** et peut fonctionner sans la plateforme.
-
-### Game Manifest (Manifest de jeu)
-
-Fichier `game.json` décrivant le jeu :
-
-```typescript
-interface GameManifest {
-  // Identité
-  id: string;                      // "tic-tac-toe"
-  name: string;                    // "Tic Tac Toe"
-  description: string;
-  version: string;
-  author: string;
-
-  // Classification
-  tags: string[];                  // ["stratégie", "2-joueurs"]
-  category: GameCategory;          // "board" | "card" | "arcade" | ...
-
-  // Joueurs
-  players: {
-    min: number;
-    max: number;
-    solo: boolean;                 // Jouable seul ?
-  };
-
-  // Type
-  type: "turnbased" | "realtime";
-
-  // Fichiers
-  files: {
-    engine: string;                // "./engine.ts"
-    client: string;                // "./client/index.html"
-    thumbnail: string;
-  };
-
-  // Options
-  options: {
-    recordGames: boolean;          // Enregistrer l'historique ?
-    supportsBots: boolean;
-    supportsSpectators: boolean;
-    allowPause: boolean;
-  };
-
-  // Configuration de partie (variantes)
-  configSchema?: ConfigSchema;
-
-  // Valeurs par défaut
-  defaults: {
-    turnTimeoutMs?: number;
-    tickRateMs?: number;
-    pauseTimeoutMs?: number;
-  };
-}
-```
+> **Spec** : [game-engine/spec.md](../openspec/specs/game-engine/spec.md)
 
 ---
 
-## Utilisateurs
+### Bot (IA)
 
-### User (Utilisateur)
+Un joueur automatique qui remplace les humains :
+- **Isomorphe** : tourne client ET serveur
+- **Déterministe** : utilise le `SeededRandom` fourni
+- **Pluggable** : plusieurs niveaux de difficulté par jeu
 
-Un compte sur la plateforme :
+En mode solo, les slots non-humains sont automatiquement remplis par le bot par défaut.
 
-```typescript
-interface User {
-  id: string;
-  pseudo: string;
-  avatar: string;              // ID d'avatar prédéfini
-  createdAt: Date;
-}
-```
-
-### Player (Joueur)
-
-Un participant dans une partie :
-
-```typescript
-interface Player {
-  id: string;
-  type: "human" | "bot";
-  userId?: string;             // Si humain
-  botId?: string;              // Si bot
-}
-```
-
-### Spectator (Spectateur)
-
-Un utilisateur qui regarde une partie sans y participer.
-Reçoit la vue spectateur (`getSpectatorView`).
+> **Spec** : [bot/spec.md](../openspec/specs/bot/spec.md)
 
 ---
 
-## Sessions et parties
+### Portal (Portail)
 
-### Lobby (Salle d'attente)
+L'interface principale de Playlab42 :
+- Catalogue des tools et games
+- Filtrage par tags, recherche
+- Lancement en iframe sandboxé
+- Préférences utilisateur (son, pseudo)
+- Historique des jeux récents
 
-Liste des parties en attente de joueurs.
-Un joueur peut :
-- Créer une nouvelle partie
-- Rejoindre une partie existante
-- Rejoindre en spectateur
+> **Spec** : [portal/spec.md](../openspec/specs/portal/spec.md)
 
-### Session (Session de jeu)
+---
 
-Une instance de partie :
+### GameKit (SDK)
 
-```typescript
-interface GameSession {
-  id: string;
-  gameId: string;
-  state: "waiting" | "playing" | "paused" | "finished";
-  players: Player[];
-  spectators: string[];
-  config: unknown;
-  seed: string;
-  createdAt: Date;
-  startedAt?: Date;
-  endedAt?: Date;
-}
-```
+Le SDK standardisé pour les jeux :
+- Communication avec le portail
+- Gestion des assets (images, sons)
+- Scores et progression
+- Hooks de cycle de vie (pause, resume)
 
-### Game State (État de jeu)
+> **Spec** : [gamekit/spec.md](../openspec/specs/gamekit/spec.md)
 
-L'état complet du jeu à un instant T.
-- Sérialisable en JSON
-- Connu uniquement du serveur (source de vérité)
-- Les joueurs reçoivent une **vue filtrée**
+---
+
+### Catalogue
+
+Base de données JSON des tools et games, générée au build :
+- Scanne les manifests (`tool.json`, `game.json`)
+- Génère `data/catalogue.json`
+- Utilisé par le portail pour afficher les entrées
+
+> **Spec** : [catalogue/spec.md](../openspec/specs/catalogue/spec.md)
+
+---
+
+### SeededRandom
+
+Générateur de nombres pseudo-aléatoires déterministe :
+- Algorithme Mulberry32
+- Même seed = même séquence
+- Essentiel pour le replay et les bots
+
+> **Spec** : [seeded-random/spec.md](../openspec/specs/seeded-random/spec.md)
+
+---
+
+## Configuration de partie
+
+### Player Slot (Slot joueur)
+
+Configuration d'un emplacement joueur :
+
+| Type | Description |
+|------|-------------|
+| `human` | Joueur humain |
+| `bot` | IA (avec choix du bot) |
+| `disabled` | Slot désactivé |
+
+En mode standalone, "Multijoueur" est grisé (version future).
+
+---
 
 ### Player View (Vue joueur)
 
-Ce qu'un joueur voit de l'état.
+Ce qu'un joueur voit de l'état du jeu.
 Permet le **fog of war** (informations cachées).
 
 Exemple au poker : un joueur voit ses cartes mais pas celles des autres.
 
 ---
 
-## Actions et communication
-
-### Action
-
-Un coup joué par un joueur :
-
-```typescript
-// Exemple Tic-Tac-Toe
-type TicTacToeAction = {
-  row: number;
-  col: number;
-};
-
-// Exemple Snake
-type SnakeAction = {
-  direction: "up" | "down" | "left" | "right";
-};
-```
-
-### Valid Actions (Actions valides)
-
-Liste des actions possibles pour un joueur à un instant T.
-Fourni par `engine.getValidActions(state, playerId)`.
-
-Essentiel pour les bots.
-
-### Turn (Tour)
-
-En mode **tour par tour** :
-- Un seul joueur peut agir à la fois
-- Déterminé par `engine.getCurrentPlayer(state)`
-- Timeout configurable
-
-### Tick
-
-En mode **temps réel** :
-- Unité de temps du game loop
-- Intervalle défini par `engine.getTickRateMs()`
-- Les actions sont appliquées à chaque tick
-
----
-
-## Bots et IA
-
-### Bot
-
-Un joueur automatique :
-
-```typescript
-interface GameBot<TView, TAction> {
-  id: string;
-  name: string;
-  author: string;
-  gameId: string;
-
-  chooseAction(
-    view: TView,
-    validActions: TAction[],
-    context: BotContext
-  ): Promise<TAction>;
-}
-```
-
-### Bot Context
-
-Informations supplémentaires pour le bot :
-
-```typescript
-interface BotContext {
-  timeRemainingMs: number;     // Temps pour décider
-  turnNumber: number;
-  gameHistory: HistoryEntry[]; // Historique des coups
-}
-```
-
-### Training (Entraînement)
-
-Mode accéléré pour jouer N parties bot vs bot :
-- Pas de délai réseau
-- Pas de WebSocket
-- Exécution directe sur le serveur
-- Génère des datasets pour ML
-
----
-
-## Historique et replay
-
-### Game Record (Enregistrement)
-
-Historique complet d'une partie :
-
-```typescript
-interface GameRecord {
-  id: string;
-  gameId: string;
-  seed: string;                // Pour replay déterministe
-  players: Player[];
-  config: unknown;
-  history: HistoryEntry[];
-  winner: string | null;
-  scores: Record<string, number>;
-}
-```
-
-### History Entry (Entrée historique)
-
-Un coup dans l'historique :
-
-```typescript
-interface HistoryEntry {
-  turn: number;
-  playerId: string;
-  action: unknown;
-  timestamp: number;           // ms depuis début partie
-}
-```
-
-### Replay
-
-Rejouer une partie grâce au seed et à l'historique.
-Même seed + mêmes actions = même déroulement exact.
-
----
-
-## Utilitaires
-
-### SeededRandom
-
-Générateur de nombres aléatoires avec seed :
-
-```typescript
-interface SeededRandom {
-  next(): number;                           // 0-1
-  nextInt(min: number, max: number): number;
-  shuffle<T>(array: T[]): T[];
-  getSeed(): string;
-}
-```
-
-**Important** : Ne jamais utiliser `Math.random()` dans un moteur.
-Toujours utiliser le `SeededRandom` injecté.
-
-### SDK (PlayLabSDK)
-
-API **optionnelle** injectée par la plateforme (`window.playlab`).
-Permet à un jeu autonome de se connecter au multi-joueur.
-
-```typescript
-interface PlayLabSDK {
-  // Contexte
-  getUser(): User | null;
-  getPlayers(): Player[];
-  getConfig(): unknown;
-
-  // Communication (multi-joueur)
-  sendAction(action: unknown): void;
-  onState(callback: (state: unknown) => void): void;
-  onYourTurn(callback: () => void): void;
-  onGameOver(callback: (result: GameResult) => void): void;
-}
-```
-
-**Détection automatique** : Le jeu vérifie `if (window.playlab)` pour savoir s'il est connecté à la plateforme.
-
----
-
-## Jeux autonomes
-
-### Principe
-
-Chaque jeu est une **mini-application autonome** :
-- Ouvrable directement (`index.html`)
-- Fonctionne sans serveur ni plateforme
-- Intègre son moteur et son UI
-
-### Structure d'un jeu
-
-```
-games/tic-tac-toe/
-├── index.html      # Point d'entrée (jouable seul)
-├── engine.ts       # Moteur pur (optionnel si inline)
-├── game.json       # Manifest pour la plateforme
-└── assets/         # Images, sons (optionnel)
-```
-
-### Mode standalone vs plateforme
-
-```javascript
-// Détection automatique du mode
-if (window.playlab) {
-  // Mode plateforme : multi-joueur via SDK
-  playlab.onState(render);
-  function play(action) {
-    playlab.sendAction(action);
-  }
-} else {
-  // Mode standalone : tout en local
-  let state = engine.createInitialState(...);
-  function play(action) {
-    state = engine.applyAction(state, currentPlayer, action);
-    render(state);
-  }
-}
-```
-
----
-
 ## Types de jeux
 
-### Tour par tour (turnbased)
+### Tour par tour (turn-based)
 
 - Un joueur joue à la fois
 - `getCurrentPlayer()` détermine qui joue
-- Timeout par tour
+- Timeout par tour configurable
 - Exemples : Tic-Tac-Toe, Échecs, Poker
 
-### Temps réel (realtime)
+### Temps réel (real-time)
 
 - Tous les joueurs jouent simultanément
 - Game loop avec ticks réguliers
@@ -432,10 +163,67 @@ if (window.playlab) {
 
 ## Modes d'exécution
 
-| Mode | Location | Réseau | Usage |
-|------|----------|--------|-------|
-| Solo local | Client | Non | Entraînement ML, offline |
-| Solo serveur | Serveur | Oui | Anti-triche |
-| Multi local | Client | Non | Hot-seat, debug |
-| Multi serveur | Serveur | Oui | Jeu en ligne |
-| Entraînement | Serveur | Non | Bot vs bot accéléré |
+### Version actuelle (standalone)
+
+| Mode | Description |
+|------|-------------|
+| Solo + bots | Humain vs IA en local |
+| Hot-seat | Plusieurs humains même écran |
+
+### Version future (avec backend)
+
+| Mode | Description |
+|------|-------------|
+| Multijoueur | Joueurs distants via WebSocket |
+| Entraînement | Bot vs bot accéléré pour ML |
+
+---
+
+## Persistence
+
+### localStorage
+
+En mode standalone, tout est stocké localement :
+
+| Clé | Contenu |
+|-----|---------|
+| `player` | Profil utilisateur (pseudo) |
+| `preferences` | Préférences (son) |
+| `recent_games` | Historique jeux récents |
+| `scores_{game}` | Scores par jeu |
+| `progress_{game}` | Sauvegarde par jeu |
+
+---
+
+## Communication
+
+### Portal ↔ Game
+
+Communication par `postMessage` entre le portail et l'iframe du jeu :
+
+**Game → Portal** :
+- `ready` : Jeu chargé
+- `score` : Nouveau score
+- `quit` : Retour au catalogue
+
+**Portal → Game** :
+- `pause` / `resume` : Contrôle du jeu
+- `unload` : Préparation fermeture
+- `preference` : Changement de préférence
+
+> **Spec** : [portal/spec.md](../openspec/specs/portal/spec.md#communication-protocol)
+
+---
+
+## Références specs
+
+| Spec | Description |
+|------|-------------|
+| [platform](../openspec/specs/platform/spec.md) | Architecture, structure projet |
+| [catalogue](../openspec/specs/catalogue/spec.md) | Format JSON, script de build |
+| [seeded-random](../openspec/specs/seeded-random/spec.md) | PRNG déterministe |
+| [game-engine](../openspec/specs/game-engine/spec.md) | Interface moteur de jeu |
+| [bot](../openspec/specs/bot/spec.md) | Interface IA, slots joueurs |
+| [manifests](../openspec/specs/manifests/spec.md) | Formats tool.json, game.json |
+| [portal](../openspec/specs/portal/spec.md) | Interface utilisateur |
+| [gamekit](../openspec/specs/gamekit/spec.md) | SDK pour les jeux |

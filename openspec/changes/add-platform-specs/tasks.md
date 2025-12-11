@@ -62,19 +62,21 @@
 
 ## Phase 3 : Mise à jour documentation
 
-- [ ] Mettre à jour `docs/CONCEPTS.md`
+- [x] Mettre à jour `docs/CONCEPTS.md`
   - Ajouter références vers les specs
   - Ajouter concept de Catalogue
 
-- [ ] Mettre à jour `docs/FEATURES.md`
+- [x] Mettre à jour `docs/FEATURES.md`
   - Lier les features aux specs concernées
 
-- [ ] Mettre à jour `CLAUDE.md`
+- [x] Mettre à jour `CLAUDE.md`
   - Ajouter section références specs techniques
 
 ## Phase 4 : Validation
 
-- [ ] Relire toutes les specs pour cohérence
+- [x] Relire toutes les specs pour cohérence
+  - Corrigé : `dist/catalogue.json` → `data/catalogue.json` (catalogue, portal)
+  - Corrigé : `manifest.json` → `game.json` (gamekit)
 - [ ] Vérifier que les interfaces TypeScript compilent
 - [ ] S'assurer que les exemples sont fonctionnels
 

@@ -2,200 +2,151 @@
 
 Liste complète des fonctionnalités à implémenter, organisées par phase.
 
+> **Specs techniques** : Voir `openspec/specs/` pour les spécifications détaillées.
+
 ---
 
 ## Phase 1 : Catalogue statique (sans backend)
 
 ### F1. Tools (HTML standalone)
 
+> **Spec** : [manifests/spec.md](../openspec/specs/manifests/spec.md)
+
 - [ ] Structure `tools/` pour les outils
 - [ ] Premier tool exemple (JSON formatter ou autre)
 - [ ] Convention : un fichier HTML = un outil
-- [ ] Manifest optionnel (`tool.json`) pour métadonnées
+- [ ] Manifest `tool.json` pour métadonnées
 
-### F2. Catalogue statique
+### F2. Portail et catalogue
+
+> **Specs** : [portal/spec.md](../openspec/specs/portal/spec.md), [catalogue/spec.md](../openspec/specs/catalogue/spec.md)
 
 - [ ] Page d'accueil listant Tools + Games
-- [ ] Onglets ou filtres : [🔧 Outils] [🎮 Jeux]
-- [ ] Recherche par nom, tags
-- [ ] Chargement d'un tool/game (iframe ou lien)
-- [ ] Lecture des manifests pour afficher les métadonnées
+- [ ] Filtres par tags
+- [ ] Recherche par nom, description
+- [ ] Chargement en iframe sandboxé
+- [ ] Section "Joué récemment"
+- [ ] Script de build pour générer `data/catalogue.json`
 - [ ] 100% statique, déployable sur GitHub Pages
+
+### F3. Préférences utilisateur
+
+> **Spec** : [portal/spec.md](../openspec/specs/portal/spec.md)
+
+- [ ] Pseudo éditable
+- [ ] Son on/off
+- [ ] Persistence localStorage
+- [ ] Écran Settings
 
 ---
 
 ## Phase 2 : Games standalone
 
-### F3. Game Engine (isomorphe)
+### F4. Game Engine (isomorphe)
+
+> **Spec** : [game-engine/spec.md](../openspec/specs/game-engine/spec.md)
 
 - [ ] Interface `GameEngine` commune à tous les jeux
-- [ ] TypeScript pur, zéro dépendance I/O
+- [ ] TypeScript/JavaScript pur, zéro dépendance I/O
 - [ ] Tourne côté client ET serveur
 - [ ] État 100% sérialisable JSON
 - [ ] Fonctions pures et déterministes
-- [ ] Random seedé via `SeededRandom` injecté
-- [ ] `getValidActions()` pour lister les coups possibles (bots)
-- [ ] Vue par joueur (`getPlayerView`) pour fog of war
-- [ ] Vue spectateur (`getSpectatorView`)
+- [ ] Random seedé via `SeededRandom`
+- [ ] `getValidActions()` pour lister les coups (bots)
+- [ ] `getPlayerView()` pour fog of war
 
-### F4. Jeu exemple : Tic-Tac-Toe (tour par tour)
+### F5. SeededRandom
+
+> **Spec** : [seeded-random/spec.md](../openspec/specs/seeded-random/spec.md)
+
+- [ ] Implémentation Mulberry32
+- [ ] Méthodes : `random()`, `int()`, `pick()`, `shuffle()`, `chance()`
+- [ ] Clone et sérialisation de l'état
+
+### F6. GameKit SDK
+
+> **Spec** : [gamekit/spec.md](../openspec/specs/gamekit/spec.md)
+
+- [ ] `GameKit.init(name)`
+- [ ] Asset Loader (images, sons, JSON)
+- [ ] `saveScore()` / `getHighScores()`
+- [ ] `saveProgress()` / `loadProgress()`
+- [ ] Hooks : `onGamePause`, `onGameResume`, `onSoundChange`, `onGameDispose`
+- [ ] Communication postMessage avec le portail
+
+### F7. Bots (IA)
+
+> **Spec** : [bot/spec.md](../openspec/specs/bot/spec.md)
+
+- [ ] Interface `Bot` abstraite
+- [ ] Configuration slots joueurs (humain/bot/disabled)
+- [ ] Bot Random (par défaut)
+- [ ] Bot Greedy (heuristique)
+- [ ] Bot Minimax (optionnel, pour jeux 2 joueurs)
+- [ ] Game Runner pour orchestrer humains et bots
+- [ ] Déclaration des bots dans `game.json`
+
+### F8. Jeu exemple : Tic-Tac-Toe
 
 - [ ] Moteur isomorphe complet
 - [ ] Client UI standalone (grille cliquable)
-- [ ] Jouable en local (2 joueurs même écran)
-- [ ] Config : taille grille (3x3, 4x4, 5x5)
+- [ ] Jouable en solo (humain vs bot)
+- [ ] Jouable en hot-seat (2 humains)
+- [ ] 3 bots : Random, Blocker, Perfect
 - [ ] Tests unitaires moteur
 - [ ] Documentation règles
 
-### F5. Authentification (localStorage)
-
-- [ ] Inscription (pseudo + avatar prédéfini)
-- [ ] Connexion / Déconnexion
-- [ ] Profil persistant en localStorage
-- [ ] Liste d'avatars prédéfinis au choix
-
 ---
 
-## Phase 3 : Backend et multi-joueur
+## Phase 3 : Backend et multi-joueur (future)
 
-### F6. Backend API
+> Ces features seront développées dans une version ultérieure.
 
-- [ ] Serveur Node.js (dans Docker)
+### F9. Backend API
+
+- [ ] Serveur Node.js (Hono)
 - [ ] Auth : register, login, profil
-- [ ] Liste des jeux (depuis manifests)
-- [ ] Scores et leaderboard par jeu
+- [ ] Scores et leaderboard partagés
+- [ ] Persistence JSON files
 
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| `POST` | `/auth/register` | Créer un compte |
-| `POST` | `/auth/login` | Se connecter |
-| `GET` | `/auth/me` | Profil courant |
-| `GET` | `/games` | Liste des jeux |
-| `GET` | `/games/:id/leaderboard` | Scores d'un jeu |
+### F10. Communication WebSocket
 
-### F7. Lobby
+- [ ] Protocole temps réel
+- [ ] Sessions de jeu multi-joueurs
+- [ ] Gestion des tours et timeout
 
-- [ ] Liste globale des parties en attente
-- [ ] Filtrer les parties par jeu
-- [ ] Créer une partie (choix jeu + config)
-- [ ] Rejoindre une partie en attente
-- [ ] Rejoindre en tant que spectateur
-- [ ] Lancer en solo (si le jeu le permet)
+### F11. PlayLabSDK
 
-### F8. Communication WebSocket
-
-#### Client → Serveur
-
-| Message | Payload | Description |
-|---------|---------|-------------|
-| `action` | `{ action }` | Action de jeu |
-| `askPause` | `{ reason? }` | Demande de pause |
-| `acceptPause` | `{}` | Accepte la pause |
-| `rejectPause` | `{}` | Refuse la pause |
-| `resume` | `{}` | Reprendre |
-
-#### Serveur → Client
-
-| Message | Payload | Description |
-|---------|---------|-------------|
-| `state` | `{ state }` | État du jeu (vue joueur) |
-| `tick` | `{ tick, state, events }` | Tick temps réel |
-| `error` | `{ message }` | Action invalide |
-| `yourTurn` | `{ timeoutMs }` | C'est ton tour |
-| `turnTimeout` | `{ playerId }` | Timeout d'un joueur |
-| `pauseRequested` | `{ by, reason? }` | Demande de pause |
-| `paused` | `{}` | Partie en pause |
-| `resumed` | `{}` | Partie reprise |
-| `gameOver` | `{ winner, scores }` | Fin de partie |
-
-### F9. Gestion de partie
-
-- [ ] `askPause` / `acceptPause` / `rejectPause` / `resume`
-- [ ] État `paused` géré côté serveur
-- [ ] Timeout de pause configurable
-
-### F10. Gestion des tours (tour par tour)
-
-- [ ] `getCurrentPlayer()` - Qui doit jouer
-- [ ] Timer par tour côté serveur
-- [ ] Timeout configurable par jeu
-- [ ] Action automatique si timeout (skip/forfait/défaut)
-- [ ] Notification `yourTurn` au joueur concerné
-
-### F11. Temps réel
-
-- [ ] Game loop serveur avec tick rate configurable
-- [ ] Message `tick` avec état + events
-- [ ] Actions bufferisées et appliquées au prochain tick
+- [ ] `window.playlab` injecté par la plateforme
+- [ ] Détection auto standalone vs plateforme
+- [ ] Communication avec le backend
 
 ---
 
-## Phase 4 : Enrichissements
+## Phase 4 : Enrichissements (future)
 
-### F12. SDK Client (optionnel)
-
-```typescript
-interface PlayLabSDK {
-  // Contexte
-  getUser(): User | null;
-  getPlayers(): Player[];
-
-  // Jeu
-  sendAction(action: unknown): void;
-  onState(callback: (state: unknown) => void): void;
-  onYourTurn(callback: () => void): void;
-  onGameOver(callback: (result: GameResult) => void): void;
-
-  // Pause
-  askPause(reason?: string): void;
-  onPauseRequested(callback: (by: string) => void): void;
-}
-```
-
-### F13. Jeu exemple 2 : Snake (temps réel)
+### F12. Jeu exemple 2 : Snake (temps réel)
 
 - [ ] Moteur isomorphe avec tick
 - [ ] Client canvas
-- [ ] Config : taille terrain, vitesse, nb fruits
 - [ ] 1-4 joueurs
-- [ ] Tests unitaires moteur
+- [ ] Config : taille terrain, vitesse
 
-### F14. Bots
+### F13. Historique & Records
 
-- [ ] Interface `GameBot` commune
-- [ ] Exécution côté client (Web Worker)
-- [ ] Exécution côté serveur (Node.js)
-- [ ] Bots exemple fournis (random, greedy)
+- [ ] Stockage : seed, joueurs, actions, résultat
+- [ ] Replay déterministe
+- [ ] Export pour ML
 
-```typescript
-interface GameBot<TView, TAction> {
-  id: string;
-  name: string;
-  gameId: string;
+### F14. Entraînement accéléré
 
-  chooseAction(
-    view: TView,
-    validActions: TAction[],
-    context: BotContext
-  ): Promise<TAction>;
-}
-```
-
-### F15. Historique & Records
-
-- [ ] Stockage : seed, joueurs, toutes actions, résultat
-- [ ] Replay déterministe (grâce au seed)
-- [ ] Export JSON/CSV pour entraînement ML
-
-### F16. Entraînement accéléré
-
-- [ ] API `POST /training/run` (N parties bot vs bot)
-- [ ] Exécution sans délai réseau
-- [ ] Runner CLI pour entraînement local
+- [ ] API bot vs bot
+- [ ] Runner CLI
+- [ ] Datasets pour ML
 
 ---
 
-## Documentation (qualité cours)
+## Documentation
 
 ### Guides
 
@@ -205,21 +156,11 @@ interface GameBot<TView, TAction> {
 - [ ] Créer un client de jeu
 - [ ] Créer un bot
 
-### Références
-
-- [ ] Interface GameEngine
-- [ ] Interface GameBot
-- [ ] Format GameManifest / ToolManifest
-- [ ] API SDK client
-- [ ] API REST backend
-- [ ] Protocole WebSocket
-
 ### Templates
 
 - [ ] Template outil HTML
 - [ ] Template moteur tour par tour
 - [ ] Template moteur temps réel
-- [ ] Template client
 - [ ] Template bot
 
 ---
@@ -227,9 +168,24 @@ interface GameBot<TView, TAction> {
 ## Qualité code
 
 - [ ] Code commenté en français
-- [ ] Tests unitaires (moteurs, SDK, API)
+- [ ] Tests unitaires (moteurs, SDK)
 - [ ] ESLint strict configuré
 - [ ] Types TypeScript exhaustifs
 - [ ] Nommage explicite
 - [ ] README par module
 - [ ] Docker-first (tout containerisé)
+
+---
+
+## Références specs
+
+| Spec | Chemin |
+|------|--------|
+| Platform | [openspec/specs/platform/spec.md](../openspec/specs/platform/spec.md) |
+| Catalogue | [openspec/specs/catalogue/spec.md](../openspec/specs/catalogue/spec.md) |
+| SeededRandom | [openspec/specs/seeded-random/spec.md](../openspec/specs/seeded-random/spec.md) |
+| GameEngine | [openspec/specs/game-engine/spec.md](../openspec/specs/game-engine/spec.md) |
+| Bot | [openspec/specs/bot/spec.md](../openspec/specs/bot/spec.md) |
+| Manifests | [openspec/specs/manifests/spec.md](../openspec/specs/manifests/spec.md) |
+| Portal | [openspec/specs/portal/spec.md](../openspec/specs/portal/spec.md) |
+| GameKit | [openspec/specs/gamekit/spec.md](../openspec/specs/gamekit/spec.md) |

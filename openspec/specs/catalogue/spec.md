@@ -16,7 +16,7 @@ The system SHALL generate the catalogue at build time.
 
 #### Scenario: Output file
 - **WHEN** the build completes
-- **THEN** `dist/catalogue.json` contains all tools and games
+- **THEN** `data/catalogue.json` contains all tools and games
 
 ### Requirement: Manifest Validation
 
@@ -185,7 +185,7 @@ interface GameEntry {
 3. GENERATE catalogue
    - Créer l'objet Catalogue
    - Ajouter timestamp
-   - Écrire dist/catalogue.json
+   - Écrire data/catalogue.json
 
 4. REPORT
    - Afficher nombre de tools trouvés
@@ -219,7 +219,7 @@ npm run build:catalogue
 ```javascript
 // Dans le catalogue HTML
 async function loadCatalogue() {
-  const response = await fetch('dist/catalogue.json');
+  const response = await fetch('data/catalogue.json');
   const catalogue = await response.json();
 
   displayTools(catalogue.tools);
