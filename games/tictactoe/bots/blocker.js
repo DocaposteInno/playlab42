@@ -24,7 +24,7 @@ export class BlockerBot {
    * @param {string} playerId - ID du bot
    * @param {object} config - Configuration (contient symbols)
    */
-  onGameStart(playerId, config) {
+  onGameStart(playerId, _config) {
     this.#playerId = playerId;
   }
 
@@ -42,15 +42,15 @@ export class BlockerBot {
 
     // 1. Gagner si possible
     const winMove = this.#findWinningMove(board, this.#mySymbol, validActions);
-    if (winMove) return winMove;
+    if (winMove) {return winMove;}
 
     // 2. Bloquer l'adversaire
     const blockMove = this.#findWinningMove(board, this.#opponentSymbol, validActions);
-    if (blockMove) return blockMove;
+    if (blockMove) {return blockMove;}
 
     // 3. Prendre le centre si libre
     const centerAction = validActions.find((a) => a.position === 4);
-    if (centerAction) return centerAction;
+    if (centerAction) {return centerAction;}
 
     // 4. Prendre un coin si libre
     const corners = [0, 2, 6, 8];
@@ -80,7 +80,7 @@ export class BlockerBot {
       if (symbolCount === 2 && emptyCount === 1) {
         const emptyIndex = line.find((i) => board[i] === null);
         const action = validActions.find((a) => a.position === emptyIndex);
-        if (action) return action;
+        if (action) {return action;}
       }
     }
     return null;

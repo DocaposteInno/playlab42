@@ -7,8 +7,8 @@
  * @see openspec/specs/catalogue/spec.md
  */
 
-import { readdir, readFile, writeFile, access, stat } from 'fs/promises';
-import { join, basename, dirname } from 'path';
+import { readdir, readFile, writeFile, access } from 'fs/promises';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Obtenir le répertoire racine du projet
@@ -28,7 +28,7 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   cyan: '\x1b[36m',
-  dim: '\x1b[2m'
+  dim: '\x1b[2m',
 };
 
 /**
@@ -54,7 +54,7 @@ async function readJSON(path) {
   try {
     const content = await readFile(path, 'utf-8');
     return JSON.parse(content);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -65,7 +65,7 @@ async function readJSON(path) {
  * @param {string} filePath
  * @returns {{valid: boolean, errors: string[]}}
  */
-function validateToolManifest(manifest, filePath) {
+function validateToolManifest(manifest, _filePath) {
   const errors = [];
   const required = ['id', 'name', 'description', 'tags'];
 
@@ -92,7 +92,7 @@ function validateToolManifest(manifest, filePath) {
  * @param {string} filePath
  * @returns {{valid: boolean, errors: string[]}}
  */
-function validateGameManifest(manifest, filePath) {
+function validateGameManifest(manifest, _filePath) {
   const errors = [];
   const required = ['id', 'name', 'description', 'players', 'type', 'tags'];
 
@@ -177,7 +177,7 @@ async function scanTools() {
       path: `tools/${htmlFile}`,
       tags: manifest.tags || [],
       ...(manifest.author && { author: manifest.author }),
-      ...(manifest.icon && { icon: manifest.icon })
+      ...(manifest.icon && { icon: manifest.icon }),
     });
 
     console.log(`${colors.green}  ✓ ${manifest.name}${colors.reset}`);
@@ -241,7 +241,7 @@ async function scanGames() {
       tags: manifest.tags || [],
       type: manifest.type,
       ...(manifest.author && { author: manifest.author }),
-      ...(manifest.icon && { icon: manifest.icon })
+      ...(manifest.icon && { icon: manifest.icon }),
     });
 
     console.log(`${colors.green}  ✓ ${manifest.name}${colors.reset}`);
@@ -279,7 +279,7 @@ async function main() {
     version: '1.0',
     generatedAt: new Date().toISOString(),
     tools,
-    games
+    games,
   };
 
   // Écrire le fichier

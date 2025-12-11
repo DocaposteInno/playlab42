@@ -6,94 +6,94 @@ Liste complète des fonctionnalités à implémenter, organisées par phase.
 
 ---
 
-## Phase 1 : Catalogue statique (sans backend)
+## Phase 1 : Catalogue statique (sans backend) ✅
 
-### F1. Tools (HTML standalone)
+### F1. Tools (HTML standalone) ✅
 
 > **Spec** : [manifests/spec.md](../openspec/specs/manifests/spec.md)
 
-- [ ] Structure `tools/` pour les outils
-- [ ] Premier tool exemple (JSON formatter ou autre)
-- [ ] Convention : un fichier HTML = un outil
-- [ ] Manifest `tool.json` pour métadonnées
+- [x] Structure `tools/` pour les outils
+- [x] Premier tool exemple (JSON formatter)
+- [x] Convention : un fichier HTML = un outil
+- [x] Manifest `tool.json` pour métadonnées
 
-### F2. Portail et catalogue
+### F2. Portail et catalogue ✅
 
 > **Specs** : [portal/spec.md](../openspec/specs/portal/spec.md), [catalogue/spec.md](../openspec/specs/catalogue/spec.md)
 
-- [ ] Page d'accueil listant Tools + Games
-- [ ] Filtres par tags
-- [ ] Recherche par nom, description
-- [ ] Chargement en iframe sandboxé
-- [ ] Section "Joué récemment"
-- [ ] Script de build pour générer `data/catalogue.json`
-- [ ] 100% statique, déployable sur GitHub Pages
+- [x] Page d'accueil listant Tools + Games
+- [x] Filtres par tags
+- [x] Recherche par nom, description
+- [x] Chargement en iframe sandboxé
+- [x] Section "Joué récemment"
+- [x] Script de build pour générer `data/catalogue.json`
+- [x] 100% statique, déployable sur GitHub Pages
 
-### F3. Préférences utilisateur
+### F3. Préférences utilisateur ✅
 
 > **Spec** : [portal/spec.md](../openspec/specs/portal/spec.md)
 
-- [ ] Pseudo éditable
-- [ ] Son on/off
-- [ ] Persistence localStorage
-- [ ] Écran Settings
+- [x] Pseudo éditable
+- [x] Son on/off
+- [x] Persistence localStorage
+- [x] Écran Settings
 
 ---
 
-## Phase 2 : Games standalone
+## Phase 2 : Games standalone ✅
 
-### F4. Game Engine (isomorphe)
+### F4. Game Engine (isomorphe) ✅
 
 > **Spec** : [game-engine/spec.md](../openspec/specs/game-engine/spec.md)
 
-- [ ] Interface `GameEngine` commune à tous les jeux
-- [ ] TypeScript/JavaScript pur, zéro dépendance I/O
-- [ ] Tourne côté client ET serveur
-- [ ] État 100% sérialisable JSON
-- [ ] Fonctions pures et déterministes
-- [ ] Random seedé via `SeededRandom`
-- [ ] `getValidActions()` pour lister les coups (bots)
-- [ ] `getPlayerView()` pour fog of war
+- [x] Interface `GameEngine` commune à tous les jeux
+- [x] TypeScript/JavaScript pur, zéro dépendance I/O
+- [x] Tourne côté client ET serveur
+- [x] État 100% sérialisable JSON
+- [x] Fonctions pures et déterministes
+- [x] Random seedé via `SeededRandom`
+- [x] `getValidActions()` pour lister les coups (bots)
+- [x] `getPlayerView()` pour fog of war
 
-### F5. SeededRandom
+### F5. SeededRandom ✅
 
 > **Spec** : [seeded-random/spec.md](../openspec/specs/seeded-random/spec.md)
 
-- [ ] Implémentation Mulberry32
-- [ ] Méthodes : `random()`, `int()`, `pick()`, `shuffle()`, `chance()`
-- [ ] Clone et sérialisation de l'état
+- [x] Implémentation Mulberry32
+- [x] Méthodes : `random()`, `int()`, `pick()`, `shuffle()`, `chance()`
+- [x] Clone et sérialisation de l'état
 
-### F6. GameKit SDK
+### F6. GameKit SDK ✅
 
 > **Spec** : [gamekit/spec.md](../openspec/specs/gamekit/spec.md)
 
-- [ ] `GameKit.init(name)`
-- [ ] Asset Loader (images, sons, JSON)
-- [ ] `saveScore()` / `getHighScores()`
-- [ ] `saveProgress()` / `loadProgress()`
-- [ ] Hooks : `onGamePause`, `onGameResume`, `onSoundChange`, `onGameDispose`
-- [ ] Communication postMessage avec le portail
+- [x] `GameKit.init(name)`
+- [x] Asset Loader (images, sons, JSON)
+- [x] `saveScore()` / `getHighScores()`
+- [x] `saveProgress()` / `loadProgress()`
+- [x] Hooks : `onGamePause`, `onGameResume`, `onSoundChange`, `onGameDispose`
+- [x] Communication postMessage avec le portail
 
-### F7. Bots (IA)
+### F7. Bots (IA) ✅
 
 > **Spec** : [bot/spec.md](../openspec/specs/bot/spec.md)
 
-- [ ] Interface `Bot` abstraite
-- [ ] Configuration slots joueurs (humain/bot/disabled)
-- [ ] Bot Random (par défaut)
-- [ ] Bot Greedy (heuristique)
-- [ ] Bot Minimax (optionnel, pour jeux 2 joueurs)
-- [ ] Game Runner pour orchestrer humains et bots
-- [ ] Déclaration des bots dans `game.json`
+- [x] Interface `Bot` abstraite
+- [x] Configuration slots joueurs (humain/bot/disabled)
+- [x] Bot Random (par défaut)
+- [x] Bot Greedy (heuristique) → Blocker
+- [x] Bot Minimax (pour jeux 2 joueurs) → Perfect
+- [x] Game Runner pour orchestrer humains et bots
+- [x] Déclaration des bots dans `game.json`
 
-### F8. Jeu exemple : Tic-Tac-Toe
+### F8. Jeu exemple : Tic-Tac-Toe ✅
 
-- [ ] Moteur isomorphe complet
-- [ ] Client UI standalone (grille cliquable)
-- [ ] Jouable en solo (humain vs bot)
-- [ ] Jouable en hot-seat (2 humains)
-- [ ] 3 bots : Random, Blocker, Perfect
-- [ ] Tests unitaires moteur
+- [x] Moteur isomorphe complet
+- [x] Client UI standalone (grille cliquable)
+- [x] Jouable en solo (humain vs bot)
+- [x] Jouable en hot-seat (2 humains)
+- [x] 3 bots : Random, Blocker, Perfect
+- [x] Tests unitaires moteur
 - [ ] Documentation règles
 
 ---
@@ -167,13 +167,13 @@ Liste complète des fonctionnalités à implémenter, organisées par phase.
 
 ## Qualité code
 
-- [ ] Code commenté en français
-- [ ] Tests unitaires (moteurs, SDK)
-- [ ] ESLint strict configuré
+- [x] Code commenté en français
+- [x] Tests unitaires (moteurs, SDK)
+- [x] ESLint strict configuré
 - [ ] Types TypeScript exhaustifs
-- [ ] Nommage explicite
+- [x] Nommage explicite
 - [ ] README par module
-- [ ] Docker-first (tout containerisé)
+- [x] Docker-first (tout containerisé)
 
 ---
 

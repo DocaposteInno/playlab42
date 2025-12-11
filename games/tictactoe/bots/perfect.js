@@ -5,13 +5,6 @@
 
 import { TicTacToeEngine } from '../engine.js';
 
-// Lignes gagnantes
-const LINES = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
-];
-
 export class PerfectBot {
   name = 'Perfect';
   description = 'Ne perd jamais (Minimax)';
@@ -85,7 +78,7 @@ export class PerfectBot {
         const score = this.#minimax(newState, depth + 1, false, alpha, beta);
         maxScore = Math.max(maxScore, score);
         alpha = Math.max(alpha, score);
-        if (beta <= alpha) break; // Élagage
+        if (beta <= alpha) {break;} // Élagage
       }
       return maxScore;
     } else {
@@ -95,7 +88,7 @@ export class PerfectBot {
         const score = this.#minimax(newState, depth + 1, true, alpha, beta);
         minScore = Math.min(minScore, score);
         beta = Math.min(beta, score);
-        if (beta <= alpha) break; // Élagage
+        if (beta <= alpha) {break;} // Élagage
       }
       return minScore;
     }

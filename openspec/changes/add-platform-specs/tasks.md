@@ -77,8 +77,13 @@
 - [x] Relire toutes les specs pour cohérence
   - Corrigé : `dist/catalogue.json` → `data/catalogue.json` (catalogue, portal)
   - Corrigé : `manifest.json` → `game.json` (gamekit)
-- [ ] Vérifier que les interfaces TypeScript compilent
-- [ ] S'assurer que les exemples sont fonctionnels
+- [x] Vérifier que les interfaces TypeScript compilent
+  - Note : Implémenté en JavaScript ES modules (pas TypeScript pour l'instant)
+  - ESLint strict configuré et passant
+- [x] S'assurer que les exemples sont fonctionnels
+  - SeededRandom : 21 tests unitaires passent
+  - TicTacToeEngine : 29 tests unitaires passent
+  - Portail, Tools et Games fonctionnels
 
 ## Specs reportées (version avec backend)
 

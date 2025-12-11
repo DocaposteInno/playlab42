@@ -91,7 +91,7 @@ export class TicTacToeEngine {
       newState.gameOver = true;
       // Trouver le playerId correspondant au symbole gagnant
       const winnerId = Object.entries(state.symbols).find(
-        ([, sym]) => sym === winner
+        ([, sym]) => sym === winner,
       )?.[0];
       newState.winners = winnerId ? [winnerId] : null;
     } else if (newBoard.every((cell) => cell !== null)) {
