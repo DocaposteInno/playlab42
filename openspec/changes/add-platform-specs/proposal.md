@@ -66,6 +66,23 @@ Créer les spécifications techniques fondamentales dans `openspec/specs/` :
 - Game Runner pour orchestrer humains et bots
 - Bots par défaut en mode solo
 
+### 7. `portal.spec.md` - Interface du portail
+
+- Écrans (catalogue, jeu, settings)
+- Filtrage et recherche
+- Game Loader (iframe sandboxé)
+- Communication iframe ↔ portail
+- Gestion des préférences (son, pseudo)
+- Historique des jeux récents
+
+### 8. `gamekit.spec.md` - SDK pour les jeux
+
+- API GameKit (init, scores, progression)
+- Asset Loader (images, sons, JSON)
+- Hooks de cycle de vie (pause, resume, dispose)
+- Communication avec le portail
+- Template de jeu minimal
+
 ### Specs reportées (version future avec backend)
 
 Les specs suivantes seront créées quand le backend sera implémenté :
@@ -85,6 +102,8 @@ Les specs suivantes seront créées quand le backend sera implémenté :
 | `manifests.spec.md` | Formats game.json, tool.json |
 | `seeded-random.spec.md` | Générateur aléatoire |
 | `bot.spec.md` | Interface Bot (IA) et configuration slots |
+| `portal.spec.md` | Interface utilisateur du portail |
+| `gamekit.spec.md` | SDK pour les jeux |
 
 ### Specs reportées
 

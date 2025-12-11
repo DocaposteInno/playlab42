@@ -158,6 +158,28 @@ interface GameManifest {
 
   /** Configuration par défaut (optionnel) */
   defaultConfig?: Record<string, unknown>;
+
+  /** Type de contrôle (optionnel) */
+  controls?: "keyboard" | "mouse" | "touch" | "gamepad";
+
+  /** Orientation préférée (optionnel) */
+  orientation?: "any" | "portrait" | "landscape";
+
+  /** Dimensions minimales (optionnel) */
+  minWidth?: number;
+  minHeight?: number;
+
+  /** Configuration des bots (optionnel) */
+  bots?: {
+    /** Bot par défaut */
+    default: string;
+    /** Liste des bots disponibles */
+    available: Array<{
+      name: string;
+      file: string;
+      difficulty: "easy" | "medium" | "hard" | "expert";
+    }>;
+  };
 }
 ```
 
@@ -178,6 +200,13 @@ interface GameManifest {
 | `version` | string | ❌ | Version semver |
 | `engine` | string | ❌ | Chemin vers le moteur (défaut: engine.ts) |
 | `defaultConfig` | object | ❌ | Configuration par défaut |
+| `controls` | string | ❌ | Type de contrôle (keyboard, mouse, touch, gamepad) |
+| `orientation` | string | ❌ | Orientation préférée (any, portrait, landscape) |
+| `minWidth` | number | ❌ | Largeur minimale en pixels |
+| `minHeight` | number | ❌ | Hauteur minimale en pixels |
+| `bots` | object | ❌ | Configuration des bots IA |
+| `bots.default` | string | ❌ | Nom du bot par défaut |
+| `bots.available` | array | ❌ | Liste des bots disponibles |
 
 ### Exemple
 
@@ -197,9 +226,21 @@ Fichier : `games/tictactoe/game.json`
   "author": "Cyrille",
   "icon": "⭕",
   "version": "1.0.0",
+  "controls": "mouse",
+  "orientation": "any",
+  "minWidth": 320,
+  "minHeight": 320,
   "defaultConfig": {
     "boardSize": 3,
     "turnTimeout": 30000
+  },
+  "bots": {
+    "default": "Random",
+    "available": [
+      { "name": "Random", "file": "bots/random.js", "difficulty": "easy" },
+      { "name": "Blocker", "file": "bots/blocker.js", "difficulty": "medium" },
+      { "name": "Perfect", "file": "bots/perfect.js", "difficulty": "expert" }
+    ]
   }
 }
 ```
@@ -210,13 +251,20 @@ Fichier : `games/tictactoe/game.json`
 games/
 ├── tictactoe/
 │   ├── index.html       # Point d'entrée standalone
-│   ├── engine.ts        # Moteur de jeu
+│   ├── game.js          # Code du jeu
+│   ├── engine.ts        # Moteur de jeu (optionnel)
 │   ├── game.json        # Manifest
+│   ├── thumb.png        # Vignette (200x200, < 50KB)
+│   ├── bots/            # Bots IA
+│   │   ├── random.js
+│   │   ├── blocker.js
+│   │   └── perfect.js
 │   └── README.md        # Règles du jeu
 ├── snake/
 │   ├── index.html
-│   ├── engine.ts
+│   ├── game.js
 │   ├── game.json
+│   ├── thumb.png
 │   └── README.md
 └── wip-game/            # Pas de game.json = pas dans le catalogue
     └── index.html

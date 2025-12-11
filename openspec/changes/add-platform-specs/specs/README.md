@@ -16,6 +16,8 @@ Cette proposal crée les spécifications techniques fondamentales du projet (ver
 | GameEngine | `openspec/specs/game-engine/spec.md` | Interface moteur de jeu |
 | Bot | `openspec/specs/bot/spec.md` | Interface Bot (IA) et configuration slots |
 | Manifests | `openspec/specs/manifests/spec.md` | Formats tool.json, game.json |
+| Portal | `openspec/specs/portal/spec.md` | Interface utilisateur du portail |
+| GameKit | `openspec/specs/gamekit/spec.md` | SDK pour les jeux |
 
 ## Specs reportées (version avec backend)
 

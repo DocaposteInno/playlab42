@@ -60,22 +60,35 @@ The system SHALL use Docker for all development tools.
 
 ```
 playlab42/
+├── index.html                # Portail principal
+├── style.css                 # Styles du portail
+├── app.js                    # Logique du portail
+├── assets/                   # Assets du portail
+│   └── default-thumb.png     # Vignette par défaut
+├── lib/                      # Bibliothèques partagées
+│   ├── gamekit.js            # SDK pour les jeux
+│   ├── assets.js             # Loader d'assets
+│   └── seeded-random.js      # PRNG déterministe
 ├── tools/                    # Outils HTML standalone
 │   ├── [tool-name].html      # Un fichier = un outil
-│   └── [tool-name].json      # Manifest (optionnel)
+│   └── [tool-name].json      # Manifest
 ├── games/                    # Jeux autonomes
 │   └── [game-id]/
 │       ├── index.html        # Point d'entrée standalone
+│       ├── game.js           # Code du jeu
+│       ├── game.json         # Manifest
+│       ├── thumb.png         # Vignette (200x200)
 │       ├── engine.ts         # Moteur isomorphe (optionnel)
-│       └── game.json         # Manifest
+│       └── bots/             # Bots IA (optionnel)
+│           └── random.js
+├── data/                     # Données générées
+│   └── catalogue.json        # DB des tools/games
 ├── src/
-│   ├── core/                 # Code partagé
+│   ├── core/                 # Code partagé (TypeScript)
 │   │   ├── types/            # Interfaces communes
-│   │   └── utils/            # SeededRandom, helpers
+│   │   └── utils/            # Helpers
 │   └── scripts/              # Scripts de build
 │       └── build-catalogue.ts
-├── dist/                     # Fichiers générés
-│   └── catalogue.json        # DB des tools/games
 ├── docs/                     # Documentation
 ├── openspec/                 # Specs et proposals
 ├── Dockerfile
@@ -109,7 +122,7 @@ Le script `build-catalogue.ts` :
 1. Scanne `tools/` pour les fichiers `*.json` (manifests)
 2. Scanne `games/*/` pour les fichiers `game.json`
 3. Valide les manifests
-4. Génère `dist/catalogue.json`
+4. Génère `data/catalogue.json`
 
 ```bash
 # Exécution
@@ -117,6 +130,17 @@ make build:catalogue
 # ou
 npm run build:catalogue
 ```
+
+## Hébergement
+
+Le portail peut être hébergé sur :
+
+- **GitHub Pages** : Gratuit, intégration Git native
+- **Netlify** : Gratuit, déploiement auto
+- **S3 + CloudFront** : Scalable, payant
+- **Serveur statique** : nginx, Apache, serve
+
+Aucun backend requis - tout est statique.
 
 ## Mode d'Exécution
 
@@ -164,3 +188,10 @@ npm run build:catalogue
 | Catalogue statique | API REST |
 | Solo uniquement | Multijoueur WebSocket |
 | Pas d'auth | Authentification |
+
+## See Also
+
+- [Portal Specification](../portal/spec.md) - Interface utilisateur du portail
+- [GameKit Specification](../gamekit/spec.md) - SDK pour les jeux
+- [Catalogue Specification](../catalogue/spec.md) - Format du catalogue JSON
+- [Manifests Specification](../manifests/spec.md) - Formats des manifests

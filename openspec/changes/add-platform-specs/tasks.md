@@ -6,44 +6,59 @@
 
 ## Phase 1 : Specs fondamentales
 
-- [ ] Créer `openspec/specs/platform/spec.md`
+- [x] Créer `openspec/specs/platform/spec.md`
   - Architecture globale (standalone)
   - Stack technique justifié
   - Structure des dossiers
   - Système de build
 
-- [ ] Créer `openspec/specs/catalogue/spec.md`
+- [x] Créer `openspec/specs/catalogue/spec.md`
   - Format du fichier `catalogue.json`
   - Structure des entrées (tools et games)
   - Script de génération (scan des manifests)
   - Utilisation par le frontend
 
-- [ ] Créer `openspec/specs/seeded-random/spec.md`
+- [x] Créer `openspec/specs/seeded-random/spec.md`
   - Interface SeededRandom
   - Algorithme (Mulberry32 ou autre)
   - Exemples d'utilisation
 
 ## Phase 2 : Specs des composants
 
-- [ ] Créer `openspec/specs/game-engine/spec.md`
+- [x] Créer `openspec/specs/game-engine/spec.md`
   - Interface GameEngine<TState, TAction, TPlayerView, TConfig>
   - Contraintes (isomorphisme, pureté, déterminisme)
   - Gestion des tours (tour par tour)
   - Gestion des ticks (temps réel)
   - Méthodes obligatoires vs optionnelles
 
-- [ ] Créer `openspec/specs/bot/spec.md`
+- [x] Créer `openspec/specs/bot/spec.md`
   - Interface Bot abstraite (isomorphe client/serveur)
   - Configuration slots joueurs (humain/bot/disabled)
   - Types de bots (Random, Greedy, Minimax)
   - Game Runner pour orchestrer la partie
   - Bots par défaut en mode solo
 
-- [ ] Créer `openspec/specs/manifests/spec.md`
+- [x] Créer `openspec/specs/manifests/spec.md`
   - Interface ToolManifest
-  - Interface GameManifest
+  - Interface GameManifest (+ controls, orientation, bots)
   - Schémas JSON (validation)
   - Exemples complets
+
+## Phase 2b : Specs interface utilisateur
+
+- [x] Créer `openspec/specs/portal/spec.md`
+  - Écrans (catalogue, jeu, settings)
+  - Game Loader (iframe sandboxé)
+  - Filtrage et recherche
+  - Communication iframe ↔ portail
+  - Préférences utilisateur
+
+- [x] Créer `openspec/specs/gamekit/spec.md`
+  - API GameKit (init, scores, progression)
+  - Asset Loader (images, sons, JSON)
+  - Hooks de cycle de vie
+  - Template de jeu minimal
 
 ## Phase 3 : Mise à jour documentation
 
