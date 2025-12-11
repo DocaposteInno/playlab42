@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlab42</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Playlab42</h1>
+    <nav>
+      <button class="btn-settings" id="btn-settings" aria-label="Paramètres">⚙</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- Vue Catalogue -->
+    <section id="view-catalogue" class="view active">
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="Rechercher..." aria-label="Rechercher">
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter active" data-tag="">Tous</button>
+      </div>
+
+      <section class="category" id="section-games">
+        <h2>Jeux</h2>
+        <div class="cards" id="cards-games"></div>
+        <p class="empty-message" id="empty-games">Aucun jeu disponible</p>
+      </section>
+
+      <section class="category" id="section-tools">
+        <h2>Outils</h2>
+        <div class="cards" id="cards-tools"></div>
+        <p class="empty-message" id="empty-tools">Aucun outil disponible</p>
+      </section>
+
+      <section class="category" id="section-recent">
+        <h2>Joué récemment</h2>
+        <div class="cards" id="cards-recent"></div>
+      </section>
+    </section>
+
+    <!-- Vue Jeu/Outil (iframe) -->
+    <section id="view-game" class="view">
+      <div class="game-header">
+        <button class="btn-back" id="btn-back" aria-label="Retour">✕</button>
+        <span class="game-title" id="game-title"></span>
+        <div class="game-controls">
+          <button class="btn-fullscreen" id="btn-fullscreen" aria-label="Plein écran">⛶</button>
+          <button class="btn-sound" id="btn-sound" aria-label="Son">🔊</button>
+        </div>
+      </div>
+      <div class="game-container">
+        <iframe id="game-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Chargement...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vue Settings -->
+    <section id="view-settings" class="view">
+      <div class="settings-header">
+        <button class="btn-back" id="btn-close-settings" aria-label="Fermer">✕</button>
+        <h2>Paramètres</h2>
+      </div>
+      <div class="settings-content">
+        <div class="setting">
+          <label for="input-pseudo">Pseudo</label>
+          <input type="text" id="input-pseudo" placeholder="Anonyme" maxlength="20">
+        </div>
+        <div class="setting">
+          <label>Son</label>
+          <div class="toggle-group">
+            <button class="toggle active" id="sound-on" data-value="true">ON</button>
+            <button class="toggle" id="sound-off" data-value="false">OFF</button>
+          </div>
+        </div>
+        <hr>
+        <button class="btn-danger" id="btn-clear-data">🗑 Effacer mes données</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Playlab42</span>
+    <span class="version">v0.1.0</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
