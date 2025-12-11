@@ -17,13 +17,14 @@ help:
 	@echo "  make shell    - Shell dans le container dev"
 	@echo ""
 	@echo "Développement:"
-	@echo "  make install      - Installer les dépendances npm"
-	@echo "  make npm CMD=...  - Commande npm (ex: make npm CMD=\"install lodash\")"
-	@echo "  make dev          - Serveur de développement"
-	@echo "  make serve        - Serveur statique (pour tools/games)"
-	@echo "  make test         - Lancer les tests"
-	@echo "  make lint         - Vérifier le code"
-	@echo "  make build-ts     - Compiler TypeScript"
+	@echo "  make install         - Installer les dépendances npm"
+	@echo "  make npm CMD=...     - Commande npm (ex: make npm CMD=\"install lodash\")"
+	@echo "  make serve           - Serveur statique (interactif)"
+	@echo "  make serve-bg        - Serveur statique (arrière-plan)"
+	@echo "  make serve-stop      - Arrêter le serveur"
+	@echo "  make build-catalogue - Générer data/catalogue.json"
+	@echo "  make test            - Lancer les tests"
+	@echo "  make lint            - Vérifier le code"
 	@echo ""
 	@echo "Claude Code:"
 	@echo "  make claude   - Lancer Claude Code"
@@ -63,10 +64,6 @@ install:
 npm:
 	docker compose exec dev npm $(CMD)
 
-# Serveur de développement
-dev:
-	docker compose exec dev npm run dev
-
 test:
 	docker compose exec dev npm test
 
@@ -79,12 +76,22 @@ lint:
 lint-fix:
 	docker compose exec dev npm run lint:fix
 
-build-ts:
-	docker compose exec dev npm run build
-
-# Serveur statique pour tester tools/games
+# Serveur statique pour tester tools/games (mode interactif)
 serve:
-	docker compose exec dev npx serve . -p 5242
+	docker compose exec dev npm run serve
+
+# Serveur statique en arrière-plan
+serve-bg:
+	docker compose exec -d dev npm run serve
+	@echo "Serveur démarré sur http://localhost:5242"
+
+# Arrêter le serveur en arrière-plan
+serve-stop:
+	docker compose exec dev pkill -f "serve" || true
+
+# Build du catalogue
+build-catalogue:
+	docker compose exec dev npm run build:catalogue
 
 # === Claude Code ===
 

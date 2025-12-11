@@ -10,7 +10,6 @@ services:
     working_dir: /workspace
     ports:
       - "5242:5242"      # Application
-      - "9229:9229"      # Debugger Node.js
     environment:
       - NODE_ENV=development
     command: tail -f /dev/null

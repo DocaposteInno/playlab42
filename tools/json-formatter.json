@@ -1,0 +1,9 @@
+{
+  "id": "json-formatter",
+  "name": "JSON Formatter",
+  "description": "Formate, valide et minifie du JSON avec coloration syntaxique",
+  "tags": ["dev", "utility", "json"],
+  "author": "Cyrille",
+  "icon": "📋",
+  "version": "1.0.0"
+}

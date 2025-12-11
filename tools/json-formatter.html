@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter - Playlab42</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg-secondary: #16213e;
+      --text: #eee;
+      --text-muted: #888;
+      --accent: #e94560;
+      --accent-hover: #ff6b6b;
+      --success: #4ade80;
+      --error: #ef4444;
+      --border: #333;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    button.secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+      background: var(--border);
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .status {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    .status.valid {
+      background: rgba(74, 222, 128, 0.1);
+      color: var(--success);
+    }
+
+    .status.invalid {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+
+    textarea {
+      flex: 1;
+      padding: 1rem;
+      background: var(--bg);
+      border: none;
+      color: var(--text);
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .output {
+      flex: 1;
+      padding: 1rem;
+      overflow: auto;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .output.error {
+      color: var(--error);
+    }
+
+    /* Syntaxe highlighting basique */
+    .string { color: #a8db8f; }
+    .number { color: #f4b752; }
+    .boolean { color: #da70d6; }
+    .null { color: #888; }
+    .key { color: #88c8ff; }
+
+    footer {
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span>📋</span> JSON Formatter</h1>
+    <div class="actions">
+      <button class="secondary" id="btn-minify">Minifier</button>
+      <button class="secondary" id="btn-copy">Copier</button>
+      <button class="primary" id="btn-format">Formater</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Entrée</h2>
+        <span class="status" id="status"></span>
+      </div>
+      <textarea
+        id="input"
+        placeholder="Collez votre JSON ici..."
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Sortie</h2>
+        <span id="size"></span>
+      </div>
+      <div class="output" id="output"></div>
+    </div>
+  </main>
+
+  <footer>
+    <span>Playlab42 - JSON Formatter</span>
+    <span><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> pour formater</span>
+  </footer>
+
+  <script>
+    // Éléments DOM
+    const inputEl = document.getElementById('input');
+    const outputEl = document.getElementById('output');
+    const statusEl = document.getElementById('status');
+    const sizeEl = document.getElementById('size');
+    const btnFormat = document.getElementById('btn-format');
+    const btnMinify = document.getElementById('btn-minify');
+    const btnCopy = document.getElementById('btn-copy');
+
+    // État
+    let lastValidJSON = null;
+    let indentSize = 2;
+
+    /**
+     * Applique la coloration syntaxique au JSON
+     */
+    function highlightJSON(json) {
+      return json
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, '<span class="key">"$1"</span>:')
+        .replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="string">"$1"</span>')
+        .replace(/\b(-?\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+        .replace(/\b(true|false)\b/g, '<span class="boolean">$1</span>')
+        .replace(/\bnull\b/g, '<span class="null">null</span>');
+    }
+
+    /**
+     * Formate le JSON avec indentation
+     */
+    function formatJSON() {
+      const input = inputEl.value.trim();
+
+      if (!input) {
+        outputEl.innerHTML = '';
+        statusEl.textContent = '';
+        statusEl.className = 'status';
+        sizeEl.textContent = '';
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(input);
+        lastValidJSON = parsed;
+        const formatted = JSON.stringify(parsed, null, indentSize);
+
+        outputEl.innerHTML = highlightJSON(formatted);
+        outputEl.classList.remove('error');
+
+        statusEl.textContent = 'Valide ✓';
+        statusEl.className = 'status valid';
+
+        const bytes = new Blob([formatted]).size;
+        sizeEl.textContent = formatBytes(bytes);
+      } catch (e) {
+        outputEl.textContent = `Erreur de syntaxe:\n${e.message}`;
+        outputEl.classList.add('error');
+
+        statusEl.textContent = 'Invalide ✗';
+        statusEl.className = 'status invalid';
+        sizeEl.textContent = '';
+      }
+    }
+
+    /**
+     * Minifie le JSON
+     */
+    function minifyJSON() {
+      if (!lastValidJSON) {
+        formatJSON(); // Essayer de parser d'abord
+        if (!lastValidJSON) return;
+      }
+
+      const minified = JSON.stringify(lastValidJSON);
+      outputEl.innerHTML = highlightJSON(minified);
+      outputEl.classList.remove('error');
+
+      const bytes = new Blob([minified]).size;
+      sizeEl.textContent = formatBytes(bytes);
+    }
+
+    /**
+     * Copie le résultat dans le presse-papiers
+     */
+    async function copyOutput() {
+      const text = outputEl.textContent;
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        const originalText = btnCopy.textContent;
+        btnCopy.textContent = 'Copié !';
+        setTimeout(() => {
+          btnCopy.textContent = originalText;
+        }, 1500);
+      } catch (e) {
+        console.error('Copy failed:', e);
+      }
+    }
+
+    /**
+     * Formate une taille en bytes
+     */
+    function formatBytes(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    // Event listeners
+    btnFormat.addEventListener('click', formatJSON);
+    btnMinify.addEventListener('click', minifyJSON);
+    btnCopy.addEventListener('click', copyOutput);
+
+    // Auto-format au fur et à mesure (débounce)
+    let debounceTimer;
+    inputEl.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(formatJSON, 300);
+    });
+
+    // Raccourci clavier Ctrl+Enter
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        formatJSON();
+      }
+    });
+
+    // Charger depuis l'URL si présent
+    const urlParams = new URLSearchParams(window.location.search);
+    const jsonParam = urlParams.get('json');
+    if (jsonParam) {
+      try {
+        inputEl.value = decodeURIComponent(jsonParam);
+        formatJSON();
+      } catch (e) {
+        console.error('Failed to load JSON from URL:', e);
+      }
+    }
+
+    // Focus initial
+    inputEl.focus();
+  </script>
+</body>
+</html>
