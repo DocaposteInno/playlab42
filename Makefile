@@ -24,6 +24,7 @@ help:
 	@echo "  make serve-stop      - Arrêter le serveur"
 	@echo "  make build-catalogue - Générer data/catalogue.json"
 	@echo "  make build-parcours  - Générer data/parcours.json"
+	@echo "  make build-bookmarks - Générer data/bookmarks.json"
 	@echo "  make test            - Lancer les tests"
 	@echo "  make lint            - Vérifier le code"
 	@echo ""
@@ -97,6 +98,10 @@ build-catalogue:
 # Build du catalogue parcours
 build-parcours:
 	docker compose exec dev npm run build:parcours
+
+# Build du catalogue bookmarks
+build-bookmarks:
+	docker compose exec dev npm run build:bookmarks
 
 # === Claude Code ===
 

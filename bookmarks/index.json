@@ -1,0 +1,8 @@
+{
+  "categories": [
+    { "id": "llm-ia", "label": "LLM & IA", "icon": "🤖", "order": 1 },
+    { "id": "developpement", "label": "Développement", "icon": "🛠️", "order": 2 },
+    { "id": "documentation", "label": "Documentation", "icon": "📚", "order": 3 },
+    { "id": "modules", "label": "Depuis les modules", "icon": "📦", "order": 99 }
+  ]
+}
