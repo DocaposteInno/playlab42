@@ -17,29 +17,29 @@
 
 ## Phase 2: Tests unitaires
 
-### build-parcours.js
+### build-parcours.js → parcours-utils.js
 
-- [ ] Setup jest pour scripts/
-- [ ] Test `readJSON()`
-- [ ] Test `validateEpic()`
-- [ ] Test `extractSlideIds()`
-- [ ] Test `countSlides()`
-- [ ] Test `buildStructure()`
-- [ ] Test `buildHierarchy()` avec threshold
-- [ ] Test `aggregateTags()`
-- [ ] Test `buildFeatured()`
-- [ ] Test intégration (génération complète)
+- [x] Setup jest pour scripts/ → refactoring en module `parcours-utils.js`
+- [x] Test `extractSlideIds()`
+- [x] Test `countSlides()`
+- [x] Test `buildStructure()`
+- [x] Test `buildHierarchy()` avec threshold
+- [x] Test `aggregateTags()`
+- [x] Test `buildFeatured()`
+- [x] Test `validateEpicFields()`
+- [x] Test `convertMarkdown()` et `injectInTemplate()`
+- [ ] Test intégration (génération complète) - Optionnel
 
 ### parcours-viewer.js
 
-- [ ] Setup jest-dom pour tests browser
-- [ ] Test `flattenStructure()`
-- [ ] Test `showSlide()`
-- [ ] Test `prev()` / `next()` / `goTo()`
-- [ ] Test `toggleMenu()`
-- [ ] Test `loadProgress()` / `saveProgress()`
-- [ ] Test `handleKeydown()`
-- [ ] Test `handleHashRoute()`
+- [x] Test `flattenStructure()` - fonction pure sans DOM
+- [ ] Tests DOM (reportés) - nécessite jest-dom
+  - [ ] Test `showSlide()`
+  - [ ] Test `prev()` / `next()` / `goTo()`
+  - [ ] Test `toggleMenu()`
+  - [ ] Test `loadProgress()` / `saveProgress()`
+  - [ ] Test `handleKeydown()`
+  - [ ] Test `handleHashRoute()`
 
 ## Phase 3: Documentation
 
