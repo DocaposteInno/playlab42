@@ -6,6 +6,7 @@
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, dirname } from 'path';
+import { marked } from 'marked';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -14,12 +15,20 @@ const PARCOURS_DIR = join(ROOT, 'parcours');
 const EPICS_DIR = join(PARCOURS_DIR, 'epics');
 const OUTPUT_FILE = join(ROOT, 'data', 'parcours.json');
 const CONFIG_FILE = join(PARCOURS_DIR, 'index.json');
+const SLIDE_TEMPLATE_FILE = join(PARCOURS_DIR, '_shared', 'slide-template.html');
+
+// Configuration de marked pour GitHub Flavored Markdown
+marked.setOptions({
+  gfm: true,
+  breaks: false
+});
 
 // Statistiques
 const stats = {
   found: 0,
   published: 0,
   drafts: 0,
+  markdownConverted: 0,
   errors: [],
   warnings: []
 };
@@ -37,9 +46,58 @@ function readJSON(path) {
 }
 
 /**
- * Valide un manifest d'epic
+ * Charge le template HTML pour les slides Markdown
  */
-function validateEpic(epic, epicDir) {
+function loadSlideTemplate() {
+  if (!existsSync(SLIDE_TEMPLATE_FILE)) {
+    console.warn('  ⚠️  Template de slide non trouvé:', SLIDE_TEMPLATE_FILE);
+    return null;
+  }
+  return readFileSync(SLIDE_TEMPLATE_FILE, 'utf-8');
+}
+
+/**
+ * Convertit un fichier Markdown en HTML et l'écrit dans index.html
+ * @param {string} slideDir - Chemin du dossier de la slide
+ * @param {string} template - Template HTML
+ * @param {object} slideData - Données du slide.json
+ * @returns {boolean} - Succès de la conversion
+ */
+function convertMarkdownSlide(slideDir, template, slideData) {
+  const mdPath = join(slideDir, 'index.md');
+  const htmlPath = join(slideDir, 'index.html');
+
+  try {
+    // Lire le Markdown
+    const markdown = readFileSync(mdPath, 'utf-8');
+
+    // Convertir en HTML
+    const htmlContent = marked.parse(markdown);
+
+    // Injecter dans le template
+    const title = slideData?.title || 'Slide';
+    const fullHtml = template
+      .replace('{{TITLE}}', title)
+      .replace('{{CONTENT}}', htmlContent);
+
+    // Écrire le fichier HTML généré
+    writeFileSync(htmlPath, fullHtml);
+    stats.markdownConverted++;
+
+    return true;
+  } catch (err) {
+    stats.errors.push(`Erreur conversion Markdown ${mdPath}: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * Valide un manifest d'epic et convertit les slides Markdown
+ * @param {object} epic - Manifest de l'epic
+ * @param {string} epicDir - Chemin du dossier de l'epic
+ * @param {string|null} template - Template HTML pour les slides Markdown
+ */
+function validateEpic(epic, epicDir, template) {
   const errors = [];
   const warnings = [];
 
@@ -74,8 +132,18 @@ function validateEpic(epic, epicDir) {
 
       const hasHtml = existsSync(join(slideDir, 'index.html'));
       const hasMd = existsSync(join(slideDir, 'index.md'));
-      if (!hasHtml && !hasMd) {
+
+      // Convertir Markdown en HTML si nécessaire
+      if (hasMd && !hasHtml && template) {
+        const slideData = readJSON(slideJson);
+        const converted = convertMarkdownSlide(slideDir, template, slideData);
+        if (!converted) {
+          errors.push(`Échec conversion Markdown pour: ${slideId}`);
+        }
+      } else if (!hasHtml && !hasMd) {
         errors.push(`Contenu manquant (index.html ou index.md) pour: ${slideId}`);
+      } else if (hasMd && !template) {
+        warnings.push(`Slide Markdown sans template, non convertie: ${slideId}`);
       }
     }
   }
@@ -169,8 +237,10 @@ function buildStructure(content, epicDir) {
 
 /**
  * Traite un epic et retourne son entrée pour le catalogue
+ * @param {string} epicId - ID de l'epic
+ * @param {string|null} template - Template HTML pour les slides Markdown
  */
-function processEpic(epicId) {
+function processEpic(epicId, template) {
   const epicDir = join(EPICS_DIR, epicId);
   const epicJson = join(epicDir, 'epic.json');
 
@@ -189,8 +259,8 @@ function processEpic(epicId) {
     return null;
   }
 
-  // Valider
-  const validation = validateEpic(epic, epicDir);
+  // Valider et convertir les slides Markdown
+  const validation = validateEpic(epic, epicDir, template);
   if (validation.errors.length > 0) {
     stats.errors.push(`${epicId}: ${validation.errors.join(', ')}`);
     console.log(`  [ERREUR] ${epicId}: ${validation.errors.length} erreur(s)`);
@@ -347,6 +417,12 @@ function main() {
   const config = readJSON(CONFIG_FILE) || {};
   console.log('Config chargée:', CONFIG_FILE);
 
+  // Charger le template pour les slides Markdown
+  const slideTemplate = loadSlideTemplate();
+  if (slideTemplate) {
+    console.log('Template slides Markdown chargé');
+  }
+
   // Scanner les epics
   console.log('\nScan des epics...');
   const epicDirs = existsSync(EPICS_DIR)
@@ -354,7 +430,7 @@ function main() {
     : [];
 
   const epics = epicDirs
-    .map(processEpic)
+    .map(epicId => processEpic(epicId, slideTemplate))
     .filter(Boolean);
 
   // Construire le catalogue
@@ -380,6 +456,9 @@ function main() {
   console.log(`Epics publiés: ${stats.published}`);
   console.log(`Brouillons: ${stats.drafts}`);
   console.log(`Tags uniques: ${catalogue.taxonomy.tags.length}`);
+  if (stats.markdownConverted > 0) {
+    console.log(`Slides Markdown converties: ${stats.markdownConverted}`);
+  }
 
   if (stats.warnings.length > 0) {
     console.log(`\nWarnings (${stats.warnings.length}):`);

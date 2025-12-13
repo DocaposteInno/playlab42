@@ -2,18 +2,18 @@
 
 ## Phase 1: Conversion Markdown
 
-- [ ] Choisir bibliothèque markdown (marked vs micromark)
-- [ ] Installer dépendance npm
-- [ ] Modifier `build-parcours.js`
-  - [ ] Détecter `index.md` vs `index.html`
-  - [ ] Convertir Markdown → HTML
-  - [ ] Injecter dans template HTML
-- [ ] Créer template `parcours/_shared/slide-template.html`
-- [ ] Ajouter syntax highlighting (optionnel)
-  - [ ] Choisir lib (Prism.js, highlight.js)
-  - [ ] Intégrer au build
-- [ ] Tester avec slide Markdown de démo
-- [ ] Documenter dans guide
+- [x] Choisir bibliothèque markdown (marked vs micromark) → **marked**
+- [x] Installer dépendance npm → `npm install marked`
+- [x] Modifier `build-parcours.js`
+  - [x] Détecter `index.md` vs `index.html`
+  - [x] Convertir Markdown → HTML
+  - [x] Injecter dans template HTML
+- [x] Créer template `parcours/_shared/slide-template.html`
+- [x] Ajouter syntax highlighting (optionnel)
+  - [x] Choisir lib (Prism.js, highlight.js) → **highlight.js via CDN**
+  - [x] Intégrer au build → thème adaptatif clair/sombre
+- [x] Tester avec slide Markdown de démo
+- [x] Documenter dans guide → `parcours/README.md`
 
 ## Phase 2: Tests unitaires
 
