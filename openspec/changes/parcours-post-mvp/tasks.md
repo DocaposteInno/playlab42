@@ -43,19 +43,19 @@
 
 ## Phase 3: Documentation
 
-- [ ] Créer `docs/guides/create-epic.md`
-  - [ ] Introduction (qu'est-ce qu'un Epic)
-  - [ ] Structure de fichiers
-  - [ ] Format `epic.json` avec tous les champs
-  - [ ] Format `slide.json` avec exemples
-  - [ ] Gestion assets (tailles, formats)
-  - [ ] Sections et optionnels
-  - [ ] Exemple minimal
-  - [ ] Exemple complet
-  - [ ] Checklist de validation
-- [ ] Mettre à jour `docs/guides/architecture.md`
-  - [ ] Ajouter section Parcours
-  - [ ] Diagramme ASCII structure
+- [x] Créer `docs/guides/create-epic.md`
+  - [x] Introduction (qu'est-ce qu'un Epic)
+  - [x] Structure de fichiers
+  - [x] Format `epic.json` avec tous les champs
+  - [x] Format `slide.json` avec exemples
+  - [x] Gestion assets (tailles, formats)
+  - [x] Sections et optionnels
+  - [x] Exemple minimal
+  - [x] Exemple complet
+  - [x] Checklist de validation
+- [x] Mettre à jour `docs/guides/architecture.md`
+  - [x] Ajouter section Parcours
+  - [x] Diagramme ASCII structure
 
 ## Phase 4: Fonctionnalités avancées (optionnel)
 

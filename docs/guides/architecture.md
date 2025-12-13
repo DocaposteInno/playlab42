@@ -9,20 +9,22 @@ Playlab42 est une plateforme modulaire de mini-jeux et outils, conçue pour la f
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         PORTAIL                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
-│  │   Outils    │  │    Jeux     │  │      Paramètres         │ │
-│  │   (tabs)    │  │   (tabs)    │  │  (pseudo, son, data)    │ │
-│  └─────────────┘  └─────────────┘  └─────────────────────────┘ │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌─────────────┐  │
+│  │  Parcours │  │   Outils  │  │   Jeux    │  │ Paramètres  │  │
+│  │   (tabs)  │  │   (tabs)  │  │  (tabs)   │  │             │  │
+│  └───────────┘  └───────────┘  └───────────┘  └─────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
-         │                  │
-         ▼                  ▼
-┌─────────────────┐  ┌─────────────────────────────────────────────┐
-│     TOOLS       │  │                    GAMES                     │
-│  (HTML simple)  │  │  ┌─────────┐  ┌─────────┐  ┌─────────────┐ │
-│                 │  │  │ Engine  │──│ Client  │──│    Bots     │ │
-│  json-formatter │  │  │(logique)│  │  (UI)   │  │ (IA locale) │ │
-│  etc.           │  │  └─────────┘  └─────────┘  └─────────────┘ │
-└─────────────────┘  └─────────────────────────────────────────────┘
+         │                  │               │
+         ▼                  ▼               ▼
+┌─────────────────┐  ┌─────────────┐  ┌──────────────────────────┐
+│    PARCOURS     │  │    TOOLS    │  │          GAMES            │
+│    (Epics)      │  │(HTML simple)│  │  ┌────────┐ ┌─────────┐ │
+│                 │  │             │  │  │ Engine │─│ Client  │ │
+│  ┌───────────┐  │  │json-format. │  │  └────────┘ └─────────┘ │
+│  │  Slides   │  │  │etc.         │  │  ┌─────────────────────┐ │
+│  │ HTML / MD │  │  │             │  │  │        Bots         │ │
+│  └───────────┘  │  │             │  │  └─────────────────────┘ │
+└─────────────────┘  └─────────────┘  └──────────────────────────┘
 ```
 
 ## Composants principaux
@@ -36,7 +38,46 @@ Le point d'entrée de l'application :
 - **Iframe sandboxé** : Charge les outils/jeux de manière isolée
 - **Paramètres** : Pseudo, son, effacement des données
 
-### 2. Outils (`tools/`)
+### 2. Parcours (`parcours/`)
+
+Système de contenus pédagogiques structurés en Epics :
+
+```
+parcours/
+├── index.json                 # Configuration globale
+├── _shared/                   # Assets partagés
+│   ├── slide-base.css         # Styles de base des slides
+│   ├── slide-template.html    # Template pour Markdown
+│   └── highlight-theme.css    # Thème coloration syntaxique
+└── epics/
+    └── mon-epic/
+        ├── epic.json          # Manifest de l'epic
+        ├── thumbnail.png      # Vignette
+        ├── assets/            # Médias de l'epic
+        │   └── images/
+        └── slides/
+            └── 01-intro/
+                ├── slide.json # Métadonnées
+                └── index.md   # Contenu (ou index.html)
+```
+
+**Concepts clés :**
+- **Epic** : Collection ordonnée de slides (parcours pédagogique)
+- **Slide** : Unité de contenu (HTML ou Markdown)
+- **Section** : Groupe de slides dans un epic
+
+**Build :**
+```bash
+make build-parcours  # Génère data/parcours.json et convertit Markdown
+```
+
+Le build :
+1. Valide les manifests `epic.json`
+2. Convertit les slides Markdown en HTML
+3. Agrège les tags et construit la hiérarchie
+4. Génère `data/parcours.json`
+
+### 3. Outils (`tools/`)
 
 Fichiers HTML autonomes et simples :
 - Un fichier = un outil complet
