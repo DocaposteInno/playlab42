@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-13T22:15:28.103Z",
+  "generatedAt": "2025-12-13T22:38:32.518Z",
   "categories": [
     {
       "id": "llm-ia",
@@ -23,13 +23,14 @@
           "meta": {
             "ogTitle": "ChatGPT",
             "ogDescription": "ChatGPT vous aide à obtenir des réponses, à trouver de l’inspiration et à gagner en productivité.",
-            "ogImage": "https://cdn.openai.com/chatgpt/share-og.png",
+            "ogImage": "data/bookmarks-images/e4c706adbcfb.png",
             "ogSiteName": "ChatGPT",
+            "ogImageOriginal": "https://cdn.openai.com/chatgpt/share-og.png",
             "favicon": "https://chat.openai.com/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:27.333Z"
+            "fetchedAt": "2025-12-13T22:37:39.848Z"
           },
           "displayTitle": "ChatGPT",
-          "displayDescription": "ChatGPT vous aide à obtenir des réponses, à trouver de l’inspiration et à gagner en productivité."
+          "displayDescription": "Assistant IA généraliste d'OpenAI"
         },
         {
           "url": "https://claude.ai",
@@ -46,12 +47,13 @@
           "meta": {
             "ogTitle": "Claude",
             "ogDescription": "Talk with Claude, an AI assistant from Anthropic",
-            "ogImage": "https://claude.ai/images/claude_ogimage.png",
+            "ogImage": "data/bookmarks-images/075219c5887a.png",
+            "ogImageOriginal": "https://claude.ai/images/claude_ogimage.png",
             "favicon": "https://claude.ai/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:27.331Z"
+            "fetchedAt": "2025-12-13T22:37:39.674Z"
           },
           "displayTitle": "Claude",
-          "displayDescription": "Talk with Claude, an AI assistant from Anthropic"
+          "displayDescription": "IA conversationnelle Anthropic"
         },
         {
           "url": "https://gemini.google.com",
@@ -68,13 +70,14 @@
           "meta": {
             "ogTitle": "‎Google Gemini",
             "ogDescription": "Voici Gemini, l'assistant IA de Google. Faites-vous aider pour rédiger, planifier, trouver des idées et plus encore. Découvrez la puissance de l'IA générative.",
-            "ogImage": "https://www.gstatic.com/lamda/images/gemini_aurora_thumbnail_4g_e74822ff0ca4259beb718.png",
+            "ogImage": "data/bookmarks-images/52da5c5bdf6f.png",
             "ogSiteName": "Gemini",
+            "ogImageOriginal": "https://www.gstatic.com/lamda/images/gemini_aurora_thumbnail_4g_e74822ff0ca4259beb718.png",
             "favicon": "https://gemini.google.com/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:26.790Z"
+            "fetchedAt": "2025-12-13T22:37:39.426Z"
           },
-          "displayTitle": "‎Google Gemini",
-          "displayDescription": "Voici Gemini, l'assistant IA de Google. Faites-vous aider pour rédiger, planifier, trouver des idées et plus encore. Découvrez la puissance de l'IA générative."
+          "displayTitle": "Gemini",
+          "displayDescription": "Modèle multimodal Google"
         },
         {
           "url": "https://chat.mistral.ai",
@@ -116,13 +119,14 @@
           "meta": {
             "ogTitle": "GitHub · Change is constant. GitHub keeps you ahead.",
             "ogDescription": "Join the world's most widely adopted, AI-powered developer platform where millions of developers, businesses, and the largest open source community build software that advances humanity.",
-            "ogImage": "https://images.ctfassets.net/8aevphvgewt8/4pe4eOtUJ0ARpZRE4fNekf/f52b1f9c52f059a33170229883731ed0/GH-Homepage-Universe-img.png",
+            "ogImage": "data/bookmarks-images/3097fca9b1ec.png",
             "ogSiteName": "GitHub",
+            "ogImageOriginal": "https://images.ctfassets.net/8aevphvgewt8/4pe4eOtUJ0ARpZRE4fNekf/f52b1f9c52f059a33170229883731ed0/GH-Homepage-Universe-img.png",
             "favicon": "https://github.com/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:26.894Z"
+            "fetchedAt": "2025-12-13T22:37:39.539Z"
           },
-          "displayTitle": "GitHub · Change is constant. GitHub keeps you ahead.",
-          "displayDescription": "Join the world's most widely adopted, AI-powered developer platform where millions of developers, businesses, and the largest open source community build software that advances humanity."
+          "displayTitle": "GitHub",
+          "displayDescription": "Hébergement de code source et collaboration"
         },
         {
           "url": "https://www.npmjs.com",
@@ -153,14 +157,15 @@
           "domain": "stackoverflow.com",
           "meta": {
             "ogTitle": "Newest Questions",
-            "ogDescription": "Stack Overflow | The World&#x2019;s Largest Online Community for Developers",
-            "ogImage": "https://stackoverflow.com/Content/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded",
+            "ogDescription": "Stack Overflow | The World’s Largest Online Community for Developers",
+            "ogImage": "data/bookmarks-images/7f4c919540be.png",
             "ogSiteName": "Stack Overflow",
+            "ogImageOriginal": "https://stackoverflow.com/Content/Sites/stackoverflow/Img/apple-touch-icon@2.png?v=73d79a89bded",
             "favicon": "https://stackoverflow.com/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:27.986Z"
+            "fetchedAt": "2025-12-13T22:37:40.587Z"
           },
-          "displayTitle": "Newest Questions",
-          "displayDescription": "Stack Overflow | The World&#x2019;s Largest Online Community for Developers"
+          "displayTitle": "Stack Overflow",
+          "displayDescription": "Questions/réponses pour développeurs"
         },
         {
           "url": "https://codepen.io",
@@ -203,10 +208,10 @@
             "ogTitle": "MDN Web Docs",
             "ogDescription": "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps.",
             "favicon": "https://developer.mozilla.org/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:27.492Z"
+            "fetchedAt": "2025-12-13T22:37:39.975Z"
           },
           "displayTitle": "MDN Web Docs",
-          "displayDescription": "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps."
+          "displayDescription": "Documentation web de référence"
         },
         {
           "url": "https://www.typescriptlang.org/docs",
@@ -223,10 +228,10 @@
             "ogTitle": "The starting point for learning TypeScript",
             "ogDescription": "Find TypeScript starter projects: from Angular to React or Node.js and CLIs.",
             "favicon": "https://www.typescriptlang.org/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:27.623Z"
+            "fetchedAt": "2025-12-13T22:37:40.146Z"
           },
-          "displayTitle": "The starting point for learning TypeScript",
-          "displayDescription": "Find TypeScript starter projects: from Angular to React or Node.js and CLIs."
+          "displayTitle": "TypeScript Docs",
+          "displayDescription": "Documentation officielle TypeScript"
         },
         {
           "url": "https://jestjs.io/docs/getting-started",
@@ -243,12 +248,13 @@
           "meta": {
             "ogTitle": "Getting Started · Jest",
             "ogDescription": "Install Jest using your favorite package manager:",
-            "ogImage": "https://jestjs.io/img/opengraph.png",
+            "ogImage": "data/bookmarks-images/c041c98cd940.png",
+            "ogImageOriginal": "https://jestjs.io/img/opengraph.png",
             "favicon": "https://jestjs.io/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:28.102Z"
+            "fetchedAt": "2025-12-13T22:37:40.779Z"
           },
-          "displayTitle": "Getting Started · Jest",
-          "displayDescription": "Install Jest using your favorite package manager:"
+          "displayTitle": "Jest",
+          "displayDescription": "Framework de tests JavaScript"
         },
         {
           "url": "https://docs.docker.com",
@@ -265,13 +271,14 @@
           "meta": {
             "ogTitle": "Home",
             "ogDescription": "Docker Documentation is the official Docker library of resources, manuals, and guides to help you containerize applications.",
-            "ogImage": "https://docs.docker.com/images/thumbnail.webp",
+            "ogImage": "data/bookmarks-images/4c3db4ae25b5.webp",
             "ogSiteName": "Docker Documentation",
+            "ogImageOriginal": "https://docs.docker.com/images/thumbnail.webp",
             "favicon": "https://docs.docker.com/favicon.ico",
-            "fetchedAt": "2025-12-13T22:15:28.059Z"
+            "fetchedAt": "2025-12-13T22:37:40.712Z"
           },
-          "displayTitle": "Home",
-          "displayDescription": "Docker Documentation is the official Docker library of resources, manuals, and guides to help you containerize applications."
+          "displayTitle": "Docker Docs",
+          "displayDescription": "Documentation Docker"
         }
       ]
     }

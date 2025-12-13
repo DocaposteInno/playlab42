@@ -307,10 +307,10 @@ async function enrichWithOGMetadata(categories) {
         stats.ogFailed++;
       }
 
-      // Enrichir le bookmark
+      // Enrichir le bookmark (titre/description manuels prioritaires, OG en fallback)
       bookmark.meta = result.meta || {};
-      bookmark.displayTitle = result.meta?.ogTitle || bookmark.title;
-      bookmark.displayDescription = result.meta?.ogDescription || bookmark.description;
+      bookmark.displayTitle = bookmark.title || result.meta?.ogTitle;
+      bookmark.displayDescription = bookmark.description || result.meta?.ogDescription;
     }));
   }
 
