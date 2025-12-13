@@ -878,8 +878,9 @@ function showBookmarkPreview(bookmarkData, anchorElement) {
   domainEl.textContent = bookmarkData.domain;
 
   // Image OG ou fallback
-  if (bookmarkData.ogImage) {
-    imageEl.style.backgroundImage = `url(${bookmarkData.ogImage})`;
+  const ogImage = bookmarkData.meta?.ogImage;
+  if (ogImage) {
+    imageEl.style.backgroundImage = `url(${ogImage})`;
     imageEl.classList.add('has-image');
   } else {
     imageEl.style.backgroundImage = '';
