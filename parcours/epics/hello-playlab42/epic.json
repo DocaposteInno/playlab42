@@ -13,6 +13,7 @@
     "language": "fr"
   },
   "icon": "👋",
+  "thumbnail": "thumbnail.png",
   "content": [
     {
       "id": "decouverte",
