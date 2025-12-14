@@ -126,7 +126,15 @@ playlab42/
 │   ├── gamekit.js            # SDK pour les jeux
 │   ├── theme.js              # Gestion thème clair/sombre
 │   ├── seeded-random.js      # PRNG déterministe
-│   └── parcours-viewer.js    # Viewer de parcours
+│   ├── parcours-viewer.js    # Viewer de parcours (orchestration)
+│   └── parcours/             # Modules du viewer de parcours
+│       ├── ParcoursProgress.js    # Gestion progression
+│       ├── ParcoursNavigation.js  # Navigation entre slides
+│       └── ParcoursUI.js          # Rendu HTML
+├── app/                      # Modules du portail (en cours de refactoring)
+│   ├── state.js              # État global
+│   ├── storage.js            # Persistence localStorage
+│   └── dom-cache.js          # Cache éléments DOM
 ├── tools/                    # Outils HTML standalone
 │   ├── [tool-name]/
 │   │   ├── index.html        # Un fichier = un outil
