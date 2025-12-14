@@ -161,7 +161,8 @@ playlab42/
 ├── lib/                # Bibliothèques partagées (thème, utilitaires)
 ├── data/               # Données générées (catalogue.json, parcours.json)
 ├── docs/               # Documentation
-└── openspec/           # Spécifications et changes
+├── openspec/           # Spécifications et changes
+└── .claude/            # Configuration Claude Code (commandes slash)
 ```
 
 ## Documentation
