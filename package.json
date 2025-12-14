@@ -22,7 +22,7 @@
     "training",
     "typescript"
   ],
-  "author": "BU DAP",
+  "author": "Docaposte",
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.2",

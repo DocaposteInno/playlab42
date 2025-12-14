@@ -161,4 +161,4 @@ Les specs détaillées sont dans `openspec/specs/` :
 ## Contexte utilisateur
 
 - Prénom : Cyrille
-- Organisation : BU DAP
+- Organisation : Docaposte
