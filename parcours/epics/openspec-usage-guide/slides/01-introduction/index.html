@@ -12,35 +12,105 @@
   </script>
   <style>
     .concept-box {
-      background: var(--color-bg-secondary);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%);
       padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid var(--color-accent);
       margin: var(--space-lg) 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .concept-box h3 {
       margin-top: 0;
       color: var(--color-accent);
+      font-size: 1.2rem;
+    }
+    .concept-box ul {
+      margin: var(--space-sm) 0 0 0;
+    }
+    .concept-box li {
+      margin: var(--space-xs) 0;
+      line-height: 1.6;
     }
     .comparison-table {
       margin: var(--space-lg) 0;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .comparison-table th {
+      background: var(--color-bg-secondary);
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+    .comparison-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
     }
     .folder-structure {
       font-family: var(--font-mono);
       font-size: 0.85rem;
       background: var(--color-bg-secondary);
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border: 1px solid var(--color-border);
       white-space: pre;
       overflow-x: auto;
-      line-height: 1.6;
+      line-height: 1.7;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .highlight-box {
-      background: var(--color-accent-light);
-      padding: var(--space-md);
+      background: #e8f4f8;
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       margin: var(--space-lg) 0;
+      border-left: 4px solid #17a2b8;
+    }
+    .highlight-box strong {
+      color: #0c5460;
+    }
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+    .benefit-card {
+      background: var(--color-bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+    .benefit-card strong {
+      color: var(--color-accent);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+    .decision-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .decision-box {
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+    }
+    .do-box {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+    }
+    .do-box h3 {
+      color: #155724;
+      margin-top: 0;
+    }
+    .dont-box {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+    }
+    .dont-box h3 {
+      color: #721c24;
+      margin-top: 0;
     }
   </style>
 </head>
@@ -168,24 +238,26 @@
 
     <h2>Quand créer une proposal OpenSpec ?</h2>
 
-    <div class="concept-box">
-      <h3>✅ Créer une proposal pour :</h3>
-      <ul>
-        <li><strong>Nouvelles fonctionnalités</strong> : Nouveau jeu, nouvel outil, nouveau parcours</li>
-        <li><strong>Breaking changes</strong> : Modifications des APIs ou interfaces existantes</li>
-        <li><strong>Changements d'architecture</strong> : Refactoring majeur, nouvelle structure</li>
-        <li><strong>Travaux significatifs</strong> : Performance, sécurité, accessibilité</li>
-      </ul>
-    </div>
+    <div class="decision-boxes">
+      <div class="decision-box do-box">
+        <h3>✅ Créer une proposal pour :</h3>
+        <ul>
+          <li><strong>Nouvelles fonctionnalités</strong> : Nouveau jeu, nouvel outil, nouveau parcours</li>
+          <li><strong>Breaking changes</strong> : Modifications des APIs ou interfaces existantes</li>
+          <li><strong>Changements d'architecture</strong> : Refactoring majeur, nouvelle structure</li>
+          <li><strong>Travaux significatifs</strong> : Performance, sécurité, accessibilité</li>
+        </ul>
+      </div>
 
-    <div class="concept-box">
-      <h3>❌ Ne PAS créer de proposal pour :</h3>
-      <ul>
-        <li>Bug fixes simples (correction d'un typo, fix d'un calcul)</li>
-        <li>Mises à jour de dépendances (npm update)</li>
-        <li>Ajout de tests sur code existant</li>
-        <li>Corrections de documentation mineures</li>
-      </ul>
+      <div class="decision-box dont-box">
+        <h3>❌ Ne PAS créer de proposal pour :</h3>
+        <ul>
+          <li>Bug fixes simples (correction d'un typo, fix d'un calcul)</li>
+          <li>Mises à jour de dépendances (npm update)</li>
+          <li>Ajout de tests sur code existant</li>
+          <li>Corrections de documentation mineures</li>
+        </ul>
+      </div>
     </div>
 
     <blockquote>
@@ -195,13 +267,28 @@
 
     <h2>Les bénéfices pour vous, stagiaire</h2>
 
-    <ul>
-      <li><strong>Clarté</strong> : Vous savez exactement quoi implémenter avant de coder</li>
-      <li><strong>Guidage</strong> : Les agents IA ont un contexte précis pour vous aider</li>
-      <li><strong>Traçabilité</strong> : Vos contributions sont documentées et valorisées</li>
-      <li><strong>Apprentissage</strong> : Vous apprenez à penser architecture avant code</li>
-      <li><strong>Collaboration</strong> : Les autres stagiaires comprennent vos choix</li>
-    </ul>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <strong>💡 Clarté</strong>
+        <p>Vous savez exactement quoi implémenter avant de coder</p>
+      </div>
+      <div class="benefit-card">
+        <strong>🤝 Guidage</strong>
+        <p>Les agents IA ont un contexte précis pour vous aider</p>
+      </div>
+      <div class="benefit-card">
+        <strong>📝 Traçabilité</strong>
+        <p>Vos contributions sont documentées et valorisées</p>
+      </div>
+      <div class="benefit-card">
+        <strong>🎓 Apprentissage</strong>
+        <p>Vous apprenez à penser architecture avant code</p>
+      </div>
+      <div class="benefit-card">
+        <strong>👥 Collaboration</strong>
+        <p>Les autres stagiaires comprennent vos choix</p>
+      </div>
+    </div>
 
     <p style="margin-top: var(--space-xl); text-align: center;">
       <strong>Maintenant que vous comprenez les concepts, passons au workflow pratique ! 👉</strong>

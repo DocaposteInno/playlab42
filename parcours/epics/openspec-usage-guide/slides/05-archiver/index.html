@@ -12,31 +12,42 @@
   </script>
   <style>
     .command-box {
-      background: var(--color-bg-tertiary);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
       padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid var(--color-accent);
       font-family: var(--font-mono);
       margin: var(--space-lg) 0;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .command-box strong {
+      color: var(--color-accent);
     }
     .step-box {
       background: var(--color-bg-secondary);
       padding: var(--space-lg);
       border-radius: var(--radius-md);
       margin: var(--space-lg) 0;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .step-box h3 {
+      margin-top: 0;
+      color: var(--color-accent);
     }
     .step-number {
       display: inline-block;
-      width: 2rem;
-      height: 2rem;
-      background: var(--color-accent);
+      width: 2.5rem;
+      height: 2.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border-radius: 50%;
       text-align: center;
-      line-height: 2rem;
+      line-height: 2.5rem;
       font-weight: bold;
       margin-right: var(--space-sm);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
     .before-after {
       display: grid;
@@ -46,8 +57,10 @@
     }
     .before-after > div {
       background: var(--color-bg-secondary);
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .before-after h4 {
       margin-top: 0;
@@ -56,28 +69,38 @@
     .folder-structure {
       font-family: var(--font-mono);
       font-size: 0.85rem;
-      background: var(--color-bg-tertiary);
-      padding: var(--space-md);
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       white-space: pre;
       overflow-x: auto;
-      line-height: 1.6;
+      line-height: 1.7;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .warning-box {
       background: #fff3cd;
       color: #856404;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #ffc107;
       margin: var(--space-lg) 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .warning-box strong {
+      color: #856404;
     }
     .success-box {
       background: #d4edda;
       color: #155724;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #28a745;
       margin: var(--space-lg) 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .success-box strong {
+      color: #155724;
     }
   </style>
 </head>
