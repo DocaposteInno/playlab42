@@ -16,10 +16,13 @@
       padding: var(--space-lg);
       border-radius: var(--radius-md);
       margin: var(--space-lg) 0;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .practice-card h3 {
       margin-top: 0;
       color: var(--color-accent);
+      font-size: 1.2rem;
     }
     .do-dont-grid {
       display: grid;
@@ -29,9 +32,10 @@
     }
     .do-box {
       background: #d4edda;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #28a745;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .do-box h4 {
       margin-top: 0;
@@ -39,37 +43,52 @@
     }
     .dont-box {
       background: #f8d7da;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #dc3545;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .dont-box h4 {
       margin-top: 0;
       color: #721c24;
     }
     .tip-box {
-      background: #d1ecf1;
+      background: #e8f4f8;
       color: #0c5460;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #17a2b8;
       margin: var(--space-lg) 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .tip-box strong {
+      color: #0c5460;
     }
     .antipattern-box {
       background: #fff3cd;
       color: #856404;
-      padding: var(--space-md);
+      padding: var(--space-lg);
       border-radius: var(--radius-md);
       border-left: 4px solid #ffc107;
       margin: var(--space-lg) 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .antipattern-box h3 {
+      margin-top: 0;
+      color: #856404;
     }
     .checklist {
       list-style: none;
       padding-left: 0;
+      margin: var(--space-sm) 0;
+    }
+    .checklist li {
+      margin: var(--space-xs) 0;
+      line-height: 1.6;
     }
     .checklist li::before {
       content: "✓ ";
-      color: var(--color-success);
+      color: #28a745;
       font-weight: bold;
       margin-right: var(--space-xs);
     }
