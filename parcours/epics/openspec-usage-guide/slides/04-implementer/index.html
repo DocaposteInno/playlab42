@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Implémenter avec /openspec:apply — OpenSpec Guide</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .command-box {
+      background: var(--color-bg-tertiary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+      font-family: var(--font-mono);
+      margin: var(--space-lg) 0;
+      font-size: 1.1rem;
+    }
+    .workflow-box {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      margin: var(--space-lg) 0;
+    }
+    .task-example {
+      background: var(--color-bg-tertiary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin: var(--space-md) 0;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    .checklist li::before {
+      content: "✓ ";
+      color: var(--color-success);
+      font-weight: bold;
+      margin-right: var(--space-xs);
+    }
+    .warning-box {
+      background: #fff3cd;
+      color: #856404;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #ffc107;
+      margin: var(--space-lg) 0;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      color: #0c5460;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #17a2b8;
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>Implémenter avec /openspec:apply</h1>
+
+    <p>Une fois la proposal validée, passons à l'implémentation guidée par <code>tasks.md</code>.</p>
+
+    <h2>Lancer l'implémentation</h2>
+
+    <div class="command-box">
+      <strong>Avec un agent IA :</strong><br>
+      /openspec:apply
+    </div>
+
+    <p>Ou manuellement :</p>
+
+    <div class="command-box">
+      <strong>Ouvrir le fichier tasks :</strong><br>
+      code openspec/changes/[change-id]/tasks.md
+    </div>
+
+    <h2>Principe : Suivre tasks.md séquentiellement</h2>
+
+    <div class="workflow-box">
+      <p><strong>📋 Règle d'or</strong> : Les tâches sont <strong>ordonnées</strong>. Chaque tâche prépare la suivante.</p>
+      <ul class="checklist">
+        <li>Lire toutes les tâches avant de commencer</li>
+        <li>Implémenter tâche par tâche (pas de saut)</li>
+        <li>Cocher <code>[x]</code> immédiatement après complétion</li>
+        <li>Tester régulièrement</li>
+        <li>Commiter au fil de l'eau</li>
+      </ul>
+    </div>
+
+    <h2>Exemple : tasks.md en cours d'implémentation</h2>
+
+    <div class="task-example">
+# Tasks: add-poker-game
+
+## Phase 1 : Préparation
+- [x] Créer `games/poker/`
+- [x] Ajouter `game.json` manifest
+- [x] Créer structure HTML
+- [x] Ajouter assets (sprites cartes)
+
+## Phase 2 : Moteur
+- [x] Implémenter `engine.js` (init, actions, getPlayerView)
+- [ ] <strong style="color: var(--color-accent);">← TÂCHE EN COURS</strong> Tests unitaires du moteur
+- [ ] Validation spec game-engine
+
+## Phase 3 : Bots
+- [ ] Bot random
+- [ ] Bot intermediate
+- [ ] Tests des bots
+
+## Phase 4 : Intégration
+- [ ] Rebuild catalogue (`make build-catalogue`)
+- [ ] Tests end-to-end
+- [ ] Documentation README
+    </div>
+
+    <h2>Workflow d'implémentation</h2>
+
+    <ol>
+      <li>
+        <strong>Lire la tâche</strong>
+        <p>Comprendre ce qui est attendu avant de coder.</p>
+      </li>
+      <li>
+        <strong>Implémenter</strong>
+        <p>Écrire le code nécessaire, suivre les specs référencées.</p>
+      </li>
+      <li>
+        <strong>Tester</strong>
+        <p>Lancer <code>make test</code> et <code>make lint</code> pour valider.</p>
+      </li>
+      <li>
+        <strong>Cocher la tâche</strong>
+        <p>Modifier <code>tasks.md</code> : <code>- [ ]</code> → <code>- [x]</code></p>
+      </li>
+      <li>
+        <strong>Commiter</strong>
+        <p>Message clair : <code>feat(poker): implémentation moteur de jeu</code></p>
+      </li>
+      <li>
+        <strong>Passer à la suivante</strong>
+        <p>Répéter le cycle.</p>
+      </li>
+    </ol>
+
+    <h2>Documenter les décisions dans design.md</h2>
+
+    <p>Si vous devez faire des choix techniques importants non prévus dans la proposal :</p>
+
+    <div class="workflow-box">
+      <p>Créez <code>openspec/changes/[change-id]/design.md</code> pour documenter :</p>
+      <ul>
+        <li>Choix d'algorithmes (ex: calcul du pot au poker)</li>
+        <li>Trade-offs (performance vs lisibilité)</li>
+        <li>Patterns utilisés (state machine, observer...)</li>
+        <li>Décisions d'architecture non évidentes</li>
+      </ul>
+    </div>
+
+    <p><strong>Exemple de design.md :</strong></p>
+
+    <div class="task-example">
+# Design: add-poker-game
+
+## Calcul du pot
+
+**Décision** : Utiliser un tableau `pots[]` pour gérer les side-pots.
+
+**Rationale** :
+- Permet all-in avec plusieurs joueurs
+- Conforme aux règles officielles du poker
+- Plus complexe mais plus correct qu'un pot unique
+
+**Alternatives considérées** :
+- Pot unique (trop simple, incorrect)
+- Calcul dynamique à chaque tour (trop coûteux)
+
+## Représentation des cartes
+
+**Décision** : String `"As"` (rang + couleur)
+
+**Rationale** :
+- Sérialisable JSON
+- Lisible en debug
+- Compatible avec assets nommés `As.png`
+    </div>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Ne pas dévier du plan sans raison</strong></p>
+      <p>Si vous découvrez qu'une tâche est obsolète ou incomplète, documentez-le dans <code>design.md</code> ou mettez à jour <code>tasks.md</code> en ajoutant une note.</p>
+    </div>
+
+    <h2>Utiliser les agents IA efficacement</h2>
+
+    <div class="tip-box">
+      <p><strong>💡 Astuce : Contexte maximal</strong></p>
+      <p>Lorsque vous demandez à un agent IA d'implémenter une tâche, donnez-lui :</p>
+      <ul>
+        <li>Le fichier <code>tasks.md</code> complet</li>
+        <li>Les specs concernées (<code>@openspec/specs/game-engine/spec.md</code>)</li>
+        <li>Le code existant à modifier</li>
+      </ul>
+      <p>Exemple de prompt :</p>
+      <pre><code>@claude Implémente la tâche "Tests unitaires du moteur"
+du fichier @openspec/changes/add-poker-game/tasks.md.
+Utilise Jest et respecte @openspec/specs/game-engine/spec.md.</code></pre>
+    </div>
+
+    <h2>Commandes utiles pendant l'implémentation</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Commande</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>make test</code></td>
+          <td>Lancer les tests Jest</td>
+        </tr>
+        <tr>
+          <td><code>make lint</code></td>
+          <td>Vérifier la qualité du code</td>
+        </tr>
+        <tr>
+          <td><code>make serve</code></td>
+          <td>Tester un tool/game dans le navigateur</td>
+        </tr>
+        <tr>
+          <td><code>make build-catalogue</code></td>
+          <td>Régénérer le catalogue après ajout</td>
+        </tr>
+        <tr>
+          <td><code>openspec show [change-id]</code></td>
+          <td>Afficher l'état d'avancement</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Checklist avant de marquer "Terminé"</h2>
+
+    <ul class="checklist">
+      <li>Toutes les tâches de tasks.md sont cochées</li>
+      <li>Tous les tests passent (<code>make test</code>)</li>
+      <li>Le linter ne rapporte aucune erreur (<code>make lint</code>)</li>
+      <li>La feature fonctionne en local (<code>make serve</code>)</li>
+      <li>La documentation est à jour (README, JSDoc)</li>
+      <li>Les commits sont propres et descriptifs</li>
+    </ul>
+
+    <div class="tip-box">
+      <p><strong>🎉 Changement implémenté ?</strong></p>
+      <p>Avant de déployer, assurez-vous de :</p>
+      <ul>
+        <li>Pousser votre branche : <code>git push -u origin feature/[change-id]</code></li>
+        <li>Créer une Pull Request</li>
+        <li>Obtenir une review si nécessaire</li>
+        <li>Merger et déployer</li>
+      </ul>
+      <p>Une fois en production, vous pourrez archiver la proposal.</p>
+    </div>
+
+    <p style="margin-top: var(--space-xl); text-align: center;">
+      <strong>Implémentation terminée ? Apprenons à archiver ! 👉</strong>
+    </p>
+  </article>
+</body>
+</html>

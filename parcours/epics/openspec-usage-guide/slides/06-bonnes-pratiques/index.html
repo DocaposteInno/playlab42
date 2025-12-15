@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonnes pratiques et pièges à éviter — OpenSpec Guide</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .practice-card {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      margin: var(--space-lg) 0;
+    }
+    .practice-card h3 {
+      margin-top: 0;
+      color: var(--color-accent);
+    }
+    .do-dont-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .do-box {
+      background: #d4edda;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #28a745;
+    }
+    .do-box h4 {
+      margin-top: 0;
+      color: #155724;
+    }
+    .dont-box {
+      background: #f8d7da;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #dc3545;
+    }
+    .dont-box h4 {
+      margin-top: 0;
+      color: #721c24;
+    }
+    .tip-box {
+      background: #d1ecf1;
+      color: #0c5460;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #17a2b8;
+      margin: var(--space-lg) 0;
+    }
+    .antipattern-box {
+      background: #fff3cd;
+      color: #856404;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #ffc107;
+      margin: var(--space-lg) 0;
+    }
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    .checklist li::before {
+      content: "✓ ";
+      color: var(--color-success);
+      font-weight: bold;
+      margin-right: var(--space-xs);
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>Bonnes pratiques et pièges à éviter</h1>
+
+    <p>Vous maîtrisez maintenant le workflow OpenSpec. Voici les bonnes pratiques pour des contributions de qualité.</p>
+
+    <h2>✅ Les bonnes pratiques</h2>
+
+    <div class="practice-card">
+      <h3>1. Proposal avant code</h3>
+      <p><strong>Principe :</strong> Toujours documenter avant d'implémenter pour les changements significatifs.</p>
+      <div class="tip-box">
+        <p><strong>💡 Pourquoi ?</strong> Cela force à réfléchir à l'architecture, facilite la review, et garantit que les specs restent à jour.</p>
+      </div>
+    </div>
+
+    <div class="practice-card">
+      <h3>2. Change ID descriptif</h3>
+      <p><strong>Format :</strong> <code>[verbe]-[nom-descriptif]</code> en kebab-case</p>
+      <ul class="checklist">
+        <li><code>add-poker-game</code> ✅</li>
+        <li><code>update-catalogue-builder</code> ✅</li>
+        <li><code>refactor-parcours-viewer</code> ✅</li>
+      </ul>
+      <p><strong>À éviter :</strong></p>
+      <ul>
+        <li><code>poker</code> ❌ (trop vague)</li>
+        <li><code>my-changes</code> ❌ (pas descriptif)</li>
+        <li><code>update_stuff</code> ❌ (snake_case au lieu de kebab-case)</li>
+      </ul>
+    </div>
+
+    <div class="practice-card">
+      <h3>3. Tasks séquentielles et atomiques</h3>
+      <p>Chaque tâche doit être :</p>
+      <ul>
+        <li><strong>Atomique</strong> : Une seule responsabilité claire</li>
+        <li><strong>Testable</strong> : On peut vérifier qu'elle est terminée</li>
+        <li><strong>Ordonnée</strong> : Prépare la tâche suivante</li>
+      </ul>
+      <div class="tip-box">
+        <p><strong>💡 Test mental :</strong> "Est-ce qu'un autre développeur pourrait faire cette tâche sans contexte additionnel ?" Si non, découpez-la.</p>
+      </div>
+    </div>
+
+    <div class="practice-card">
+      <h3>4. Documenter les décisions dans design.md</h3>
+      <p>Si vous faites un choix technique non évident, documentez-le :</p>
+      <ul>
+        <li>Décision prise</li>
+        <li>Rationale (pourquoi)</li>
+        <li>Alternatives considérées</li>
+        <li>Trade-offs</li>
+      </ul>
+    </div>
+
+    <div class="practice-card">
+      <h3>5. Tester régulièrement pendant l'implémentation</h3>
+      <p>Ne pas attendre la fin pour tester. Après chaque tâche :</p>
+      <pre><code>make test
+make lint
+make serve  # Si applicable</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>❌ Les pièges à éviter</h2>
+
+    <div class="antipattern-box">
+      <h3>Piège #1 : Over-specification</h3>
+      <p><strong>Symptôme :</strong> Proposal de 10 pages pour ajouter un bouton.</p>
+      <p><strong>Solution :</strong> Adapter le niveau de détail à la complexité du changement. Pour un petit changement, une proposal d'une demi-page suffit.</p>
+    </div>
+
+    <div class="antipattern-box">
+      <h3>Piège #2 : Dévier du plan sans documenter</h3>
+      <p><strong>Symptôme :</strong> "En implémentant, j'ai changé l'approche mais j'ai oublié de mettre à jour tasks.md"</p>
+      <p><strong>Solution :</strong> Si vous découvrez qu'une tâche est obsolète, mettez à jour tasks.md ET documentez pourquoi dans design.md.</p>
+    </div>
+
+    <div class="antipattern-box">
+      <h3>Piège #3 : Archiver trop tôt</h3>
+      <p><strong>Symptôme :</strong> Archiver dès que le code est mergé, même si pas encore déployé.</p>
+      <p><strong>Solution :</strong> Attendre le déploiement en production et confirmation qu'il n'y a pas de régression.</p>
+    </div>
+
+    <div class="antipattern-box">
+      <h3>Piège #4 : Proposals génériques</h3>
+      <p><strong>Symptôme :</strong> "Améliorer le projet", "Refactorer le code"</p>
+      <p><strong>Solution :</strong> Être spécifique. "Refactorer parcours-viewer pour séparer UI et logique"</p>
+    </div>
+
+    <div class="antipattern-box">
+      <h3>Piège #5 : Ignorer les specs existantes</h3>
+      <p><strong>Symptôme :</strong> Créer un jeu qui ne respecte pas l'interface game-engine.</p>
+      <p><strong>Solution :</strong> Toujours lire les specs concernées AVANT d'écrire la proposal.</p>
+    </div>
+
+    <hr>
+
+    <h2>Do / Don't — Résumé visuel</h2>
+
+    <div class="do-dont-grid">
+      <div class="do-box">
+        <h4>✅ À faire</h4>
+        <ul>
+          <li>Lire les specs avant de proposer</li>
+          <li>Change ID en kebab-case avec verbe</li>
+          <li>Tasks séquentielles et testables</li>
+          <li>Cocher les tâches au fur et à mesure</li>
+          <li>Commiter régulièrement</li>
+          <li>Tester avant de cocher une tâche</li>
+          <li>Archiver après déploiement confirmé</li>
+        </ul>
+      </div>
+
+      <div class="dont-box">
+        <h4>❌ À éviter</h4>
+        <ul>
+          <li>Coder avant de spécifier (pour gros changements)</li>
+          <li>Change ID vague ou avec typo</li>
+          <li>Tasks trop grosses ou floues</li>
+          <li>Cocher toutes les tâches d'un coup</li>
+          <li>Un seul gros commit à la fin</li>
+          <li>Implémenter sans tester</li>
+          <li>Archiver avant déploiement</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Travailler avec des agents IA : Best practices</h2>
+
+    <div class="practice-card">
+      <h3>Donnez du contexte maximal</h3>
+      <p>Les agents IA sont plus efficaces quand vous leur donnez :</p>
+      <ul>
+        <li>Le fichier de spec concerné (<code>@openspec/specs/game-engine/spec.md</code>)</li>
+        <li>La proposal complète (<code>@openspec/changes/add-poker-game/proposal.md</code>)</li>
+        <li>Les tâches en cours (<code>@openspec/changes/add-poker-game/tasks.md</code>)</li>
+      </ul>
+      <div class="tip-box">
+        <p><strong>Exemple de bon prompt :</strong></p>
+        <pre><code>@claude Implémente la tâche "Tests unitaires du moteur"
+dans @openspec/changes/add-poker-game/tasks.md.
+Utilise Jest et respecte @openspec/specs/game-engine/spec.md.
+Les tests doivent couvrir init, applyAction, et getPlayerView.</code></pre>
+      </div>
+    </div>
+
+    <div class="practice-card">
+      <h3>Utilisez les slash commands</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/openspec:proposal</code></td>
+            <td>Créer une nouvelle proposal guidée</td>
+          </tr>
+          <tr>
+            <td><code>/openspec:apply</code></td>
+            <td>Implémenter une proposal existante</td>
+          </tr>
+          <tr>
+            <td><code>/openspec:archive</code></td>
+            <td>Archiver après déploiement</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="practice-card">
+      <h3>Validez toujours le travail de l'agent</h3>
+      <p>Ne pas faire confiance aveuglément. Après chaque génération :</p>
+      <ul class="checklist">
+        <li>Lire le code généré</li>
+        <li>Vérifier la conformité aux specs</li>
+        <li>Lancer les tests</li>
+        <li>Vérifier le lint</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <h2>Checklist du contributeur exemplaire</h2>
+
+    <div class="practice-card">
+      <h3>Avant de commencer</h3>
+      <ul class="checklist">
+        <li>J'ai lu les specs concernées</li>
+        <li>J'ai vérifié qu'aucune proposal similaire n'existe</li>
+        <li>Mon changement mérite une proposal (pas un simple bugfix)</li>
+      </ul>
+
+      <h3>Pendant la proposal</h3>
+      <ul class="checklist">
+        <li>Mon Change ID est descriptif et en kebab-case</li>
+        <li>J'ai documenté Motivation + Description + Impact</li>
+        <li>Mes tasks sont séquentielles et atomiques</li>
+        <li>J'ai identifié les specs impactées</li>
+      </ul>
+
+      <h3>Pendant l'implémentation</h3>
+      <ul class="checklist">
+        <li>Je suis tasks.md séquentiellement</li>
+        <li>Je coche chaque tâche après complétion</li>
+        <li>Je teste régulièrement</li>
+        <li>Je commite au fil de l'eau</li>
+        <li>Je documente les décisions dans design.md</li>
+      </ul>
+
+      <h3>Avant l'archivage</h3>
+      <ul class="checklist">
+        <li>Le changement est déployé en production</li>
+        <li>Tous les tests passent</li>
+        <li>Aucune régression détectée</li>
+        <li>Les deltas de specs sont prêts à être fusionnés</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <h2>Ressources et liens utiles</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ressource</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>openspec/AGENTS.md</code></td>
+          <td>Instructions complètes pour agents IA</td>
+        </tr>
+        <tr>
+          <td><code>openspec/project.md</code></td>
+          <td>Conventions du projet Playlab42</td>
+        </tr>
+        <tr>
+          <td><code>openspec/specs/</code></td>
+          <td>Toutes les spécifications techniques</td>
+        </tr>
+        <tr>
+          <td><code>AGENTS.md</code> (racine)</td>
+          <td>Instructions générales pour agents IA</td>
+        </tr>
+        <tr>
+          <td><code>docs/CONCEPTS.md</code></td>
+          <td>Glossaire et définitions</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h2>🎉 Conclusion</h2>
+
+    <p>Vous avez maintenant toutes les clés pour contribuer à Playlab42 avec OpenSpec !</p>
+
+    <div class="practice-card">
+      <h3>Ce que vous avez appris</h3>
+      <ul class="checklist">
+        <li>La philosophie spec-driven development</li>
+        <li>Le workflow en 3 étapes : Proposal → Apply → Archive</li>
+        <li>Comment créer une proposal structurée</li>
+        <li>Comment implémenter avec rigueur</li>
+        <li>Comment archiver proprement</li>
+        <li>Les bonnes pratiques et pièges à éviter</li>
+      </ul>
+    </div>
+
+    <div class="tip-box">
+      <p><strong>🚀 Prochaine étape</strong></p>
+      <p>Créez votre première proposal pour un petit changement (ajout d'un tool simple, amélioration de la doc) et suivez le workflow complet. C'est en pratiquant qu'on maîtrise !</p>
+    </div>
+
+    <p style="text-align: center; margin-top: var(--space-2xl); font-size: 1.25rem;">
+      <strong>Bon développement avec OpenSpec ! 🎮📋</strong>
+    </p>
+  </article>
+</body>
+</html>

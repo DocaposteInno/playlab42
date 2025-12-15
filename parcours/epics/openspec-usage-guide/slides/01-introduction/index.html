@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introduction et concepts clés — OpenSpec Guide</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .concept-box {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+      margin: var(--space-lg) 0;
+    }
+    .concept-box h3 {
+      margin-top: 0;
+      color: var(--color-accent);
+    }
+    .comparison-table {
+      margin: var(--space-lg) 0;
+    }
+    .folder-structure {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--color-bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .highlight-box {
+      background: var(--color-accent-light);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>Introduction et concepts clés</h1>
+
+    <h2>Qu'est-ce qu'OpenSpec ?</h2>
+
+    <p><strong>OpenSpec</strong> est un système de gestion de spécifications et de changements conçu pour faciliter le développement collaboratif, particulièrement avec des agents IA.</p>
+
+    <div class="concept-box">
+      <h3>🎯 Philosophie : Spec-Driven Development</h3>
+      <p>Plutôt que de modifier le code directement, on commence par <strong>spécifier le changement</strong> avant de l'implémenter. Cela garantit :</p>
+      <ul>
+        <li>Une documentation à jour automatiquement</li>
+        <li>Une vision claire avant le code</li>
+        <li>Un historique traçable des décisions</li>
+        <li>Une collaboration fluide humain-IA</li>
+      </ul>
+    </div>
+
+    <h2>Pourquoi OpenSpec dans Playlab42 ?</h2>
+
+    <p>Playlab42 est un <strong>projet pédagogique</strong> où :</p>
+    <ul>
+      <li>Des stagiaires contribuent à chaque session de formation</li>
+      <li>Des agents IA (Claude, Copilot, etc.) assistent le développement</li>
+      <li>Le code doit rester exemplaire et documenté</li>
+      <li>Les décisions d'architecture doivent être explicites</li>
+    </ul>
+
+    <div class="highlight-box">
+      <p><strong>💡 Exemple concret</strong></p>
+      <p>Sans OpenSpec : "On ajoute un nouveau jeu" → code directement → documentation oubliée → confusion pour les prochains stagiaires.</p>
+      <p>Avec OpenSpec : Proposal → validation → implémentation guidée → spec fusionnée → documentation parfaitement à jour.</p>
+    </div>
+
+    <h2>Structure des dossiers OpenSpec</h2>
+
+    <div class="folder-structure">openspec/
+├── AGENTS.md           # Instructions pour les agents IA
+├── project.md          # Conventions du projet
+├── specs/              # Spécifications des capabilities
+│   ├── platform/
+│   │   └── spec.md     # Architecture globale
+│   ├── game-engine/
+│   │   └── spec.md     # Interface des moteurs de jeu
+│   └── catalogue/
+│       └── spec.md     # Format du catalogue
+└── changes/            # Propositions de changement
+    ├── add-poker-game/
+    │   ├── proposal.md # Pourquoi, Quoi, Impact
+    │   ├── tasks.md    # Checklist d'implémentation
+    │   ├── design.md   # Décisions techniques
+    │   └── specs/      # Deltas des specs
+    └── archive/        # Changes déployés
+        └── 2025-12-01-add-poker-game/</div>
+
+    <h2>Les 3 types de fichiers OpenSpec</h2>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Location</th>
+          <th>Rôle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Specs</strong></td>
+          <td><code>specs/[capability]/spec.md</code></td>
+          <td>Documentation technique de référence (truth source)</td>
+        </tr>
+        <tr>
+          <td><strong>Proposals</strong></td>
+          <td><code>changes/[id]/proposal.md</code></td>
+          <td>Description d'un changement proposé (why + what)</td>
+        </tr>
+        <tr>
+          <td><strong>Tasks</strong></td>
+          <td><code>changes/[id]/tasks.md</code></td>
+          <td>Checklist d'implémentation séquentielle</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Vocabulaire essentiel</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Terme</th>
+          <th>Définition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Capability</strong></td>
+          <td>Fonctionnalité du système (ex: game-engine, catalogue, parcours)</td>
+        </tr>
+        <tr>
+          <td><strong>Change</strong></td>
+          <td>Proposition de modification d'une ou plusieurs capabilities</td>
+        </tr>
+        <tr>
+          <td><strong>Spec</strong></td>
+          <td>Spécification technique d'une capability</td>
+        </tr>
+        <tr>
+          <td><strong>Proposal</strong></td>
+          <td>Document décrivant pourquoi et quoi changer</td>
+        </tr>
+        <tr>
+          <td><strong>Delta</strong></td>
+          <td>Modification incrémentale d'une spec (ADDED/UPDATED/REMOVED)</td>
+        </tr>
+        <tr>
+          <td><strong>Tasks</strong></td>
+          <td>Liste séquentielle des tâches d'implémentation</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Quand créer une proposal OpenSpec ?</h2>
+
+    <div class="concept-box">
+      <h3>✅ Créer une proposal pour :</h3>
+      <ul>
+        <li><strong>Nouvelles fonctionnalités</strong> : Nouveau jeu, nouvel outil, nouveau parcours</li>
+        <li><strong>Breaking changes</strong> : Modifications des APIs ou interfaces existantes</li>
+        <li><strong>Changements d'architecture</strong> : Refactoring majeur, nouvelle structure</li>
+        <li><strong>Travaux significatifs</strong> : Performance, sécurité, accessibilité</li>
+      </ul>
+    </div>
+
+    <div class="concept-box">
+      <h3>❌ Ne PAS créer de proposal pour :</h3>
+      <ul>
+        <li>Bug fixes simples (correction d'un typo, fix d'un calcul)</li>
+        <li>Mises à jour de dépendances (npm update)</li>
+        <li>Ajout de tests sur code existant</li>
+        <li>Corrections de documentation mineures</li>
+      </ul>
+    </div>
+
+    <blockquote>
+      <p><strong>💡 Règle d'or</strong></p>
+      <p>Si vous hésitez, demandez-vous : "Est-ce que ce changement mérite d'être documenté dans les specs ?" Si oui → proposal. Si non → commit direct.</p>
+    </blockquote>
+
+    <h2>Les bénéfices pour vous, stagiaire</h2>
+
+    <ul>
+      <li><strong>Clarté</strong> : Vous savez exactement quoi implémenter avant de coder</li>
+      <li><strong>Guidage</strong> : Les agents IA ont un contexte précis pour vous aider</li>
+      <li><strong>Traçabilité</strong> : Vos contributions sont documentées et valorisées</li>
+      <li><strong>Apprentissage</strong> : Vous apprenez à penser architecture avant code</li>
+      <li><strong>Collaboration</strong> : Les autres stagiaires comprennent vos choix</li>
+    </ul>
+
+    <p style="margin-top: var(--space-xl); text-align: center;">
+      <strong>Maintenant que vous comprenez les concepts, passons au workflow pratique ! 👉</strong>
+    </p>
+  </article>
+</body>
+</html>

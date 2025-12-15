@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-15T12:57:38.535Z",
+  "generatedAt": "2025-12-15T15:32:39.503Z",
   "epics": [
     {
       "id": "coding-agents-2025",
@@ -279,6 +279,69 @@
           "icon": "🔮"
         }
       ]
+    },
+    {
+      "id": "openspec-usage-guide",
+      "title": "OpenSpec — Guide d'utilisation pour Playlab42",
+      "description": "Maîtrisez le workflow spec-driven development avec OpenSpec : créer des proposals, implémenter des changements, archiver les modifications. Guide complet pour contribuer à Playlab42 avec rigueur et clarté.",
+      "path": "./parcours/epics/openspec-usage-guide",
+      "hierarchy": [
+        "playlab42"
+      ],
+      "tags": [
+        "openspec",
+        "workflow",
+        "dev",
+        "guide",
+        "contribution",
+        "specs"
+      ],
+      "author": "Playlab42",
+      "created": "2025-12-15",
+      "duration": "45 min",
+      "difficulty": "intermediate",
+      "icon": "📋",
+      "thumbnail": "./parcours/epics/openspec-usage-guide/assets/banner.svg",
+      "slideCount": 7,
+      "optionalSlideCount": 0,
+      "hasIndex": false,
+      "structure": [
+        {
+          "type": "slide",
+          "id": "00-presentation",
+          "title": "OpenSpec — Guide d'utilisation"
+        },
+        {
+          "type": "slide",
+          "id": "01-introduction",
+          "title": "Introduction et concepts clés"
+        },
+        {
+          "type": "slide",
+          "id": "02-workflow",
+          "title": "Le workflow en 3 étapes"
+        },
+        {
+          "type": "slide",
+          "id": "03-creer-proposal",
+          "title": "Créer une proposal"
+        },
+        {
+          "type": "slide",
+          "id": "04-implementer",
+          "title": "Implémenter avec /openspec:apply"
+        },
+        {
+          "type": "slide",
+          "id": "05-archiver",
+          "title": "Archiver après déploiement"
+        },
+        {
+          "type": "slide",
+          "id": "06-bonnes-pratiques",
+          "title": "Bonnes pratiques et pièges à éviter"
+        }
+      ]
     }
   ],
   "taxonomy": {
@@ -287,7 +350,7 @@
         "id": "autres",
         "label": "Autres",
         "icon": "📚",
-        "count": 4,
+        "count": 5,
         "thumbnail": null,
         "visible": true,
         "children": []
@@ -302,6 +365,11 @@
       {
         "id": "dev",
         "label": "Développement",
+        "count": 3
+      },
+      {
+        "id": "guide",
+        "label": "guide",
         "count": 2
       },
       {
@@ -327,11 +395,6 @@
       {
         "id": "ide",
         "label": "ide",
-        "count": 1
-      },
-      {
-        "id": "guide",
-        "label": "guide",
         "count": 1
       },
       {
@@ -362,6 +425,26 @@
       {
         "id": "archive",
         "label": "Archive",
+        "count": 1
+      },
+      {
+        "id": "openspec",
+        "label": "openspec",
+        "count": 1
+      },
+      {
+        "id": "workflow",
+        "label": "workflow",
+        "count": 1
+      },
+      {
+        "id": "contribution",
+        "label": "contribution",
+        "count": 1
+      },
+      {
+        "id": "specs",
+        "label": "specs",
         "count": 1
       }
     ]
@@ -453,6 +536,69 @@
             "id": "07-cli-annexes",
             "title": "Copilot CLI, OpenCode et Annexes",
             "icon": "📚"
+          }
+        ]
+      },
+      {
+        "id": "openspec-usage-guide",
+        "title": "OpenSpec — Guide d'utilisation pour Playlab42",
+        "description": "Maîtrisez le workflow spec-driven development avec OpenSpec : créer des proposals, implémenter des changements, archiver les modifications. Guide complet pour contribuer à Playlab42 avec rigueur et clarté.",
+        "path": "./parcours/epics/openspec-usage-guide",
+        "hierarchy": [
+          "playlab42"
+        ],
+        "tags": [
+          "openspec",
+          "workflow",
+          "dev",
+          "guide",
+          "contribution",
+          "specs"
+        ],
+        "author": "Playlab42",
+        "created": "2025-12-15",
+        "duration": "45 min",
+        "difficulty": "intermediate",
+        "icon": "📋",
+        "thumbnail": "./parcours/epics/openspec-usage-guide/assets/banner.svg",
+        "slideCount": 7,
+        "optionalSlideCount": 0,
+        "hasIndex": false,
+        "structure": [
+          {
+            "type": "slide",
+            "id": "00-presentation",
+            "title": "OpenSpec — Guide d'utilisation"
+          },
+          {
+            "type": "slide",
+            "id": "01-introduction",
+            "title": "Introduction et concepts clés"
+          },
+          {
+            "type": "slide",
+            "id": "02-workflow",
+            "title": "Le workflow en 3 étapes"
+          },
+          {
+            "type": "slide",
+            "id": "03-creer-proposal",
+            "title": "Créer une proposal"
+          },
+          {
+            "type": "slide",
+            "id": "04-implementer",
+            "title": "Implémenter avec /openspec:apply"
+          },
+          {
+            "type": "slide",
+            "id": "05-archiver",
+            "title": "Archiver après déploiement"
+          },
+          {
+            "type": "slide",
+            "id": "06-bonnes-pratiques",
+            "title": "Bonnes pratiques et pièges à éviter"
           }
         ]
       },
