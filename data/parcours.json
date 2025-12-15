@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-15T12:50:31.225Z",
+  "generatedAt": "2025-12-15T12:57:38.535Z",
   "epics": [
     {
       "id": "coding-agents-2025",
       "title": "Coding Agents en 2025",
       "description": "Guide technique complet sur les coding agents : écosystème, architecture, capacités et perspectives.",
-      "path": "/parcours/epics/coding-agents-2025",
+      "path": "./parcours/epics/coding-agents-2025",
       "hierarchy": [
         "agentique"
       ],
@@ -21,7 +21,7 @@
       "duration": "45 min",
       "difficulty": "intermediate",
       "icon": "🤖",
-      "thumbnail": "/parcours/epics/coding-agents-2025/assets/banner.png",
+      "thumbnail": "./parcours/epics/coding-agents-2025/assets/banner.png",
       "slideCount": 6,
       "optionalSlideCount": 0,
       "hasIndex": false,
@@ -68,7 +68,7 @@
       "id": "github-copilot-guide",
       "title": "GitHub Copilot — Guide du développeur",
       "description": "Guide complet pour maîtriser GitHub Copilot : présentation du service, autocomplétion, configuration projet, agents spécialisés, techniques de prompting, MCP et bonnes pratiques.",
-      "path": "/parcours/epics/github-copilot-guide",
+      "path": "./parcours/epics/github-copilot-guide",
       "hierarchy": [
         "ia-dev"
       ],
@@ -85,7 +85,7 @@
       "duration": "60 min",
       "difficulty": "intermediate",
       "icon": "🤖",
-      "thumbnail": "/parcours/epics/github-copilot-guide/assets/banner.png",
+      "thumbnail": "./parcours/epics/github-copilot-guide/assets/banner.png",
       "slideCount": 10,
       "optionalSlideCount": 0,
       "hasIndex": false,
@@ -156,7 +156,7 @@
       "id": "hello-playlab42",
       "title": "Bienvenue sur PlayLab42",
       "description": "Découvrez la plateforme, ses objectifs pédagogiques et comment contribuer.",
-      "path": "/parcours/epics/hello-playlab42",
+      "path": "./parcours/epics/hello-playlab42",
       "hierarchy": [
         "playlab42"
       ],
@@ -172,7 +172,7 @@
       "duration": "15 min",
       "difficulty": "beginner",
       "icon": "👋",
-      "thumbnail": "/parcours/epics/hello-playlab42/thumbnail.png",
+      "thumbnail": "./parcours/epics/hello-playlab42/thumbnail.png",
       "slideCount": 7,
       "optionalSlideCount": 0,
       "hasIndex": false,
@@ -241,7 +241,7 @@
       "id": "internet-france-1994",
       "title": "L'Internet débarque en France",
       "description": "Dossier spécial : cette technologie américaine qui va révolutionner nos entreprises.",
-      "path": "/parcours/epics/internet-france-1994",
+      "path": "./parcours/epics/internet-france-1994",
       "hierarchy": [
         "autres"
       ],
@@ -372,7 +372,7 @@
         "id": "github-copilot-guide",
         "title": "GitHub Copilot — Guide du développeur",
         "description": "Guide complet pour maîtriser GitHub Copilot : présentation du service, autocomplétion, configuration projet, agents spécialisés, techniques de prompting, MCP et bonnes pratiques.",
-        "path": "/parcours/epics/github-copilot-guide",
+        "path": "./parcours/epics/github-copilot-guide",
         "hierarchy": [
           "ia-dev"
         ],
@@ -389,7 +389,7 @@
         "duration": "60 min",
         "difficulty": "intermediate",
         "icon": "🤖",
-        "thumbnail": "/parcours/epics/github-copilot-guide/assets/banner.png",
+        "thumbnail": "./parcours/epics/github-copilot-guide/assets/banner.png",
         "slideCount": 10,
         "optionalSlideCount": 0,
         "hasIndex": false,
@@ -460,7 +460,7 @@
         "id": "coding-agents-2025",
         "title": "Coding Agents en 2025",
         "description": "Guide technique complet sur les coding agents : écosystème, architecture, capacités et perspectives.",
-        "path": "/parcours/epics/coding-agents-2025",
+        "path": "./parcours/epics/coding-agents-2025",
         "hierarchy": [
           "agentique"
         ],
@@ -475,7 +475,7 @@
         "duration": "45 min",
         "difficulty": "intermediate",
         "icon": "🤖",
-        "thumbnail": "/parcours/epics/coding-agents-2025/assets/banner.png",
+        "thumbnail": "./parcours/epics/coding-agents-2025/assets/banner.png",
         "slideCount": 6,
         "optionalSlideCount": 0,
         "hasIndex": false,
@@ -522,7 +522,7 @@
         "id": "hello-playlab42",
         "title": "Bienvenue sur PlayLab42",
         "description": "Découvrez la plateforme, ses objectifs pédagogiques et comment contribuer.",
-        "path": "/parcours/epics/hello-playlab42",
+        "path": "./parcours/epics/hello-playlab42",
         "hierarchy": [
           "playlab42"
         ],
@@ -538,7 +538,7 @@
         "duration": "15 min",
         "difficulty": "beginner",
         "icon": "👋",
-        "thumbnail": "/parcours/epics/hello-playlab42/thumbnail.png",
+        "thumbnail": "./parcours/epics/hello-playlab42/thumbnail.png",
         "slideCount": 7,
         "optionalSlideCount": 0,
         "hasIndex": false,
