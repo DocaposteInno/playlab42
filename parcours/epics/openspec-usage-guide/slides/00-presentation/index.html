@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenSpec — Guide d'utilisation pour Playlab42</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .hero {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+      background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      margin: var(--space-xl) 0;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+      color: white;
+    }
+    .hero .subtitle {
+      font-size: 1.25rem;
+      opacity: 0.95;
+      margin-bottom: var(--space-lg);
+    }
+    .hero .icon {
+      font-size: 5rem;
+      margin-bottom: var(--space-md);
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+    .feature-card {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .feature-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-sm);
+    }
+    .feature-card h3 {
+      margin: var(--space-sm) 0;
+    }
+    .target-audience {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+      margin: var(--space-xl) 0;
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <div class="hero">
+      <div class="icon">📋</div>
+      <h1>OpenSpec</h1>
+      <p class="subtitle">Guide d'utilisation pour Playlab42</p>
+      <p>Maîtrisez le workflow spec-driven development</p>
+    </div>
+
+    <div class="target-audience">
+      <p><strong>👥 Public cible</strong> : Développeurs contribuant à Playlab42, stagiaires en formation IA-assisted dev</p>
+      <p><strong>⏱️ Durée estimée</strong> : 45 minutes</p>
+      <p><strong>📊 Niveau</strong> : Intermédiaire (connaissances git requises)</p>
+    </div>
+
+    <h2>🎯 Objectifs de ce parcours</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">🧠</div>
+        <h3>Comprendre</h3>
+        <p>La philosophie spec-driven et son intérêt pour un projet pédagogique</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">⚙️</div>
+        <h3>Maîtriser</h3>
+        <p>Le workflow en 3 étapes : proposal → apply → archive</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">✍️</div>
+        <h3>Créer</h3>
+        <p>Vos premières proposals de changement avec rigueur</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="icon">🚀</div>
+        <h3>Contribuer</h3>
+        <p>Efficacement au projet avec des changements documentés</p>
+      </div>
+    </div>
+
+    <h2>📚 Ce que vous apprendrez</h2>
+
+    <ul>
+      <li>Pourquoi utiliser OpenSpec dans Playlab42</li>
+      <li>Quand créer une proposal (et quand ne pas le faire)</li>
+      <li>Comment structurer une proposition de changement</li>
+      <li>Comment implémenter un changement step by step</li>
+      <li>Comment archiver et fusionner les specs après déploiement</li>
+      <li>Les bonnes pratiques pour des contributions de qualité</li>
+    </ul>
+
+    <blockquote>
+      <p><strong>💡 Prérequis</strong></p>
+      <p>Connaissances de base en git, markdown, et développement collaboratif. Avoir lu le fichier <code>AGENTS.md</code> du projet est un plus.</p>
+    </blockquote>
+
+    <p style="text-align: center; margin-top: var(--space-2xl); font-size: 1.25rem;">
+      <strong>Prêt à maîtriser OpenSpec ?</strong><br>
+      <span style="opacity: 0.7;">Passez à la suite pour découvrir les concepts clés 👉</span>
+    </p>
+  </article>
+</body>
+</html>

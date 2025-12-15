@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le workflow en 3 étapes — OpenSpec Guide</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .workflow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-lg);
+      margin: var(--space-2xl) 0;
+      flex-wrap: wrap;
+    }
+    .workflow-step {
+      flex: 1;
+      min-width: 200px;
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+      text-align: center;
+      position: relative;
+    }
+    .workflow-step .number {
+      display: inline-block;
+      width: 3rem;
+      height: 3rem;
+      background: var(--color-accent);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 3rem;
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-bottom: var(--space-md);
+    }
+    .workflow-step h3 {
+      margin: var(--space-sm) 0;
+      color: var(--color-accent);
+    }
+    .workflow-arrow {
+      font-size: 2rem;
+      color: var(--color-text-muted);
+    }
+    .command-box {
+      background: var(--color-bg-tertiary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+      font-family: var(--font-mono);
+      margin: var(--space-md) 0;
+    }
+    .detail-section {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      margin: var(--space-xl) 0;
+    }
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+    .checklist li::before {
+      content: "✓ ";
+      color: var(--color-success);
+      font-weight: bold;
+      margin-right: var(--space-xs);
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>Le workflow en 3 étapes</h1>
+
+    <p>OpenSpec suit un workflow simple et linéaire. Chaque changement passe par ces 3 phases :</p>
+
+    <div class="workflow-diagram">
+      <div class="workflow-step">
+        <div class="number">1</div>
+        <h3>Proposal</h3>
+        <p>Créer et valider le changement</p>
+      </div>
+
+      <div class="workflow-arrow">→</div>
+
+      <div class="workflow-step">
+        <div class="number">2</div>
+        <h3>Apply</h3>
+        <p>Implémenter les tâches</p>
+      </div>
+
+      <div class="workflow-arrow">→</div>
+
+      <div class="workflow-step">
+        <div class="number">3</div>
+        <h3>Archive</h3>
+        <p>Fusionner et archiver</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Étape 1 : Créer une proposal</h2>
+
+    <div class="detail-section">
+      <h3>🎯 Objectif</h3>
+      <p>Décrire <strong>pourquoi</strong> et <strong>quoi</strong> changer avant d'écrire du code.</p>
+
+      <h3>📝 Actions</h3>
+      <ul class="checklist">
+        <li>Créer un dossier <code>openspec/changes/[change-id]/</code></li>
+        <li>Rédiger <code>proposal.md</code> (Motivation, Description, Impact)</li>
+        <li>Lister les tâches dans <code>tasks.md</code></li>
+        <li>Ajouter les deltas de specs dans <code>specs/</code> (optionnel)</li>
+        <li>Obtenir validation (review ou auto-validation si mineur)</li>
+      </ul>
+
+      <div class="command-box">
+        <strong>Commande agent IA :</strong><br>
+        /openspec:proposal
+      </div>
+
+      <blockquote>
+        <p><strong>💡 Astuce</strong> : Les agents IA peuvent créer la proposal pour vous si vous leur expliquez votre besoin clairement.</p>
+      </blockquote>
+    </div>
+
+    <hr>
+
+    <h2>Étape 2 : Implémenter (Apply)</h2>
+
+    <div class="detail-section">
+      <h3>🎯 Objectif</h3>
+      <p>Suivre le plan défini dans <code>tasks.md</code> et cocher chaque tâche au fur et à mesure.</p>
+
+      <h3>📝 Actions</h3>
+      <ul class="checklist">
+        <li>Ouvrir <code>openspec/changes/[change-id]/tasks.md</code></li>
+        <li>Implémenter chaque tâche <strong>séquentiellement</strong></li>
+        <li>Cocher chaque tâche terminée avec <code>[x]</code></li>
+        <li>Documenter les décisions dans <code>design.md</code> si nécessaire</li>
+        <li>Tester régulièrement (<code>make test</code>, <code>make lint</code>)</li>
+        <li>Commiter au fil de l'eau</li>
+      </ul>
+
+      <div class="command-box">
+        <strong>Commande agent IA :</strong><br>
+        /openspec:apply
+      </div>
+
+      <blockquote>
+        <p><strong>⚠️ Important</strong> : Ne pas sauter les tâches. Chaque tâche prépare la suivante.</p>
+      </blockquote>
+    </div>
+
+    <hr>
+
+    <h2>Étape 3 : Archiver après déploiement</h2>
+
+    <div class="detail-section">
+      <h3>🎯 Objectif</h3>
+      <p>Fusionner les deltas dans les specs officielles et archiver la proposal pour garder <code>changes/</code> propre.</p>
+
+      <h3>📝 Actions</h3>
+      <ul class="checklist">
+        <li>Vérifier que le changement est <strong>déployé en production</strong></li>
+        <li>Fusionner les deltas <code>changes/[id]/specs/</code> → <code>specs/</code></li>
+        <li>Déplacer le dossier vers <code>changes/archive/YYYY-MM-DD-[name]/</code></li>
+        <li>Mettre à jour les références dans <code>AGENTS.md</code> si nécessaire</li>
+      </ul>
+
+      <div class="command-box">
+        <strong>Commande agent IA :</strong><br>
+        /openspec:archive
+      </div>
+
+      <blockquote>
+        <p><strong>💡 Pourquoi archiver ?</strong> Cela garde les specs à jour et évite un dossier <code>changes/</code> encombré de proposals terminées.</p>
+      </blockquote>
+    </div>
+
+    <hr>
+
+    <h2>Résumé visuel du cycle de vie</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>État du changement</th>
+          <th>Action clé</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Proposal</strong></td>
+          <td>Idée documentée</td>
+          <td>Valider avant de coder</td>
+        </tr>
+        <tr>
+          <td><strong>Apply</strong></td>
+          <td>Implémentation en cours</td>
+          <td>Suivre tasks.md étape par étape</td>
+        </tr>
+        <tr>
+          <td><strong>Déployé</strong></td>
+          <td>En production</td>
+          <td>Utiliser, monitorer</td>
+        </tr>
+        <tr>
+          <td><strong>Archive</strong></td>
+          <td>Spec fusionnée</td>
+          <td>Historique propre</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Commandes CLI disponibles</h2>
+
+    <p>Si vous préférez la ligne de commande aux slash commands :</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Commande</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>openspec list</code></td>
+          <td>Liste les changes actifs</td>
+        </tr>
+        <tr>
+          <td><code>openspec list --specs</code></td>
+          <td>Liste toutes les capabilities</td>
+        </tr>
+        <tr>
+          <td><code>openspec show [item]</code></td>
+          <td>Affiche les détails d'un item</td>
+        </tr>
+        <tr>
+          <td><code>openspec validate [item]</code></td>
+          <td>Validation stricte d'une proposal</td>
+        </tr>
+        <tr>
+          <td><code>openspec archive &lt;id&gt;</code></td>
+          <td>Archive un changement déployé</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: var(--space-xl); text-align: center;">
+      <strong>Passons maintenant à la pratique : créer votre première proposal ! 👉</strong>
+    </p>
+  </article>
+</body>
+</html>

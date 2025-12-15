@@ -1,0 +1,40 @@
+{
+  "id": "openspec-usage-guide",
+  "title": "OpenSpec — Guide d'utilisation pour Playlab42",
+  "description": "Maîtrisez le workflow spec-driven development avec OpenSpec : créer des proposals, implémenter des changements, archiver les modifications. Guide complet pour contribuer à Playlab42 avec rigueur et clarté.",
+  "hierarchy": ["playlab42"],
+  "tags": ["openspec", "workflow", "dev", "guide", "contribution", "specs"],
+  "metadata": {
+    "author": "Playlab42",
+    "created": "2025-12-15",
+    "duration": "45 min",
+    "difficulty": "intermediate"
+  },
+  "icon": "📋",
+  "thumbnail": "assets/banner.svg",
+  "content": [
+    { "id": "00-presentation" },
+    { "id": "01-introduction" },
+    { "id": "02-workflow" },
+    { "id": "03-creer-proposal" },
+    { "id": "04-implementer" },
+    { "id": "05-archiver" },
+    { "id": "06-bonnes-pratiques" }
+  ],
+  "bookmarks": [
+    {
+      "url": "https://github.com/z4ppy/playlab42",
+      "title": "Playlab42 Repository",
+      "description": "Dépôt GitHub du projet Playlab42",
+      "icon": "🎮",
+      "tags": ["github", "playlab42"]
+    },
+    {
+      "url": "https://github.com/z4ppy/playlab42/tree/main/openspec",
+      "title": "OpenSpec Directory",
+      "description": "Structure OpenSpec de Playlab42",
+      "icon": "📁",
+      "tags": ["openspec", "specs"]
+    }
+  ]
+}

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archiver après déploiement — OpenSpec Guide</title>
+  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '/lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .command-box {
+      background: var(--color-bg-tertiary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-accent);
+      font-family: var(--font-mono);
+      margin: var(--space-lg) 0;
+      font-size: 1.1rem;
+    }
+    .step-box {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      margin: var(--space-lg) 0;
+    }
+    .step-number {
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      background: var(--color-accent);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 2rem;
+      font-weight: bold;
+      margin-right: var(--space-sm);
+    }
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .before-after > div {
+      background: var(--color-bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+    }
+    .before-after h4 {
+      margin-top: 0;
+      color: var(--color-accent);
+    }
+    .folder-structure {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--color-bg-tertiary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .warning-box {
+      background: #fff3cd;
+      color: #856404;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #ffc107;
+      margin: var(--space-lg) 0;
+    }
+    .success-box {
+      background: #d4edda;
+      color: #155724;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #28a745;
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>Archiver après déploiement</h1>
+
+    <p>Une fois le changement <strong>déployé en production</strong>, il faut archiver la proposal pour garder le dossier <code>changes/</code> propre et fusionner les deltas dans les specs officielles.</p>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Important : N'archiver qu'après déploiement</strong></p>
+      <p>L'archivage signifie que le changement est <strong>terminé et en production</strong>. Ne pas archiver si le code est seulement mergé mais pas encore déployé.</p>
+    </div>
+
+    <h2>Quand archiver ?</h2>
+
+    <ul>
+      <li>✅ Le changement est mergé sur la branche principale</li>
+      <li>✅ Le changement est déployé en production (GitHub Pages pour Playlab42)</li>
+      <li>✅ Les tests passent en production</li>
+      <li>✅ Aucune régression détectée</li>
+    </ul>
+
+    <h2>Lancer l'archivage</h2>
+
+    <div class="command-box">
+      <strong>Avec un agent IA :</strong><br>
+      /openspec:archive
+    </div>
+
+    <p>Ou manuellement avec le CLI :</p>
+
+    <div class="command-box">
+      openspec archive &lt;change-id&gt;
+    </div>
+
+    <h2>Ce que fait l'archivage</h2>
+
+    <div class="step-box">
+      <h3><span class="step-number">1</span> Fusionner les deltas dans les specs</h3>
+      <p>Les modifications dans <code>changes/[id]/specs/</code> sont intégrées dans <code>specs/</code>.</p>
+      <p><strong>Exemple :</strong></p>
+      <ul>
+        <li><code>changes/add-poker-game/specs/catalogue/delta.md</code></li>
+        <li>→ Fusionné dans <code>specs/catalogue/spec.md</code></li>
+      </ul>
+    </div>
+
+    <div class="step-box">
+      <h3><span class="step-number">2</span> Déplacer vers archive/</h3>
+      <p>Le dossier de la proposal est déplacé avec un timestamp :</p>
+      <div class="folder-structure">changes/add-poker-game/
+→ changes/archive/2025-12-15-add-poker-game/</div>
+      <p><strong>Format du timestamp :</strong> <code>YYYY-MM-DD-[change-id]</code></p>
+    </div>
+
+    <div class="step-box">
+      <h3><span class="step-number">3</span> Mettre à jour AGENTS.md (si nécessaire)</h3>
+      <p>Si votre changement introduit de nouvelles conventions ou workflows, mettez à jour <code>openspec/AGENTS.md</code>.</p>
+    </div>
+
+    <h2>Avant / Après archivage</h2>
+
+    <div class="before-after">
+      <div>
+        <h4>📁 Avant (changes actifs)</h4>
+        <div class="folder-structure">openspec/
+├── changes/
+│   ├── add-poker-game/
+│   │   ├── proposal.md
+│   │   ├── tasks.md
+│   │   └── specs/
+│   │       └── catalogue/
+│   │           └── delta.md
+│   └── archive/
+└── specs/
+    └── catalogue/
+        └── spec.md</div>
+      </div>
+
+      <div>
+        <h4>📁 Après archivage</h4>
+        <div class="folder-structure">openspec/
+├── changes/
+│   └── archive/
+│       └── 2025-12-15-add-poker-game/
+│           ├── proposal.md
+│           ├── tasks.md
+│           └── specs/ (conservé)
+└── specs/
+    └── catalogue/
+        └── spec.md (mis à jour ✓)</div>
+      </div>
+    </div>
+
+    <h2>Fusionner les deltas : Exemple concret</h2>
+
+    <p><strong>Contenu du delta :</strong> <code>changes/add-poker-game/specs/catalogue/delta.md</code></p>
+
+    <div class="folder-structure">## ADDED Requirements
+
+### Requirement: Poker Game Entry
+The catalogue SHALL include an entry for the poker game.
+
+#### Scenario: Poker appears in catalogue
+- **WHEN** the catalogue is rebuilt
+- **THEN** the poker game is listed with correct metadata</div>
+
+    <p><strong>Après fusion dans</strong> <code>specs/catalogue/spec.md</code> :</p>
+
+    <div class="folder-structure"># Catalogue Specification
+
+## Requirements
+
+### Requirement: Game Entries
+The catalogue SHALL list all games with metadata.
+
+### Requirement: Poker Game Entry
+The catalogue SHALL include an entry for the poker game.
+
+#### Scenario: Poker appears in catalogue
+- **WHEN** the catalogue is rebuilt
+- **THEN** the poker game is listed with correct metadata</div>
+
+    <h2>Procédure manuelle d'archivage</h2>
+
+    <p>Si vous préférez archiver manuellement :</p>
+
+    <ol>
+      <li>
+        <strong>Vérifier l'état</strong>
+        <pre><code>openspec show add-poker-game</code></pre>
+      </li>
+      <li>
+        <strong>Fusionner les deltas</strong>
+        <p>Copiez le contenu de <code>changes/[id]/specs/</code> dans <code>specs/</code> en respectant les sections ADDED/UPDATED/REMOVED.</p>
+      </li>
+      <li>
+        <strong>Déplacer le dossier</strong>
+        <pre><code>mv openspec/changes/add-poker-game \
+   openspec/changes/archive/2025-12-15-add-poker-game</code></pre>
+      </li>
+      <li>
+        <strong>Commiter</strong>
+        <pre><code>git add openspec/
+git commit -m "docs(openspec): archivage add-poker-game"</code></pre>
+      </li>
+    </ol>
+
+    <div class="success-box">
+      <p><strong>✅ Archivage terminé !</strong></p>
+      <p>Votre changement est maintenant :</p>
+      <ul>
+        <li>Intégré dans les specs officielles</li>
+        <li>Archivé avec historique complet</li>
+        <li>Traçable pour les futurs contributeurs</li>
+      </ul>
+    </div>
+
+    <h2>Pourquoi archiver est important</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Bénéfice</th>
+          <th>Explication</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Specs à jour</strong></td>
+          <td>Les specs reflètent toujours l'état actuel du système</td>
+        </tr>
+        <tr>
+          <td><strong>Dossier propre</strong></td>
+          <td><code>changes/</code> ne contient que les proposals actives</td>
+        </tr>
+        <tr>
+          <td><strong>Historique</strong></td>
+          <td>L'archive garde la trace de toutes les décisions passées</td>
+        </tr>
+        <tr>
+          <td><strong>Onboarding</strong></td>
+          <td>Les nouveaux contributeurs voient clairement ce qui est en cours</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Checklist avant archivage</h2>
+
+    <ul>
+      <li>✅ Changement déployé en production</li>
+      <li>✅ Tests passent en production</li>
+      <li>✅ Aucune régression signalée</li>
+      <li>✅ Deltas de specs identifiés</li>
+      <li>✅ Branche feature mergée et supprimée</li>
+    </ul>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Ne pas supprimer l'archive</strong></p>
+      <p>Les proposals archivées servent de documentation historique. Ne jamais les supprimer, même des années plus tard.</p>
+    </div>
+
+    <p style="margin-top: var(--space-xl); text-align: center;">
+      <strong>Vous maîtrisez maintenant le cycle complet ! Découvrons les bonnes pratiques 👉</strong>
+    </p>
+  </article>
+</body>
+</html>
