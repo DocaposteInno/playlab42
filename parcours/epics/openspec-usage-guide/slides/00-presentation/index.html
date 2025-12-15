@@ -13,52 +13,124 @@
   <style>
     .hero {
       text-align: center;
-      padding: var(--space-2xl) var(--space-lg);
-      background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+      padding: var(--space-2xl) var(--space-xl);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border-radius: var(--radius-lg);
-      margin: var(--space-xl) 0;
+      margin: var(--space-lg) 0 var(--space-2xl) 0;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
     .hero h1 {
-      font-size: 3rem;
-      margin-bottom: var(--space-md);
+      font-size: 2.5rem;
+      margin-bottom: var(--space-sm);
       color: white;
+      font-weight: 700;
     }
     .hero .subtitle {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       opacity: 0.95;
-      margin-bottom: var(--space-lg);
+      margin-bottom: 0;
     }
     .hero .icon {
-      font-size: 5rem;
-      margin-bottom: var(--space-md);
+      font-size: 3.5rem;
+      margin-bottom: var(--space-sm);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .info-banner {
+      background: var(--color-bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      margin: var(--space-lg) 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+    }
+    .info-item {
+      text-align: center;
+      padding: var(--space-sm);
+    }
+    .info-item strong {
+      display: block;
+      color: var(--color-accent);
+      margin-bottom: var(--space-xs);
+      font-size: 0.9rem;
     }
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--space-lg);
-      margin: var(--space-xl) 0;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
     }
     .feature-card {
+      background: var(--color-bg-secondary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .feature-card .icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .feature-card-content h3 {
+      margin: 0 0 var(--space-xs) 0;
+      font-size: 1.1rem;
+      color: var(--color-accent);
+    }
+    .feature-card-content p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .learning-list {
       background: var(--color-bg-secondary);
       padding: var(--space-lg);
       border-radius: var(--radius-md);
       border: 1px solid var(--color-border);
-      text-align: center;
     }
-    .feature-card .icon {
-      font-size: 2.5rem;
-      margin-bottom: var(--space-sm);
+    .learning-list h2 {
+      margin-top: 0;
+      color: var(--color-accent);
     }
-    .feature-card h3 {
+    .learning-list ul {
+      margin: 0;
+      padding-left: var(--space-lg);
+    }
+    .learning-list li {
       margin: var(--space-sm) 0;
+      line-height: 1.6;
     }
-    .target-audience {
-      background: var(--color-bg-secondary);
-      padding: var(--space-lg);
+    .cta-box {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      padding: var(--space-xl);
       border-radius: var(--radius-md);
-      border-left: 4px solid var(--color-accent);
-      margin: var(--space-xl) 0;
+      margin-top: var(--space-2xl);
+      border: 2px solid var(--color-accent);
+    }
+    .cta-box strong {
+      font-size: 1.3rem;
+      color: var(--color-accent);
+    }
+    .prereq-box {
+      background: #fff3cd;
+      color: #856404;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 4px solid #ffc107;
+      margin: var(--space-lg) 0;
+    }
+    .prereq-box strong {
+      color: #856404;
     }
   </style>
 </head>
@@ -68,13 +140,21 @@
       <div class="icon">📋</div>
       <h1>OpenSpec</h1>
       <p class="subtitle">Guide d'utilisation pour Playlab42</p>
-      <p>Maîtrisez le workflow spec-driven development</p>
     </div>
 
-    <div class="target-audience">
-      <p><strong>👥 Public cible</strong> : Développeurs contribuant à Playlab42, stagiaires en formation IA-assisted dev</p>
-      <p><strong>⏱️ Durée estimée</strong> : 45 minutes</p>
-      <p><strong>📊 Niveau</strong> : Intermédiaire (connaissances git requises)</p>
+    <div class="info-banner">
+      <div class="info-item">
+        <strong>👥 Public cible</strong>
+        <span>Développeurs et stagiaires</span>
+      </div>
+      <div class="info-item">
+        <strong>⏱️ Durée</strong>
+        <span>45 minutes</span>
+      </div>
+      <div class="info-item">
+        <strong>📊 Niveau</strong>
+        <span>Intermédiaire</span>
+      </div>
     </div>
 
     <h2>🎯 Objectifs de ce parcours</h2>
@@ -82,49 +162,58 @@
     <div class="feature-grid">
       <div class="feature-card">
         <div class="icon">🧠</div>
-        <h3>Comprendre</h3>
-        <p>La philosophie spec-driven et son intérêt pour un projet pédagogique</p>
+        <div class="feature-card-content">
+          <h3>Comprendre</h3>
+          <p>La philosophie spec-driven et son intérêt pour un projet pédagogique</p>
+        </div>
       </div>
 
       <div class="feature-card">
         <div class="icon">⚙️</div>
-        <h3>Maîtriser</h3>
-        <p>Le workflow en 3 étapes : proposal → apply → archive</p>
+        <div class="feature-card-content">
+          <h3>Maîtriser</h3>
+          <p>Le workflow en 3 étapes : proposal → apply → archive</p>
+        </div>
       </div>
 
       <div class="feature-card">
         <div class="icon">✍️</div>
-        <h3>Créer</h3>
-        <p>Vos premières proposals de changement avec rigueur</p>
+        <div class="feature-card-content">
+          <h3>Créer</h3>
+          <p>Vos premières proposals de changement avec rigueur</p>
+        </div>
       </div>
 
       <div class="feature-card">
         <div class="icon">🚀</div>
-        <h3>Contribuer</h3>
-        <p>Efficacement au projet avec des changements documentés</p>
+        <div class="feature-card-content">
+          <h3>Contribuer</h3>
+          <p>Efficacement au projet avec des changements documentés</p>
+        </div>
       </div>
     </div>
 
-    <h2>📚 Ce que vous apprendrez</h2>
+    <div class="learning-list">
+      <h2>📚 Ce que vous apprendrez</h2>
+      <ul>
+        <li>Pourquoi utiliser OpenSpec dans Playlab42</li>
+        <li>Quand créer une proposal (et quand ne pas le faire)</li>
+        <li>Comment structurer une proposition de changement</li>
+        <li>Comment implémenter un changement step by step</li>
+        <li>Comment archiver et fusionner les specs après déploiement</li>
+        <li>Les bonnes pratiques pour des contributions de qualité</li>
+      </ul>
+    </div>
 
-    <ul>
-      <li>Pourquoi utiliser OpenSpec dans Playlab42</li>
-      <li>Quand créer une proposal (et quand ne pas le faire)</li>
-      <li>Comment structurer une proposition de changement</li>
-      <li>Comment implémenter un changement step by step</li>
-      <li>Comment archiver et fusionner les specs après déploiement</li>
-      <li>Les bonnes pratiques pour des contributions de qualité</li>
-    </ul>
-
-    <blockquote>
+    <div class="prereq-box">
       <p><strong>💡 Prérequis</strong></p>
       <p>Connaissances de base en git, markdown, et développement collaboratif. Avoir lu le fichier <code>AGENTS.md</code> du projet est un plus.</p>
-    </blockquote>
+    </div>
 
-    <p style="text-align: center; margin-top: var(--space-2xl); font-size: 1.25rem;">
-      <strong>Prêt à maîtriser OpenSpec ?</strong><br>
-      <span style="opacity: 0.7;">Passez à la suite pour découvrir les concepts clés 👉</span>
-    </p>
+    <div class="cta-box">
+      <p><strong>Prêt à maîtriser OpenSpec ?</strong></p>
+      <p style="opacity: 0.8; margin-top: var(--space-sm);">Passez à la suite pour découvrir les concepts clés 👉</p>
+    </div>
   </article>
 </body>
 </html>
