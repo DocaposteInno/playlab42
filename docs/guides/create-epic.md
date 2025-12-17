@@ -127,10 +127,10 @@ Chaque slide est un dossier avec `slide.json` et un fichier de contenu.
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Introduction - PlayLab42</title>
-  <link rel="stylesheet" href="/lib/theme.css">
-  <link rel="stylesheet" href="/parcours/_shared/slide-base.css">
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
   <script type="module">
-    import { initTheme } from '/lib/theme.js';
+    import { initTheme } from '../../../../../lib/theme.js';
     initTheme();
   </script>
 </head>
