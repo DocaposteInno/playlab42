@@ -108,6 +108,31 @@ The system SHALL display pedagogical content (Epics) in the Parcours tab.
 - **THEN** navigation controls (prev/next) are visible
 - **AND** keyboard shortcuts work (arrows, Escape)
 
+### Requirement: Hash Routing
+
+The system SHALL use hash-based routing for deep linking and navigation.
+
+#### Scenario: Direct link to game
+- **WHEN** a user opens `#/games/checkers`
+- **THEN** the game loads directly in the iframe
+
+#### Scenario: Direct link to parcours
+- **WHEN** a user opens `#/parcours/hello-playlab42`
+- **THEN** the parcours viewer opens at the first slide
+
+#### Scenario: Direct link to slide
+- **WHEN** a user opens `#/parcours/hello-playlab42/02-methodologies`
+- **THEN** the parcours viewer opens at the specified slide
+
+#### Scenario: Browser back button
+- **WHEN** a user navigates to a game then presses back
+- **THEN** the catalog is displayed
+
+#### Scenario: Bookmarkable URLs
+- **WHEN** viewing a slide
+- **THEN** the URL reflects the current position
+- **AND** the URL can be bookmarked or shared
+
 ## Interface
 
 ### Application State
@@ -454,6 +479,60 @@ function renderCard(entry, type) {
 }
 ```
 
+## Hash Router
+
+Le portail utilise un hash router (`lib/router.js`) pour la navigation. Cela permet :
+- **Deep linking** : URLs partageables vers un jeu, outil ou slide spécifique
+- **Bookmarks** : Les favoris fonctionnent correctement
+- **Historique** : Le bouton précédent/suivant du navigateur fonctionne
+- **Compatibilité GitHub Pages** : Pas de configuration serveur requise
+
+### Routes supportées
+
+| Route | Description |
+|-------|-------------|
+| `#/` | Catalogue (accueil) |
+| `#/games/:id` | Jeu spécifique |
+| `#/tools/:id` | Outil spécifique |
+| `#/parcours/:epic` | Parcours (premier slide) |
+| `#/parcours/:epic/:slide` | Slide spécifique |
+| `#/settings` | Paramètres |
+
+### Exemples d'URLs
+
+```
+https://example.com/playlab42/#/games/checkers
+https://example.com/playlab42/#/tools/json-formatter
+https://example.com/playlab42/#/parcours/hello-playlab42
+https://example.com/playlab42/#/parcours/hello-playlab42/02-methodologies
+https://example.com/playlab42/#/settings
+```
+
+### API du Router
+
+```javascript
+import { initRouter, navigate, replaceRoute, getCurrentRoute, buildUrl } from './lib/router.js';
+
+// Initialiser avec les handlers
+initRouter({
+  catalogue: () => showCatalogue(),
+  game: (params) => loadGame(params.id),
+  tool: (params) => loadTool(params.id),
+  parcours: (params) => openParcours(params.epic),
+  slide: (params) => openSlide(params.epic, params.slide),
+  settings: () => showSettings(),
+});
+
+// Naviguer programmatiquement
+navigate('/games/checkers');
+
+// Mettre à jour l'URL sans déclencher de navigation
+replaceRoute('/parcours/hello/02-slide');
+
+// Construire une URL
+const url = buildUrl('game', { id: 'checkers' }); // '#/games/checkers'
+```
+
 ## Keyboard Shortcuts
 
 | Key | Context | Action |
@@ -462,8 +541,10 @@ function renderCard(entry, type) {
 | `F` | Game view | Toggle fullscreen |
 | `M` | Game view | Toggle mute |
 | `/` | Catalog | Focus search |
-| `1` | Catalog | Switch to Tools tab |
-| `2` | Catalog | Switch to Games tab |
+| `1` | Catalog | Switch to Parcours tab |
+| `2` | Catalog | Switch to Tools tab |
+| `3` | Catalog | Switch to Games tab |
+| `4` | Catalog | Switch to Bookmarks tab |
 
 ## Responsive Design
 

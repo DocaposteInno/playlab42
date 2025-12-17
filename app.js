@@ -6,6 +6,7 @@
 import { $, on, delegate, cloneTemplate, debounce } from './lib/dom.js';
 import { getTheme, setTheme, THEMES } from './lib/theme.js';
 import { ParcoursViewer } from './lib/parcours-viewer.js';
+import { initRouter, navigate } from './lib/router.js';
 
 // === État de l'application ===
 const state = {
@@ -724,9 +725,8 @@ function openEpic(epicId, slideId = null) {
  * Ferme le viewer de parcours et retourne au catalogue
  */
 function closeParcours() {
-  el.viewParcours.classList.remove('active');
-  el.viewCatalogue.classList.add('active');
-  setState({ currentView: 'catalogue' });
+  // Naviguer vers le catalogue via le router
+  navigate('/');
 }
 
 /**
@@ -1020,16 +1020,8 @@ function unloadGame() {
 
   setTimeout(() => {
     el.gameIframe.src = 'about:blank';
-    setState({
-      currentGame: null,
-      currentView: 'catalogue',
-    });
-
-    el.viewGame.classList.remove('active');
-    el.viewSettings.classList.remove('active');
-    el.viewCatalogue.classList.add('active');
-    document.body.classList.remove('fullscreen');
-    document.body.classList.remove('game-active');
+    // Naviguer vers le catalogue via le router
+    navigate('/');
   }, 100);
 }
 
@@ -1079,9 +1071,8 @@ function hideSettings() {
   state.preferences.pseudo = newPseudo;
   savePreferences();
 
-  setState({ currentView: 'catalogue' });
-  el.viewSettings.classList.remove('active');
-  el.viewCatalogue.classList.add('active');
+  // Naviguer vers le catalogue via le router
+  navigate('/');
 }
 
 function updateSoundToggles() {
@@ -1138,9 +1129,13 @@ function clearAllData() {
 function setupEventListeners() {
   // Catalogue - click sur carte (délégation)
   delegate(document, 'click', '.card', (card) => {
-    const { path, id, type } = card.dataset;
-    const name = card.querySelector('h3').textContent;
-    loadGame(path, name, type, id);
+    const { id, type } = card.dataset;
+    // Naviguer vers la route appropriée
+    if (type === 'game') {
+      navigate(`/games/${id}`);
+    } else if (type === 'tool') {
+      navigate(`/tools/${id}`);
+    }
   });
 
   // Catalogue - onglets
@@ -1152,7 +1147,7 @@ function setupEventListeners() {
   // Parcours - click sur carte epic (délégation)
   delegate(document, 'click', '.epic-card', (card) => {
     const epicId = card.dataset.epicId;
-    openEpic(epicId);
+    navigate(`/parcours/${epicId}`);
   });
 
   // Parcours - click sur filtre de catégorie (délégation)
@@ -1215,7 +1210,7 @@ function setupEventListeners() {
   on(el.btnSound, 'click', toggleSound);
 
   // Settings
-  on(el.btnSettings, 'click', showSettings);
+  on(el.btnSettings, 'click', () => navigate('/settings'));
   on(el.btnCloseSettings, 'click', hideSettings);
   on(el.soundOn, 'click', () => setSoundPreference(true));
   on(el.soundOff, 'click', () => setSoundPreference(false));
@@ -1294,23 +1289,67 @@ function setupEventListeners() {
 // === Hash Routing ===
 
 /**
- * Gère le routage basé sur le hash URL
+ * Affiche le catalogue (vue par défaut)
  */
-function handleHashRoute() {
-  const hash = window.location.hash;
+function showCatalogue() {
+  el.viewGame.classList.remove('active');
+  el.viewParcours.classList.remove('active');
+  el.viewSettings.classList.remove('active');
+  el.viewCatalogue.classList.add('active');
+  document.body.classList.remove('fullscreen');
+  document.body.classList.remove('game-active');
+  setState({ currentView: 'catalogue', currentGame: null });
 
-  // Route parcours: #/parcours/{epicId}/{slideId}
-  const parcoursMatch = hash.match(/#\/parcours\/([^/]+)(?:\/(.+))?/);
-  if (parcoursMatch) {
-    const [, epicId, slideId] = parcoursMatch;
-    openEpic(epicId, slideId);
-    return;
+  // Fermer le parcours si ouvert
+  if (state.parcoursViewer) {
+    state.parcoursViewer.close();
   }
+}
 
-  // Pas de route spéciale, afficher le catalogue
-  if (state.currentView === 'parcours') {
-    closeParcours();
+/**
+ * Charge un jeu depuis le router
+ * @param {string} gameId - ID du jeu
+ */
+function loadGameFromRouter(gameId) {
+  if (!state.catalogue) {return;}
+
+  const game = state.catalogue.games.find(g => g.id === gameId);
+  if (game) {
+    loadGame(game.path, game.name, 'game', game.id);
+  } else {
+    console.warn(`[Router] Jeu non trouvé: ${gameId}`);
+    navigate('/');
   }
+}
+
+/**
+ * Charge un outil depuis le router
+ * @param {string} toolId - ID de l'outil
+ */
+function loadToolFromRouter(toolId) {
+  if (!state.catalogue) {return;}
+
+  const tool = state.catalogue.tools.find(t => t.id === toolId);
+  if (tool) {
+    loadGame(tool.path, tool.name, 'tool', tool.id);
+  } else {
+    console.warn(`[Router] Outil non trouvé: ${toolId}`);
+    navigate('/');
+  }
+}
+
+/**
+ * Initialise le router avec les handlers de l'application
+ */
+function setupRouter() {
+  initRouter({
+    catalogue: () => showCatalogue(),
+    game: (params) => loadGameFromRouter(params.id),
+    tool: (params) => loadToolFromRouter(params.id),
+    parcours: (params) => openEpic(params.epic),
+    slide: (params) => openEpic(params.epic, params.slide),
+    settings: () => showSettings(),
+  });
 }
 
 // === Initialisation ===
@@ -1338,13 +1377,8 @@ async function init() {
     renderBookmarks();
   }
 
-  // Gérer le hash initial
-  if (window.location.hash) {
-    handleHashRoute();
-  }
-
-  // Écouter les changements de hash
-  window.addEventListener('hashchange', handleHashRoute);
+  // Initialiser le router (gère le hash initial et écoute les changements)
+  setupRouter();
 }
 
 init();

@@ -41,19 +41,19 @@ Créez un fichier `tools/mon-outil.html` avec la structure suivante :
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Outil - Playlab42</title>
-  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="../lib/theme.css">
   <style>
     /* Vos styles ici - utilisez les variables CSS */
   </style>
   <script type="module">
-    import { initTheme } from '/lib/theme.js';
+    import { initTheme } from '../lib/theme.js';
     initTheme();
   </script>
 </head>
 <body>
   <!-- Interface ici -->
   <script type="module">
-    import { $, on, escapeHtml, debounce } from '/lib/dom.js';
+    import { $, on, escapeHtml, debounce } from '../lib/dom.js';
     // Logique ici
   </script>
 </body>

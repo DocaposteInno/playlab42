@@ -476,8 +476,8 @@ const GameKit = {
 </head>
 <body>
   <canvas id="game"></canvas>
-  <script src="/lib/assets.js"></script>
-  <script src="/lib/gamekit.js"></script>
+  <script src="../../lib/assets.js"></script>
+  <script src="../../lib/gamekit.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
@@ -567,7 +567,7 @@ For games that use the isomorphic GameEngine, GameKit acts as a thin wrapper:
 ```javascript
 // games/tictactoe/game.js
 import { TicTacToeEngine, TicTacToeRandomBot } from './engine.js';
-import { SeededRandom } from '/lib/seeded-random.js';
+import { SeededRandom } from '../../lib/seeded-random.js';
 
 GameKit.init('tictactoe');
 

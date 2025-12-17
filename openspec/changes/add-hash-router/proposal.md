@@ -1,6 +1,6 @@
 # Proposal: Système de Navigation Hash Router
 
-**Status:** Draft
+**Status:** Approved
 **Author:** Claude
 **Date:** 2025-12-17
 

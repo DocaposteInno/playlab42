@@ -127,7 +127,8 @@ lib/
 Helpers légers pour manipuler le DOM sans framework :
 
 ```javascript
-import { $, $$, on, delegate, escapeHtml, cloneTemplate, debounce } from '/lib/dom.js';
+// Chemin relatif depuis votre fichier vers lib/ (ex: depuis tools/ → ../lib/)
+import { $, $$, on, delegate, escapeHtml, cloneTemplate, debounce } from '../lib/dom.js';
 
 // Sélecteurs courts
 const btn = $('#btn-start');
@@ -149,7 +150,7 @@ const fragment = cloneTemplate('card-template');
 Support de thèmes dark/light avec respect des préférences système :
 
 ```javascript
-import { initTheme, setTheme, getTheme, THEMES } from '/lib/theme.js';
+import { initTheme, setTheme, getTheme, THEMES } from '../lib/theme.js';
 
 // Initialiser au chargement (évite le flash)
 initTheme();

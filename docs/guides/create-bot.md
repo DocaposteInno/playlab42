@@ -428,7 +428,7 @@ Créez des tests pour valider votre bot :
 // games/mon-jeu/bots/smart.test.js
 import { SmartBot } from './smart.js';
 import { MonJeuEngine } from '../engine.js';
-import { SeededRandom } from '/lib/seeded-random.js';
+import { SeededRandom } from '../../../lib/seeded-random.js';
 
 describe('SmartBot', () => {
   let bot;

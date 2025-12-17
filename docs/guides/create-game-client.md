@@ -38,7 +38,7 @@ games/mon-jeu/
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Jeu - Playlab42</title>
-  <link rel="stylesheet" href="/lib/theme.css">
+  <link rel="stylesheet" href="../../lib/theme.css">
   <style>
     /* Vos styles - utilisez les variables CSS */
     body {
@@ -49,7 +49,7 @@ games/mon-jeu/
     }
   </style>
   <script type="module">
-    import { initTheme } from '/lib/theme.js';
+    import { initTheme } from '../../lib/theme.js';
     initTheme();
   </script>
 </head>
@@ -72,7 +72,7 @@ games/mon-jeu/
   </div>
 
   <script type="module">
-    import { $, $$, on } from '/lib/dom.js';
+    import { $, $$, on } from '../../lib/dom.js';
     // Code du client
   </script>
 </body>
@@ -100,9 +100,9 @@ Importez `lib/theme.css` pour avoir accès aux variables de design. Les thèmes 
 ### 3. Importer les dépendances
 
 ```javascript
-import { $, $$, on } from '/lib/dom.js';
+import { $, $$, on } from '../../lib/dom.js';
 import { MonJeuEngine } from './engine.js';
-import { SeededRandom } from '/lib/seeded-random.js';
+import { SeededRandom } from '../../lib/seeded-random.js';
 import { RandomBot } from './bots/random.js';
 ```
 
