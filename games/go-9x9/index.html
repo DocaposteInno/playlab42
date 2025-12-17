@@ -64,14 +64,64 @@
             position: relative;
             width: 100%;
             height: 100%;
-            border: 1px solid rgba(0, 0, 0, 0.15);
             background: transparent;
             cursor: pointer;
             padding: 0;
+            border: none;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #000;
+            z-index: 0;
+        }
+
+        .cell::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #000;
+            z-index: 0;
+        }
+
+        .cell[data-x="0"]::before {
+            left: 50%;
+        }
+
+        .cell[data-x="8"]::before {
+            right: 50%;
+        }
+
+        .cell[data-y="0"]::after {
+            top: 50%;
+        }
+
+        .cell[data-y="8"]::after {
+            bottom: 50%;
+        }
+
+        .cell.hoshi::before {
+            /* Ensure line is still drawn */
+        }
+
+        /* Hoshi dot using radial gradient on the cell itself, but we need to be careful not to hide lines if we use background-color. 
+           We use background-image. */
+        .cell.hoshi {
+            background-image: radial-gradient(circle at center, #000 3px, transparent 3.5px);
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .cell:hover {
-            background: rgba(0, 0, 0, 0.06);
+            background-color: rgba(0, 0, 0, 0.06);
         }
 
         .stone {
@@ -79,6 +129,7 @@
             inset: 8%;
             border-radius: 50%;
             box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.35);
+            z-index: 1;
         }
 
         .stone.black {
@@ -90,14 +141,17 @@
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .last-move::after {
+        .last-move .stone::after {
             content: '';
             position: absolute;
-            inset: 45%;
-            width: 10%;
-            height: 10%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25%;
+            height: 25%;
             border-radius: 50%;
             background: var(--color-accent);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .controls {
@@ -260,10 +314,14 @@
 
         function buildBoard() {
             boardEl.innerHTML = '';
+            const hoshis = ['2,2', '6,2', '4,4', '2,6', '6,6'];
             for (let y = 0; y < 9; y++) {
                 for (let x = 0; x < 9; x++) {
                     const btn = document.createElement('button');
                     btn.className = 'cell';
+                    if (hoshis.includes(`${x},${y}`)) {
+                        btn.classList.add('hoshi');
+                    }
                     btn.dataset.x = x;
                     btn.dataset.y = y;
                     on(btn, 'click', () => handleHumanMove(x, y));
