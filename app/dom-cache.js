@@ -1,52 +1,71 @@
 /**
- * Cache des éléments DOM pour éviter les querySelector répétés
+ * Cache des éléments DOM de l'application
+ * @module app/dom-cache
+ *
+ * Centralise l'accès aux éléments DOM pour éviter les requêtes répétées.
+ * Les éléments sont mis en cache au chargement du module.
  */
 
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => document.querySelectorAll(selector);
+import { $ } from '../lib/dom.js';
 
 /**
- * Éléments DOM cachés
+ * Cache des éléments DOM de l'application
+ * @type {Object}
  */
 export const el = {
-  // Views
+  // === Views ===
   viewCatalogue: $('#view-catalogue'),
   viewGame: $('#view-game'),
   viewParcours: $('#view-parcours'),
+  viewSettings: $('#view-settings'),
 
-  // Tabs
-  tabs: $$('.tab-btn'),
-  tabContents: $$('.tab-content'),
-
-  // Catalogue
-  catalogueContainer: $('#catalogue-container'),
-  catalogueGrid: $('#catalogue-grid'),
-  filters: $('#filters'),
+  // === Catalogue ===
   search: $('#search'),
+  filters: $('#filters'),
+  cardsGames: $('#cards-games'),
+  cardsTools: $('#cards-tools'),
+  emptyGames: $('#empty-games'),
+  emptyTools: $('#empty-tools'),
 
-  // Parcours
-  parcoursContainer: $('#parcours-container'),
-  parcoursCategoryFilters: $('#parcours-category-filters'),
-  parcoursGrid: $('#parcours-grid'),
+  // === Tabs ===
+  tabParcours: $('#tab-parcours'),
+  tabTools: $('#tab-tools'),
+  tabGames: $('#tab-games'),
+  tabBookmarks: $('#tab-bookmarks'),
+  panelParcours: $('#panel-parcours'),
+  panelTools: $('#panel-tools'),
+  panelGames: $('#panel-games'),
+  panelBookmarks: $('#panel-bookmarks'),
 
-  // Bookmarks
-  bookmarksContainer: $('#bookmarks-container'),
-  bookmarkTagFilters: $('#bookmark-tag-filters'),
-  bookmarksGrid: $('#bookmarks-grid'),
+  // === Bookmarks ===
+  bookmarkFilters: $('#bookmark-filters'),
+  bookmarkTree: $('#bookmark-tree'),
+  emptyBookmarks: $('#empty-bookmarks'),
   bookmarkPreview: $('#bookmark-preview'),
 
-  // Game view
-  gameFrame: $('#game-frame'),
+  // === Parcours ===
+  parcoursCategoryFilters: $('#parcours-category-filters'),
+  parcoursCategoriesExpanded: $('#parcours-categories-expanded'),
+  parcoursList: $('#parcours-list'),
+  cardsParcours: $('#cards-parcours'),
+  emptyParcours: $('#empty-parcours'),
+
+  // === Game ===
   gameTitle: $('#game-title'),
-  gameInfo: $('#game-info'),
+  gameIframe: $('#game-iframe'),
+  loading: $('#loading'),
   btnBack: $('#btn-back'),
   btnFullscreen: $('#btn-fullscreen'),
   btnSound: $('#btn-sound'),
-  btnSettings: $('#btn-settings'),
 
-  // Settings modal
-  settingsModal: $('#settings-modal'),
+  // === Settings ===
+  btnSettings: $('#btn-settings'),
   btnCloseSettings: $('#btn-close-settings'),
-  pseudoInput: $('#pseudo-input'),
-  btnSavePseudo: $('#btn-save-pseudo'),
+  inputPseudo: $('#input-pseudo'),
+  soundOn: $('#sound-on'),
+  soundOff: $('#sound-off'),
+  themeSystem: $('#theme-system'),
+  themeDark: $('#theme-dark'),
+  themeLight: $('#theme-light'),
+  btnClearData: $('#btn-clear-data'),
 };

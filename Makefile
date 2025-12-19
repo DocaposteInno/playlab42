@@ -1,6 +1,11 @@
 # Playlab42 - Makefile
 # Commandes de développement
 
+# Export automatique de l'UID/GID pour Docker
+# Permet aux fichiers créés dans le container d'avoir les bons droits
+export LOCAL_UID := $(shell id -u)
+export LOCAL_GID := $(shell id -g)
+
 .PHONY: help up down build shell logs status claude install test lint
 
 # Affiche l'aide par défaut
@@ -131,7 +136,12 @@ openspec-validate:
 
 # === Raccourcis ===
 
-init: build up install
+# Initialiser les permissions des volumes Docker (exécuté en root)
+init-volumes:
+	@echo "Initialisation des volumes Docker..."
+	@docker compose exec -u 0 -e LOCAL_UID=$(LOCAL_UID) -e LOCAL_GID=$(LOCAL_GID) dev /usr/local/bin/init-volumes.sh
+
+init: build up init-volumes install
 	@echo "Projet initialisé avec succès"
 
 clean:
