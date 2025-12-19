@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: playlab42-dev
+    # Utiliser l'UID/GID de l'utilisateur host pour les bons droits sur les fichiers
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     volumes:
       - .:/workspace
       - node_modules:/workspace/node_modules
@@ -12,7 +14,9 @@ services:
       - "5242:5242"      # Application
     environment:
       - NODE_ENV=development
-    command: tail -f /dev/null
+      # Home temporaire pour npm/node (évite les erreurs de permissions)
+      - HOME=/tmp
+      - npm_config_cache=/tmp/.npm
     networks:
       - playlab42-network
 

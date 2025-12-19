@@ -18,6 +18,10 @@ ARG GID=1000
 RUN addgroup -g ${GID} devuser && \
     adduser -D -u ${UID} -G devuser devuser
 
+# Script d'initialisation des volumes
+COPY docker/init-volumes.sh /usr/local/bin/init-volumes.sh
+RUN chmod +x /usr/local/bin/init-volumes.sh
+
 # Répertoire de travail
 WORKDIR /workspace
 
