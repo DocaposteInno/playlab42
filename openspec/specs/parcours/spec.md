@@ -1133,6 +1133,129 @@ class ParcoursUI {
 
 ---
 
+## 14. Communication slide ↔ viewer
+
+Les slides chargées dans l'iframe peuvent communiquer avec le viewer parent via `postMessage`.
+
+### 14.1 Protocole
+
+#### Messages slide → viewer
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `slide:toc` | `{ items: TocItem[] }` | Envoie la table des matières interne |
+| `slide:toc:clear` | - | Efface la TOC (optionnel, auto au changement) |
+
+#### Messages viewer → slide
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `viewer:scroll-to` | `{ anchor: string }` | Demande de scroller vers une ancre |
+
+### 14.2 Format TocItem
+
+```typescript
+interface TocItem {
+  /** Identifiant de l'ancre (ex: "intro", "backprop") */
+  id: string;
+
+  /** Texte affiché dans la navigation (tronqué si trop long) */
+  label: string;
+
+  /** Emoji optionnel */
+  icon?: string;
+
+  /** Niveau de profondeur (1 = h2, 2 = h3) */
+  level?: number;
+}
+```
+
+### 14.3 Limites
+
+| Limite | Valeur | Raison |
+|--------|--------|--------|
+| Max items TOC | 15 | Éviter surcharge du menu |
+| Troncature labels | CSS `text-overflow: ellipsis` | Corrigé par redimensionnement |
+| Niveaux max | 2 (h2, h3) | Limiter la profondeur |
+
+### 14.4 API slide-utils.js
+
+```typescript
+/**
+ * Envoie la table des matières interne au viewer.
+ * La TOC sera affichée dans le menu latéral comme enfants de la slide.
+ */
+function sendTOC(items: TocItem[]): void;
+
+/**
+ * Efface la TOC du viewer.
+ * Appelé automatiquement au changement de slide.
+ */
+function clearTOC(): void;
+
+/**
+ * Détecte automatiquement la TOC depuis les headings.
+ * @param selector - Sélecteur CSS pour les headings (défaut: 'h2[id], h3[id]')
+ */
+function autoDetectTOC(selector?: string): TocItem[];
+```
+
+### 14.5 Comportement viewer
+
+#### Intégration dans le menu latéral
+
+```
+Menu (sidebar) :
+├── ✓ Slide 1
+├── ▼ ● Slide 2 (avec TOC)      ← slide courante, expandable
+│   ├── ○ Intro                  ← ancres intra-slide
+│   ├── ○ Chapitre 1
+│   ├── ● Chapitre 2             ← ancre active
+│   └── ○ Conclusion
+└── ○ Slide 3
+```
+
+#### Comportement
+
+- Quand une slide envoie `slide:toc`, elle devient **expansible** dans le menu
+- Les items TOC apparaissent comme **enfants** de la slide
+- La slide est automatiquement **dépliée** pour montrer ses ancres
+- Clic sur un item → envoie `viewer:scroll-to` à la slide
+- La slide scrolle vers l'ancre avec `scrollIntoView({ behavior: 'smooth' })`
+
+#### Reset
+
+- Au changement de slide, les sous-items TOC sont **retirés** du menu
+- L'ancienne slide redevient un item simple (non expansible)
+- La nouvelle slide peut envoyer sa propre TOC
+
+### 14.6 Sécurité
+
+- Vérification de l'origine des messages (même origin)
+- Validation du format des payloads
+- Pas d'exécution de code arbitraire
+
+### 14.7 Menu redimensionnable (Desktop)
+
+```
+┌──────────────────┬─║─────────────────────────────────────────┐
+│ Sidebar          │ ║ Contenu                                  │
+│ (200-400px)      │ ║                                          │
+│                  │ ║  Drag la bordure pour redimensionner     │
+└──────────────────┴─║─────────────────────────────────────────┘
+                     ↑
+                  Resize handle
+```
+
+**Comportement** :
+- Bordure droite de la sidebar draggable
+- Largeur min: 200px, max: 400px
+- Curseur `col-resize` au survol du handle
+- Largeur persistée en `localStorage` (`parcours-menu-width`)
+- Restaurée au prochain chargement
+
+---
+
 ## Exemples
 
 ### Epic minimal
