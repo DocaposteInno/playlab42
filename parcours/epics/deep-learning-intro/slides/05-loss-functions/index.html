@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forward & Loss - Deep Learning</title>
+    <title>Mesurer l'Erreur - Deep Learning</title>
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
@@ -11,152 +11,17 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script type="module">
-        import { initSlide, initGlossary, sendTOC, setupScrollHandler } from '../../../../../parcours/_shared/slide-utils.js';
+        import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
         initSlide();
         initGlossary();
-        setupScrollHandler();
-        sendTOC([
-            { id: 'forward', label: 'Propagation Avant', icon: '➡️' },
-            { id: 'loss', label: 'Mesurer l\'Erreur', icon: '📏' },
-        ]);
     </script>
 </head>
 <body class="antialiased selection:bg-blue-500 selection:text-white">
 
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-        <!-- FORWARD PROPAGATION -->
-        <section id="forward" class="mb-24 scroll-mt-24">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="text-3xl">➡️</span>
-                <h2 class="text-3xl font-bold dl-text-primary">La Propagation Avant</h2>
-            </div>
-
-            <div class="prose-content dl-text-secondary">
-
-                <!-- ACCROCHE : LE VOYAGE DE LA DONNÉE -->
-                <p class="text-lg mb-6 dl-text-primary font-medium">
-                    La propagation avant est le processus par lequel une donnée brute traverse le réseau pour devenir une prédiction. C'est une suite de <strong>fonctions composées</strong> : la sortie d'une couche devient l'entrée de la suivante. Si vous savez calculer \(f(g(x))\), vous comprenez déjà la propagation avant.
-                </p>
-
-                <!-- LES TROIS PRINCIPES -->
-                <div class="grid md:grid-cols-3 gap-4 my-8">
-                    <div class="dl-card p-4 rounded-xl border">
-                        <div class="text-2xl mb-2">➡️</div>
-                        <h4 class="font-bold text-blue-400 mb-2">Flux Unidirectionnel</h4>
-                        <p class="text-sm dl-text-muted">
-                            L'information "coule" de gauche à droite, de l'entrée vers la sortie, sans jamais revenir en arrière à cette étape.
-                        </p>
-                    </div>
-                    <div class="dl-card p-4 rounded-xl border">
-                        <div class="text-2xl mb-2">🔄</div>
-                        <h4 class="font-bold text-purple-400 mb-2">Transformation par Étapes</h4>
-                        <p class="text-sm dl-text-muted">
-                            À chaque couche \(l\), deux opérations : une somme pondérée \(z\), puis une activation \(a\) qui introduit la non-linéarité.
-                        </p>
-                    </div>
-                    <div class="dl-card p-4 rounded-xl border">
-                        <div class="text-2xl mb-2">💾</div>
-                        <h4 class="font-bold text-green-400 mb-2">Mémorisation Stratégique</h4>
-                        <p class="text-sm dl-text-muted">
-                            Le réseau stocke les valeurs intermédiaires. Sans ce cache, la rétropropagation serait extrêmement lente.
-                        </p>
-                    </div>
-                </div>
-
-                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">La chaîne de sculpture</h3>
-
-                <p class="mb-4">
-                    Imaginez un atelier où une dizaine d'artisans travaillent en chaîne sur un bloc de marbre brut. Le premier reçoit la matière première et effectue les coupes grossières pour dégager la forme générale. Il passe ensuite sa création au suivant, qui affine les contours, ajoute des détails, ajuste les proportions.
-                </p>
-
-                <div class="concept-box my-6">
-                    <div class="grid md:grid-cols-3 gap-4 text-center">
-                        <div>
-                            <div class="text-3xl mb-2">🪨</div>
-                            <p class="text-sm font-bold text-cyan-400">Entrée \(a^{[0]}\)</p>
-                            <p class="text-xs dl-text-muted">Le marbre brut</p>
-                            <p class="text-xs dl-text-secondary">La donnée arrive au premier artisan</p>
-                        </div>
-                        <div>
-                            <div class="text-3xl mb-2">⚒️</div>
-                            <p class="text-sm font-bold text-purple-400">Couches cachées</p>
-                            <p class="text-xs dl-text-muted">Les artisans</p>
-                            <p class="text-xs dl-text-secondary">Chaque couche affine la forme</p>
-                        </div>
-                        <div>
-                            <div class="text-3xl mb-2">🗿</div>
-                            <p class="text-sm font-bold text-green-400">Sortie \(\hat{y}\)</p>
-                            <p class="text-xs dl-text-muted">L'œuvre finale</p>
-                            <p class="text-xs dl-text-secondary">La prédiction sort de l'atelier</p>
-                        </div>
-                    </div>
-                </div>
-
-                <p class="mb-6 text-sm dl-text-muted italic">
-                    Les premières couches détectent des structures grossières — contours, textures basiques. Les couches intermédiaires reconnaissent des formes plus complexes. Les dernières polissent les détails et identifient des concepts de haut niveau. Cette cascade de transformations construit une <strong>hiérarchie de représentations</strong>.
-                </p>
-
-                <!-- FORMULES -->
-                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Les formules</h3>
-
-                <p class="mb-4">
-                    Pour chaque couche \(l\) du réseau, on applique deux opérations :
-                </p>
-
-                <div class="math-block">
-                    <p class="text-sm dl-text-muted mb-2">1. La somme pondérée (pré-activation) :</p>
-                    $$ z^{[l]} = W^{[l]} \cdot a^{[l-1]} + b^{[l]} $$
-                    <p class="text-sm dl-text-muted mb-2 mt-4">2. L'activation :</p>
-                    $$ a^{[l]} = \sigma(z^{[l]}) $$
-                </div>
-
-                <p class="mb-6">
-                    On part de \(a^{[0]} = x\) (l'entrée) et on répète ce processus jusqu'à obtenir la prédiction finale \(\hat{y} = a^{[L]}\).
-                </p>
-
-                <!-- PSEUDO-CODE AMÉLIORÉ -->
-                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Pseudo-code</h3>
-
-                <div class="dl-card rounded-xl border overflow-hidden mb-8">
-                    <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
-                        forward.py
-                    </div>
-                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Initialisation avec l'entrée (a[0] = x)</span>
-<span class="text-purple-400">activation_actuelle</span> = x
-
-<span class="text-slate-500"># On parcourt chaque couche l du réseau</span>
-<span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> L:
-    <span class="text-slate-500"># 1. Calcul de la somme pondérée z[l] = W[l] * a[l-1] + b[l]</span>
-    <span class="text-purple-400">z</span> = produit_matriciel(poids[l], activation_actuelle) + biais[l]
-
-    <span class="text-slate-500"># 2. Calcul de l'activation a[l] = sigma(z[l])</span>
-    <span class="text-purple-400">activation_actuelle</span> = fonction_activation(z)
-
-    <span class="text-slate-500"># Sauvegarde de z et a pour la future rétropropagation</span>
-    stocker_intermediaire(z, activation_actuelle)
-
-<span class="text-slate-500"># Le résultat final est la prédiction</span>
-<span class="text-purple-400">y_chapeau</span> = activation_actuelle</code></pre>
-                </div>
-
-                <div class="warning-box">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">💡</span>
-                        <div>
-                            <h4 class="font-bold text-yellow-500 mb-2">Pourquoi c'est "trivial mais fondamental"</h4>
-                            <p class="dl-text-secondary text-sm">
-                                La propagation avant n'est qu'une évaluation de fonction composée — rien de nouveau mathématiquement. Ce qui est révolutionnaire, c'est de l'appliquer à des <strong>graphes de calcul</strong> de millions de paramètres, et de <strong>stocker les intermédiaires</strong> pour la phase d'apprentissage.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
         <!-- LOSS FUNCTION -->
-        <section id="loss" class="mb-16 scroll-mt-24">
+        <section id="loss" class="mb-16">
             <div class="flex items-center gap-3 mb-6">
                 <span class="text-3xl">📏</span>
                 <h2 class="text-3xl font-bold dl-text-primary">Mesurer l'Erreur</h2>
@@ -165,7 +30,7 @@
             <div class="prose-content dl-text-secondary">
 
                 <p class="text-lg mb-6 dl-text-primary font-medium">
-                    La propagation avant trace la trajectoire du réseau. La fonction de perte mesure la distance qui le sépare de la destination. Ces deux informations complémentaires — <em>où je suis</em> et <em>à quel point je me trompe</em> — sont essentielles pour guider l'apprentissage.
+                    La propagation avant trace la trajectoire du réseau. La <dfn>fonction de perte</dfn> mesure la distance qui le sépare de la destination. Ces deux informations complémentaires — <em>où je suis</em> et <em>à quel point je me trompe</em> — sont essentielles pour guider l'apprentissage.
                 </p>
 
                 <h3 class="text-xl font-bold dl-text-primary mt-8 mb-4">Le navigateur dans la brume</h3>
@@ -179,7 +44,7 @@
                 </p>
 
                 <p class="mb-6">
-                    La <strong>fonction de perte</strong> joue exactement ce rôle. Elle transforme la qualité des prédictions en un <strong>nombre unique</strong> : plus la perte est élevée, plus le réseau se trompe. C'est ce signal qui guidera la correction des poids lors de la rétropropagation.
+                    La <strong>fonction de perte</strong> joue exactement ce rôle. Elle transforme la qualité des prédictions en un <strong>nombre unique</strong> : plus la perte est élevée, plus le réseau se trompe. C'est ce signal qui guidera la correction des <dfn>poids</dfn> lors de la <dfn>rétropropagation</dfn>.
                 </p>
 
                 <!-- VISUALISATION INTERACTIVE DES LOSS FUNCTIONS -->
@@ -211,7 +76,7 @@
                         <h4 id="lossTitle" class="font-bold text-orange-400 text-lg">MSE — Erreur Quadratique Moyenne</h4>
                         <p id="lossFormula" class="font-mono text-sm dl-text-muted my-2">\( L = \frac{1}{2}(y - \hat{y})^2 \)</p>
                         <p id="lossDescription" class="text-sm dl-text-secondary max-w-lg mx-auto">
-                            Pénalise fortement les grandes erreurs (quadratiquement). Idéale pour la régression, mais sensible aux outliers.
+                            Pénalise fortement les grandes erreurs (quadratiquement). Idéale pour la <dfn>régression</dfn>, mais sensible aux outliers.
                         </p>
                     </div>
 
@@ -541,7 +406,7 @@
                         <tbody class="dl-text-secondary">
                             <tr class="border-b border-slate-700">
                                 <td class="py-3 px-2 font-bold text-orange-400">MSE</td>
-                                <td class="py-3 px-2">Régression</td>
+                                <td class="py-3 px-2"><dfn>Régression</dfn></td>
                                 <td class="py-3 px-2">Pénalise fortement les grandes erreurs</td>
                                 <td class="py-3 px-2 text-yellow-500">Sensible aux outliers</td>
                             </tr>
@@ -549,17 +414,17 @@
                                 <td class="py-3 px-2 font-bold text-cyan-400">MAE</td>
                                 <td class="py-3 px-2">Régression robuste</td>
                                 <td class="py-3 px-2">Robuste aux outliers</td>
-                                <td class="py-3 px-2 text-yellow-500">Gradient constant (convergence plus lente)</td>
+                                <td class="py-3 px-2 text-yellow-500"><dfn>Gradient</dfn> constant (convergence plus lente)</td>
                             </tr>
                             <tr class="border-b border-slate-700">
                                 <td class="py-3 px-2 font-bold text-green-400">Huber</td>
                                 <td class="py-3 px-2">Régression hybride</td>
                                 <td class="py-3 px-2">Meilleur des deux mondes</td>
-                                <td class="py-3 px-2 text-yellow-500">Hyperparamètre δ à régler</td>
+                                <td class="py-3 px-2 text-yellow-500"><dfn>Hyperparamètre</dfn> δ à régler</td>
                             </tr>
                             <tr>
                                 <td class="py-3 px-2 font-bold text-purple-400">Cross-Entropy</td>
-                                <td class="py-3 px-2">Classification</td>
+                                <td class="py-3 px-2"><dfn>Classification</dfn></td>
                                 <td class="py-3 px-2">Adapté aux probabilités</td>
                                 <td class="py-3 px-2 text-yellow-500">Pas pour la régression</td>
                             </tr>
@@ -586,7 +451,7 @@
                         <div>
                             <h4 class="font-bold text-blue-400 mb-2">L'objectif de l'entraînement</h4>
                             <p class="dl-text-secondary text-sm">
-                                Trouver les valeurs de poids \(W\) et biais \(b\) qui <strong>minimisent</strong> la fonction de perte sur l'ensemble des données d'entraînement. C'est un problème d'<strong>optimisation</strong>. Le prochain slide explique comment y parvenir grâce à la rétropropagation.
+                                Trouver les valeurs de <dfn>poids</dfn> \(W\) et <dfn>biais</dfn> \(b\) qui <strong>minimisent</strong> la fonction de perte sur l'ensemble des données d'entraînement. C'est un problème d'<strong>optimisation</strong>. La slide suivante explique comment y parvenir grâce à la <dfn>rétropropagation</dfn>.
                             </p>
                         </div>
                     </div>
@@ -597,7 +462,7 @@
     </main>
 
     <footer class="dl-footer border-t py-8 text-center text-sm">
-        <p>Deep Learning pour l'impatient — Slide 4/8</p>
+        <p>Deep Learning pour l'impatient — Slide 5/10</p>
     </footer>
 
 </body>

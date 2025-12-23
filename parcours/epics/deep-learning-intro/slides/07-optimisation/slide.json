@@ -1,5 +1,5 @@
 {
-  "id": "05-optimisation",
+  "id": "07-optimisation",
   "title": "Optimisation",
   "description": "Descente de gradient et optimiseur Adam",
   "type": "page",
