@@ -151,6 +151,29 @@
                     </div>
                 </div>
 
+                <!-- INFÉRENCE = PROPAGATION AVANT EN PRODUCTION -->
+                <div class="concept-box mt-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🚀</span>
+                        <div>
+                            <h4 class="font-bold text-blue-400 mb-2">En production : l'<dfn>inférence</dfn></h4>
+                            <p class="dl-text-secondary text-sm mb-3">
+                                Une fois le modèle entraîné, on n'utilise <strong>que la propagation avant</strong>. C'est ce qu'on appelle l'inférence. Tout le reste disparaît :
+                            </p>
+                            <ul class="text-sm space-y-1 dl-text-muted">
+                                <li>❌ Pas de stockage des valeurs intermédiaires</li>
+                                <li>❌ Pas de calcul de la <dfn>fonction de perte</dfn></li>
+                                <li>❌ Pas de <dfn>rétropropagation</dfn> ni de gradients</li>
+                                <li>❌ Pas de mise à jour des <dfn>poids</dfn></li>
+                                <li>✅ Juste : entrée → réseau → prédiction</li>
+                            </ul>
+                            <p class="dl-text-muted text-xs mt-3 italic">
+                                Résultat : l'inférence est <strong>~100× plus rapide</strong> et consomme beaucoup moins de mémoire que l'entraînement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
