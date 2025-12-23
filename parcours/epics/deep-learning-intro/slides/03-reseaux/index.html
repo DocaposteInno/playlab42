@@ -11,8 +11,9 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script type="module">
-        import { initSlide } from '../../../../../parcours/_shared/slide-utils.js';
+        import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
         initSlide();
+        initGlossary();
     </script>
 </head>
 <body class="antialiased selection:bg-blue-500 selection:text-white">
@@ -451,6 +452,40 @@
     <span class="text-pink-400">retourner</span> a</code></pre>
                 </div>
 
+                <!-- DÉPLOIEMENT EN PRODUCTION -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Et concrètement, à quoi ça ressemble ?</h3>
+
+                <p class="mb-4">
+                    Une fois entraîné, un réseau de neurones n'est qu'un <strong>fichier de poids</strong> + une architecture. On l'exporte dans un format portable, puis on exécute l'<dfn>inférence</dfn> sur la cible : serveur cloud, smartphone, voiture autonome, ou même navigateur web.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 my-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-blue-400 mb-3">📦 Formats de modèles</h4>
+                        <ul class="text-sm dl-text-secondary space-y-2">
+                            <li><strong class="text-cyan-400"><dfn>ONNX</dfn></strong> — Format universel (PyTorch → TensorFlow → mobile)</li>
+                            <li><strong class="text-green-400">SavedModel</strong> — Format natif TensorFlow</li>
+                            <li><strong class="text-purple-400">TorchScript</strong> — PyTorch sans Python</li>
+                            <li><strong class="text-orange-400">CoreML</strong> — Apple (iPhone/Mac)</li>
+                            <li><strong class="text-yellow-400">TensorRT</strong> — NVIDIA, ultra-rapide sur GPU</li>
+                        </ul>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-green-400 mb-3">🎯 Cibles de déploiement</h4>
+                        <ul class="text-sm dl-text-secondary space-y-2">
+                            <li><strong class="text-cyan-400">Cloud</strong> — AWS SageMaker, Google Vertex AI</li>
+                            <li><strong class="text-purple-400">Edge</strong> — Raspberry Pi, Jetson Nano, TPU Coral</li>
+                            <li><strong class="text-pink-400">Mobile</strong> — TensorFlow Lite, CoreML</li>
+                            <li><strong class="text-orange-400">Navigateur</strong> — TensorFlow.js, ONNX.js, WebGPU</li>
+                            <li><strong class="text-green-400">Embarqué</strong> — TinyML, voitures, drones</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="text-sm dl-text-muted italic mb-6">
+                    Un modèle de 1 Go peut être compressé à 50 Mo grâce à la quantization et au pruning. L'inférence est <strong>100× plus rapide</strong> que l'entraînement : pas de gradients, pas de backprop.
+                </p>
+
                 <!-- CE QU'IL FAUT RETENIR -->
                 <div class="concept-box mt-10">
                     <div class="flex items-start gap-3">
@@ -462,6 +497,7 @@
                                 <li>• "Deep" signifie <strong>≥ 2 couches cachées</strong></li>
                                 <li>• La profondeur permet un <strong>apprentissage hiérarchique</strong> des features</li>
                                 <li>• Les données traversent le réseau de l'entrée vers la sortie : c'est la <strong>propagation avant</strong></li>
+                                <li>• En production, le modèle est exporté (ONNX, etc.) et exécute l'<strong>inférence</strong></li>
                             </ul>
                         </div>
                     </div>
