@@ -58,8 +58,20 @@
     "propagation avant": {
       "short": "Calcul de la prédiction en traversant le réseau de l'entrée vers la sortie",
       "long": "Forward propagation. Processus par lequel une donnée d'entrée traverse successivement toutes les couches du réseau pour produire une prédiction. Chaque couche applique ses poids, biais et activation. Les valeurs intermédiaires sont stockées pour la rétropropagation.",
-      "see": ["rétropropagation", "couche"],
+      "see": ["rétropropagation", "couche", "inférence"],
       "category": "Apprentissage"
+    },
+    "inférence": {
+      "short": "Utilisation d'un modèle entraîné pour faire des prédictions en production",
+      "long": "L'inférence est la propagation avant d'un modèle déjà entraîné, sans calcul de gradients ni mise à jour des poids. C'est le mode \"production\" : le modèle reçoit des données, calcule une prédiction, et c'est tout. Plus rapide que l'entraînement car pas de rétropropagation. Le modèle peut être exporté dans des formats optimisés (ONNX, TensorRT, SavedModel) pour être déployé sur serveur, mobile ou embarqué.",
+      "see": ["propagation avant", "ONNX"],
+      "category": "Déploiement"
+    },
+    "ONNX": {
+      "short": "Format standard pour échanger des modèles entre frameworks (PyTorch → TensorFlow, etc.)",
+      "long": "Open Neural Network Exchange. Format ouvert permettant d'exporter un modèle entraîné dans un framework (PyTorch, TensorFlow, scikit-learn) et de l'exécuter dans un autre. Facilite le déploiement : on entraîne en Python, on déploie en C++, JavaScript, ou sur GPU mobile. Runtimes populaires : ONNX Runtime, TensorRT.",
+      "see": ["inférence"],
+      "category": "Déploiement"
     },
     "rétropropagation": {
       "short": "Algorithme qui calcule les gradients en remontant de la sortie vers l'entrée",

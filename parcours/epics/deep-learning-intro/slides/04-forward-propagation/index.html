@@ -31,7 +31,11 @@
 
                 <!-- ACCROCHE : LE VOYAGE DE LA DONNÉE -->
                 <p class="text-lg mb-6 dl-text-primary font-medium">
-                    La propagation avant est le processus par lequel une donnée brute traverse le réseau pour devenir une prédiction. C'est une suite de <strong>fonctions composées</strong> : la sortie d'une couche devient l'entrée de la suivante. Si vous savez calculer \(f(g(x))\), vous comprenez déjà la propagation avant.
+                    La <dfn>propagation avant</dfn> est le processus par lequel une donnée brute traverse le réseau pour devenir une prédiction. C'est une suite de <strong>fonctions composées</strong> : la sortie d'une couche devient l'entrée de la suivante. Si vous savez calculer \(f(g(x))\), vous comprenez déjà la propagation avant.
+                </p>
+
+                <p class="mb-6 dl-text-secondary">
+                    En production, quand le modèle est entraîné, on parle d'<dfn>inférence</dfn> : c'est la même propagation avant, mais sans calcul de gradients ni mise à jour des poids. Le réseau "fait son travail" : il reçoit une image et répond "chat", sans chercher à apprendre.
                 </p>
 
                 <!-- LES TROIS PRINCIPES -->
@@ -147,13 +151,47 @@
                     </div>
                 </div>
 
+                <!-- DÉPLOIEMENT EN PRODUCTION -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Et concrètement en production ?</h3>
+
+                <p class="mb-4">
+                    Une fois le modèle entraîné, il faut le déployer. On exporte les <dfn>poids</dfn> et l'architecture dans un format portable, puis on exécute l'<dfn>inférence</dfn> sur la cible : serveur cloud, smartphone, voiture autonome, ou même navigateur web.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 my-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-blue-400 mb-3">📦 Formats de modèles</h4>
+                        <ul class="text-sm dl-text-secondary space-y-2">
+                            <li><strong class="text-cyan-400"><dfn>ONNX</dfn></strong> — Format universel, fonctionne partout (PyTorch → TensorFlow → mobile)</li>
+                            <li><strong class="text-green-400">SavedModel</strong> — Format natif TensorFlow, optimisé pour TF Serving</li>
+                            <li><strong class="text-purple-400">TorchScript</strong> — Format PyTorch, pour déploiement sans Python</li>
+                            <li><strong class="text-orange-400">CoreML</strong> — Format Apple, optimisé pour iPhone/Mac</li>
+                            <li><strong class="text-yellow-400">TensorRT</strong> — NVIDIA, inférence ultra-rapide sur GPU</li>
+                        </ul>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-green-400 mb-3">🎯 Cibles de déploiement</h4>
+                        <ul class="text-sm dl-text-secondary space-y-2">
+                            <li><strong class="text-cyan-400">Cloud</strong> — AWS SageMaker, Google Vertex AI, Azure ML</li>
+                            <li><strong class="text-purple-400">Edge</strong> — Raspberry Pi, Jetson Nano, TPU Coral</li>
+                            <li><strong class="text-pink-400">Mobile</strong> — TensorFlow Lite, CoreML, ONNX Runtime Mobile</li>
+                            <li><strong class="text-orange-400">Navigateur</strong> — TensorFlow.js, ONNX.js, WebGPU</li>
+                            <li><strong class="text-green-400">Embarqué</strong> — Microcontrôleurs (TinyML), voitures, drones</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="text-sm dl-text-muted italic">
+                    L'inférence peut être <strong>100× plus rapide</strong> que l'entraînement : pas de gradients, pas de backprop, et des optimisations spécifiques (quantization, pruning, fusion d'opérations). Un modèle de 1 Go peut être compressé à 50 Mo pour tourner sur un téléphone.
+                </p>
+
             </div>
         </section>
 
     </main>
 
     <footer class="dl-footer border-t py-8 text-center text-sm">
-        <p>Deep Learning pour l'impatient — Slide 4/10</p>
+        <p>Deep Learning pour l'impatient — Slide 4/8</p>
     </footer>
 
 </body>
