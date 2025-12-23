@@ -33,37 +33,67 @@
 
             <div class="prose-content dl-text-secondary">
 
-                <!-- ACCROCHE -->
+                <!-- ACCROCHE : LE VOYAGE DE LA DONNÉE -->
                 <p class="text-lg mb-6 dl-text-primary font-medium">
-                    Imaginez un voyage où la propagation avant trace votre trajectoire actuelle, tandis que la fonction de perte calcule la distance qui vous sépare de la destination. Le réseau a besoin de ces deux informations complémentaires : savoir <em>où il va</em> et mesurer <em>son égarement</em>. C'est cette boucle de rétroaction qui guide l'optimisation vers des prédictions toujours plus précises.
+                    La propagation avant est le processus par lequel une donnée brute traverse le réseau pour devenir une prédiction. C'est une suite de <strong>fonctions composées</strong> : la sortie d'une couche devient l'entrée de la suivante. Si vous savez calculer \(f(g(x))\), vous comprenez déjà la propagation avant.
                 </p>
 
-                <h3 class="text-xl font-bold dl-text-primary mt-8 mb-4">Des fonctions composées</h3>
+                <!-- LES TROIS PRINCIPES -->
+                <div class="grid md:grid-cols-3 gap-4 my-8">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">➡️</div>
+                        <h4 class="font-bold text-blue-400 mb-2">Flux Unidirectionnel</h4>
+                        <p class="text-sm dl-text-muted">
+                            L'information "coule" de gauche à droite, de l'entrée vers la sortie, sans jamais revenir en arrière à cette étape.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">🔄</div>
+                        <h4 class="font-bold text-purple-400 mb-2">Transformation par Étapes</h4>
+                        <p class="text-sm dl-text-muted">
+                            À chaque couche \(l\), deux opérations : une somme pondérée \(z\), puis une activation \(a\) qui introduit la non-linéarité.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">💾</div>
+                        <h4 class="font-bold text-green-400 mb-2">Mémorisation Stratégique</h4>
+                        <p class="text-sm dl-text-muted">
+                            Le réseau stocke les valeurs intermédiaires. Sans ce cache, la rétropropagation serait extrêmement lente.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">La chaîne de sculpture</h3>
 
                 <p class="mb-4">
-                    La propagation avant est, d'un point de vue mathématique, d'une simplicité déconcertante. Il s'agit simplement d'évaluer une <strong>fonction composée</strong> — une succession de transformations appliquées les unes après les autres. Si vous avez déjà calculé \(f(g(x))\), vous savez faire de la propagation avant.
+                    Imaginez un atelier où une dizaine d'artisans travaillent en chaîne sur un bloc de marbre brut. Le premier reçoit la matière première et effectue les coupes grossières pour dégager la forme générale. Il passe ensuite sa création au suivant, qui affine les contours, ajoute des détails, ajuste les proportions.
                 </p>
 
-                <p class="mb-4">
-                    Ce concept est aussi vieux que le calcul différentiel lui-même. Ce qui est nouveau, c'est de l'appliquer à des <strong>graphes de calcul</strong> comportant des millions de paramètres, où chaque nœud représente une opération mathématique simple.
-                </p>
+                <div class="concept-box my-6">
+                    <div class="grid md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-3xl mb-2">🪨</div>
+                            <p class="text-sm font-bold text-cyan-400">Entrée \(a^{[0]}\)</p>
+                            <p class="text-xs dl-text-muted">Le marbre brut</p>
+                            <p class="text-xs dl-text-secondary">La donnée arrive au premier artisan</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl mb-2">⚒️</div>
+                            <p class="text-sm font-bold text-purple-400">Couches cachées</p>
+                            <p class="text-xs dl-text-muted">Les artisans</p>
+                            <p class="text-xs dl-text-secondary">Chaque couche affine la forme</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl mb-2">🗿</div>
+                            <p class="text-sm font-bold text-green-400">Sortie \(\hat{y}\)</p>
+                            <p class="text-xs dl-text-muted">L'œuvre finale</p>
+                            <p class="text-xs dl-text-secondary">La prédiction sort de l'atelier</p>
+                        </div>
+                    </div>
+                </div>
 
-                <p class="mb-6">
-                    Pourquoi est-ce "trivial" mais fondamental ? Parce que les <strong>valeurs intermédiaires</strong> calculées lors de la propagation avant seront réutilisées par la rétropropagation. Sans ce stockage intelligent, l'entraînement serait des millions de fois plus lent.
-                </p>
-
-                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">L'atelier de sculpture</h3>
-
-                <p class="mb-4">
-                    Imaginez un atelier de sculpture où une dizaine d'artisans travaillent en chaîne sur un bloc de marbre brut. Le premier artisan reçoit le bloc et effectue les coupes grossières pour dégager la forme générale. Il passe ensuite sa création au suivant, qui affine les contours, ajoute des détails, ajuste les proportions.
-                </p>
-
-                <p class="mb-4">
-                    Chaque artisan successif reçoit une version de plus en plus raffinée, appliquant sa spécialité : l'un travaille les textures de surface, un autre les détails minutieux, jusqu'à ce que le dernier polisse l'œuvre finale. Chaque artisan transforme ce qu'il reçoit selon ses outils et son savoir-faire, dans un <strong>flux unidirectionnel</strong> qui métamorphose la matière brute en œuvre d'art.
-                </p>
-
-                <p class="mb-8 text-sm dl-text-muted italic">
-                    Dans un réseau de neurones, les données d'entrée (le bloc brut) traversent successivement chaque couche (chaque artisan). Les premières couches détectent des motifs simples — contours, couleurs. Les couches intermédiaires reconnaissent des formes plus complexes. Les dernières identifient des concepts de haut niveau. Cette cascade de transformations permet de construire une hiérarchie de représentations.
+                <p class="mb-6 text-sm dl-text-muted italic">
+                    Les premières couches détectent des structures grossières — contours, textures basiques. Les couches intermédiaires reconnaissent des formes plus complexes. Les dernières polissent les détails et identifient des concepts de haut niveau. Cette cascade de transformations construit une <strong>hiérarchie de représentations</strong>.
                 </p>
 
                 <!-- FORMULES -->
@@ -74,7 +104,7 @@
                 </p>
 
                 <div class="math-block">
-                    <p class="text-sm dl-text-muted mb-2">1. La somme pondérée :</p>
+                    <p class="text-sm dl-text-muted mb-2">1. La somme pondérée (pré-activation) :</p>
                     $$ z^{[l]} = W^{[l]} \cdot a^{[l-1]} + b^{[l]} $$
                     <p class="text-sm dl-text-muted mb-2 mt-4">2. L'activation :</p>
                     $$ a^{[l]} = \sigma(z^{[l]}) $$
@@ -84,29 +114,41 @@
                     On part de \(a^{[0]} = x\) (l'entrée) et on répète ce processus jusqu'à obtenir la prédiction finale \(\hat{y} = a^{[L]}\).
                 </p>
 
-                <!-- PSEUDO-CODE -->
+                <!-- PSEUDO-CODE AMÉLIORÉ -->
                 <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Pseudo-code</h3>
 
                 <div class="dl-card rounded-xl border overflow-hidden mb-8">
                     <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
                         forward.py
                     </div>
-                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Entrée du réseau</span>
-<span class="text-purple-400">a</span> = x
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Initialisation avec l'entrée (a[0] = x)</span>
+<span class="text-purple-400">activation_actuelle</span> = x
 
-<span class="text-slate-500"># Traverser chaque couche</span>
+<span class="text-slate-500"># On parcourt chaque couche l du réseau</span>
 <span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> L:
-    <span class="text-slate-500"># Somme pondérée</span>
-    z = W[l] @ a + b[l]
+    <span class="text-slate-500"># 1. Calcul de la somme pondérée z[l] = W[l] * a[l-1] + b[l]</span>
+    <span class="text-purple-400">z</span> = produit_matriciel(poids[l], activation_actuelle) + biais[l]
 
-    <span class="text-slate-500"># Activation</span>
-    a = activation(z)
+    <span class="text-slate-500"># 2. Calcul de l'activation a[l] = sigma(z[l])</span>
+    <span class="text-purple-400">activation_actuelle</span> = fonction_activation(z)
 
-    <span class="text-slate-500"># Stocker pour la backprop</span>
-    cache[l] = (z, a)
+    <span class="text-slate-500"># Sauvegarde de z et a pour la future rétropropagation</span>
+    stocker_intermediaire(z, activation_actuelle)
 
-<span class="text-slate-500"># Prédiction finale</span>
-<span class="text-purple-400">y_pred</span> = a</code></pre>
+<span class="text-slate-500"># Le résultat final est la prédiction</span>
+<span class="text-purple-400">y_chapeau</span> = activation_actuelle</code></pre>
+                </div>
+
+                <div class="warning-box">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">💡</span>
+                        <div>
+                            <h4 class="font-bold text-yellow-500 mb-2">Pourquoi c'est "trivial mais fondamental"</h4>
+                            <p class="dl-text-secondary text-sm">
+                                La propagation avant n'est qu'une évaluation de fonction composée — rien de nouveau mathématiquement. Ce qui est révolutionnaire, c'est de l'appliquer à des <strong>graphes de calcul</strong> de millions de paramètres, et de <strong>stocker les intermédiaires</strong> pour la phase d'apprentissage.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -121,6 +163,10 @@
 
             <div class="prose-content dl-text-secondary">
 
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    La propagation avant trace la trajectoire du réseau. La fonction de perte mesure la distance qui le sépare de la destination. Ces deux informations complémentaires — <em>où je suis</em> et <em>à quel point je me trompe</em> — sont essentielles pour guider l'apprentissage.
+                </p>
+
                 <h3 class="text-xl font-bold dl-text-primary mt-8 mb-4">Le navigateur dans la brume</h3>
 
                 <p class="mb-4">
@@ -128,71 +174,177 @@
                 </p>
 
                 <p class="mb-4">
-                    Cette mesure d'écart entre <em>"où je suis"</em> et <em>"où je veux être"</em> est absolument cruciale : sans elle, le navigateur voguerait à l'aveugle, incapable de savoir s'il s'approche ou s'éloigne de son objectif. Plus l'écart est grand, plus la correction doit être significative ; plus il diminue, plus les ajustements deviennent subtils.
+                    Cette mesure d'écart entre <em>"où je suis"</em> et <em>"où je veux être"</em> est absolument cruciale : sans elle, le navigateur voguerait à l'aveugle. Plus l'écart est grand, plus la correction doit être significative ; plus il diminue, plus les ajustements deviennent subtils.
                 </p>
 
                 <p class="mb-6">
-                    La <strong>fonction de perte</strong> joue exactement ce rôle pour le réseau de neurones. Elle transforme la qualité des prédictions en un <strong>nombre unique</strong> : plus la perte est élevée, plus le réseau se trompe. C'est ce signal qui guidera la correction des poids lors de la rétropropagation.
+                    La <strong>fonction de perte</strong> joue exactement ce rôle. Elle transforme la qualité des prédictions en un <strong>nombre unique</strong> : plus la perte est élevée, plus le réseau se trompe. C'est ce signal qui guidera la correction des poids lors de la rétropropagation.
                 </p>
 
-                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">L'Erreur Quadratique (MSE)</h3>
+                <!-- VISUALISATION INTERACTIVE DES LOSS FUNCTIONS -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Comparer les fonctions de perte</h3>
 
                 <p class="mb-4">
-                    La fonction de perte la plus intuitive est l'<strong>Erreur Quadratique Moyenne</strong> (Mean Squared Error). Son principe est simple : on calcule la différence entre la prédiction et la réalité, puis on l'élève au carré.
+                    Cliquez sur une fonction pour voir sa courbe et comprendre son comportement :
                 </p>
 
-                <div class="math-block text-center">
-                    $$ L = \frac{1}{2}(y - \hat{y})^2 $$
-                </div>
-
-                <p class="mb-4">
-                    Pourquoi le carré ? Deux raisons. D'abord, il <strong>pénalise fortement les grandes erreurs</strong> : se tromper de 2 coûte 4 fois plus cher que se tromper de 1. Ensuite, il rend la fonction <strong>dérivable partout</strong>, ce qui est essentiel pour calculer les gradients.
-                </p>
-
-                <p class="mb-6 text-sm dl-text-muted">
-                    Le facteur \(\frac{1}{2}\) est une convention : il simplifie les calculs lors de la dérivation, car \(\frac{d}{dx}\frac{1}{2}x^2 = x\).
-                </p>
-
-                <!-- Visualisation interactive MSE -->
                 <div class="my-6 p-4 dl-card rounded-xl border">
-                    <h4 class="font-bold text-blue-400 mb-3 text-center">Visualisation de la Perte MSE</h4>
-                    <div class="flex flex-col md:flex-row gap-4 items-center justify-center">
-                        <div class="flex items-center gap-3">
-                            <label class="text-sm dl-text-secondary">Cible y =</label>
-                            <input type="range" id="targetY" min="-1" max="1" step="0.1" value="0.5" class="w-24">
-                            <span id="targetYValue" class="font-mono text-cyan-400 w-12">0.5</span>
-                        </div>
-                        <canvas id="mseCanvas" width="400" height="200" class="rounded-lg" style="max-width: 400px;"></canvas>
+                    <!-- Sélecteur de loss -->
+                    <div class="flex flex-wrap justify-center gap-2 mb-4">
+                        <button id="btnMSE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-orange-500 bg-orange-500/20 text-orange-400">
+                            MSE
+                        </button>
+                        <button id="btnMAE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-cyan-500/30 bg-transparent text-cyan-400 hover:border-cyan-500 hover:bg-cyan-500/20">
+                            MAE
+                        </button>
+                        <button id="btnHuber" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-green-500/30 bg-transparent text-green-400 hover:border-green-500 hover:bg-green-500/20">
+                            Huber
+                        </button>
+                        <button id="btnCrossEntropy" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-purple-500/30 bg-transparent text-purple-400 hover:border-purple-500 hover:bg-purple-500/20">
+                            Cross-Entropy
+                        </button>
                     </div>
-                    <p class="text-center text-xs dl-text-muted mt-2">La parabole montre la perte en fonction de ŷ. Déplacez le curseur pour changer y.</p>
+
+                    <!-- Info sur la loss sélectionnée -->
+                    <div id="lossInfo" class="text-center mb-4">
+                        <h4 id="lossTitle" class="font-bold text-orange-400 text-lg">MSE — Erreur Quadratique Moyenne</h4>
+                        <p id="lossFormula" class="font-mono text-sm dl-text-muted my-2">\( L = \frac{1}{2}(y - \hat{y})^2 \)</p>
+                        <p id="lossDescription" class="text-sm dl-text-secondary max-w-lg mx-auto">
+                            Pénalise fortement les grandes erreurs (quadratiquement). Idéale pour la régression, mais sensible aux outliers.
+                        </p>
+                    </div>
+
+                    <!-- Canvas de visualisation -->
+                    <div class="flex flex-col items-center">
+                        <canvas id="lossCanvas" width="500" height="280" class="rounded-lg" style="max-width: 500px; width: 100%;"></canvas>
+                        <div class="flex items-center gap-3 mt-3">
+                            <label class="text-sm dl-text-secondary">Cible y =</label>
+                            <input type="range" id="targetY" min="-1" max="1" step="0.1" value="0" class="w-32">
+                            <span id="targetYValue" class="font-mono text-cyan-400 w-12">0.0</span>
+                        </div>
+                        <p class="text-center text-xs dl-text-muted mt-2">Survolez la courbe pour voir les valeurs • Déplacez le curseur pour changer la cible</p>
+                    </div>
                 </div>
 
                 <script>
                 (function() {
-                    const canvas = document.getElementById('mseCanvas');
+                    const canvas = document.getElementById('lossCanvas');
                     const ctx = canvas.getContext('2d');
                     const slider = document.getElementById('targetY');
                     const valueDisplay = document.getElementById('targetYValue');
                     const W = canvas.width, H = canvas.height;
-                    const margin = { top: 20, right: 20, bottom: 35, left: 45 };
+                    const margin = { top: 30, right: 30, bottom: 40, left: 50 };
                     const plotW = W - margin.left - margin.right;
                     const plotH = H - margin.top - margin.bottom;
 
-                    const xMin = -1.5, xMax = 1.5;
-                    const yMin = 0, yMax = 2.5;
-                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
-                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
-                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
-
+                    // État
+                    let currentLoss = 'mse';
                     let mouseX = null;
+                    const huberDelta = 0.5;
 
-                    function mse(y, yHat) {
-                        return 0.5 * Math.pow(y - yHat, 2);
+                    // Fonctions de perte
+                    const lossFunctions = {
+                        mse: {
+                            fn: (y, yHat) => 0.5 * Math.pow(y - yHat, 2),
+                            color: '#f97316',
+                            title: 'MSE — Erreur Quadratique Moyenne',
+                            formula: '\\( L = \\frac{1}{2}(y - \\hat{y})^2 \\)',
+                            description: 'Pénalise fortement les grandes erreurs (quadratiquement). Idéale pour la régression, mais sensible aux outliers.',
+                            yMax: 2.5,
+                            xRange: [-1.5, 1.5]
+                        },
+                        mae: {
+                            fn: (y, yHat) => Math.abs(y - yHat),
+                            color: '#22d3ee',
+                            title: 'MAE — Erreur Absolue Moyenne',
+                            formula: '\\( L = |y - \\hat{y}| \\)',
+                            description: 'Traite toutes les erreurs de façon équitable (linéairement). Plus robuste aux outliers que MSE.',
+                            yMax: 2.5,
+                            xRange: [-1.5, 1.5]
+                        },
+                        huber: {
+                            fn: (y, yHat) => {
+                                const diff = Math.abs(y - yHat);
+                                if (diff <= huberDelta) {
+                                    return 0.5 * diff * diff;
+                                } else {
+                                    return huberDelta * (diff - 0.5 * huberDelta);
+                                }
+                            },
+                            color: '#22c55e',
+                            title: 'Huber — Perte Hybride',
+                            formula: '\\( L = \\begin{cases} \\frac{1}{2}(y-\\hat{y})^2 & |y-\\hat{y}| \\leq \\delta \\\\ \\delta(|y-\\hat{y}| - \\frac{\\delta}{2}) & \\text{sinon} \\end{cases} \\)',
+                            description: 'Quadratique près de 0 (gradients lisses), linéaire loin (robustesse). Le meilleur des deux mondes avec δ=' + huberDelta + '.',
+                            yMax: 2.5,
+                            xRange: [-1.5, 1.5]
+                        },
+                        crossentropy: {
+                            fn: (y, yHat) => {
+                                // Pour y=1 (classe positive) : -log(yHat)
+                                // Pour y=0 (classe négative) : -log(1-yHat)
+                                // Ici on montre -log(yHat) pour y=1
+                                const eps = 1e-7;
+                                const p = Math.max(eps, Math.min(1 - eps, (yHat + 1) / 2)); // map [-1,1] to [0,1]
+                                return -Math.log(p);
+                            },
+                            color: '#a855f7',
+                            title: 'Cross-Entropy — Classification',
+                            formula: '\\( L = -\\log(\\hat{y}) \\)',
+                            description: 'Pour les probabilités (0 à 1). Punit exponentiellement les prédictions confiantes mais fausses. Ici : -log(ŷ) pour y=1.',
+                            yMax: 5,
+                            xRange: [-1, 1]
+                        }
+                    };
+
+                    const toCanvasX = (x, xMin, xMax) => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = (y, yMax) => margin.top + (yMax - y) / yMax * plotH;
+                    const fromCanvasX = (cx, xMin, xMax) => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    function updateLossInfo() {
+                        const loss = lossFunctions[currentLoss];
+                        document.getElementById('lossTitle').textContent = loss.title;
+                        document.getElementById('lossTitle').style.color = loss.color;
+                        document.getElementById('lossFormula').innerHTML = loss.formula;
+                        document.getElementById('lossDescription').textContent = loss.description;
+
+                        // Re-render MathJax
+                        if (window.MathJax) {
+                            MathJax.typesetPromise([document.getElementById('lossFormula')]);
+                        }
+                    }
+
+                    function updateButtons() {
+                        const buttons = {
+                            mse: document.getElementById('btnMSE'),
+                            mae: document.getElementById('btnMAE'),
+                            huber: document.getElementById('btnHuber'),
+                            crossentropy: document.getElementById('btnCrossEntropy')
+                        };
+                        const colors = {
+                            mse: 'orange',
+                            mae: 'cyan',
+                            huber: 'green',
+                            crossentropy: 'purple'
+                        };
+
+                        Object.keys(buttons).forEach(key => {
+                            const btn = buttons[key];
+                            const color = colors[key];
+                            if (key === currentLoss) {
+                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500 bg-${color}-500/20 text-${color}-400`;
+                            } else {
+                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500/30 bg-transparent text-${color}-400 hover:border-${color}-500 hover:bg-${color}-500/20`;
+                            }
+                        });
                     }
 
                     function draw() {
                         const targetY = parseFloat(slider.value);
                         valueDisplay.textContent = targetY.toFixed(1);
+
+                        const loss = lossFunctions[currentLoss];
+                        const [xMin, xMax] = loss.xRange;
+                        const yMax = loss.yMax;
 
                         const isDark = document.documentElement.classList.contains('dark');
                         const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
@@ -206,98 +358,153 @@
                         // Grille
                         ctx.strokeStyle = gridColor;
                         ctx.lineWidth = 1;
-                        for (let x = -1; x <= 1; x += 0.5) {
+                        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x += 0.5) {
                             ctx.beginPath();
-                            ctx.moveTo(toCanvasX(x), margin.top);
-                            ctx.lineTo(toCanvasX(x), H - margin.bottom);
+                            ctx.moveTo(toCanvasX(x, xMin, xMax), margin.top);
+                            ctx.lineTo(toCanvasX(x, xMin, xMax), H - margin.bottom);
                             ctx.stroke();
                         }
-                        for (let y = 0; y <= 2; y += 0.5) {
+                        for (let y = 0; y <= yMax; y += 0.5) {
                             ctx.beginPath();
-                            ctx.moveTo(margin.left, toCanvasY(y));
-                            ctx.lineTo(W - margin.right, toCanvasY(y));
+                            ctx.moveTo(margin.left, toCanvasY(y, yMax));
+                            ctx.lineTo(W - margin.right, toCanvasY(y, yMax));
                             ctx.stroke();
+                        }
+
+                        // Axe vertical à la position de la cible (pour MSE, MAE, Huber)
+                        if (currentLoss !== 'crossentropy') {
+                            ctx.strokeStyle = '#22d3ee';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            ctx.beginPath();
+                            ctx.moveTo(toCanvasX(targetY, xMin, xMax), margin.top);
+                            ctx.lineTo(toCanvasX(targetY, xMin, xMax), H - margin.bottom);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
                         }
 
                         // Axes
                         ctx.strokeStyle = axisColor;
                         ctx.lineWidth = 2;
                         ctx.beginPath();
-                        ctx.moveTo(margin.left, toCanvasY(0));
-                        ctx.lineTo(W - margin.right, toCanvasY(0));
-                        ctx.moveTo(toCanvasX(targetY), margin.top);
-                        ctx.lineTo(toCanvasX(targetY), H - margin.bottom);
+                        ctx.moveTo(margin.left, toCanvasY(0, yMax));
+                        ctx.lineTo(W - margin.right, toCanvasY(0, yMax));
                         ctx.stroke();
 
                         // Labels
                         ctx.fillStyle = textColor;
                         ctx.font = '11px monospace';
                         ctx.textAlign = 'center';
-                        ctx.fillText('ŷ', W - margin.right + 10, toCanvasY(0) + 4);
-                        ctx.fillText('-1', toCanvasX(-1), H - margin.bottom + 15);
-                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 15);
-                        ctx.fillText('1', toCanvasX(1), H - margin.bottom + 15);
+                        ctx.fillText('ŷ (prédiction)', W / 2, H - 5);
+                        ctx.fillText(xMin.toString(), toCanvasX(xMin, xMin, xMax), H - margin.bottom + 18);
+                        ctx.fillText('0', toCanvasX(0, xMin, xMax), H - margin.bottom + 18);
+                        ctx.fillText(xMax.toString(), toCanvasX(xMax, xMin, xMax), H - margin.bottom + 18);
                         ctx.textAlign = 'right';
-                        ctx.fillText('L', margin.left - 5, margin.top + 10);
-                        ctx.fillText('1', margin.left - 5, toCanvasY(1) + 4);
-                        ctx.fillText('2', margin.left - 5, toCanvasY(2) + 4);
+                        ctx.fillText('L (perte)', margin.left - 5, margin.top - 10);
 
-                        // Courbe MSE
-                        ctx.strokeStyle = '#f97316';
+                        for (let y = 1; y <= yMax; y++) {
+                            ctx.fillText(y.toString(), margin.left - 8, toCanvasY(y, yMax) + 4);
+                        }
+
+                        // Courbe de perte
+                        ctx.strokeStyle = loss.color;
                         ctx.lineWidth = 3;
                         ctx.beginPath();
                         let started = false;
                         for (let px = margin.left; px <= W - margin.right; px++) {
-                            const yHat = fromCanvasX(px);
-                            const loss = mse(targetY, yHat);
-                            const py = toCanvasY(Math.min(loss, yMax));
-                            if (!started) { ctx.moveTo(px, py); started = true; }
-                            else ctx.lineTo(px, py);
+                            const yHat = fromCanvasX(px, xMin, xMax);
+                            const lossVal = loss.fn(targetY, yHat);
+                            const py = toCanvasY(Math.min(lossVal, yMax), yMax);
+                            if (py >= margin.top && py <= H - margin.bottom) {
+                                if (!started) { ctx.moveTo(px, py); started = true; }
+                                else ctx.lineTo(px, py);
+                            }
                         }
                         ctx.stroke();
 
-                        // Point minimum (y = ŷ)
-                        ctx.fillStyle = '#22c55e';
-                        ctx.beginPath();
-                        ctx.arc(toCanvasX(targetY), toCanvasY(0), 8, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = textColor;
-                        ctx.font = 'bold 10px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('min', toCanvasX(targetY), H - margin.bottom + 25);
+                        // Point minimum (pour MSE, MAE, Huber)
+                        if (currentLoss !== 'crossentropy') {
+                            ctx.fillStyle = '#22c55e';
+                            ctx.beginPath();
+                            ctx.arc(toCanvasX(targetY, xMin, xMax), toCanvasY(0, yMax), 8, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.fillStyle = textColor;
+                            ctx.font = 'bold 10px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('y=' + targetY.toFixed(1), toCanvasX(targetY, xMin, xMax), H - margin.bottom + 32);
+                        }
 
                         // Point sur la courbe si souris
                         if (mouseX !== null && mouseX >= margin.left && mouseX <= W - margin.right) {
-                            const yHat = fromCanvasX(mouseX);
-                            const loss = mse(targetY, yHat);
-                            const error = targetY - yHat;
+                            const yHat = fromCanvasX(mouseX, xMin, xMax);
+                            const lossVal = loss.fn(targetY, yHat);
 
-                            // Ligne verticale erreur
+                            // Ligne verticale
                             ctx.strokeStyle = '#ef4444';
                             ctx.lineWidth = 2;
                             ctx.setLineDash([4, 4]);
                             ctx.beginPath();
-                            ctx.moveTo(mouseX, toCanvasY(0));
-                            ctx.lineTo(mouseX, toCanvasY(Math.min(loss, yMax)));
+                            ctx.moveTo(mouseX, toCanvasY(0, yMax));
+                            ctx.lineTo(mouseX, toCanvasY(Math.min(lossVal, yMax), yMax));
                             ctx.stroke();
                             ctx.setLineDash([]);
 
                             // Point
                             ctx.fillStyle = '#ef4444';
                             ctx.beginPath();
-                            ctx.arc(mouseX, toCanvasY(Math.min(loss, yMax)), 6, 0, Math.PI * 2);
+                            ctx.arc(mouseX, toCanvasY(Math.min(lossVal, yMax), yMax), 6, 0, Math.PI * 2);
                             ctx.fill();
 
-                            // Valeurs
-                            ctx.fillStyle = textColor;
+                            // Tooltip
+                            const tooltipX = mouseX > W * 0.7 ? mouseX - 120 : mouseX + 15;
+                            ctx.fillStyle = isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+                            ctx.strokeStyle = axisColor;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.roundRect(tooltipX, margin.top, 105, 50, 5);
+                            ctx.fill();
+                            ctx.stroke();
+
                             ctx.font = 'bold 11px monospace';
                             ctx.textAlign = 'left';
-                            const infoX = mouseX > W/2 ? mouseX - 110 : mouseX + 10;
-                            ctx.fillText(`ŷ = ${yHat.toFixed(2)}`, infoX, margin.top + 15);
-                            ctx.fillStyle = '#ef4444';
-                            ctx.fillText(`L = ${loss.toFixed(3)}`, infoX, margin.top + 30);
+                            ctx.fillStyle = textColor;
+                            ctx.fillText(`ŷ = ${yHat.toFixed(2)}`, tooltipX + 8, margin.top + 18);
+                            ctx.fillStyle = loss.color;
+                            ctx.fillText(`L = ${lossVal.toFixed(3)}`, tooltipX + 8, margin.top + 35);
                         }
+
+                        // Titre du graphique
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.fillStyle = loss.color;
+                        ctx.textAlign = 'left';
+                        ctx.fillText(loss.title.split(' — ')[0], margin.left, margin.top - 10);
                     }
+
+                    // Event listeners pour les boutons
+                    document.getElementById('btnMSE').addEventListener('click', () => {
+                        currentLoss = 'mse';
+                        updateButtons();
+                        updateLossInfo();
+                        draw();
+                    });
+                    document.getElementById('btnMAE').addEventListener('click', () => {
+                        currentLoss = 'mae';
+                        updateButtons();
+                        updateLossInfo();
+                        draw();
+                    });
+                    document.getElementById('btnHuber').addEventListener('click', () => {
+                        currentLoss = 'huber';
+                        updateButtons();
+                        updateLossInfo();
+                        draw();
+                    });
+                    document.getElementById('btnCrossEntropy').addEventListener('click', () => {
+                        currentLoss = 'crossentropy';
+                        updateButtons();
+                        updateLossInfo();
+                        draw();
+                    });
 
                     slider.addEventListener('input', draw);
                     canvas.addEventListener('mousemove', e => {
@@ -307,54 +514,56 @@
                     });
                     canvas.addEventListener('mouseleave', () => { mouseX = null; draw(); });
                     new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                    updateButtons();
                     draw();
                 })();
                 </script>
 
-                <!-- AUTRES FONCTIONS DE PERTE -->
+                <!-- TABLEAU RÉCAPITULATIF -->
                 <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Choisir la bonne fonction de perte</h3>
 
                 <p class="mb-4">
-                    MSE n'est pas la seule option. Le choix de la fonction de perte est <strong>crucial</strong> car elle définit ce que le réseau va optimiser — et donc ce qu'il va apprendre.
+                    Le choix de la fonction de perte est <strong>crucial</strong> car elle définit ce que le réseau va optimiser — et donc ce qu'il va apprendre.
                 </p>
 
-                <div class="grid md:grid-cols-2 gap-4 my-6">
-                    <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-orange-400 mb-2">MSE — Régression</h4>
-                        <p class="text-sm dl-text-muted mb-2">
-                            \( L = \frac{1}{2}(y - \hat{y})^2 \)
-                        </p>
-                        <p class="text-xs dl-text-secondary">
-                            Idéale pour prédire des valeurs continues. Pénalise fortement les grandes erreurs. <span class="text-yellow-500">Sensible aux outliers.</span>
-                        </p>
-                    </div>
-                    <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-purple-400 mb-2">Cross-Entropy — Classification</h4>
-                        <p class="text-sm dl-text-muted mb-2">
-                            \( L = -y \log(\hat{y}) \)
-                        </p>
-                        <p class="text-xs dl-text-secondary">
-                            Pour les probabilités. Punit <strong>exponentiellement</strong> les prédictions confiantes mais fausses.
-                        </p>
-                    </div>
-                    <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-cyan-400 mb-2">MAE — Robuste</h4>
-                        <p class="text-sm dl-text-muted mb-2">
-                            \( L = |y - \hat{y}| \)
-                        </p>
-                        <p class="text-xs dl-text-secondary">
-                            Plus robuste aux outliers que MSE. Traite toutes les erreurs de façon équitable.
-                        </p>
-                    </div>
-                    <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-green-400 mb-2">Huber — Hybride</h4>
-                        <p class="text-sm dl-text-muted mb-2">
-                            MSE près de 0, MAE loin
-                        </p>
-                        <p class="text-xs dl-text-secondary">
-                            Le meilleur des deux mondes : gradients lisses pour les petites erreurs, robustesse pour les grandes.
-                        </p>
-                    </div>
+                <div class="overflow-x-auto my-6">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-600">
+                                <th class="text-left py-3 px-2 dl-text-primary">Fonction</th>
+                                <th class="text-left py-3 px-2 dl-text-primary">Usage</th>
+                                <th class="text-left py-3 px-2 dl-text-primary">Avantage</th>
+                                <th class="text-left py-3 px-2 dl-text-primary">Inconvénient</th>
+                            </tr>
+                        </thead>
+                        <tbody class="dl-text-secondary">
+                            <tr class="border-b border-slate-700">
+                                <td class="py-3 px-2 font-bold text-orange-400">MSE</td>
+                                <td class="py-3 px-2">Régression</td>
+                                <td class="py-3 px-2">Pénalise fortement les grandes erreurs</td>
+                                <td class="py-3 px-2 text-yellow-500">Sensible aux outliers</td>
+                            </tr>
+                            <tr class="border-b border-slate-700">
+                                <td class="py-3 px-2 font-bold text-cyan-400">MAE</td>
+                                <td class="py-3 px-2">Régression robuste</td>
+                                <td class="py-3 px-2">Robuste aux outliers</td>
+                                <td class="py-3 px-2 text-yellow-500">Gradient constant (convergence plus lente)</td>
+                            </tr>
+                            <tr class="border-b border-slate-700">
+                                <td class="py-3 px-2 font-bold text-green-400">Huber</td>
+                                <td class="py-3 px-2">Régression hybride</td>
+                                <td class="py-3 px-2">Meilleur des deux mondes</td>
+                                <td class="py-3 px-2 text-yellow-500">Hyperparamètre δ à régler</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-2 font-bold text-purple-400">Cross-Entropy</td>
+                                <td class="py-3 px-2">Classification</td>
+                                <td class="py-3 px-2">Adapté aux probabilités</td>
+                                <td class="py-3 px-2 text-yellow-500">Pas pour la régression</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="warning-box mt-8">
