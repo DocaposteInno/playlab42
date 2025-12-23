@@ -89,6 +89,12 @@
   background: var(--color-accent);
 }
 
+/* Optimisation pendant le resize */
+.pv-resize-handle.dragging ~ .pv-menu,
+.pv-sidebar:has(.pv-resize-handle.dragging) {
+  will-change: width;
+}
+
 /* Masquer sur mobile */
 @media (max-width: 768px) {
   .pv-resize-handle {
