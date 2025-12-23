@@ -82,6 +82,8 @@ parcours/epics/mon-epic/
 
 ### 15.4 Marquage des termes dans les slides
 
+**Important** : Le marquage est **explicite**. Les termes ne sont pas auto-détectés. L'auteur doit marquer chaque occurrence qu'il souhaite rendre interactive.
+
 **HTML :**
 ```html
 <!-- Terme simple -->
@@ -94,13 +96,18 @@ parcours/epics/mon-epic/
 <span class="term" data-term="régression">régression</span>
 ```
 
-**Markdown (après transformation) :**
+**Markdown :**
 ```markdown
+<!-- Syntaxe wiki-like -->
 La [[régression]] consiste à prédire...
 
 <!-- Terme avec texte différent -->
 La [[régression|forme régressive]] consiste à...
 ```
+
+**Transformation Markdown → HTML :**
+- `[[terme]]` → `<dfn>terme</dfn>`
+- `[[terme|texte]]` → `<dfn data-term="terme">texte</dfn>`
 
 ### 15.5 Affichage tooltip
 

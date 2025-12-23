@@ -1,0 +1,191 @@
+{
+  "$schema": "../../glossary.schema.json",
+  "terms": {
+    "régression": {
+      "short": "Prédire une valeur numérique continue (prix, température, âge...)",
+      "long": "En machine learning, la régression consiste à prédire une valeur numérique continue, par opposition à la classification qui prédit des catégories discrètes. Exemples : prédire le prix d'une maison, la température de demain, l'âge d'une personne.",
+      "see": ["classification"],
+      "category": "Types de tâches"
+    },
+    "classification": {
+      "short": "Prédire une catégorie parmi plusieurs (spam/non-spam, chat/chien...)",
+      "long": "Tâche de machine learning consistant à attribuer une étiquette (classe) à une donnée. Le modèle prédit la probabilité d'appartenance à chaque classe. Exemples : détection de spam, reconnaissance d'images, diagnostic médical.",
+      "see": ["régression"],
+      "category": "Types de tâches"
+    },
+    "neurone": {
+      "short": "Unité de calcul : somme pondérée des entrées + fonction d'activation",
+      "long": "Brique fondamentale des réseaux de neurones. Un neurone artificiel calcule la somme pondérée de ses entrées, ajoute un biais, puis applique une fonction d'activation non-linéaire. Inspiré (très librement) du neurone biologique.",
+      "see": ["poids", "biais", "activation"],
+      "category": "Architecture"
+    },
+    "poids": {
+      "short": "Paramètre appris qui détermine l'importance d'une connexion",
+      "long": "Les poids (weights) sont les paramètres principaux d'un réseau de neurones. Chaque connexion entre neurones a un poids qui est ajusté pendant l'entraînement. Un poids élevé signifie que cette entrée a une forte influence sur la sortie.",
+      "see": ["biais", "neurone"],
+      "category": "Architecture"
+    },
+    "biais": {
+      "short": "Paramètre appris qui décale le seuil d'activation d'un neurone",
+      "long": "Le biais (bias) est un paramètre additionnel de chaque neurone qui permet de décaler la fonction d'activation. Sans biais, un neurone avec toutes ses entrées à zéro aurait toujours une sortie nulle.",
+      "see": ["poids", "neurone"],
+      "category": "Architecture"
+    },
+    "activation": {
+      "short": "Fonction non-linéaire appliquée à la sortie d'un neurone (ReLU, sigmoid, tanh...)",
+      "long": "La fonction d'activation introduit la non-linéarité dans le réseau, ce qui lui permet d'apprendre des patterns complexes. Sans activation, un réseau de N couches serait équivalent à une seule transformation linéaire. Fonctions courantes : ReLU, sigmoid, tanh.",
+      "see": ["neurone", "ReLU", "sigmoid"],
+      "category": "Architecture"
+    },
+    "ReLU": {
+      "short": "Fonction d'activation : max(0, x) — la plus populaire aujourd'hui",
+      "long": "Rectified Linear Unit. Fonction d'activation qui retourne x si x > 0, sinon 0. Simple, efficace, et évite le problème de vanishing gradient pour les valeurs positives. Variantes : Leaky ReLU, ELU, GELU.",
+      "see": ["activation", "sigmoid", "vanishing gradient"],
+      "category": "Architecture"
+    },
+    "sigmoid": {
+      "short": "Fonction d'activation : sortie entre 0 et 1, idéale pour les probabilités",
+      "long": "Fonction σ(x) = 1/(1+e^(-x)) qui \"écrase\" toute valeur dans l'intervalle [0, 1]. Utilisée en sortie pour la classification binaire. Problème : peut causer le vanishing gradient pour les valeurs extrêmes.",
+      "see": ["activation", "ReLU"],
+      "category": "Architecture"
+    },
+    "couche": {
+      "short": "Ensemble de neurones au même niveau du réseau",
+      "long": "Un réseau de neurones est organisé en couches successives. La couche d'entrée reçoit les données, les couches cachées effectuent les transformations, et la couche de sortie produit la prédiction. Le terme 'deep' learning vient du nombre de couches cachées.",
+      "see": ["neurone", "propagation avant"],
+      "category": "Architecture"
+    },
+    "propagation avant": {
+      "short": "Calcul de la prédiction en traversant le réseau de l'entrée vers la sortie",
+      "long": "Forward propagation. Processus par lequel une donnée d'entrée traverse successivement toutes les couches du réseau pour produire une prédiction. Chaque couche applique ses poids, biais et activation. Les valeurs intermédiaires sont stockées pour la rétropropagation.",
+      "see": ["rétropropagation", "couche"],
+      "category": "Apprentissage"
+    },
+    "rétropropagation": {
+      "short": "Algorithme qui calcule les gradients en remontant de la sortie vers l'entrée",
+      "long": "Backpropagation. Algorithme fondamental du deep learning qui calcule efficacement le gradient de la fonction de perte par rapport à chaque poids du réseau. Utilise la règle de la chaîne pour propager l'erreur de la sortie vers l'entrée.",
+      "see": ["gradient", "propagation avant", "règle de la chaîne"],
+      "category": "Apprentissage"
+    },
+    "gradient": {
+      "short": "Vecteur indiquant la direction et l'intensité de la pente de la fonction de perte",
+      "long": "Le gradient est la dérivée partielle de la fonction de perte par rapport à chaque paramètre. Il indique dans quelle direction modifier les poids pour réduire l'erreur. La descente de gradient suit ce signal pour optimiser le réseau.",
+      "see": ["descente de gradient", "rétropropagation"],
+      "category": "Apprentissage"
+    },
+    "descente de gradient": {
+      "short": "Algorithme d'optimisation : ajuster les poids dans la direction opposée au gradient",
+      "long": "Gradient Descent. Méthode itérative pour trouver le minimum d'une fonction. À chaque étape, les poids sont mis à jour : w = w - η * ∇L, où η est le learning rate et ∇L le gradient de la perte. Variantes : SGD, mini-batch, momentum.",
+      "see": ["gradient", "learning rate", "Adam"],
+      "category": "Apprentissage"
+    },
+    "fonction de perte": {
+      "short": "Mesure de l'écart entre la prédiction du réseau et la valeur attendue",
+      "long": "Loss function. Fonction qui quantifie l'erreur du modèle. L'objectif de l'entraînement est de minimiser cette fonction. Exemples : MSE (régression), Cross-Entropy (classification), MAE (robuste aux outliers).",
+      "see": ["MSE", "cross-entropy", "gradient"],
+      "category": "Apprentissage"
+    },
+    "MSE": {
+      "short": "Mean Squared Error : moyenne des carrés des erreurs, pénalise fortement les grandes erreurs",
+      "long": "Fonction de perte standard pour la régression. MSE = (1/n) Σ(y - ŷ)². Le carré pénalise davantage les grandes erreurs. Avantage : dérivable partout. Inconvénient : sensible aux outliers.",
+      "see": ["fonction de perte", "MAE", "régression"],
+      "category": "Apprentissage"
+    },
+    "cross-entropy": {
+      "short": "Fonction de perte pour la classification : punit les prédictions confiantes mais fausses",
+      "long": "Mesure la différence entre deux distributions de probabilités. Pour la classification binaire : L = -[y·log(ŷ) + (1-y)·log(1-ŷ)]. Pénalise exponentiellement les prédictions confiantes mais incorrectes.",
+      "see": ["fonction de perte", "classification", "sigmoid"],
+      "category": "Apprentissage"
+    },
+    "MAE": {
+      "short": "Mean Absolute Error : moyenne des valeurs absolues des erreurs, robuste aux outliers",
+      "long": "Fonction de perte alternative à MSE. MAE = (1/n) Σ|y - ŷ|. Traite toutes les erreurs de façon équitable (pas de carré). Plus robuste aux outliers mais gradient constant (convergence plus lente près du minimum).",
+      "see": ["fonction de perte", "MSE", "outlier"],
+      "category": "Apprentissage"
+    },
+    "epoch": {
+      "short": "Un passage complet sur l'ensemble des données d'entraînement",
+      "long": "Une epoch correspond à une itération complète sur tout le dataset. L'entraînement typique nécessite plusieurs dizaines à centaines d'epochs. Trop peu = underfitting, trop = overfitting.",
+      "see": ["batch", "overfitting"],
+      "category": "Apprentissage"
+    },
+    "batch": {
+      "short": "Sous-ensemble de données traité ensemble avant mise à jour des poids",
+      "long": "Mini-batch. Au lieu de mettre à jour les poids après chaque exemple (SGD) ou après tous les exemples (batch GD), on utilise des sous-ensembles de taille fixe. Compromis entre stabilité (gros batch) et vitesse (petit batch). Tailles typiques : 32, 64, 128.",
+      "see": ["epoch", "descente de gradient"],
+      "category": "Apprentissage"
+    },
+    "learning rate": {
+      "short": "Hyperparamètre qui contrôle la taille des pas dans la descente de gradient",
+      "long": "Le learning rate (η ou α) détermine l'amplitude des mises à jour des poids. Trop grand : oscillations, divergence. Trop petit : convergence très lente. Valeurs typiques : 0.001 à 0.1. Souvent décroissant au cours de l'entraînement.",
+      "see": ["descente de gradient", "Adam"],
+      "category": "Apprentissage"
+    },
+    "Adam": {
+      "short": "Optimiseur populaire combinant momentum et learning rate adaptatif",
+      "long": "Adaptive Moment Estimation. Optimiseur qui maintient une moyenne mobile des gradients (momentum) et de leurs carrés (adaptation). Combine les avantages de SGD+Momentum et RMSprop. Hyperparamètres par défaut : β₁=0.9, β₂=0.999, ε=10⁻⁸.",
+      "see": ["descente de gradient", "learning rate", "momentum"],
+      "category": "Apprentissage"
+    },
+    "momentum": {
+      "short": "Technique qui accumule les gradients passés pour accélérer la convergence",
+      "long": "Le momentum ajoute une \"inertie\" à la descente de gradient. Au lieu d'utiliser uniquement le gradient actuel, on utilise une moyenne mobile des gradients passés. Accélère la convergence et aide à sortir des minimums locaux peu profonds.",
+      "see": ["descente de gradient", "Adam"],
+      "category": "Apprentissage"
+    },
+    "overfitting": {
+      "short": "Le modèle mémorise les données d'entraînement au lieu d'apprendre des patterns généraux",
+      "long": "Surapprentissage. Le modèle performe très bien sur les données d'entraînement mais mal sur de nouvelles données. Signe : écart croissant entre loss d'entraînement et loss de validation. Solutions : régularisation, dropout, early stopping, plus de données.",
+      "see": ["underfitting", "régularisation", "dropout"],
+      "category": "Problèmes"
+    },
+    "underfitting": {
+      "short": "Le modèle est trop simple pour capturer les patterns des données",
+      "long": "Sous-apprentissage. Le modèle ne parvient pas à apprendre correctement, même sur les données d'entraînement. Causes : modèle trop petit, pas assez d'entraînement, features insuffisantes. Solutions : modèle plus grand, plus d'epochs, meilleurs features.",
+      "see": ["overfitting"],
+      "category": "Problèmes"
+    },
+    "outlier": {
+      "short": "Valeur aberrante, très éloignée de la distribution normale des données",
+      "long": "Point de données atypique qui s'écarte significativement des autres observations. Les outliers peuvent fausser l'entraînement, surtout avec MSE qui pénalise fortement les grandes erreurs. Solutions : détection et suppression, ou fonctions de perte robustes (MAE, Huber).",
+      "see": ["MSE", "MAE"],
+      "category": "Problèmes"
+    },
+    "vanishing gradient": {
+      "short": "Gradients qui deviennent minuscules dans les réseaux profonds, bloquant l'apprentissage",
+      "long": "Dans les réseaux très profonds, les gradients se multiplient couche après couche lors de la rétropropagation. Si chaque facteur est < 1, le gradient final devient négligeable et les premières couches n'apprennent plus. Solutions : ReLU, batch normalization, skip connections (ResNet).",
+      "see": ["exploding gradient", "rétropropagation", "ReLU"],
+      "category": "Problèmes"
+    },
+    "exploding gradient": {
+      "short": "Gradients qui deviennent énormes, causant des poids infinis",
+      "long": "Inverse du vanishing gradient : les gradients se multiplient et explosent vers l'infini. Les poids deviennent NaN. Solutions : gradient clipping (limiter la norme), initialisation soignée des poids, batch normalization.",
+      "see": ["vanishing gradient", "rétropropagation"],
+      "category": "Problèmes"
+    },
+    "minimum local": {
+      "short": "Creux dans la fonction de perte qui n'est pas le minimum global",
+      "long": "Point où le gradient est nul mais qui n'est pas le meilleur minimum possible. En pratique, les réseaux de neurones modernes (haute dimension) ont peu de \"mauvais\" minimums locaux. Les techniques comme le momentum aident à traverser les minimums peu profonds.",
+      "see": ["descente de gradient", "momentum"],
+      "category": "Problèmes"
+    },
+    "règle de la chaîne": {
+      "short": "Règle mathématique pour dériver une fonction composée : (f∘g)' = f'(g) × g'",
+      "long": "Chain rule. Fondement mathématique de la rétropropagation. Permet de calculer la dérivée d'une fonction composée en multipliant les dérivées locales. Si z = f(g(x)), alors dz/dx = dz/dg × dg/dx.",
+      "see": ["rétropropagation", "gradient"],
+      "category": "Mathématiques"
+    },
+    "dropout": {
+      "short": "Technique de régularisation : désactiver aléatoirement des neurones pendant l'entraînement",
+      "long": "Pendant l'entraînement, chaque neurone a une probabilité p d'être \"éteint\" (sortie = 0). Force le réseau à ne pas trop dépendre de neurones spécifiques. Réduit l'overfitting. Typiquement p = 0.2 à 0.5. Désactivé en inférence.",
+      "see": ["overfitting", "régularisation"],
+      "category": "Techniques"
+    },
+    "régularisation": {
+      "short": "Techniques pour empêcher l'overfitting en pénalisant la complexité du modèle",
+      "long": "Ensemble de méthodes pour améliorer la généralisation : L1/L2 regularization (pénalité sur les poids), dropout, early stopping, data augmentation, batch normalization. L'idée est de contraindre le modèle pour éviter qu'il mémorise les données.",
+      "see": ["overfitting", "dropout"],
+      "category": "Techniques"
+    }
+  }
+}

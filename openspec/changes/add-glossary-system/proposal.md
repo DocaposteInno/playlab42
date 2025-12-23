@@ -194,11 +194,25 @@ La slide `glossaire` est auto-générée à partir des définitions :
 
 ---
 
-## Questions ouvertes
+## Décisions prises
 
-1. **Priorité des définitions** : Epic > Global ? Ou fusion ?
-2. **Auto-détection** : Faut-il souligner automatiquement les termes définis, ou exiger un marquage explicite ?
-3. **Format Markdown** : Quelle syntaxe ? `*terme*{.term}` ou `[[terme]]` ou autre ?
+1. **Priorité des définitions** : Epic > Global (l'epic peut redéfinir un terme global)
+2. **Marquage explicite** : Pas d'auto-détection. Les termes doivent être marqués explicitement dans les slides.
+3. **Syntaxe Markdown** : `[[terme]]` (style wiki, intuitif)
+
+---
+
+## Lexique de test
+
+Le parcours `deep-learning-intro` contient un fichier `glossary.json` avec ~30 termes définis pour tester la feature :
+
+**Categories :**
+- Types de tâches : régression, classification
+- Architecture : neurone, poids, biais, activation, ReLU, sigmoid, couche
+- Apprentissage : propagation avant, rétropropagation, gradient, descente de gradient, fonction de perte, MSE, cross-entropy, MAE, epoch, batch, learning rate, Adam, momentum
+- Problèmes : overfitting, underfitting, outlier, vanishing gradient, exploding gradient, minimum local
+- Techniques : dropout, régularisation
+- Mathématiques : règle de la chaîne
 
 ---
 
