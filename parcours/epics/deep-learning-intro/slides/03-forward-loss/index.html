@@ -89,6 +89,164 @@
                     Le facteur \(\frac{1}{2}\) est une convention pour simplifier les dérivées. Plus cette valeur est grande, plus le réseau se trompe.
                 </p>
 
+                <!-- Visualisation interactive MSE -->
+                <div class="my-6 p-4 dl-card rounded-xl border">
+                    <h4 class="font-bold text-blue-400 mb-3 text-center">Visualisation de la Perte MSE</h4>
+                    <div class="flex flex-col md:flex-row gap-4 items-center justify-center">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm dl-text-secondary">Cible y =</label>
+                            <input type="range" id="targetY" min="-1" max="1" step="0.1" value="0.5" class="w-24">
+                            <span id="targetYValue" class="font-mono text-cyan-400 w-12">0.5</span>
+                        </div>
+                        <canvas id="mseCanvas" width="400" height="200" class="rounded-lg" style="max-width: 400px;"></canvas>
+                    </div>
+                    <p class="text-center text-xs dl-text-muted mt-2">La parabole montre la perte en fonction de ŷ. Déplacez le curseur pour changer y.</p>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('mseCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const slider = document.getElementById('targetY');
+                    const valueDisplay = document.getElementById('targetYValue');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 20, right: 20, bottom: 35, left: 45 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    const xMin = -1.5, xMax = 1.5;
+                    const yMin = 0, yMax = 2.5;
+                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
+                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    let mouseX = null;
+
+                    function mse(y, yHat) {
+                        return 0.5 * Math.pow(y - yHat, 2);
+                    }
+
+                    function draw() {
+                        const targetY = parseFloat(slider.value);
+                        valueDisplay.textContent = targetY.toFixed(1);
+
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const axisColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Grille
+                        ctx.strokeStyle = gridColor;
+                        ctx.lineWidth = 1;
+                        for (let x = -1; x <= 1; x += 0.5) {
+                            ctx.beginPath();
+                            ctx.moveTo(toCanvasX(x), margin.top);
+                            ctx.lineTo(toCanvasX(x), H - margin.bottom);
+                            ctx.stroke();
+                        }
+                        for (let y = 0; y <= 2; y += 0.5) {
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, toCanvasY(y));
+                            ctx.lineTo(W - margin.right, toCanvasY(y));
+                            ctx.stroke();
+                        }
+
+                        // Axes
+                        ctx.strokeStyle = axisColor;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(margin.left, toCanvasY(0));
+                        ctx.lineTo(W - margin.right, toCanvasY(0));
+                        ctx.moveTo(toCanvasX(targetY), margin.top);
+                        ctx.lineTo(toCanvasX(targetY), H - margin.bottom);
+                        ctx.stroke();
+
+                        // Labels
+                        ctx.fillStyle = textColor;
+                        ctx.font = '11px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('ŷ', W - margin.right + 10, toCanvasY(0) + 4);
+                        ctx.fillText('-1', toCanvasX(-1), H - margin.bottom + 15);
+                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 15);
+                        ctx.fillText('1', toCanvasX(1), H - margin.bottom + 15);
+                        ctx.textAlign = 'right';
+                        ctx.fillText('L', margin.left - 5, margin.top + 10);
+                        ctx.fillText('1', margin.left - 5, toCanvasY(1) + 4);
+                        ctx.fillText('2', margin.left - 5, toCanvasY(2) + 4);
+
+                        // Courbe MSE
+                        ctx.strokeStyle = '#f97316';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        let started = false;
+                        for (let px = margin.left; px <= W - margin.right; px++) {
+                            const yHat = fromCanvasX(px);
+                            const loss = mse(targetY, yHat);
+                            const py = toCanvasY(Math.min(loss, yMax));
+                            if (!started) { ctx.moveTo(px, py); started = true; }
+                            else ctx.lineTo(px, py);
+                        }
+                        ctx.stroke();
+
+                        // Point minimum (y = ŷ)
+                        ctx.fillStyle = '#22c55e';
+                        ctx.beginPath();
+                        ctx.arc(toCanvasX(targetY), toCanvasY(0), 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = textColor;
+                        ctx.font = 'bold 10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('min', toCanvasX(targetY), H - margin.bottom + 25);
+
+                        // Point sur la courbe si souris
+                        if (mouseX !== null && mouseX >= margin.left && mouseX <= W - margin.right) {
+                            const yHat = fromCanvasX(mouseX);
+                            const loss = mse(targetY, yHat);
+                            const error = targetY - yHat;
+
+                            // Ligne verticale erreur
+                            ctx.strokeStyle = '#ef4444';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([4, 4]);
+                            ctx.beginPath();
+                            ctx.moveTo(mouseX, toCanvasY(0));
+                            ctx.lineTo(mouseX, toCanvasY(Math.min(loss, yMax)));
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+
+                            // Point
+                            ctx.fillStyle = '#ef4444';
+                            ctx.beginPath();
+                            ctx.arc(mouseX, toCanvasY(Math.min(loss, yMax)), 6, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            // Valeurs
+                            ctx.fillStyle = textColor;
+                            ctx.font = 'bold 11px monospace';
+                            ctx.textAlign = 'left';
+                            const infoX = mouseX > W/2 ? mouseX - 110 : mouseX + 10;
+                            ctx.fillText(`ŷ = ${yHat.toFixed(2)}`, infoX, margin.top + 15);
+                            ctx.fillStyle = '#ef4444';
+                            ctx.fillText(`L = ${loss.toFixed(3)}`, infoX, margin.top + 30);
+                        }
+                    }
+
+                    slider.addEventListener('input', draw);
+                    canvas.addEventListener('mousemove', e => {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = (e.clientX - rect.left) * (W / rect.width);
+                        draw();
+                    });
+                    canvas.addEventListener('mouseleave', () => { mouseX = null; draw(); });
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    draw();
+                })();
+                </script>
+
                 <div class="concept-box">
                     <h4 class="font-bold text-blue-400 mb-3">L'Objectif de l'Entraînement</h4>
                     <p class="dl-text-secondary text-sm">

@@ -54,21 +54,207 @@
 
                 <div class="concept-box">
                     <h4 class="font-bold text-blue-400 mb-3">Fonctions d'Activation Courantes</h4>
-                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+
+                    <!-- Visualisation interactive -->
+                    <div class="my-4 relative">
+                        <canvas id="activationCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
+                        <div class="flex justify-center gap-4 mt-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showTanh" checked class="accent-cyan-400">
+                                <span class="text-cyan-400 text-sm font-mono">tanh</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showSigmoid" checked class="accent-purple-400">
+                                <span class="text-purple-400 text-sm font-mono">sigmoid</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showRelu" checked class="accent-green-400">
+                                <span class="text-green-400 text-sm font-mono">ReLU</span>
+                            </label>
+                        </div>
+                        <p class="text-center text-xs dl-text-muted mt-2">Survolez pour voir les valeurs</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4 text-sm mt-4">
                         <div>
                             <span class="font-mono text-cyan-400">tanh(z)</span>
                             <p class="dl-text-muted text-xs mt-1">Sortie entre -1 et 1. Utilisée dans notre simulation.</p>
                         </div>
                         <div>
-                            <span class="font-mono text-cyan-400">sigmoid(z)</span>
+                            <span class="font-mono text-purple-400">sigmoid(z)</span>
                             <p class="dl-text-muted text-xs mt-1">Sortie entre 0 et 1. Idéale pour les probabilités.</p>
                         </div>
                         <div>
-                            <span class="font-mono text-cyan-400">ReLU(z)</span>
+                            <span class="font-mono text-green-400">ReLU(z)</span>
                             <p class="dl-text-muted text-xs mt-1">max(0, z). La plus populaire aujourd'hui.</p>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('activationCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    // Fonctions d'activation
+                    const tanh = z => Math.tanh(z);
+                    const sigmoid = z => 1 / (1 + Math.exp(-z));
+                    const relu = z => Math.max(0, z);
+
+                    // Échelles
+                    const xMin = -4, xMax = 4;
+                    const yMin = -1.5, yMax = 1.5;
+                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
+                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    let mouseX = null;
+
+                    function draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const axisColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Grille
+                        ctx.strokeStyle = gridColor;
+                        ctx.lineWidth = 1;
+                        for (let x = -4; x <= 4; x++) {
+                            ctx.beginPath();
+                            ctx.moveTo(toCanvasX(x), margin.top);
+                            ctx.lineTo(toCanvasX(x), H - margin.bottom);
+                            ctx.stroke();
+                        }
+                        for (let y = -1; y <= 1; y += 0.5) {
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, toCanvasY(y));
+                            ctx.lineTo(W - margin.right, toCanvasY(y));
+                            ctx.stroke();
+                        }
+
+                        // Axes
+                        ctx.strokeStyle = axisColor;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(toCanvasX(0), margin.top);
+                        ctx.lineTo(toCanvasX(0), H - margin.bottom);
+                        ctx.moveTo(margin.left, toCanvasY(0));
+                        ctx.lineTo(W - margin.right, toCanvasY(0));
+                        ctx.stroke();
+
+                        // Labels
+                        ctx.fillStyle = textColor;
+                        ctx.font = '11px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('z', W - margin.right + 10, toCanvasY(0) + 4);
+                        ctx.fillText('-4', toCanvasX(-4), H - margin.bottom + 15);
+                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 15);
+                        ctx.fillText('4', toCanvasX(4), H - margin.bottom + 15);
+                        ctx.textAlign = 'right';
+                        ctx.fillText('1', margin.left - 5, toCanvasY(1) + 4);
+                        ctx.fillText('-1', margin.left - 5, toCanvasY(-1) + 4);
+
+                        // Fonctions
+                        const showTanh = document.getElementById('showTanh').checked;
+                        const showSigmoid = document.getElementById('showSigmoid').checked;
+                        const showRelu = document.getElementById('showRelu').checked;
+
+                        function drawCurve(fn, color, clip = false) {
+                            ctx.strokeStyle = color;
+                            ctx.lineWidth = 2.5;
+                            ctx.beginPath();
+                            let started = false;
+                            for (let px = margin.left; px <= W - margin.right; px++) {
+                                const x = fromCanvasX(px);
+                                let y = fn(x);
+                                if (clip) y = Math.min(Math.max(y, yMin), yMax);
+                                const py = toCanvasY(y);
+                                if (!started) { ctx.moveTo(px, py); started = true; }
+                                else ctx.lineTo(px, py);
+                            }
+                            ctx.stroke();
+                        }
+
+                        if (showTanh) drawCurve(tanh, '#22d3ee');
+                        if (showSigmoid) drawCurve(sigmoid, '#a855f7');
+                        if (showRelu) drawCurve(relu, '#22c55e', true);
+
+                        // Curseur et valeurs
+                        if (mouseX !== null && mouseX >= margin.left && mouseX <= W - margin.right) {
+                            const x = fromCanvasX(mouseX);
+
+                            ctx.strokeStyle = axisColor;
+                            ctx.lineWidth = 1;
+                            ctx.setLineDash([4, 4]);
+                            ctx.beginPath();
+                            ctx.moveTo(mouseX, margin.top);
+                            ctx.lineTo(mouseX, H - margin.bottom);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+
+                            // Points et valeurs
+                            let yOffset = 15;
+                            ctx.font = 'bold 11px monospace';
+                            ctx.textAlign = 'left';
+
+                            ctx.fillStyle = textColor;
+                            ctx.fillText(`z = ${x.toFixed(2)}`, mouseX + 8, margin.top + yOffset);
+                            yOffset += 15;
+
+                            if (showTanh) {
+                                const y = tanh(x);
+                                ctx.fillStyle = '#22d3ee';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(y), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`tanh = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                                yOffset += 15;
+                            }
+                            if (showSigmoid) {
+                                const y = sigmoid(x);
+                                ctx.fillStyle = '#a855f7';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(y), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`σ = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                                yOffset += 15;
+                            }
+                            if (showRelu) {
+                                const y = relu(x);
+                                ctx.fillStyle = '#22c55e';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(Math.min(y, yMax)), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`ReLU = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                            }
+                        }
+                    }
+
+                    canvas.addEventListener('mousemove', e => {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = (e.clientX - rect.left) * (W / rect.width);
+                        draw();
+                    });
+                    canvas.addEventListener('mouseleave', () => { mouseX = null; draw(); });
+
+                    document.getElementById('showTanh').addEventListener('change', draw);
+                    document.getElementById('showSigmoid').addEventListener('change', draw);
+                    document.getElementById('showRelu').addEventListener('change', draw);
+
+                    // Observer le changement de thème
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                    draw();
+                })();
+                </script>
 
                 <div class="analogy-box">
                     <div class="flex items-start gap-3">
