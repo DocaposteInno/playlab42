@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rétropropagation - Deep Learning</title>
+    <title>Rétropropagation & Optimisation - Deep Learning</title>
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
@@ -16,10 +16,11 @@
         initGlossary();
         setupScrollHandler();
         sendTOC([
-            { id: 'history', label: 'Un Peu d\'Histoire', icon: '📜' },
-            { id: 'chain-rule', label: 'Règle de la Chaîne', icon: '🔗' },
-            { id: 'calcul', label: 'Calcul Étape par Étape', icon: '📝' },
-            { id: 'pitfalls', label: 'Pièges Classiques', icon: '⚠️' },
+            { id: 'history', label: 'Histoire', icon: '📜' },
+            { id: 'gradients', label: 'Calcul des Gradients', icon: '🔗' },
+            { id: 'update', label: 'Mise à Jour', icon: '🔧' },
+            { id: 'adam', label: 'Adam', icon: '🚀' },
+            { id: 'pitfalls', label: 'Pièges', icon: '⚠️' },
         ]);
     </script>
 </head>
@@ -30,126 +31,102 @@
         <section id="backprop" class="mb-16">
             <div class="flex items-center gap-3 mb-6">
                 <span class="text-3xl">⬅️</span>
-                <h2 class="text-3xl font-bold dl-text-primary">La Rétropropagation</h2>
+                <h2 class="text-3xl font-bold dl-text-primary">Rétropropagation & Optimisation</h2>
             </div>
 
             <div class="prose-content dl-text-secondary">
 
                 <p class="text-lg mb-6 dl-text-primary font-medium">
-                    La <dfn>rétropropagation</dfn> est l'algorithme qui a rendu le Deep Learning possible. Son principe est simple : calculer comment chaque poids contribue à l'erreur finale, puis ajuster tous les poids simultanément pour réduire cette erreur.
+                    La <dfn>rétropropagation</dfn> est l'algorithme qui a rendu le Deep Learning possible. Elle répond à deux questions : <em>"de combien chaque poids contribue-t-il à l'erreur ?"</em> (calcul des gradients) et <em>"comment corriger ces poids ?"</em> (optimisation).
                 </p>
 
-                <!-- HISTOIRE -->
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 1 : HISTOIRE
+                     ═══════════════════════════════════════════════════════════ -->
                 <h3 id="history" class="text-xl font-bold dl-text-primary mt-10 mb-4 scroll-mt-24">Un peu d'histoire</h3>
 
                 <p class="mb-4">
-                    La rétropropagation n'est pas une invention soudaine, mais le fruit de décennies de recherche. Son histoire est jalonnée de redécouvertes et d'oublis — un rappel que les bonnes idées doivent parfois attendre leur moment.
+                    La rétropropagation n'est pas une invention soudaine, mais le fruit de décennies de recherche. Son histoire est jalonnée de redécouvertes et d'oublis.
                 </p>
 
-                <div class="space-y-4 my-6">
+                <div class="space-y-3 my-6">
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1970 - Différentiation Automatique</span>
+                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1970</span>
                         <h4 class="text-base font-semibold dl-text-primary">Seppo Linnainmaa</h4>
-                        <p class="dl-text-muted mt-1 text-sm">Dans sa thèse de master en Finlande, il formalise le "mode inverse" de la différentiation automatique. Tous les frameworks modernes (TensorFlow, PyTorch) reposent encore sur son algorithme de 1970.</p>
+                        <p class="dl-text-muted mt-1 text-sm">Formalise le "mode inverse" de la différentiation automatique. Tous les frameworks modernes (TensorFlow, PyTorch) reposent encore sur son algorithme.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1974 - La Thèse Oubliée</span>
+                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1974</span>
                         <h4 class="text-base font-semibold dl-text-primary">Paul Werbos</h4>
-                        <p class="dl-text-muted mt-1 text-sm">Dans sa thèse de PhD à Harvard, il propose explicitement d'appliquer la règle de la chaîne aux réseaux de neurones. Malheureusement, c'est l'époque du premier "hiver de l'IA" — personne n'y prête attention. Il recevra le IEEE Neural Network Pioneer Award en 1995.</p>
+                        <p class="dl-text-muted mt-1 text-sm">Propose d'appliquer la règle de la chaîne aux réseaux de neurones dans sa thèse à Harvard. C'est l'hiver de l'IA — personne n'écoute.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1986 - Le Triomphe</span>
+                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1986</span>
                         <h4 class="text-base font-semibold dl-text-primary">Rumelhart, Hinton & Williams</h4>
-                        <p class="dl-text-muted mt-1 text-sm">Leur article dans <em>Nature</em> popularise enfin la technique. Ils montrent qu'un réseau peut apprendre des <strong>représentations internes</strong> dans ses couches cachées — résolvant enfin le problème XOR qui avait enterré le Perceptron.</p>
+                        <p class="dl-text-muted mt-1 text-sm">Leur article dans <em>Nature</em> popularise enfin la technique et résout le fameux problème XOR.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1989 - Première Application Industrielle</span>
-                        <h4 class="text-base font-semibold dl-text-primary">Yann LeCun (Bell Labs)</h4>
-                        <p class="dl-text-muted mt-1 text-sm">Utilise des réseaux convolutionnels entraînés par rétropropagation pour lire les chèques manuscrits. Ce système traitera des millions de chèques aux États-Unis.</p>
-                    </div>
-                    <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">2012 - L'Été Sans Fin</span>
-                        <h4 class="text-base font-semibold dl-text-primary">AlexNet (Krizhevsky, Sutskever, Hinton)</h4>
-                        <p class="dl-text-muted mt-1 text-sm">Victoire écrasante sur ImageNet avec 2× moins d'erreurs que le second. 8 couches, 60 millions de paramètres, 6 jours d'entraînement sur 2 GPU. Le Deep Learning moderne est né.</p>
+                        <span class="text-cyan-400 font-mono text-xs mb-1 block">2012</span>
+                        <h4 class="text-base font-semibold dl-text-primary">AlexNet</h4>
+                        <p class="dl-text-muted mt-1 text-sm">Victoire écrasante sur ImageNet. 8 couches, 60M paramètres, GPU. Le Deep Learning moderne est né.</p>
                     </div>
                 </div>
 
-                <div class="warning-box mb-8">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">💡</span>
-                        <div>
-                            <h4 class="font-bold text-yellow-500 mb-2">Pourquoi 40 ans d'attente ?</h4>
-                            <p class="dl-text-secondary text-sm">
-                                Les ingrédients manquaient : <strong>puissance de calcul</strong> (les GPU sont arrivés), <strong>données massives</strong> (ImageNet : 14 millions d'images), et <strong>astuces algorithmiques</strong> (ReLU, Dropout, BatchNorm). L'idée de 1974 avait juste besoin d'attendre son époque.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PRINCIPE -->
-                <p class="mb-6">
-                    Maintenant, la question clé : <strong>comment ajuster chaque poids pour réduire l'erreur ?</strong>
-                </p>
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 2 : CALCUL DES GRADIENTS
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="gradients" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Étape 1 : Calculer les Gradients</h3>
 
                 <p class="mb-6">
-                    On doit calculer la <strong>dérivée partielle</strong> de la perte par rapport à chaque poids : \(\frac{\partial L}{\partial w}\). Cette valeur nous dit : "si je bouge ce poids un tout petit peu, de combien l'erreur va-t-elle changer ?"
+                    On veut calculer \(\frac{\partial L}{\partial w}\) pour chaque poids : "si je bouge ce poids un peu, de combien l'erreur change-t-elle ?"
                 </p>
 
-                <div id="chain-rule" class="concept-box scroll-mt-24">
-                    <h4 class="font-bold text-blue-400 mb-3">La Règle de la Chaîne (Chain Rule)</h4>
+                <div class="concept-box mb-6">
+                    <h4 class="font-bold text-blue-400 mb-3">La Règle de la Chaîne</h4>
                     <p class="dl-text-secondary text-sm mb-4">
-                        C'est l'outil mathématique fondamental. Si \(L\) dépend de \(a\), qui dépend de \(z\), qui dépend de \(w\), alors :
+                        Si \(L\) dépend de \(a\), qui dépend de \(z\), qui dépend de \(w\), alors :
                     </p>
                     <div class="math-block text-center">
                         $$ \frac{\partial L}{\partial w} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial w} $$
                     </div>
                     <p class="dl-text-muted text-xs mt-3">
-                        On décompose un calcul complexe en une série de calculs simples, multipliés ensemble.
+                        On décompose un calcul complexe en calculs simples, multipliés ensemble.
                     </p>
                 </div>
-
-                <h3 id="calcul" class="text-xl font-bold dl-text-primary mt-10 mb-4 scroll-mt-24">Le Calcul Étape par Étape</h3>
 
                 <div class="step-indicator">
                     <span class="step-number">1</span>
                     <span class="dl-text-primary font-semibold">Erreur de sortie</span>
                 </div>
-                <p class="mb-4 ml-10">
-                    On commence par la fin. Pour la dernière couche :
-                </p>
-                <div class="math-block text-sm">
-                    $$ \delta^{[L]} = \frac{\partial L}{\partial a^{[L]}} = -(y - \hat{y}) $$
+                <p class="mb-2 ml-10 text-sm">On commence par la fin :</p>
+                <div class="math-block text-sm mb-4">
+                    $$ \delta^{[L]} = -(y - \hat{y}) $$
                 </div>
 
                 <div class="step-indicator">
                     <span class="step-number">2</span>
-                    <span class="dl-text-primary font-semibold">Propagation arrière de l'erreur</span>
+                    <span class="dl-text-primary font-semibold">Propagation arrière</span>
                 </div>
-                <p class="mb-4 ml-10">
-                    Pour chaque couche précédente, on "propage" l'erreur en arrière :
-                </p>
-                <div class="math-block text-sm">
+                <p class="mb-2 ml-10 text-sm">Pour chaque couche, on propage l'erreur en arrière :</p>
+                <div class="math-block text-sm mb-4">
                     $$ \delta^{[l]} = \delta^{[l+1]} \cdot W^{[l+1]} \cdot \sigma'(z^{[l]}) $$
                 </div>
-                <p class="mb-4 ml-10 text-sm dl-text-muted">
-                    Où \(\sigma'(z)\) est la dérivée de la fonction d'<dfn>activation</dfn>. Pour tanh : \(\sigma'(z) = 1 - \tanh^2(z)\).
-                </p>
 
                 <!-- Visualisation tanh et sa dérivée -->
-                <div class="my-6 ml-10 p-4 dl-card rounded-xl border">
+                <div class="my-6 p-4 dl-card rounded-xl border">
+                    <p class="text-center text-sm dl-text-secondary mb-3">La dérivée \(\sigma'(z)\) est cruciale — elle peut s'annuler aux extrémités (saturation)</p>
                     <div class="flex flex-col items-center">
-                        <canvas id="tanhDerivCanvas" width="500" height="220" class="rounded-lg" style="max-width: 500px;"></canvas>
-                        <div class="flex gap-6 mt-3">
+                        <canvas id="tanhDerivCanvas" width="450" height="180" class="rounded-lg" style="max-width: 450px;"></canvas>
+                        <div class="flex gap-6 mt-2">
                             <div class="flex items-center gap-2">
                                 <span class="inline-block w-4 h-1 rounded" style="background: #22d3ee;"></span>
                                 <span class="text-xs dl-text-secondary">tanh(z)</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="inline-block w-4 h-1 rounded" style="background: #f97316;"></span>
-                                <span class="text-xs dl-text-secondary">tanh'(z) = 1 - tanh²(z)</span>
+                                <span class="text-xs dl-text-secondary">tanh'(z)</span>
                             </div>
                         </div>
-                        <p class="text-xs dl-text-muted mt-2">La dérivée est maximale en 0 (pente forte) et s'annule aux extrémités (saturation).</p>
                     </div>
                 </div>
 
@@ -158,19 +135,17 @@
                     const canvas = document.getElementById('tanhDerivCanvas');
                     const ctx = canvas.getContext('2d');
                     const W = canvas.width, H = canvas.height;
-                    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                    const margin = { top: 15, right: 15, bottom: 25, left: 35 };
                     const plotW = W - margin.left - margin.right;
                     const plotH = H - margin.top - margin.bottom;
 
-                    const xMin = -4, xMax = 4;
-                    const yMin = -1.2, yMax = 1.2;
+                    const xMin = -4, xMax = 4, yMin = -1.2, yMax = 1.2;
                     const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
                     const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
                     const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
 
                     const tanh = z => Math.tanh(z);
                     const tanhDeriv = z => 1 - Math.pow(Math.tanh(z), 2);
-
                     let mouseX = null;
 
                     function draw() {
@@ -183,226 +158,491 @@
                         ctx.fillStyle = bgColor;
                         ctx.fillRect(0, 0, W, H);
 
-                        // Grille
                         ctx.strokeStyle = gridColor;
                         ctx.lineWidth = 1;
-                        for (let x = -4; x <= 4; x++) {
-                            ctx.beginPath();
-                            ctx.moveTo(toCanvasX(x), margin.top);
-                            ctx.lineTo(toCanvasX(x), H - margin.bottom);
-                            ctx.stroke();
+                        for (let x = -4; x <= 4; x += 2) {
+                            ctx.beginPath(); ctx.moveTo(toCanvasX(x), margin.top); ctx.lineTo(toCanvasX(x), H - margin.bottom); ctx.stroke();
                         }
                         for (let y = -1; y <= 1; y += 0.5) {
-                            ctx.beginPath();
-                            ctx.moveTo(margin.left, toCanvasY(y));
-                            ctx.lineTo(W - margin.right, toCanvasY(y));
-                            ctx.stroke();
+                            ctx.beginPath(); ctx.moveTo(margin.left, toCanvasY(y)); ctx.lineTo(W - margin.right, toCanvasY(y)); ctx.stroke();
                         }
 
-                        // Axes
-                        ctx.strokeStyle = axisColor;
-                        ctx.lineWidth = 2;
-                        ctx.beginPath();
-                        ctx.moveTo(toCanvasX(0), margin.top);
-                        ctx.lineTo(toCanvasX(0), H - margin.bottom);
-                        ctx.moveTo(margin.left, toCanvasY(0));
-                        ctx.lineTo(W - margin.right, toCanvasY(0));
-                        ctx.stroke();
+                        ctx.strokeStyle = axisColor; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(toCanvasX(0), margin.top); ctx.lineTo(toCanvasX(0), H - margin.bottom);
+                        ctx.moveTo(margin.left, toCanvasY(0)); ctx.lineTo(W - margin.right, toCanvasY(0)); ctx.stroke();
 
-                        // Labels
-                        ctx.fillStyle = textColor;
-                        ctx.font = '11px monospace';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('z', W - margin.right + 10, toCanvasY(0) + 4);
-                        ctx.fillText('-4', toCanvasX(-4), H - margin.bottom + 15);
-                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 15);
-                        ctx.fillText('4', toCanvasX(4), H - margin.bottom + 15);
+                        ctx.fillStyle = textColor; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+                        ctx.fillText('-4', toCanvasX(-4), H - margin.bottom + 12);
+                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 12);
+                        ctx.fillText('4', toCanvasX(4), H - margin.bottom + 12);
                         ctx.textAlign = 'right';
-                        ctx.fillText('1', margin.left - 5, toCanvasY(1) + 4);
-                        ctx.fillText('-1', margin.left - 5, toCanvasY(-1) + 4);
+                        ctx.fillText('1', margin.left - 4, toCanvasY(1) + 3);
 
-                        // Courbe tanh
-                        ctx.strokeStyle = '#22d3ee';
-                        ctx.lineWidth = 2.5;
+                        ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 2;
                         ctx.beginPath();
                         for (let px = margin.left; px <= W - margin.right; px++) {
-                            const x = fromCanvasX(px);
-                            const y = tanh(x);
-                            if (px === margin.left) ctx.moveTo(px, toCanvasY(y));
-                            else ctx.lineTo(px, toCanvasY(y));
+                            const x = fromCanvasX(px), y = tanh(x);
+                            px === margin.left ? ctx.moveTo(px, toCanvasY(y)) : ctx.lineTo(px, toCanvasY(y));
                         }
                         ctx.stroke();
 
-                        // Courbe dérivée
-                        ctx.strokeStyle = '#f97316';
-                        ctx.lineWidth = 2.5;
+                        ctx.strokeStyle = '#f97316'; ctx.lineWidth = 2;
                         ctx.beginPath();
                         for (let px = margin.left; px <= W - margin.right; px++) {
-                            const x = fromCanvasX(px);
-                            const y = tanhDeriv(x);
-                            if (px === margin.left) ctx.moveTo(px, toCanvasY(y));
-                            else ctx.lineTo(px, toCanvasY(y));
+                            const x = fromCanvasX(px), y = tanhDeriv(x);
+                            px === margin.left ? ctx.moveTo(px, toCanvasY(y)) : ctx.lineTo(px, toCanvasY(y));
                         }
                         ctx.stroke();
 
-                        // Curseur
                         if (mouseX !== null && mouseX >= margin.left && mouseX <= W - margin.right) {
-                            const z = fromCanvasX(mouseX);
-                            const yTanh = tanh(z);
-                            const yDeriv = tanhDeriv(z);
-
-                            ctx.strokeStyle = axisColor;
-                            ctx.lineWidth = 1;
-                            ctx.setLineDash([4, 4]);
-                            ctx.beginPath();
-                            ctx.moveTo(mouseX, margin.top);
-                            ctx.lineTo(mouseX, H - margin.bottom);
-                            ctx.stroke();
+                            const z = fromCanvasX(mouseX), yT = tanh(z), yD = tanhDeriv(z);
+                            ctx.strokeStyle = axisColor; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                            ctx.beginPath(); ctx.moveTo(mouseX, margin.top); ctx.lineTo(mouseX, H - margin.bottom); ctx.stroke();
                             ctx.setLineDash([]);
-
-                            // Points
-                            ctx.fillStyle = '#22d3ee';
-                            ctx.beginPath();
-                            ctx.arc(mouseX, toCanvasY(yTanh), 5, 0, Math.PI * 2);
-                            ctx.fill();
-
-                            ctx.fillStyle = '#f97316';
-                            ctx.beginPath();
-                            ctx.arc(mouseX, toCanvasY(yDeriv), 5, 0, Math.PI * 2);
-                            ctx.fill();
-
-                            // Valeurs
-                            ctx.font = 'bold 11px monospace';
-                            ctx.textAlign = 'left';
-                            const infoX = mouseX > W * 0.6 ? mouseX - 120 : mouseX + 10;
-                            ctx.fillStyle = textColor;
-                            ctx.fillText(`z = ${z.toFixed(2)}`, infoX, margin.top + 15);
-                            ctx.fillStyle = '#22d3ee';
-                            ctx.fillText(`tanh = ${yTanh.toFixed(3)}`, infoX, margin.top + 30);
-                            ctx.fillStyle = '#f97316';
-                            ctx.fillText(`tanh' = ${yDeriv.toFixed(3)}`, infoX, margin.top + 45);
+                            ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(mouseX, toCanvasY(yT), 4, 0, Math.PI * 2); ctx.fill();
+                            ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(mouseX, toCanvasY(yD), 4, 0, Math.PI * 2); ctx.fill();
+                            ctx.font = 'bold 10px monospace'; ctx.textAlign = 'left';
+                            const infoX = mouseX > W * 0.6 ? mouseX - 90 : mouseX + 8;
+                            ctx.fillStyle = textColor; ctx.fillText(`z=${z.toFixed(1)}`, infoX, margin.top + 12);
+                            ctx.fillStyle = '#f97316'; ctx.fillText(`σ'=${yD.toFixed(2)}`, infoX, margin.top + 24);
                         }
                     }
 
-                    canvas.addEventListener('mousemove', e => {
-                        const rect = canvas.getBoundingClientRect();
-                        mouseX = (e.clientX - rect.left) * (W / rect.width);
-                        draw();
-                    });
+                    canvas.addEventListener('mousemove', e => { mouseX = (e.clientX - canvas.getBoundingClientRect().left) * (W / canvas.getBoundingClientRect().width); draw(); });
                     canvas.addEventListener('mouseleave', () => { mouseX = null; draw(); });
                     new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
                     draw();
                 })();
                 </script>
 
-                <p class="mb-6"></p>
-
                 <div class="step-indicator">
                     <span class="step-number">3</span>
-                    <span class="dl-text-primary font-semibold">Calcul des <dfn data-term="gradient">gradients</dfn></span>
+                    <span class="dl-text-primary font-semibold">Gradient de chaque poids</span>
                 </div>
-                <p class="mb-4 ml-10">
-                    Maintenant qu'on a les \(\delta\) pour chaque couche, on calcule le gradient pour chaque poids :
-                </p>
+                <p class="mb-2 ml-10 text-sm">On obtient le gradient pour chaque poids :</p>
                 <div class="math-block text-sm">
                     $$ \frac{\partial L}{\partial W^{[l]}} = \delta^{[l]} \cdot (a^{[l-1]})^T $$
-                    <p class="dl-text-muted text-xs mt-2">
-                        Le gradient d'un poids = erreur locale × entrée de ce poids
-                    </p>
                 </div>
 
-                <div class="analogy-box">
+                <div class="analogy-box mt-6">
                     <div class="flex items-start gap-3">
-                        <span class="text-2xl">💡</span>
+                        <span class="text-xl">💡</span>
                         <div>
-                            <h4 class="font-bold text-green-400 mb-2">Analogie : Le jeu du téléphone inversé</h4>
+                            <h4 class="font-bold text-green-400 mb-1">Le jeu du téléphone inversé</h4>
                             <p class="dl-text-secondary text-sm">
-                                Imaginez une file de personnes. Le dernier reçoit un message "tu t'es trompé de X". Il chuchote à la personne devant lui "c'est en partie ta faute". Cette personne calcule sa part de responsabilité et transmet le message. À la fin, chaque personne sait <strong>à quel point elle a contribué</strong> à l'erreur finale.
+                                Le dernier reçoit "tu t'es trompé de X", chuchote à celui devant "c'est en partie ta faute". À la fin, chacun connaît <strong>sa part de responsabilité</strong> dans l'erreur.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="warning-box">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">⚡</span>
-                        <div>
-                            <h4 class="font-bold text-yellow-500 mb-2">Pourquoi c'est efficace ?</h4>
-                            <p class="dl-text-secondary text-sm">
-                                L'alternative naïve serait de calculer la dérivée pour chaque poids <strong>indépendamment</strong>, en faisant une forward pass à chaque fois. Avec 1 million de poids, cela ferait 1 million de forward passes ! La backprop fait le même travail en <strong>1 forward pass + 1 backward pass</strong>. C'est un gain de temps gigantesque.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 3 : MISE À JOUR DES POIDS
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="update" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Étape 2 : Mettre à Jour les Poids</h3>
 
-                <!-- PIÈGES CLASSIQUES -->
-                <h3 id="pitfalls" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Pièges Classiques</h3>
-
-                <p class="mb-6">
-                    La rétropropagation est puissante, mais elle a ses faiblesses. Voici les problèmes les plus courants et leurs solutions.
+                <p class="mb-4">
+                    Maintenant qu'on a les gradients, on corrige les poids. La méthode de base est la <strong>descente de gradient</strong> :
                 </p>
 
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="card-hover dl-card p-5 rounded-xl border">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-9 h-9 rounded-lg bg-red-500/20 flex items-center justify-center text-lg">📉</div>
-                            <h4 class="text-base font-bold dl-text-primary"><dfn data-term="vanishing gradient">Vanishing Gradient</dfn></h4>
+                <div class="math-block text-center mb-6">
+                    $$ w_{t+1} = w_t - \eta \cdot \frac{\partial L}{\partial w} $$
+                </div>
+
+                <p class="mb-6 text-sm dl-text-muted">
+                    Où \(\eta\) est le <dfn data-term="learning rate">taux d'apprentissage</dfn> — la taille du pas à chaque itération.
+                </p>
+
+                <!-- Visualisation descente de gradient -->
+                <div class="my-6 p-4 dl-card rounded-xl border">
+                    <h4 class="font-bold text-blue-400 mb-3 text-center">Descente de Gradient Interactive</h4>
+                    <div class="flex flex-col items-center gap-3">
+                        <canvas id="gradientCanvas" width="480" height="220" class="rounded-lg" style="max-width: 480px;"></canvas>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm dl-text-secondary">η =</label>
+                                <input type="range" id="learningRate" min="0.01" max="1.5" step="0.01" value="0.3" class="w-20">
+                                <span id="lrValue" class="font-mono text-cyan-400 w-10 text-sm">0.30</span>
+                            </div>
+                            <button id="resetGradient" class="px-3 py-1 text-xs bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded-lg">Reset</button>
+                            <button id="stepGradient" class="px-3 py-1 text-xs bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 rounded-lg">Step</button>
+                            <button id="runGradient" class="px-3 py-1 text-xs bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 rounded-lg">▶ Run</button>
                         </div>
-                        <p class="text-sm dl-text-muted mb-3">
-                            Dans les réseaux profonds, les gradients se multiplient couche après couche. Si chaque dérivée est &lt; 1 (comme avec sigmoid/tanh aux extrémités), le gradient devient minuscule et les premières couches n'apprennent plus.
+                        <p class="text-xs dl-text-muted">Cliquez pour placer la bille. Testez différentes valeurs de η.</p>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('gradientCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const lrSlider = document.getElementById('learningRate');
+                    const lrValue = document.getElementById('lrValue');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 20, right: 20, bottom: 25, left: 40 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    const xMin = -3.5, xMax = 3.5, yMin = 0, yMax = 4;
+                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
+                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    const loss = w => Math.sin(1.5 * w) + 0.1 * w * w + 1.5;
+                    const gradient = w => 1.5 * Math.cos(1.5 * w) + 0.2 * w;
+
+                    let w = 3.0, history = [w], running = false, animId = null;
+                    const runBtn = document.getElementById('runGradient');
+
+                    function draw() {
+                        const lr = parseFloat(lrSlider.value);
+                        lrValue.textContent = lr.toFixed(2);
+
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const axisColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor; ctx.fillRect(0, 0, W, H);
+
+                        ctx.strokeStyle = gridColor; ctx.lineWidth = 1;
+                        for (let x = -3; x <= 3; x++) { ctx.beginPath(); ctx.moveTo(toCanvasX(x), margin.top); ctx.lineTo(toCanvasX(x), H - margin.bottom); ctx.stroke(); }
+                        for (let y = 0; y <= 4; y++) { ctx.beginPath(); ctx.moveTo(margin.left, toCanvasY(y)); ctx.lineTo(W - margin.right, toCanvasY(y)); ctx.stroke(); }
+
+                        ctx.strokeStyle = axisColor; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(toCanvasX(0), margin.top); ctx.lineTo(toCanvasX(0), H - margin.bottom);
+                        ctx.moveTo(margin.left, toCanvasY(0)); ctx.lineTo(W - margin.right, toCanvasY(0)); ctx.stroke();
+
+                        ctx.fillStyle = textColor; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+                        ctx.fillText('w', W - margin.right + 8, toCanvasY(0) + 3);
+                        ctx.textAlign = 'right'; ctx.fillText('L(w)', margin.left - 4, margin.top + 8);
+
+                        ctx.strokeStyle = '#f97316'; ctx.lineWidth = 2.5; ctx.beginPath();
+                        for (let px = margin.left; px <= W - margin.right; px++) {
+                            const x = fromCanvasX(px), y = loss(x);
+                            px === margin.left ? ctx.moveTo(px, toCanvasY(Math.min(y, yMax))) : ctx.lineTo(px, toCanvasY(Math.min(y, yMax)));
+                        }
+                        ctx.stroke();
+
+                        if (history.length > 1) {
+                            ctx.strokeStyle = 'rgba(34, 211, 238, 0.4)'; ctx.lineWidth = 2; ctx.beginPath();
+                            for (let i = 0; i < history.length; i++) {
+                                const hw = history[i], px = toCanvasX(hw), py = toCanvasY(loss(hw));
+                                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+                            }
+                            ctx.stroke();
+                            for (let i = 0; i < history.length - 1; i++) {
+                                ctx.fillStyle = 'rgba(34, 211, 238, 0.3)'; ctx.beginPath();
+                                ctx.arc(toCanvasX(history[i]), toCanvasY(loss(history[i])), 3, 0, Math.PI * 2); ctx.fill();
+                            }
+                        }
+
+                        const currentLoss = loss(w);
+                        ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(toCanvasX(w), toCanvasY(currentLoss), 9, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = '#0e7490'; ctx.lineWidth = 2; ctx.stroke();
+
+                        const grad = gradient(w), arrowLen = Math.min(Math.abs(grad) * 18, 45), arrowDir = grad > 0 ? -1 : 1;
+                        const arrowX = toCanvasX(w) + arrowDir * arrowLen, arrowY = toCanvasY(currentLoss);
+                        ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(toCanvasX(w), arrowY); ctx.lineTo(arrowX, arrowY); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(arrowX, arrowY); ctx.lineTo(arrowX - arrowDir * 7, arrowY - 4); ctx.lineTo(arrowX - arrowDir * 7, arrowY + 4); ctx.closePath();
+                        ctx.fillStyle = '#22c55e'; ctx.fill();
+
+                        ctx.fillStyle = textColor; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'left';
+                        ctx.fillText(`w=${w.toFixed(2)}  L=${currentLoss.toFixed(2)}  step=${history.length - 1}`, margin.left + 5, margin.top + 12);
+
+                        let lrStatus = '', lrColor = textColor;
+                        if (lr > 0.8) { lrStatus = '⚠️ trop grand'; lrColor = '#ef4444'; }
+                        else if (lr < 0.1) { lrStatus = '🐌 lent'; lrColor = '#eab308'; }
+                        else { lrStatus = '✓'; lrColor = '#22c55e'; }
+                        ctx.fillStyle = lrColor; ctx.textAlign = 'right'; ctx.fillText(lrStatus, W - margin.right - 5, margin.top + 12);
+                    }
+
+                    function step() {
+                        const lr = parseFloat(lrSlider.value), grad = gradient(w);
+                        w = Math.max(xMin + 0.1, Math.min(xMax - 0.1, w - lr * grad));
+                        history.push(w); if (history.length > 100) history.shift(); draw();
+                    }
+
+                    function stop() {
+                        running = false; if (animId) { clearTimeout(animId); animId = null; }
+                        runBtn.textContent = '▶ Run';
+                        runBtn.classList.remove('bg-red-500/20', 'border-red-500/50');
+                        runBtn.classList.add('bg-purple-500/20', 'border-purple-500/50');
+                    }
+
+                    function reset() { stop(); w = 3.0; history = [w]; draw(); }
+
+                    function run() {
+                        if (running) { stop(); return; }
+                        running = true; runBtn.textContent = '⏹ Stop';
+                        runBtn.classList.remove('bg-purple-500/20', 'border-purple-500/50');
+                        runBtn.classList.add('bg-red-500/20', 'border-red-500/50');
+                        (function animate() { if (!running) return; step(); animId = setTimeout(animate, 80); })();
+                    }
+
+                    canvas.addEventListener('click', e => {
+                        stop(); const rect = canvas.getBoundingClientRect();
+                        w = Math.max(xMin + 0.1, Math.min(xMax - 0.1, fromCanvasX((e.clientX - rect.left) * (W / rect.width))));
+                        history = [w]; draw();
+                    });
+
+                    lrSlider.addEventListener('input', draw);
+                    document.getElementById('resetGradient').addEventListener('click', reset);
+                    document.getElementById('stepGradient').addEventListener('click', step);
+                    document.getElementById('runGradient').addEventListener('click', run);
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    draw();
+                })();
+                </script>
+
+                <div class="grid md:grid-cols-2 gap-3 my-6">
+                    <div class="bg-red-500/10 border border-red-500/30 p-3 rounded-xl">
+                        <h4 class="font-bold text-red-400 mb-1 text-sm">η trop grand</h4>
+                        <p class="text-xs dl-text-muted">On "saute" par-dessus le minimum, oscillations, divergence.</p>
+                    </div>
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl">
+                        <h4 class="font-bold text-yellow-500 mb-1 text-sm">η trop petit</h4>
+                        <p class="text-xs dl-text-muted">Convergence très lente, risque de rester dans un minimum local.</p>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 4 : ADAM
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="adam" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">L'Optimiseur Adam</h3>
+
+                <p class="mb-4">
+                    La descente de gradient "vanilla" a des limitations. <strong>Adam</strong> (2015) combine deux améliorations :
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 my-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-purple-400 mb-2 text-sm">Momentum</h4>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Moyenne mobile des gradients passés → "lisse" la trajectoire et accélère.
                         </p>
-                        <div class="text-xs text-blue-400 font-mono">
-                            Solutions : ReLU, Batch Normalization, ResNets
+                        <div class="math-block text-xs py-1">$$ m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t $$</div>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h4 class="font-bold text-orange-400 mb-2 text-sm">Taux Adaptatif</h4>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Chaque poids a son propre η ajusté selon la variance de ses gradients.
+                        </p>
+                        <div class="math-block text-xs py-1">$$ v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2 $$</div>
+                    </div>
+                </div>
+
+                <!-- Visualisation Adam vs GD -->
+                <div class="my-6 p-4 dl-card rounded-xl border">
+                    <h4 class="font-bold text-blue-400 mb-3 text-center text-sm">Adam vs Descente de Gradient</h4>
+                    <div class="flex flex-col items-center gap-3">
+                        <canvas id="adamCanvas" width="480" height="200" class="rounded-lg" style="max-width: 480px;"></canvas>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <label class="text-sm dl-text-secondary">η =</label>
+                                <input type="range" id="adamLR" min="0.01" max="1.0" step="0.01" value="0.3" class="w-16">
+                                <span id="adamLRValue" class="font-mono text-cyan-400 w-10 text-sm">0.30</span>
+                            </div>
+                            <button id="resetAdam" class="px-2 py-1 text-xs bg-blue-500/20 border border-blue-500/50 rounded-lg">Reset</button>
+                            <button id="runAdam" class="px-2 py-1 text-xs bg-purple-500/20 border border-purple-500/50 rounded-lg">▶ Run</button>
+                        </div>
+                        <div class="flex gap-4 text-xs">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> GD</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Adam</span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card-hover dl-card p-5 rounded-xl border">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-9 h-9 rounded-lg bg-orange-500/20 flex items-center justify-center text-lg">💥</div>
-                            <h4 class="text-base font-bold dl-text-primary"><dfn data-term="exploding gradient">Exploding Gradient</dfn></h4>
-                        </div>
-                        <p class="text-sm dl-text-muted mb-3">
-                            L'inverse : les gradients deviennent énormes et font "exploser" les poids vers l'infini. La loss devient NaN et l'entraînement échoue.
-                        </p>
-                        <div class="text-xs text-orange-400 font-mono">
-                            Solutions : Gradient Clipping, Xavier/Kaiming Init
+                <script>
+                (function() {
+                    const canvas = document.getElementById('adamCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const lrSlider = document.getElementById('adamLR');
+                    const lrValue = document.getElementById('adamLRValue');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 15, right: 15, bottom: 20, left: 35 };
+                    const plotW = W - margin.left - margin.right, plotH = H - margin.top - margin.bottom;
+
+                    const xMin = -3.5, xMax = 3.5, yMin = 0, yMax = 4;
+                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
+                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    const loss = w => Math.sin(1.5 * w) + 0.1 * w * w + 1.5;
+                    const gradient = w => 1.5 * Math.cos(1.5 * w) + 0.2 * w;
+
+                    let wGD = 3.0, historyGD = [wGD], wAdam = 3.0, historyAdam = [wAdam];
+                    let m = 0, v = 0, t = 0;
+                    const beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8;
+                    let running = false, animId = null;
+                    const runBtn = document.getElementById('runAdam');
+
+                    function draw() {
+                        const lr = parseFloat(lrSlider.value);
+                        lrValue.textContent = lr.toFixed(2);
+
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const axisColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor; ctx.fillRect(0, 0, W, H);
+
+                        ctx.strokeStyle = gridColor; ctx.lineWidth = 1;
+                        for (let x = -3; x <= 3; x++) { ctx.beginPath(); ctx.moveTo(toCanvasX(x), margin.top); ctx.lineTo(toCanvasX(x), H - margin.bottom); ctx.stroke(); }
+
+                        ctx.strokeStyle = '#f97316'; ctx.lineWidth = 2.5; ctx.beginPath();
+                        for (let px = margin.left; px <= W - margin.right; px++) {
+                            const x = fromCanvasX(px), y = loss(x);
+                            px === margin.left ? ctx.moveTo(px, toCanvasY(Math.min(y, yMax))) : ctx.lineTo(px, toCanvasY(Math.min(y, yMax)));
+                        }
+                        ctx.stroke();
+
+                        if (historyGD.length > 1) {
+                            ctx.strokeStyle = 'rgba(34, 211, 238, 0.4)'; ctx.lineWidth = 2; ctx.beginPath();
+                            historyGD.forEach((hw, i) => i === 0 ? ctx.moveTo(toCanvasX(hw), toCanvasY(loss(hw))) : ctx.lineTo(toCanvasX(hw), toCanvasY(loss(hw))));
+                            ctx.stroke();
+                        }
+                        if (historyAdam.length > 1) {
+                            ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)'; ctx.lineWidth = 2; ctx.beginPath();
+                            historyAdam.forEach((hw, i) => i === 0 ? ctx.moveTo(toCanvasX(hw), toCanvasY(loss(hw))) : ctx.lineTo(toCanvasX(hw), toCanvasY(loss(hw))));
+                            ctx.stroke();
+                        }
+
+                        ctx.fillStyle = '#22d3ee'; ctx.beginPath(); ctx.arc(toCanvasX(wGD), toCanvasY(loss(wGD)), 7, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = '#0e7490'; ctx.lineWidth = 1.5; ctx.stroke();
+                        ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(toCanvasX(wAdam), toCanvasY(loss(wAdam)), 7, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.5; ctx.stroke();
+
+                        ctx.font = 'bold 10px monospace'; ctx.textAlign = 'left';
+                        ctx.fillStyle = '#22d3ee'; ctx.fillText(`GD: L=${loss(wGD).toFixed(2)}`, margin.left + 5, margin.top + 12);
+                        ctx.fillStyle = '#a855f7'; ctx.fillText(`Adam: L=${loss(wAdam).toFixed(2)}`, margin.left + 5, margin.top + 24);
+                        ctx.fillStyle = textColor; ctx.fillText(`step=${historyGD.length - 1}`, margin.left + 5, margin.top + 36);
+                    }
+
+                    function step() {
+                        const lr = parseFloat(lrSlider.value);
+                        wGD = Math.max(xMin + 0.1, Math.min(xMax - 0.1, wGD - lr * gradient(wGD)));
+                        historyGD.push(wGD);
+
+                        t++;
+                        const g = gradient(wAdam);
+                        m = beta1 * m + (1 - beta1) * g;
+                        v = beta2 * v + (1 - beta2) * g * g;
+                        const mHat = m / (1 - Math.pow(beta1, t)), vHat = v / (1 - Math.pow(beta2, t));
+                        wAdam = Math.max(xMin + 0.1, Math.min(xMax - 0.1, wAdam - lr * mHat / (Math.sqrt(vHat) + epsilon)));
+                        historyAdam.push(wAdam);
+
+                        if (historyGD.length > 100) historyGD.shift();
+                        if (historyAdam.length > 100) historyAdam.shift();
+                        draw();
+                    }
+
+                    function stop() {
+                        running = false; if (animId) { clearTimeout(animId); animId = null; }
+                        runBtn.textContent = '▶ Run';
+                        runBtn.classList.remove('bg-red-500/20', 'border-red-500/50');
+                        runBtn.classList.add('bg-purple-500/20', 'border-purple-500/50');
+                    }
+
+                    function reset() { stop(); wGD = 3.0; wAdam = 3.0; historyGD = [wGD]; historyAdam = [wAdam]; m = 0; v = 0; t = 0; draw(); }
+
+                    function run() {
+                        if (running) { stop(); return; }
+                        running = true; runBtn.textContent = '⏹';
+                        runBtn.classList.remove('bg-purple-500/20', 'border-purple-500/50');
+                        runBtn.classList.add('bg-red-500/20', 'border-red-500/50');
+                        (function animate() { if (!running) return; step(); animId = setTimeout(animate, 80); })();
+                    }
+
+                    canvas.addEventListener('click', e => {
+                        stop(); const rect = canvas.getBoundingClientRect();
+                        const newW = Math.max(xMin + 0.1, Math.min(xMax - 0.1, fromCanvasX((e.clientX - rect.left) * (W / rect.width))));
+                        wGD = newW; wAdam = newW; historyGD = [wGD]; historyAdam = [wAdam]; m = 0; v = 0; t = 0; draw();
+                    });
+
+                    lrSlider.addEventListener('input', draw);
+                    document.getElementById('resetAdam').addEventListener('click', reset);
+                    document.getElementById('runAdam').addEventListener('click', run);
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    draw();
+                })();
+                </script>
+
+                <div class="analogy-box mt-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">⚽</span>
+                        <div>
+                            <h4 class="font-bold text-green-400 mb-1">La balle qui roule</h4>
+                            <p class="dl-text-secondary text-sm">
+                                <strong>Momentum</strong> = inertie : elle accélère si elle roule toujours dans la même direction. <strong>Taux adaptatif</strong> = freinage automatique sur terrain chaotique, accélération sur lignes droites.
+                            </p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="card-hover dl-card p-5 rounded-xl border">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-9 h-9 rounded-lg bg-yellow-500/20 flex items-center justify-center text-lg">📚</div>
-                            <h4 class="text-base font-bold dl-text-primary"><dfn>Overfitting</dfn></h4>
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 5 : PIÈGES
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="pitfalls" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Pièges Classiques</h3>
+
+                <div class="grid md:grid-cols-2 gap-3">
+                    <div class="card-hover dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center">📉</div>
+                            <h4 class="text-sm font-bold dl-text-primary"><dfn data-term="vanishing gradient">Vanishing Gradient</dfn></h4>
                         </div>
-                        <p class="text-sm dl-text-muted mb-3">
-                            Le réseau "apprend par cœur" les données d'entraînement au lieu de généraliser. Il performe bien sur les données vues, mais mal sur les nouvelles.
+                        <p class="text-xs dl-text-muted mb-2">
+                            Gradients minuscules dans les réseaux profonds → les premières couches n'apprennent plus.
                         </p>
-                        <div class="text-xs text-yellow-500 font-mono">
-                            Solutions : Early Stopping, Dropout, Régularisation L2
-                        </div>
+                        <div class="text-xs text-blue-400 font-mono">ReLU, BatchNorm, ResNets</div>
                     </div>
 
-                    <div class="card-hover dl-card p-5 rounded-xl border">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center text-lg">🎯</div>
-                            <h4 class="text-base font-bold dl-text-primary">Mauvais <dfn data-term="learning rate">Learning Rate</dfn></h4>
+                    <div class="card-hover dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">💥</div>
+                            <h4 class="text-sm font-bold dl-text-primary"><dfn data-term="exploding gradient">Exploding Gradient</dfn></h4>
                         </div>
-                        <p class="text-sm dl-text-muted mb-3">
-                            Trop élevé : l'entraînement oscille et ne converge pas. Trop bas : l'entraînement est extrêmement lent ou reste bloqué.
+                        <p class="text-xs dl-text-muted mb-2">
+                            Gradients énormes → poids explosent vers l'infini, loss = NaN.
                         </p>
-                        <div class="text-xs text-purple-400 font-mono">
-                            Solutions : Adam, Learning Rate Scheduling, Warmup
+                        <div class="text-xs text-orange-400 font-mono">Gradient Clipping, Init Xavier</div>
+                    </div>
+
+                    <div class="card-hover dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center">📚</div>
+                            <h4 class="text-sm font-bold dl-text-primary"><dfn>Overfitting</dfn></h4>
                         </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Le réseau apprend par cœur au lieu de généraliser.
+                        </p>
+                        <div class="text-xs text-yellow-500 font-mono">Dropout, Early Stopping, L2</div>
+                    </div>
+
+                    <div class="card-hover dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">🕳️</div>
+                            <h4 class="text-sm font-bold dl-text-primary">Minimums Locaux</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            En haute dimension, moins problématique que prévu (souvent des points-selle).
+                        </p>
+                        <div class="text-xs text-purple-400 font-mono">Adam, Momentum</div>
                     </div>
                 </div>
 
                 <div class="concept-box mt-8">
                     <div class="flex items-start gap-3">
-                        <span class="text-2xl">🎯</span>
+                        <span class="text-xl">🎯</span>
                         <div>
-                            <h4 class="font-bold text-blue-400 mb-2">Le bon côté des choses</h4>
+                            <h4 class="font-bold text-blue-400 mb-1">Récapitulatif</h4>
                             <p class="dl-text-secondary text-sm">
-                                La crainte historique des <strong>minimums locaux</strong> s'est révélée moins problématique que prévu. En très haute dimension, la plupart des "mauvais" points critiques sont des <strong>points-selle</strong> dont on peut s'échapper. Les optimiseurs modernes comme Adam gèrent cela très bien.
+                                <strong>Rétropropagation</strong> = calcul efficace des gradients via la règle de la chaîne.<br>
+                                <strong>Optimisation</strong> = utilisation de ces gradients pour corriger les poids.<br>
+                                Ces deux étapes forment la boucle d'apprentissage de tout réseau de neurones.
                             </p>
                         </div>
                     </div>
@@ -414,7 +654,7 @@
     </main>
 
     <footer class="dl-footer border-t py-8 text-center text-sm">
-        <p>Deep Learning pour l'impatient — Slide 6/9</p>
+        <p>Deep Learning pour l'impatient — Slide 6/8</p>
     </footer>
 
 </body>

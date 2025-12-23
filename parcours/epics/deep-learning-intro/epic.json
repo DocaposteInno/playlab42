@@ -23,11 +23,10 @@
         { "id": "03-reseaux" },
         { "id": "04-forward-propagation" },
         { "id": "05-loss-functions" },
-        { "id": "06-backpropagation" },
-        { "id": "07-optimisation" }
+        { "id": "06-backpropagation" }
       ]
     },
-    { "id": "08-laboratoire" },
-    { "id": "09-glossaire", "type": "glossary", "optional": true }
+    { "id": "07-laboratoire" },
+    { "id": "08-glossaire", "type": "glossary", "optional": true }
   ]
 }

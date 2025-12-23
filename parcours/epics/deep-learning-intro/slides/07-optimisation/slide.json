@@ -1,8 +1,0 @@
-{
-  "id": "07-optimisation",
-  "title": "Optimisation",
-  "description": "Descente de gradient et optimiseur Adam",
-  "type": "page",
-  "icon": "🔧",
-  "duration": "5 min"
-}

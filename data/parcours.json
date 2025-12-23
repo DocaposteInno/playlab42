@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-23T16:57:53.065Z",
+  "generatedAt": "2025-12-23T17:06:36.949Z",
   "epics": [
     {
       "id": "coding-agents-2025",
@@ -85,7 +85,7 @@
       "difficulty": "beginner",
       "icon": "🧠",
       "thumbnail": null,
-      "slideCount": 9,
+      "slideCount": 8,
       "optionalSlideCount": 1,
       "hasIndex": false,
       "structure": [
@@ -128,26 +128,20 @@
             {
               "type": "slide",
               "id": "06-backpropagation",
-              "title": "Rétropropagation",
+              "title": "Rétropropagation & Optimisation",
               "icon": "⬅️"
-            },
-            {
-              "type": "slide",
-              "id": "07-optimisation",
-              "title": "Optimisation",
-              "icon": "🔧"
             }
           ]
         },
         {
           "type": "slide",
-          "id": "08-laboratoire",
+          "id": "07-laboratoire",
           "title": "Laboratoire",
           "icon": "🧪"
         },
         {
           "type": "slide",
-          "id": "09-glossaire",
+          "id": "08-glossaire",
           "title": "Glossaire",
           "icon": "📖",
           "optional": true
@@ -583,7 +577,7 @@
         "difficulty": "beginner",
         "icon": "🧠",
         "thumbnail": null,
-        "slideCount": 9,
+        "slideCount": 8,
         "optionalSlideCount": 1,
         "hasIndex": false,
         "structure": [
@@ -626,26 +620,20 @@
               {
                 "type": "slide",
                 "id": "06-backpropagation",
-                "title": "Rétropropagation",
+                "title": "Rétropropagation & Optimisation",
                 "icon": "⬅️"
-              },
-              {
-                "type": "slide",
-                "id": "07-optimisation",
-                "title": "Optimisation",
-                "icon": "🔧"
               }
             ]
           },
           {
             "type": "slide",
-            "id": "08-laboratoire",
+            "id": "07-laboratoire",
             "title": "Laboratoire",
             "icon": "🧪"
           },
           {
             "type": "slide",
-            "id": "09-glossaire",
+            "id": "08-glossaire",
             "title": "Glossaire",
             "icon": "📖",
             "optional": true
