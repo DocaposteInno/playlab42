@@ -63,6 +63,326 @@
                     </div>
                 </div>
 
+                <!-- VISUALISATION ANIMÉE -->
+                <div class="concept-box my-8">
+                    <h4 class="font-bold text-blue-400 mb-3">Visualisez la Propagation</h4>
+                    <p class="text-sm dl-text-muted mb-4">Observez les valeurs se propager couche par couche. Chaque neurone calcule <code class="text-cyan-400">z = Σ(w·a) + b</code> puis applique l'activation <code class="text-purple-400">a = tanh(z)</code>.</p>
+                    <div class="my-4">
+                        <canvas id="forwardCanvas" width="700" height="320" class="w-full rounded-lg" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
+                    </div>
+                    <div class="flex justify-center gap-4 mt-3">
+                        <button id="btnPause" class="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-200">⏸ Pause</button>
+                        <button id="btnReset" class="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-200">🔄 Nouveau</button>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('forwardCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+
+                    // Architecture : 2 entrées → 3 cachée → 2 sorties
+                    const layers = [2, 3, 2];
+                    const layerNames = ['Entrée', 'Cachée', 'Sortie'];
+
+                    // État de l'animation
+                    let isPaused = false;
+                    let animationPhase = 0; // 0 = entrée, 1 = cachée, 2 = sortie, 3 = pause avant reset
+                    let phaseProgress = 0;  // 0 à 1 dans la phase
+                    const PHASE_DURATION = 2500; // ms par couche
+                    const PAUSE_DURATION = 2000; // pause à la fin
+                    let lastTime = 0;
+
+                    // Données du réseau
+                    let weights = [];
+                    let biases = [];
+                    let inputs = [];
+                    let activations = [];
+                    let preActivations = [];
+
+                    // Positions des neurones
+                    const neuronPositions = [];
+                    const margin = { left: 100, right: 100, top: 60, bottom: 40 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    for (let l = 0; l < layers.length; l++) {
+                        const x = margin.left + (l / (layers.length - 1)) * plotW;
+                        const layerPositions = [];
+                        for (let n = 0; n < layers[l]; n++) {
+                            const y = margin.top + ((n + 0.5) / layers[l]) * plotH;
+                            layerPositions.push({ x, y });
+                        }
+                        neuronPositions.push(layerPositions);
+                    }
+
+                    function initNetwork() {
+                        // Poids et biais aléatoires
+                        weights = [];
+                        biases = [];
+                        for (let l = 1; l < layers.length; l++) {
+                            const layerW = [];
+                            const layerB = [];
+                            for (let j = 0; j < layers[l]; j++) {
+                                const neuronW = [];
+                                for (let i = 0; i < layers[l-1]; i++) {
+                                    neuronW.push((Math.random() - 0.5) * 2);
+                                }
+                                layerW.push(neuronW);
+                                layerB.push((Math.random() - 0.5) * 0.5);
+                            }
+                            weights.push(layerW);
+                            biases.push(layerB);
+                        }
+
+                        // Entrées aléatoires
+                        inputs = [];
+                        for (let i = 0; i < layers[0]; i++) {
+                            inputs.push(Math.round((Math.random() * 2 - 1) * 10) / 10);
+                        }
+
+                        // Calcul complet de la propagation
+                        activations = [inputs.slice()];
+                        preActivations = [inputs.slice()];
+                        let current = inputs;
+
+                        for (let l = 0; l < weights.length; l++) {
+                            const nextZ = [];
+                            const nextA = [];
+                            for (let j = 0; j < weights[l].length; j++) {
+                                let sum = biases[l][j];
+                                for (let i = 0; i < current.length; i++) {
+                                    sum += current[i] * weights[l][j][i];
+                                }
+                                nextZ.push(sum);
+                                nextA.push(Math.tanh(sum));
+                            }
+                            preActivations.push(nextZ);
+                            activations.push(nextA);
+                            current = nextA;
+                        }
+
+                        animationPhase = 0;
+                        phaseProgress = 0;
+                    }
+
+                    function getColor(value, alpha = 1) {
+                        if (value >= 0) {
+                            const intensity = Math.min(1, value);
+                            return `rgba(34, 211, 238, ${alpha * (0.3 + intensity * 0.7)})`;
+                        } else {
+                            const intensity = Math.min(1, -value);
+                            return `rgba(249, 115, 22, ${alpha * (0.3 + intensity * 0.7)})`;
+                        }
+                    }
+
+                    function easeInOut(t) {
+                        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                    }
+
+                    function draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const textColor = isDark ? '#e2e8f0' : '#334155';
+                        const mutedColor = isDark ? '#64748b' : '#94a3b8';
+                        const dimColor = isDark ? '#334155' : '#cbd5e1';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Déterminer quelles couches sont "actives"
+                        const activeUpTo = animationPhase;
+                        const currentLayerProgress = easeInOut(phaseProgress);
+
+                        // Dessiner les connexions
+                        for (let l = 0; l < weights.length; l++) {
+                            const isActive = l < activeUpTo || (l === activeUpTo && animationPhase > 0);
+                            const isCurrent = l === activeUpTo - 1 && animationPhase > 0 && animationPhase <= layers.length - 1;
+
+                            for (let j = 0; j < weights[l].length; j++) {
+                                for (let i = 0; i < weights[l][j].length; i++) {
+                                    const weight = weights[l][j][i];
+                                    const fromPos = neuronPositions[l][i];
+                                    const toPos = neuronPositions[l + 1][j];
+
+                                    let alpha = 0.15;
+                                    let lineWidth = 1;
+
+                                    if (isActive) {
+                                        alpha = 0.6;
+                                        lineWidth = 1 + Math.abs(weight) * 1.5;
+                                    }
+                                    if (isCurrent) {
+                                        // Animation du flux
+                                        alpha = 0.3 + currentLayerProgress * 0.5;
+                                    }
+
+                                    ctx.strokeStyle = isActive ? getColor(weight, alpha) : dimColor;
+                                    ctx.lineWidth = lineWidth;
+                                    ctx.beginPath();
+                                    ctx.moveTo(fromPos.x + 22, fromPos.y);
+                                    ctx.lineTo(toPos.x - 22, toPos.y);
+                                    ctx.stroke();
+
+                                    // Particule animée sur la connexion active
+                                    if (isCurrent && currentLayerProgress > 0 && currentLayerProgress < 1) {
+                                        const px = fromPos.x + 22 + (toPos.x - 22 - fromPos.x - 22) * currentLayerProgress;
+                                        const py = fromPos.y + (toPos.y - fromPos.y) * currentLayerProgress;
+                                        ctx.fillStyle = '#22d3ee';
+                                        ctx.beginPath();
+                                        ctx.arc(px, py, 4, 0, Math.PI * 2);
+                                        ctx.fill();
+                                    }
+                                }
+                            }
+                        }
+
+                        // Dessiner les neurones
+                        for (let l = 0; l < layers.length; l++) {
+                            const isActive = l <= activeUpTo;
+                            const isCurrent = l === activeUpTo && animationPhase < layers.length;
+                            const justActivated = l === activeUpTo && phaseProgress > 0.8;
+
+                            for (let n = 0; n < layers[l]; n++) {
+                                const pos = neuronPositions[l][n];
+                                const activation = activations[l][n];
+                                const preAct = preActivations[l][n];
+
+                                let displayValue = 0;
+                                let radius = 20;
+                                let glowIntensity = 0;
+
+                                if (isActive) {
+                                    if (isCurrent) {
+                                        displayValue = activation * easeInOut(phaseProgress);
+                                        glowIntensity = phaseProgress > 0.7 ? (phaseProgress - 0.7) / 0.3 : 0;
+                                    } else {
+                                        displayValue = activation;
+                                    }
+                                }
+
+                                // Glow effect quand le neurone s'active
+                                if (glowIntensity > 0) {
+                                    ctx.shadowColor = activation >= 0 ? '#22d3ee' : '#f97316';
+                                    ctx.shadowBlur = 15 * glowIntensity;
+                                }
+
+                                // Cercle du neurone
+                                ctx.fillStyle = isActive ? getColor(displayValue) : dimColor;
+                                ctx.beginPath();
+                                ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+                                ctx.fill();
+
+                                ctx.shadowBlur = 0;
+
+                                ctx.strokeStyle = isCurrent ? '#22d3ee' : mutedColor;
+                                ctx.lineWidth = isCurrent ? 2 : 1;
+                                ctx.stroke();
+
+                                // Valeur dans le neurone
+                                if (isActive) {
+                                    ctx.fillStyle = Math.abs(displayValue) > 0.5 ? '#fff' : textColor;
+                                    ctx.font = 'bold 11px monospace';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText(displayValue.toFixed(2), pos.x, pos.y);
+                                }
+
+                                // Afficher z et a pour la couche en cours d'activation (pas l'entrée)
+                                if (isCurrent && l > 0 && phaseProgress > 0.3) {
+                                    const showZ = phaseProgress > 0.3 && phaseProgress < 0.7;
+                                    const showA = phaseProgress >= 0.7;
+
+                                    ctx.font = '9px monospace';
+                                    ctx.textAlign = 'left';
+
+                                    if (showZ) {
+                                        ctx.fillStyle = '#a78bfa';
+                                        ctx.fillText(`z=${preAct.toFixed(2)}`, pos.x + 25, pos.y - 5);
+                                    }
+                                    if (showA) {
+                                        ctx.fillStyle = '#22d3ee';
+                                        ctx.fillText(`a=${activation.toFixed(2)}`, pos.x + 25, pos.y + 8);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Labels des couches
+                        ctx.font = '11px sans-serif';
+                        ctx.textAlign = 'center';
+                        for (let l = 0; l < layers.length; l++) {
+                            const x = neuronPositions[l][0].x;
+                            const isActive = l <= activeUpTo;
+                            ctx.fillStyle = isActive ? textColor : mutedColor;
+                            ctx.fillText(layerNames[l], x, H - 12);
+                        }
+
+                        // Indicateur de phase
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillStyle = '#22d3ee';
+                        if (animationPhase < layers.length) {
+                            ctx.fillText(`Couche ${animationPhase + 1}/${layers.length}`, W / 2, 25);
+                        } else {
+                            ctx.fillStyle = '#4ade80';
+                            ctx.fillText('✓ Propagation terminée', W / 2, 25);
+                        }
+
+                        // Légende
+                        ctx.font = '9px sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#a78bfa';
+                        ctx.fillText('z = somme pondérée', 10, 18);
+                        ctx.fillStyle = '#22d3ee';
+                        ctx.fillText('a = tanh(z)', 10, 30);
+                    }
+
+                    function animate(timestamp) {
+                        if (!lastTime) lastTime = timestamp;
+                        const delta = timestamp - lastTime;
+                        lastTime = timestamp;
+
+                        if (!isPaused) {
+                            if (animationPhase < layers.length) {
+                                phaseProgress += delta / PHASE_DURATION;
+                                if (phaseProgress >= 1) {
+                                    phaseProgress = 0;
+                                    animationPhase++;
+                                }
+                            } else {
+                                // Phase de pause avant reset
+                                phaseProgress += delta / PAUSE_DURATION;
+                                if (phaseProgress >= 1) {
+                                    initNetwork();
+                                }
+                            }
+                        }
+
+                        draw();
+                        requestAnimationFrame(animate);
+                    }
+
+                    // Boutons
+                    document.getElementById('btnPause').addEventListener('click', () => {
+                        isPaused = !isPaused;
+                        document.getElementById('btnPause').textContent = isPaused ? '▶ Reprendre' : '⏸ Pause';
+                    });
+
+                    document.getElementById('btnReset').addEventListener('click', () => {
+                        initNetwork();
+                    });
+
+                    // Observer le changement de thème
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                    // Démarrage
+                    initNetwork();
+                    requestAnimationFrame(animate);
+                })();
+                </script>
+
                 <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">La chaîne de sculpture</h3>
 
                 <p class="mb-4">
