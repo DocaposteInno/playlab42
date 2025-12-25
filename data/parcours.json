@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-23T19:07:32.416Z",
+  "generatedAt": "2025-12-25T08:04:50.023Z",
   "epics": [
     {
       "id": "coding-agents-2025",
@@ -85,7 +85,7 @@
       "difficulty": "beginner",
       "icon": "🧠",
       "thumbnail": null,
-      "slideCount": 8,
+      "slideCount": 9,
       "optionalSlideCount": 1,
       "hasIndex": false,
       "structure": [
@@ -130,18 +130,24 @@
               "id": "06-backpropagation",
               "title": "Rétropropagation",
               "icon": "⬅️"
+            },
+            {
+              "type": "slide",
+              "id": "07-entrainement",
+              "title": "L'Entraînement",
+              "icon": "🏋️"
             }
           ]
         },
         {
           "type": "slide",
-          "id": "07-laboratoire",
+          "id": "08-laboratoire",
           "title": "Laboratoire",
           "icon": "🧪"
         },
         {
           "type": "slide",
-          "id": "08-glossaire",
+          "id": "09-glossaire",
           "title": "Glossaire",
           "icon": "📖",
           "optional": true
@@ -577,7 +583,7 @@
         "difficulty": "beginner",
         "icon": "🧠",
         "thumbnail": null,
-        "slideCount": 8,
+        "slideCount": 9,
         "optionalSlideCount": 1,
         "hasIndex": false,
         "structure": [
@@ -622,18 +628,24 @@
                 "id": "06-backpropagation",
                 "title": "Rétropropagation",
                 "icon": "⬅️"
+              },
+              {
+                "type": "slide",
+                "id": "07-entrainement",
+                "title": "L'Entraînement",
+                "icon": "🏋️"
               }
             ]
           },
           {
             "type": "slide",
-            "id": "07-laboratoire",
+            "id": "08-laboratoire",
             "title": "Laboratoire",
             "icon": "🧪"
           },
           {
             "type": "slide",
-            "id": "08-glossaire",
+            "id": "09-glossaire",
             "title": "Glossaire",
             "icon": "📖",
             "optional": true
