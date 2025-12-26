@@ -202,3 +202,47 @@ body {
 - Ne pas utiliser `@media (prefers-color-scheme)` directement en CSS (géré par JS)
 - Ne pas stocker le thème ailleurs que dans localStorage
 - Ne pas modifier `data-theme` directement (utiliser `setTheme()`)
+
+## Couleurs d'accent adaptatives
+
+Pour les contenus pédagogiques (parcours, slides), il est courant d'utiliser des couleurs d'accent thématiques (jaune pour supervisé, cyan pour non-supervisé, etc.). Ces couleurs doivent être **lisibles dans les deux thèmes**.
+
+### Problème
+
+Les classes Tailwind comme `text-yellow-400` ou `text-purple-300` sont conçues pour le thème sombre et manquent de contraste sur fond clair.
+
+### Solution
+
+Créer des classes utilitaires avec des variantes par thème :
+
+```css
+/* Couleur par défaut (light mode) : teintes foncées -700 */
+.dl-accent-yellow { color: #b45309 !important; }  /* amber-700 */
+.dl-accent-purple { color: #6d28d9 !important; }  /* violet-700 */
+
+/* En thème sombre : teintes claires -400 */
+:root:not([data-theme="light"]) .dl-accent-yellow { color: #fbbf24 !important; }
+:root:not([data-theme="light"]) .dl-accent-purple { color: #a78bfa !important; }
+
+/* Support prefers-color-scheme pour les utilisateurs sans JS */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .dl-accent-yellow { color: #fbbf24 !important; }
+  :root:not([data-theme]) .dl-accent-purple { color: #a78bfa !important; }
+}
+```
+
+### Palette recommandée
+
+| Couleur | Light mode (-700) | Dark mode (-400) | Usage exemple |
+|---------|-------------------|------------------|---------------|
+| Yellow | `#b45309` | `#fbbf24` | Supervisé, highlights |
+| Cyan | `#0e7490` | `#22d3ee` | Non-supervisé |
+| Green | `#047857` | `#34d399` | Analogies, succès |
+| Red | `#b91c1c` | `#f87171` | Renforcement, erreurs |
+| Purple | `#6d28d9` | `#a78bfa` | Auto-supervisé, code |
+| Blue | `#1d4ed8` | `#60a5fa` | Liens, concepts |
+| Orange | `#c2410c` | `#fb923c` | Warnings, biais |
+
+### Implémentation parcours
+
+Le parcours `deep-learning-intro` implémente ces classes dans `_shared/deep-learning.css`. Elles peuvent servir de référence pour d'autres parcours nécessitant des couleurs thématiques.

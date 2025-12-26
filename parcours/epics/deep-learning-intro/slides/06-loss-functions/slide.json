@@ -1,0 +1,8 @@
+{
+  "id": "05-loss-functions",
+  "title": "Mesurer l'Erreur",
+  "description": "Les fonctions de perte : MSE, MAE, Huber et Cross-Entropy",
+  "type": "page",
+  "icon": "📏",
+  "duration": "5 min"
+}

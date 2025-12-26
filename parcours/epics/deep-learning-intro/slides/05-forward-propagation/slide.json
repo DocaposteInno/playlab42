@@ -1,0 +1,8 @@
+{
+  "id": "04-forward-propagation",
+  "title": "La Propagation Avant",
+  "description": "Comment une donnée traverse le réseau pour devenir une prédiction",
+  "type": "page",
+  "icon": "➡️",
+  "duration": "5 min"
+}

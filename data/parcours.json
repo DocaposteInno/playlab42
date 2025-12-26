@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-12-15T15:32:39.503Z",
+  "generatedAt": "2025-12-26T11:37:20.644Z",
   "epics": [
     {
       "id": "coding-agents-2025",
@@ -63,6 +63,121 @@
           "icon": "🔮"
         }
       ]
+    },
+    {
+      "id": "deep-learning-intro",
+      "title": "Deep Learning pour l'impatient",
+      "description": "Comprendre les réseaux de neurones de zéro à expert : types d'apprentissage, neurones, propagation, rétropropagation, architectures modernes et laboratoire interactif.",
+      "path": "./parcours/epics/deep-learning-intro",
+      "hierarchy": [
+        "ia"
+      ],
+      "tags": [
+        "ia",
+        "deep-learning",
+        "neural-network",
+        "machine-learning",
+        "interactif"
+      ],
+      "author": "cyrille",
+      "created": "2025-12-15",
+      "duration": "45 min",
+      "difficulty": "beginner",
+      "icon": "🧠",
+      "thumbnail": null,
+      "slideCount": 13,
+      "optionalSlideCount": 1,
+      "hasIndex": false,
+      "structure": [
+        {
+          "type": "section",
+          "id": "theorie",
+          "title": "Théorie",
+          "icon": "📚",
+          "children": [
+            {
+              "type": "slide",
+              "id": "01-introduction",
+              "title": "Introduction",
+              "icon": "🎯"
+            },
+            {
+              "type": "slide",
+              "id": "02-types-apprentissage",
+              "title": "Types d'apprentissage",
+              "icon": "📚"
+            },
+            {
+              "type": "slide",
+              "id": "03-neurone",
+              "title": "Le Neurone",
+              "icon": "⚡"
+            },
+            {
+              "type": "slide",
+              "id": "04-reseaux",
+              "title": "Les Réseaux",
+              "icon": "🔗"
+            },
+            {
+              "type": "slide",
+              "id": "05-forward-propagation",
+              "title": "La Propagation Avant",
+              "icon": "➡️"
+            },
+            {
+              "type": "slide",
+              "id": "06-loss-functions",
+              "title": "Mesurer l'Erreur",
+              "icon": "📏"
+            },
+            {
+              "type": "slide",
+              "id": "07-backpropagation",
+              "title": "Rétropropagation",
+              "icon": "⬅️"
+            },
+            {
+              "type": "slide",
+              "id": "08-entrainement",
+              "title": "L'Entraînement",
+              "icon": "🏋️"
+            }
+          ]
+        },
+        {
+          "type": "slide",
+          "id": "09-cas-usage",
+          "title": "Cas d'Usage",
+          "icon": "🌍"
+        },
+        {
+          "type": "slide",
+          "id": "10-architectures",
+          "title": "Les Grandes Architectures",
+          "icon": "🏗️"
+        },
+        {
+          "type": "slide",
+          "id": "11-outils",
+          "title": "Frameworks & Hardware",
+          "icon": "🛠️"
+        },
+        {
+          "type": "slide",
+          "id": "12-laboratoire",
+          "title": "Laboratoire",
+          "icon": "🧪"
+        },
+        {
+          "type": "slide",
+          "id": "13-glossaire",
+          "title": "Glossaire",
+          "icon": "📖",
+          "optional": true
+        }
+      ],
+      "glossaryTermCount": 58
     },
     {
       "id": "github-copilot-guide",
@@ -350,7 +465,7 @@
         "id": "autres",
         "label": "Autres",
         "icon": "📚",
-        "count": 5,
+        "count": 6,
         "thumbnail": null,
         "visible": true,
         "children": []
@@ -360,7 +475,7 @@
       {
         "id": "ia",
         "label": "Intelligence Artificielle",
-        "count": 3
+        "count": 4
       },
       {
         "id": "dev",
@@ -380,6 +495,26 @@
       {
         "id": "agent",
         "label": "Agents IA",
+        "count": 1
+      },
+      {
+        "id": "deep-learning",
+        "label": "deep-learning",
+        "count": 1
+      },
+      {
+        "id": "neural-network",
+        "label": "neural-network",
+        "count": 1
+      },
+      {
+        "id": "machine-learning",
+        "label": "machine-learning",
+        "count": 1
+      },
+      {
+        "id": "interactif",
+        "label": "interactif",
         "count": 1
       },
       {
@@ -451,6 +586,121 @@
   },
   "featured": {
     "recent": [
+      {
+        "id": "deep-learning-intro",
+        "title": "Deep Learning pour l'impatient",
+        "description": "Comprendre les réseaux de neurones de zéro à expert : types d'apprentissage, neurones, propagation, rétropropagation, architectures modernes et laboratoire interactif.",
+        "path": "./parcours/epics/deep-learning-intro",
+        "hierarchy": [
+          "ia"
+        ],
+        "tags": [
+          "ia",
+          "deep-learning",
+          "neural-network",
+          "machine-learning",
+          "interactif"
+        ],
+        "author": "cyrille",
+        "created": "2025-12-15",
+        "duration": "45 min",
+        "difficulty": "beginner",
+        "icon": "🧠",
+        "thumbnail": null,
+        "slideCount": 13,
+        "optionalSlideCount": 1,
+        "hasIndex": false,
+        "structure": [
+          {
+            "type": "section",
+            "id": "theorie",
+            "title": "Théorie",
+            "icon": "📚",
+            "children": [
+              {
+                "type": "slide",
+                "id": "01-introduction",
+                "title": "Introduction",
+                "icon": "🎯"
+              },
+              {
+                "type": "slide",
+                "id": "02-types-apprentissage",
+                "title": "Types d'apprentissage",
+                "icon": "📚"
+              },
+              {
+                "type": "slide",
+                "id": "03-neurone",
+                "title": "Le Neurone",
+                "icon": "⚡"
+              },
+              {
+                "type": "slide",
+                "id": "04-reseaux",
+                "title": "Les Réseaux",
+                "icon": "🔗"
+              },
+              {
+                "type": "slide",
+                "id": "05-forward-propagation",
+                "title": "La Propagation Avant",
+                "icon": "➡️"
+              },
+              {
+                "type": "slide",
+                "id": "06-loss-functions",
+                "title": "Mesurer l'Erreur",
+                "icon": "📏"
+              },
+              {
+                "type": "slide",
+                "id": "07-backpropagation",
+                "title": "Rétropropagation",
+                "icon": "⬅️"
+              },
+              {
+                "type": "slide",
+                "id": "08-entrainement",
+                "title": "L'Entraînement",
+                "icon": "🏋️"
+              }
+            ]
+          },
+          {
+            "type": "slide",
+            "id": "09-cas-usage",
+            "title": "Cas d'Usage",
+            "icon": "🌍"
+          },
+          {
+            "type": "slide",
+            "id": "10-architectures",
+            "title": "Les Grandes Architectures",
+            "icon": "🏗️"
+          },
+          {
+            "type": "slide",
+            "id": "11-outils",
+            "title": "Frameworks & Hardware",
+            "icon": "🛠️"
+          },
+          {
+            "type": "slide",
+            "id": "12-laboratoire",
+            "title": "Laboratoire",
+            "icon": "🧪"
+          },
+          {
+            "type": "slide",
+            "id": "13-glossaire",
+            "title": "Glossaire",
+            "icon": "📖",
+            "optional": true
+          }
+        ],
+        "glossaryTermCount": 58
+      },
       {
         "id": "github-copilot-guide",
         "title": "GitHub Copilot — Guide du développeur",

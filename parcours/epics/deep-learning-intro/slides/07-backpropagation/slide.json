@@ -1,0 +1,8 @@
+{
+  "id": "06-backpropagation",
+  "title": "Rétropropagation",
+  "description": "Calcul des gradients, descente de gradient et optimiseur Adam",
+  "type": "page",
+  "icon": "⬅️",
+  "duration": "8 min"
+}

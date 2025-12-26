@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Propagation Avant - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script type="module">
+        import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- FORWARD PROPAGATION -->
+        <section id="forward" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">➡️</span>
+                <h2 class="text-3xl font-bold dl-text-primary">La Propagation Avant</h2>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <!-- ACCROCHE : LE VOYAGE DE LA DONNÉE -->
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    La <dfn>propagation avant</dfn> est le processus par lequel une donnée brute traverse le réseau pour devenir une prédiction. C'est une suite de <strong>fonctions composées</strong> : la sortie d'une couche devient l'entrée de la suivante. Si vous savez calculer \(f(g(x))\), vous comprenez déjà la propagation avant.
+                </p>
+
+                <p class="mb-6 dl-text-secondary">
+                    En production, quand le modèle est entraîné, on parle d'<dfn>inférence</dfn> : c'est la même propagation avant, mais sans calcul de gradients ni mise à jour des poids. Le réseau "fait son travail" : il reçoit une image et répond "chat", sans chercher à apprendre.
+                </p>
+
+                <!-- LES TROIS PRINCIPES -->
+                <div class="grid md:grid-cols-3 gap-4 my-8">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">➡️</div>
+                        <h4 class="font-bold dl-accent-blue mb-2">Flux Unidirectionnel</h4>
+                        <p class="text-sm dl-text-muted">
+                            L'information "coule" de gauche à droite, de l'entrée vers la sortie, sans jamais revenir en arrière à cette étape.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">🔄</div>
+                        <h4 class="font-bold dl-accent-purple mb-2">Transformation par Étapes</h4>
+                        <p class="text-sm dl-text-muted">
+                            À chaque couche \(l\), deux opérations : une somme pondérée \(z\), puis une activation \(a\) qui introduit la non-linéarité.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="text-2xl mb-2">💾</div>
+                        <h4 class="font-bold dl-accent-green mb-2">Mémorisation Stratégique</h4>
+                        <p class="text-sm dl-text-muted">
+                            Le réseau stocke les valeurs intermédiaires. Sans ce cache, la <dfn>rétropropagation</dfn> serait extrêmement lente.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- VISUALISATION ANIMÉE -->
+                <div class="concept-box my-8">
+                    <h4 class="font-bold dl-accent-blue mb-3">Visualisez la Propagation</h4>
+                    <p class="text-sm dl-text-muted mb-4">Observez les valeurs se propager couche par couche. Chaque neurone calcule <code class="dl-accent-cyan">z = Σ(w·a) + b</code> puis applique l'activation <code class="dl-accent-purple">a = tanh(z)</code>.</p>
+                    <div class="my-4">
+                        <canvas id="forwardCanvas" width="700" height="320" class="w-full rounded-lg" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
+                    </div>
+                    <div class="flex justify-center gap-4 mt-3">
+                        <button id="btnPause" class="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-200">⏸ Pause</button>
+                        <button id="btnReset" class="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-200">🔄 Nouveau</button>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('forwardCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+
+                    // Architecture : 2 entrées → 3 cachée → 2 sorties
+                    const layers = [2, 3, 2];
+                    const layerNames = ['Entrée', 'Cachée', 'Sortie'];
+
+                    // État de l'animation
+                    let isPaused = false;
+                    let animationPhase = 0; // 0 = entrée, 1 = cachée, 2 = sortie, 3 = pause avant reset
+                    let phaseProgress = 0;  // 0 à 1 dans la phase
+                    const PHASE_DURATION = 2500; // ms par couche
+                    const PAUSE_DURATION = 2000; // pause à la fin
+                    let lastTime = 0;
+
+                    // Données du réseau
+                    let weights = [];
+                    let biases = [];
+                    let inputs = [];
+                    let activations = [];
+                    let preActivations = [];
+
+                    // Positions des neurones
+                    const neuronPositions = [];
+                    const margin = { left: 100, right: 100, top: 60, bottom: 40 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    for (let l = 0; l < layers.length; l++) {
+                        const x = margin.left + (l / (layers.length - 1)) * plotW;
+                        const layerPositions = [];
+                        for (let n = 0; n < layers[l]; n++) {
+                            const y = margin.top + ((n + 0.5) / layers[l]) * plotH;
+                            layerPositions.push({ x, y });
+                        }
+                        neuronPositions.push(layerPositions);
+                    }
+
+                    function initNetwork() {
+                        // Poids et biais aléatoires
+                        weights = [];
+                        biases = [];
+                        for (let l = 1; l < layers.length; l++) {
+                            const layerW = [];
+                            const layerB = [];
+                            for (let j = 0; j < layers[l]; j++) {
+                                const neuronW = [];
+                                for (let i = 0; i < layers[l-1]; i++) {
+                                    neuronW.push((Math.random() - 0.5) * 2);
+                                }
+                                layerW.push(neuronW);
+                                layerB.push((Math.random() - 0.5) * 0.5);
+                            }
+                            weights.push(layerW);
+                            biases.push(layerB);
+                        }
+
+                        // Entrées aléatoires
+                        inputs = [];
+                        for (let i = 0; i < layers[0]; i++) {
+                            inputs.push(Math.round((Math.random() * 2 - 1) * 10) / 10);
+                        }
+
+                        // Calcul complet de la propagation
+                        activations = [inputs.slice()];
+                        preActivations = [inputs.slice()];
+                        let current = inputs;
+
+                        for (let l = 0; l < weights.length; l++) {
+                            const nextZ = [];
+                            const nextA = [];
+                            for (let j = 0; j < weights[l].length; j++) {
+                                let sum = biases[l][j];
+                                for (let i = 0; i < current.length; i++) {
+                                    sum += current[i] * weights[l][j][i];
+                                }
+                                nextZ.push(sum);
+                                nextA.push(Math.tanh(sum));
+                            }
+                            preActivations.push(nextZ);
+                            activations.push(nextA);
+                            current = nextA;
+                        }
+
+                        animationPhase = 0;
+                        phaseProgress = 0;
+                    }
+
+                    function getColor(value, alpha = 1) {
+                        if (value >= 0) {
+                            const intensity = Math.min(1, value);
+                            return `rgba(34, 211, 238, ${alpha * (0.3 + intensity * 0.7)})`;
+                        } else {
+                            const intensity = Math.min(1, -value);
+                            return `rgba(249, 115, 22, ${alpha * (0.3 + intensity * 0.7)})`;
+                        }
+                    }
+
+                    function easeInOut(t) {
+                        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                    }
+
+                    function draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const textColor = isDark ? '#e2e8f0' : '#334155';
+                        const mutedColor = isDark ? '#64748b' : '#94a3b8';
+                        const dimColor = isDark ? '#334155' : '#cbd5e1';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Déterminer quelles couches sont "actives"
+                        const activeUpTo = animationPhase;
+                        const currentLayerProgress = easeInOut(phaseProgress);
+
+                        // Dessiner les connexions
+                        for (let l = 0; l < weights.length; l++) {
+                            const isActive = l < activeUpTo || (l === activeUpTo && animationPhase > 0);
+                            const isCurrent = l === activeUpTo - 1 && animationPhase > 0 && animationPhase <= layers.length - 1;
+
+                            for (let j = 0; j < weights[l].length; j++) {
+                                for (let i = 0; i < weights[l][j].length; i++) {
+                                    const weight = weights[l][j][i];
+                                    const fromPos = neuronPositions[l][i];
+                                    const toPos = neuronPositions[l + 1][j];
+
+                                    let alpha = 0.15;
+                                    let lineWidth = 1;
+
+                                    if (isActive) {
+                                        alpha = 0.6;
+                                        lineWidth = 1 + Math.abs(weight) * 1.5;
+                                    }
+                                    if (isCurrent) {
+                                        // Animation du flux
+                                        alpha = 0.3 + currentLayerProgress * 0.5;
+                                    }
+
+                                    ctx.strokeStyle = isActive ? getColor(weight, alpha) : dimColor;
+                                    ctx.lineWidth = lineWidth;
+                                    ctx.beginPath();
+                                    ctx.moveTo(fromPos.x + 22, fromPos.y);
+                                    ctx.lineTo(toPos.x - 22, toPos.y);
+                                    ctx.stroke();
+
+                                    // Particule animée sur la connexion active
+                                    if (isCurrent && currentLayerProgress > 0 && currentLayerProgress < 1) {
+                                        const px = fromPos.x + 22 + (toPos.x - 22 - fromPos.x - 22) * currentLayerProgress;
+                                        const py = fromPos.y + (toPos.y - fromPos.y) * currentLayerProgress;
+                                        ctx.fillStyle = '#22d3ee';
+                                        ctx.beginPath();
+                                        ctx.arc(px, py, 4, 0, Math.PI * 2);
+                                        ctx.fill();
+                                    }
+                                }
+                            }
+                        }
+
+                        // Dessiner les neurones
+                        for (let l = 0; l < layers.length; l++) {
+                            const isActive = l <= activeUpTo;
+                            const isCurrent = l === activeUpTo && animationPhase < layers.length;
+                            const justActivated = l === activeUpTo && phaseProgress > 0.8;
+
+                            for (let n = 0; n < layers[l]; n++) {
+                                const pos = neuronPositions[l][n];
+                                const activation = activations[l][n];
+                                const preAct = preActivations[l][n];
+
+                                let displayValue = 0;
+                                let radius = 20;
+                                let glowIntensity = 0;
+
+                                if (isActive) {
+                                    if (isCurrent) {
+                                        displayValue = activation * easeInOut(phaseProgress);
+                                        glowIntensity = phaseProgress > 0.7 ? (phaseProgress - 0.7) / 0.3 : 0;
+                                    } else {
+                                        displayValue = activation;
+                                    }
+                                }
+
+                                // Glow effect quand le neurone s'active
+                                if (glowIntensity > 0) {
+                                    ctx.shadowColor = activation >= 0 ? '#22d3ee' : '#f97316';
+                                    ctx.shadowBlur = 15 * glowIntensity;
+                                }
+
+                                // Cercle du neurone
+                                ctx.fillStyle = isActive ? getColor(displayValue) : dimColor;
+                                ctx.beginPath();
+                                ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+                                ctx.fill();
+
+                                ctx.shadowBlur = 0;
+
+                                ctx.strokeStyle = isCurrent ? '#22d3ee' : mutedColor;
+                                ctx.lineWidth = isCurrent ? 2 : 1;
+                                ctx.stroke();
+
+                                // Valeur dans le neurone
+                                if (isActive) {
+                                    ctx.fillStyle = Math.abs(displayValue) > 0.5 ? '#fff' : textColor;
+                                    ctx.font = 'bold 11px monospace';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText(displayValue.toFixed(2), pos.x, pos.y);
+                                }
+
+                                // Afficher z et a pour la couche en cours d'activation (pas l'entrée)
+                                if (isCurrent && l > 0 && phaseProgress > 0.3) {
+                                    const showZ = phaseProgress > 0.3 && phaseProgress < 0.7;
+                                    const showA = phaseProgress >= 0.7;
+
+                                    ctx.font = '9px monospace';
+                                    ctx.textAlign = 'left';
+
+                                    if (showZ) {
+                                        ctx.fillStyle = '#a78bfa';
+                                        ctx.fillText(`z=${preAct.toFixed(2)}`, pos.x + 25, pos.y - 5);
+                                    }
+                                    if (showA) {
+                                        ctx.fillStyle = '#22d3ee';
+                                        ctx.fillText(`a=${activation.toFixed(2)}`, pos.x + 25, pos.y + 8);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Labels des couches
+                        ctx.font = '11px sans-serif';
+                        ctx.textAlign = 'center';
+                        for (let l = 0; l < layers.length; l++) {
+                            const x = neuronPositions[l][0].x;
+                            const isActive = l <= activeUpTo;
+                            ctx.fillStyle = isActive ? textColor : mutedColor;
+                            ctx.fillText(layerNames[l], x, H - 12);
+                        }
+
+                        // Indicateur de phase
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillStyle = '#22d3ee';
+                        if (animationPhase < layers.length) {
+                            ctx.fillText(`Couche ${animationPhase + 1}/${layers.length}`, W / 2, 25);
+                        } else {
+                            ctx.fillStyle = '#4ade80';
+                            ctx.fillText('✓ Propagation terminée', W / 2, 25);
+                        }
+
+                        // Légende
+                        ctx.font = '9px sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#a78bfa';
+                        ctx.fillText('z = somme pondérée', 10, 18);
+                        ctx.fillStyle = '#22d3ee';
+                        ctx.fillText('a = tanh(z)', 10, 30);
+                    }
+
+                    function animate(timestamp) {
+                        if (!lastTime) lastTime = timestamp;
+                        const delta = timestamp - lastTime;
+                        lastTime = timestamp;
+
+                        if (!isPaused) {
+                            if (animationPhase < layers.length) {
+                                phaseProgress += delta / PHASE_DURATION;
+                                if (phaseProgress >= 1) {
+                                    phaseProgress = 0;
+                                    animationPhase++;
+                                }
+                            } else {
+                                // Phase de pause avant reset
+                                phaseProgress += delta / PAUSE_DURATION;
+                                if (phaseProgress >= 1) {
+                                    initNetwork();
+                                }
+                            }
+                        }
+
+                        draw();
+                        requestAnimationFrame(animate);
+                    }
+
+                    // Boutons
+                    document.getElementById('btnPause').addEventListener('click', () => {
+                        isPaused = !isPaused;
+                        document.getElementById('btnPause').textContent = isPaused ? '▶ Reprendre' : '⏸ Pause';
+                    });
+
+                    document.getElementById('btnReset').addEventListener('click', () => {
+                        initNetwork();
+                    });
+
+                    // Observer le changement de thème
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                    // Démarrage
+                    initNetwork();
+                    requestAnimationFrame(animate);
+                })();
+                </script>
+
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">La chaîne de sculpture</h3>
+
+                <p class="mb-4">
+                    Imaginez un atelier où une dizaine d'artisans travaillent en chaîne sur un bloc de marbre brut. Le premier reçoit la matière première et effectue les coupes grossières pour dégager la forme générale. Il passe ensuite sa création au suivant, qui affine les contours, ajoute des détails, ajuste les proportions.
+                </p>
+
+                <div class="concept-box my-6">
+                    <div class="grid md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-3xl mb-2">🪨</div>
+                            <p class="text-sm font-bold dl-accent-cyan">Entrée \(a^{[0]}\)</p>
+                            <p class="text-xs dl-text-muted">Le marbre brut</p>
+                            <p class="text-xs dl-text-secondary">La donnée arrive au premier artisan</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl mb-2">⚒️</div>
+                            <p class="text-sm font-bold dl-accent-purple">Couches cachées</p>
+                            <p class="text-xs dl-text-muted">Les artisans</p>
+                            <p class="text-xs dl-text-secondary">Chaque couche affine la forme</p>
+                        </div>
+                        <div>
+                            <div class="text-3xl mb-2">🗿</div>
+                            <p class="text-sm font-bold dl-accent-green">Sortie \(\hat{y}\)</p>
+                            <p class="text-xs dl-text-muted">L'œuvre finale</p>
+                            <p class="text-xs dl-text-secondary">La prédiction sort de l'atelier</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mb-6 text-sm dl-text-muted italic">
+                    Les premières couches détectent des structures grossières — contours, textures basiques. Les couches intermédiaires reconnaissent des formes plus complexes. Les dernières polissent les détails et identifient des concepts de haut niveau. Cette cascade de transformations construit une <strong>hiérarchie de représentations</strong>.
+                </p>
+
+                <!-- FORMULES -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Les formules</h3>
+
+                <p class="mb-4">
+                    Pour chaque couche \(l\) du réseau, on applique deux opérations :
+                </p>
+
+                <div class="math-block">
+                    <p class="text-sm dl-text-muted mb-2">1. La somme pondérée (pré-activation) :</p>
+                    $$ z^{[l]} = W^{[l]} \cdot a^{[l-1]} + b^{[l]} $$
+                    <p class="text-sm dl-text-muted mb-2 mt-4">2. L'<dfn>activation</dfn> :</p>
+                    $$ a^{[l]} = \sigma(z^{[l]}) $$
+                </div>
+
+                <p class="mb-6">
+                    On part de \(a^{[0]} = x\) (l'entrée) et on répète ce processus jusqu'à obtenir la prédiction finale \(\hat{y} = a^{[L]}\).
+                </p>
+
+                <!-- PSEUDO-CODE AMÉLIORÉ -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Pseudo-code</h3>
+
+                <div class="dl-card rounded-xl border overflow-hidden mb-8">
+                    <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
+                        forward.py
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Initialisation avec l'entrée (a[0] = x)</span>
+<span class="text-purple-400">activation_actuelle</span> = x
+
+<span class="text-slate-500"># On parcourt chaque couche l du réseau</span>
+<span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> L:
+    <span class="text-slate-500"># 1. Calcul de la somme pondérée z[l] = W[l] * a[l-1] + b[l]</span>
+    <span class="text-purple-400">z</span> = produit_matriciel(<dfn>poids</dfn>[l], activation_actuelle) + <dfn>biais</dfn>[l]
+
+    <span class="text-slate-500"># 2. Calcul de l'activation a[l] = sigma(z[l])</span>
+    <span class="text-purple-400">activation_actuelle</span> = fonction_activation(z)
+
+    <span class="text-slate-500"># Sauvegarde de z et a pour la future rétropropagation</span>
+    stocker_intermediaire(z, activation_actuelle)
+
+<span class="text-slate-500"># Le résultat final est la prédiction</span>
+<span class="text-purple-400">y_chapeau</span> = activation_actuelle</code></pre>
+                </div>
+
+                <div class="warning-box">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">💡</span>
+                        <div>
+                            <h4 class="font-bold dl-accent-yellow mb-2">Pourquoi c'est "trivial mais fondamental"</h4>
+                            <p class="dl-text-secondary text-sm">
+                                La propagation avant n'est qu'une évaluation de fonction composée — rien de nouveau sur le plan mathématique. Ce qui est révolutionnaire, c'est de l'appliquer à des <strong>graphes de calcul</strong> de millions de paramètres, et de <strong>stocker les intermédiaires</strong> pour la phase d'apprentissage.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INFÉRENCE = PROPAGATION AVANT EN PRODUCTION -->
+                <div class="concept-box mt-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🚀</span>
+                        <div>
+                            <h4 class="font-bold dl-accent-blue mb-2">En production : l'<dfn>inférence</dfn></h4>
+                            <p class="dl-text-secondary text-sm mb-3">
+                                Une fois le modèle entraîné, on n'utilise <strong>que la propagation avant</strong>. C'est ce qu'on appelle l'inférence. Tout le reste disparaît :
+                            </p>
+                            <ul class="text-sm space-y-1 dl-text-muted">
+                                <li>❌ Pas de stockage des valeurs intermédiaires</li>
+                                <li>❌ Pas de calcul de la <dfn>fonction de perte</dfn></li>
+                                <li>❌ Pas de <dfn>rétropropagation</dfn> ni de gradients</li>
+                                <li>❌ Pas de mise à jour des <dfn>poids</dfn></li>
+                                <li>✅ Juste : entrée → réseau → prédiction</li>
+                            </ul>
+                            <p class="dl-text-muted text-xs mt-3 italic">
+                                Résultat : l'inférence est <strong>~100× plus rapide</strong> et consomme beaucoup moins de mémoire que l'entraînement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Slide 4/8</p>
+    </footer>
+
+</body>
+</html>
