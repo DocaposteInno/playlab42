@@ -66,23 +66,23 @@ async function initSlideFooter() {
     // Détecter l'epic et la slide depuis l'URL
     // URL typique : /parcours/epics/mon-epic/slides/01-intro/index.html
     const pathMatch = window.location.pathname.match(
-      /\/parcours\/epics\/([^/]+)\/slides\/([^/]+)\//
+      /\/parcours\/epics\/([^/]+)\/slides\/([^/]+)\//,
     );
-    if (!pathMatch) return;
+    if (!pathMatch) {return;}
 
     const [, epicId, slideId] = pathMatch;
 
     // Charger epic.json et slide.json en parallèle
     const [epicResponse, slideResponse] = await Promise.all([
       fetch('../../epic.json'),
-      fetch('./slide.json')
+      fetch('./slide.json'),
     ]);
 
-    if (!epicResponse.ok || !slideResponse.ok) return;
+    if (!epicResponse.ok || !slideResponse.ok) {return;}
 
     const [epicData, slideData] = await Promise.all([
       epicResponse.json(),
-      slideResponse.json()
+      slideResponse.json(),
     ]);
 
     // Extraire la liste ordonnée des slides depuis la structure content
@@ -90,7 +90,7 @@ async function initSlideFooter() {
 
     // Trouver la position de la slide courante
     const currentIndex = slideIds.indexOf(slideId);
-    if (currentIndex === -1) return;
+    if (currentIndex === -1) {return;}
 
     const slideNumber = currentIndex + 1;
     const totalSlides = slideIds.length;
