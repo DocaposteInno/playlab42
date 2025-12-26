@@ -54,19 +54,19 @@
                 </p>
 
                 <p class="mb-4">
-                    Le candidat arrive avec plusieurs <strong>compétences</strong> — disons un diplôme noté sur 10, des années d'expérience, et un score de motivation. Ce sont les <strong class="text-cyan-400">entrées</strong> du neurone, notées \(x_1, x_2, x_3\).
+                    Le candidat arrive avec plusieurs <strong>compétences</strong> — disons un diplôme noté sur 10, des années d'expérience, et un score de motivation. Ce sont les <strong class="dl-accent-cyan">entrées</strong> du neurone, notées \(x_1, x_2, x_3\).
                 </p>
 
                 <p class="mb-4">
-                    Mais toutes les compétences ne se valent pas. Pour un poste technique, le diplôme compte peut-être plus que la motivation. Le recruteur attribue donc un <dfn class="text-purple-400">poids</dfn> à chaque critère : \(w_1 = 0.4\) pour le diplôme, \(w_2 = 0.35\) pour l'expérience, \(w_3 = 0.25\) pour la motivation.
+                    Mais toutes les compétences ne se valent pas. Pour un poste technique, le diplôme compte peut-être plus que la motivation. Le recruteur attribue donc un <dfn class="dl-accent-purple">poids</dfn> à chaque critère : \(w_1 = 0.4\) pour le diplôme, \(w_2 = 0.35\) pour l'expérience, \(w_3 = 0.25\) pour la motivation.
                 </p>
 
                 <p class="mb-4">
-                    Le recruteur calcule ensuite un <strong>score total</strong> : il multiplie chaque compétence par son poids, puis additionne le tout. C'est la <em>somme pondérée</em>. Mais il ajoute aussi un <dfn class="text-orange-400">biais</dfn> \(b\), qui représente son niveau d'exigence global. Un biais très négatif ? Recruteur sévère. Un biais positif ? Facile à convaincre.
+                    Le recruteur calcule ensuite un <strong>score total</strong> : il multiplie chaque compétence par son poids, puis additionne le tout. C'est la <em>somme pondérée</em>. Mais il ajoute aussi un <dfn class="dl-accent-orange">biais</dfn> \(b\), qui représente son niveau d'exigence global. Un biais très négatif ? Recruteur sévère. Un biais positif ? Facile à convaincre.
                 </p>
 
                 <p class="mb-6">
-                    Enfin, si le score dépasse un certain seuil, le neurone <strong class="text-green-400">"s'active"</strong> et transmet le signal. Sinon, il reste silencieux. C'est le rôle de la <dfn data-term="activation">fonction d'activation</dfn>.
+                    Enfin, si le score dépasse un certain seuil, le neurone <strong class="dl-accent-green">"s'active"</strong> et transmet le signal. Sinon, il reste silencieux. C'est le rôle de la <dfn data-term="activation">fonction d'activation</dfn>.
                 </p>
 
                 <p class="mb-8 text-sm dl-text-muted italic">
@@ -75,7 +75,7 @@
 
                 <!-- VISUALISATION INTERACTIVE DU NEURONE -->
                 <div class="concept-box mb-8">
-                    <h4 class="font-bold text-blue-400 mb-3">Expérimentez</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Expérimentez</h4>
                     <div class="my-4">
                         <canvas id="neuronCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
                         <p class="text-center text-xs dl-text-muted mt-2">Ajustez les curseurs pour voir l'effet sur la sortie</p>
@@ -84,22 +84,22 @@
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">x₁ (Diplôme)</label>
                             <input type="range" id="x1" min="0" max="10" value="7" class="w-full">
-                            <span id="x1Val" class="text-cyan-400 text-xs font-mono">7</span>
+                            <span id="x1Val" class="dl-accent-cyan text-xs font-mono">7</span>
                         </div>
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">x₂ (Expérience)</label>
                             <input type="range" id="x2" min="0" max="10" value="5" class="w-full">
-                            <span id="x2Val" class="text-cyan-400 text-xs font-mono">5</span>
+                            <span id="x2Val" class="dl-accent-cyan text-xs font-mono">5</span>
                         </div>
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">x₃ (Motivation)</label>
                             <input type="range" id="x3" min="0" max="10" value="8" class="w-full">
-                            <span id="x3Val" class="text-cyan-400 text-xs font-mono">8</span>
+                            <span id="x3Val" class="dl-accent-cyan text-xs font-mono">8</span>
                         </div>
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">Biais (b)</label>
                             <input type="range" id="biasSlider" min="-5" max="5" step="0.5" value="-3" class="w-full">
-                            <span id="biasVal" class="text-orange-400 text-xs font-mono">-3</span>
+                            <span id="biasVal" class="dl-accent-orange text-xs font-mono">-3</span>
                         </div>
                     </div>
                 </div>
@@ -302,7 +302,7 @@
 
                 <!-- 4. FONCTIONS D'ACTIVATION -->
                 <div class="concept-box mt-8">
-                    <h4 class="font-bold text-blue-400 mb-3">Fonctions d'Activation Courantes</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Fonctions d'Activation Courantes</h4>
 
                     <!-- Visualisation interactive -->
                     <div class="my-4 relative">
@@ -310,15 +310,15 @@
                         <div class="flex justify-center gap-4 mt-3">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="showTanh" checked class="accent-cyan-400">
-                                <span class="text-cyan-400 text-sm font-mono">tanh</span>
+                                <span class="dl-accent-cyan text-sm font-mono">tanh</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="showSigmoid" checked class="accent-purple-400">
-                                <span class="text-purple-400 text-sm font-mono">sigmoid</span>
+                                <span class="dl-accent-purple text-sm font-mono">sigmoid</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="showRelu" checked class="accent-green-400">
-                                <span class="text-green-400 text-sm font-mono">ReLU</span>
+                                <span class="dl-accent-green text-sm font-mono">ReLU</span>
                             </label>
                         </div>
                         <p class="text-center text-xs dl-text-muted mt-2">Survolez pour voir les valeurs</p>
@@ -326,15 +326,15 @@
 
                     <div class="grid md:grid-cols-3 gap-4 text-sm mt-4">
                         <div>
-                            <span class="font-mono text-cyan-400">tanh(z)</span>
+                            <span class="font-mono dl-accent-cyan">tanh(z)</span>
                             <p class="dl-text-muted text-xs mt-1">Sortie entre -1 et 1. Utilisée dans notre simulation.</p>
                         </div>
                         <div>
-                            <span class="font-mono text-purple-400">sigmoid(z)</span>
+                            <span class="font-mono dl-accent-purple">sigmoid(z)</span>
                             <p class="dl-text-muted text-xs mt-1">Sortie entre 0 et 1. Idéale pour les probabilités.</p>
                         </div>
                         <div>
-                            <span class="font-mono text-green-400">ReLU(z)</span>
+                            <span class="font-mono dl-accent-green">ReLU(z)</span>
                             <p class="dl-text-muted text-xs mt-1">max(0, z). La plus populaire aujourd'hui.</p>
                         </div>
                     </div>
@@ -524,23 +524,23 @@
                         neurone.py
                     </div>
                     <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Entrées (ex: Diplôme=7, Expérience=5, Motivation=8)</span>
-<span class="text-purple-400">entrees</span> = [x1, x2, ..., xn]
+<span class="dl-accent-purple">entrees</span> = [x1, x2, ..., xn]
 
 <span class="text-slate-500"># Paramètres du neurone</span>
-<span class="text-purple-400">poids</span> = [w1, w2, ..., wn]
-<span class="text-purple-400">biais</span> = b
+<span class="dl-accent-purple">poids</span> = [w1, w2, ..., wn]
+<span class="dl-accent-purple">biais</span> = b
 
 <span class="text-slate-500"># 1. Calcul de la somme pondérée</span>
-<span class="text-purple-400">z</span> = <span class="text-cyan-400">0</span>
-<span class="text-pink-400">pour</span> i <span class="text-pink-400">de</span> <span class="text-cyan-400">0</span> <span class="text-pink-400">à</span> n:
+<span class="dl-accent-purple">z</span> = <span class="dl-accent-cyan">0</span>
+<span class="text-pink-400">pour</span> i <span class="text-pink-400">de</span> <span class="dl-accent-cyan">0</span> <span class="text-pink-400">à</span> n:
     z += entrees[i] * poids[i]
 z += biais
 
 <span class="text-slate-500"># 2. Fonction d'activation (ReLU)</span>
-<span class="text-pink-400">si</span> z > <span class="text-cyan-400">0</span>:
-    <span class="text-purple-400">sortie</span> = z
+<span class="text-pink-400">si</span> z > <span class="dl-accent-cyan">0</span>:
+    <span class="dl-accent-purple">sortie</span> = z
 <span class="text-pink-400">sinon</span>:
-    <span class="text-purple-400">sortie</span> = <span class="text-cyan-400">0</span>
+    <span class="dl-accent-purple">sortie</span> = <span class="dl-accent-cyan">0</span>
 
 <span class="text-pink-400">retourner</span> sortie</code></pre>
                 </div>
@@ -579,16 +579,16 @@ z += biais
                         <div class="flex items-start gap-3">
                             <span class="text-2xl">⚡</span>
                             <div>
-                                <h4 class="font-bold text-cyan-400 mb-1">Neurones à impulsions</h4>
+                                <h4 class="font-bold dl-accent-cyan mb-1">Neurones à impulsions</h4>
                                 <p class="text-xs dl-text-muted mb-2">Spiking Neural Networks (SNNs)</p>
                                 <p class="text-sm dl-text-secondary mb-2">
                                     Au lieu de valeurs continues, ces neurones communiquent par <strong>trains d'impulsions</strong> (spikes), comme les vrais neurones biologiques.
                                 </p>
                                 <div class="text-xs dl-text-muted space-y-1">
-                                    <p><strong class="text-cyan-300">Origine :</strong> <strong>Hodgkin & Huxley</strong> (Cambridge, 1952) — Prix Nobel 1963 pour leur modèle du potentiel d'action</p>
-                                    <p><strong class="text-cyan-300">Théorisé :</strong> <strong>Wolfgang Maass</strong> (TU Graz, 1997) — "3ème génération" de réseaux</p>
-                                    <p><strong class="text-cyan-300">Atout :</strong> Efficacité énergétique exceptionnelle</p>
-                                    <p><strong class="text-cyan-300">Hardware :</strong> Intel Loihi (1M neurones), IBM TrueNorth</p>
+                                    <p><strong class="dl-accent-cyan">Origine :</strong> <strong>Hodgkin & Huxley</strong> (Cambridge, 1952) — Prix Nobel 1963 pour leur modèle du potentiel d'action</p>
+                                    <p><strong class="dl-accent-cyan">Théorisé :</strong> <strong>Wolfgang Maass</strong> (TU Graz, 1997) — "3ème génération" de réseaux</p>
+                                    <p><strong class="dl-accent-cyan">Atout :</strong> Efficacité énergétique exceptionnelle</p>
+                                    <p><strong class="dl-accent-cyan">Hardware :</strong> Intel Loihi (1M neurones), IBM TrueNorth</p>
                                 </div>
                             </div>
                         </div>
@@ -599,16 +599,16 @@ z += biais
                         <div class="flex items-start gap-3">
                             <span class="text-2xl">💧</span>
                             <div>
-                                <h4 class="font-bold text-purple-400 mb-1">Neurones liquides</h4>
+                                <h4 class="font-bold dl-accent-purple mb-1">Neurones liquides</h4>
                                 <p class="text-xs dl-text-muted mb-2">Liquid Time-Constant (LTC)</p>
                                 <p class="text-sm dl-text-secondary mb-2">
                                     Des neurones dont les <strong>constantes de temps varient</strong> selon l'entrée, s'adaptant dynamiquement au contexte.
                                 </p>
                                 <div class="text-xs dl-text-muted space-y-1">
-                                    <p><strong class="text-purple-300">Origine :</strong> <strong>Ramin Hasani</strong> (MIT CSAIL, 2020), sous la direction de <strong>Daniela Rus</strong></p>
-                                    <p><strong class="text-purple-300">Inspiration :</strong> Le ver <em>C. elegans</em> (302 neurones, comportements complexes)</p>
-                                    <p><strong class="text-purple-300">Atout :</strong> Compacité remarquable — un drone navigue avec <strong>19 neurones</strong> !</p>
-                                    <p><strong class="text-purple-300">Startup :</strong> Liquid AI (valorisation $2.35B en 2024)</p>
+                                    <p><strong class="dl-accent-purple">Origine :</strong> <strong>Ramin Hasani</strong> (MIT CSAIL, 2020), sous la direction de <strong>Daniela Rus</strong></p>
+                                    <p><strong class="dl-accent-purple">Inspiration :</strong> Le ver <em>C. elegans</em> (302 neurones, comportements complexes)</p>
+                                    <p><strong class="dl-accent-purple">Atout :</strong> Compacité remarquable — un drone navigue avec <strong>19 neurones</strong> !</p>
+                                    <p><strong class="dl-accent-purple">Startup :</strong> Liquid AI (valorisation $2.35B en 2024)</p>
                                 </div>
                             </div>
                         </div>
@@ -621,15 +621,15 @@ z += biais
                         <div class="flex items-start gap-3">
                             <span class="text-2xl">🌊</span>
                             <div>
-                                <h4 class="font-bold text-green-400 mb-1">Réservoir Computing</h4>
+                                <h4 class="font-bold dl-accent-green mb-1">Réservoir Computing</h4>
                                 <p class="text-xs dl-text-muted mb-2">Echo State Networks (ESN)</p>
                                 <p class="text-sm dl-text-secondary mb-2">
                                     Un réseau récurrent <strong>fixe et aléatoire</strong> (le "réservoir") transforme les entrées, et seule la couche de sortie est entraînée.
                                 </p>
                                 <div class="text-xs dl-text-muted space-y-1">
-                                    <p><strong class="text-green-300">Origine :</strong> <strong>Herbert Jaeger</strong> (GMD, 2001) — ESN</p>
-                                    <p><strong class="text-green-300">Parallèle :</strong> <strong>Wolfgang Maass</strong> — Liquid State Machines</p>
-                                    <p><strong class="text-green-300">Atout :</strong> Entraînement ultra-rapide (régression linéaire)</p>
+                                    <p><strong class="dl-accent-green">Origine :</strong> <strong>Herbert Jaeger</strong> (GMD, 2001) — ESN</p>
+                                    <p><strong class="dl-accent-green">Parallèle :</strong> <strong>Wolfgang Maass</strong> — Liquid State Machines</p>
+                                    <p><strong class="dl-accent-green">Atout :</strong> Entraînement ultra-rapide (régression linéaire)</p>
                                 </div>
                             </div>
                         </div>
@@ -640,15 +640,15 @@ z += biais
                         <div class="flex items-start gap-3">
                             <span class="text-2xl">🌳</span>
                             <div>
-                                <h4 class="font-bold text-orange-400 mb-1">Neurones dendritiques</h4>
+                                <h4 class="font-bold dl-accent-orange mb-1">Neurones dendritiques</h4>
                                 <p class="text-xs dl-text-muted mb-2">Dendritic Neural Networks</p>
                                 <p class="text-sm dl-text-secondary mb-2">
                                     Modélisent la <strong>structure arborescente</strong> des dendrites, où l'intégration spatiale des entrées compte.
                                 </p>
                                 <div class="text-xs dl-text-muted space-y-1">
-                                    <p><strong class="text-orange-300">Motivation :</strong> Les dendrites occupent 90% de l'organisation cellulaire nerveuse</p>
-                                    <p><strong class="text-orange-300">Atout :</strong> Moins de paramètres pour atteindre la même précision</p>
-                                    <p><strong class="text-orange-300">Applications :</strong> Résolution du problème d'oubli catastrophique</p>
+                                    <p><strong class="dl-accent-orange">Motivation :</strong> Les dendrites occupent 90% de l'organisation cellulaire nerveuse</p>
+                                    <p><strong class="dl-accent-orange">Atout :</strong> Moins de paramètres pour atteindre la même précision</p>
+                                    <p><strong class="dl-accent-orange">Applications :</strong> Résolution du problème d'oubli catastrophique</p>
                                 </div>
                             </div>
                         </div>
@@ -657,7 +657,7 @@ z += biais
 
                 <div class="analogy-box">
                     <p class="text-sm dl-text-secondary">
-                        <strong class="text-green-400">Pour aller plus loin :</strong> Ces approches restent de niche, mais elles illustrent que le neurone de McCulloch-Pitts n'est qu'<em>une</em> façon de modéliser le calcul neural. L'avenir pourrait voir émerger des hybrides combinant efficacité énergétique des SNNs, adaptabilité des neurones liquides et puissance des architectures classiques.
+                        <strong class="dl-accent-green">Pour aller plus loin :</strong> Ces approches restent de niche, mais elles illustrent que le neurone de McCulloch-Pitts n'est qu'<em>une</em> façon de modéliser le calcul neural. L'avenir pourrait voir émerger des hybrides combinant efficacité énergétique des SNNs, adaptabilité des neurones liquides et puissance des architectures classiques.
                     </p>
                 </div>
 

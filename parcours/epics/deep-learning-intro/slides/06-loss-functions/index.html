@@ -57,23 +57,23 @@
                 <div class="my-6 p-4 dl-card rounded-xl border">
                     <!-- Sélecteur de loss -->
                     <div class="flex flex-wrap justify-center gap-2 mb-4">
-                        <button id="btnMSE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-orange-500 bg-orange-500/20 text-orange-400">
+                        <button id="btnMSE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-orange-500 bg-orange-500/20 dl-accent-orange">
                             MSE
                         </button>
-                        <button id="btnMAE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-cyan-500/30 bg-transparent text-cyan-400 hover:border-cyan-500 hover:bg-cyan-500/20">
+                        <button id="btnMAE" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-cyan-500/30 bg-transparent dl-accent-cyan hover:border-cyan-500 hover:bg-cyan-500/20">
                             MAE
                         </button>
-                        <button id="btnHuber" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-green-500/30 bg-transparent text-green-400 hover:border-green-500 hover:bg-green-500/20">
+                        <button id="btnHuber" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-green-500/30 bg-transparent dl-accent-green hover:border-green-500 hover:bg-green-500/20">
                             Huber
                         </button>
-                        <button id="btnCrossEntropy" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-purple-500/30 bg-transparent text-purple-400 hover:border-purple-500 hover:bg-purple-500/20">
+                        <button id="btnCrossEntropy" class="loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-purple-500/30 bg-transparent dl-accent-purple hover:border-purple-500 hover:bg-purple-500/20">
                             Cross-Entropy
                         </button>
                     </div>
 
                     <!-- Info sur la loss sélectionnée -->
                     <div id="lossInfo" class="text-center mb-4">
-                        <h4 id="lossTitle" class="font-bold text-orange-400 text-lg">MSE — Erreur Quadratique Moyenne</h4>
+                        <h4 id="lossTitle" class="font-bold dl-accent-orange text-lg">MSE — Erreur Quadratique Moyenne</h4>
                         <p id="lossFormula" class="font-mono text-sm dl-text-muted my-2">\( L = \frac{1}{2}(y - \hat{y})^2 \)</p>
                         <p id="lossDescription" class="text-sm dl-text-secondary max-w-lg mx-auto">
                             Pénalise fortement les grandes erreurs (quadratiquement). Idéale pour la <dfn>régression</dfn>, mais sensible aux outliers.
@@ -86,7 +86,7 @@
                         <div class="flex items-center gap-3 mt-3">
                             <label class="text-sm dl-text-secondary">Cible y =</label>
                             <input type="range" id="targetY" min="-1" max="1" step="0.1" value="0" class="w-32">
-                            <span id="targetYValue" class="font-mono text-cyan-400 w-12">0.0</span>
+                            <span id="targetYValue" class="font-mono dl-accent-cyan w-12">0.0</span>
                         </div>
                         <p class="text-center text-xs dl-text-muted mt-2">Survolez la courbe pour voir les valeurs • Déplacez le curseur pour changer la cible</p>
                     </div>
@@ -197,9 +197,9 @@
                             const btn = buttons[key];
                             const color = colors[key];
                             if (key === currentLoss) {
-                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500 bg-${color}-500/20 text-${color}-400`;
+                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500 bg-${color}-500/20 dl-accent-${color}`;
                             } else {
-                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500/30 bg-transparent text-${color}-400 hover:border-${color}-500 hover:bg-${color}-500/20`;
+                                btn.className = `loss-btn px-4 py-2 rounded-lg text-sm font-medium transition-all border-2 border-${color}-500/30 bg-transparent dl-accent-${color} hover:border-${color}-500 hover:bg-${color}-500/20`;
                             }
                         });
                     }
@@ -405,28 +405,28 @@
                         </thead>
                         <tbody class="dl-text-secondary">
                             <tr class="border-b border-slate-700">
-                                <td class="py-3 px-2 font-bold text-orange-400">MSE</td>
+                                <td class="py-3 px-2 font-bold dl-accent-orange">MSE</td>
                                 <td class="py-3 px-2"><dfn>Régression</dfn></td>
                                 <td class="py-3 px-2">Pénalise fortement les grandes erreurs</td>
-                                <td class="py-3 px-2 text-yellow-500">Sensible aux outliers</td>
+                                <td class="py-3 px-2 dl-accent-yellow">Sensible aux outliers</td>
                             </tr>
                             <tr class="border-b border-slate-700">
-                                <td class="py-3 px-2 font-bold text-cyan-400">MAE</td>
+                                <td class="py-3 px-2 font-bold dl-accent-cyan">MAE</td>
                                 <td class="py-3 px-2">Régression robuste</td>
                                 <td class="py-3 px-2">Robuste aux outliers</td>
-                                <td class="py-3 px-2 text-yellow-500"><dfn>Gradient</dfn> constant (convergence plus lente)</td>
+                                <td class="py-3 px-2 dl-accent-yellow"><dfn>Gradient</dfn> constant (convergence plus lente)</td>
                             </tr>
                             <tr class="border-b border-slate-700">
-                                <td class="py-3 px-2 font-bold text-green-400">Huber</td>
+                                <td class="py-3 px-2 font-bold dl-accent-green">Huber</td>
                                 <td class="py-3 px-2">Régression hybride</td>
                                 <td class="py-3 px-2">Meilleur des deux mondes</td>
-                                <td class="py-3 px-2 text-yellow-500"><dfn>Hyperparamètre</dfn> δ à régler</td>
+                                <td class="py-3 px-2 dl-accent-yellow"><dfn>Hyperparamètre</dfn> δ à régler</td>
                             </tr>
                             <tr>
-                                <td class="py-3 px-2 font-bold text-purple-400">Cross-Entropy</td>
+                                <td class="py-3 px-2 font-bold dl-accent-purple">Cross-Entropy</td>
                                 <td class="py-3 px-2"><dfn>Classification</dfn></td>
                                 <td class="py-3 px-2">Adapté aux probabilités</td>
-                                <td class="py-3 px-2 text-yellow-500">Pas pour la régression</td>
+                                <td class="py-3 px-2 dl-accent-yellow">Pas pour la régression</td>
                             </tr>
                         </tbody>
                     </table>
@@ -449,7 +449,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-2xl">🎯</span>
                         <div>
-                            <h4 class="font-bold text-blue-400 mb-2">L'objectif de l'entraînement</h4>
+                            <h4 class="font-bold dl-accent-blue mb-2">L'objectif de l'entraînement</h4>
                             <p class="dl-text-secondary text-sm">
                                 Trouver les valeurs de <dfn>poids</dfn> \(W\) et <dfn>biais</dfn> \(b\) qui <strong>minimisent</strong> la fonction de perte sur l'ensemble des données d'entraînement. C'est un problème d'<strong>optimisation</strong>. Le slide suivant explique comment y parvenir grâce à la <dfn>rétropropagation</dfn>.
                             </p>

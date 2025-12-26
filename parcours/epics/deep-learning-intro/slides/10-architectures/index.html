@@ -44,11 +44,11 @@
                 <div class="flex items-start gap-4">
                     <div class="text-4xl">🖼️</div>
                     <div class="flex-grow">
-                        <h2 class="text-2xl font-bold text-blue-400 mb-2">CNN - Réseaux Convolutifs</h2>
+                        <h2 class="text-2xl font-bold dl-accent-blue mb-2">CNN - Réseaux Convolutifs</h2>
                         <p class="text-sm dl-text-muted mb-4">Convolutional Neural Networks</p>
 
                         <div class="concept-box mb-4">
-                            <h4 class="font-bold text-blue-300 mb-2">Principe</h4>
+                            <h4 class="font-bold dl-accent-blue mb-2">Principe</h4>
                             <p class="text-sm dl-text-secondary">
                                 Les <dfn>convolutions</dfn> détectent des patterns locaux en scannant l'image avec des filtres. Chaque filtre apprend à reconnaître une caractéristique (lignes, courbes, textures) puis, couche après couche, des formes de plus en plus complexes.
                             </p>
@@ -56,13 +56,13 @@
 
                         <div class="analogy-box mb-4">
                             <p class="text-sm dl-text-secondary">
-                                <strong class="text-green-400">Analogie :</strong> Scanner une photo avec une loupe qu'on déplace partout. Chaque position analyse un petit motif, et la combinaison crée la compréhension globale.
+                                <strong class="dl-accent-green">Analogie :</strong> Scanner une photo avec une loupe qu'on déplace partout. Chaque position analyse un petit motif, et la combinaison crée la compréhension globale.
                             </p>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-4 text-xs mb-4">
                             <div>
-                                <h5 class="font-bold text-blue-300 mb-2">Cas d'usage</h5>
+                                <h5 class="font-bold dl-accent-blue mb-2">Cas d'usage</h5>
                                 <ul class="dl-text-muted space-y-1">
                                     <li>• Classification d'images</li>
                                     <li>• Détection d'objets</li>
@@ -71,7 +71,7 @@
                                 </ul>
                             </div>
                             <div>
-                                <h5 class="font-bold text-blue-300 mb-2">Évolutions notables</h5>
+                                <h5 class="font-bold dl-accent-blue mb-2">Évolutions notables</h5>
                                 <ul class="dl-text-muted space-y-1">
                                     <li>• <strong>LeNet</strong> (1998) : chiffres manuscrits</li>
                                     <li>• <strong>AlexNet</strong> (2012) : révolution ImageNet</li>
@@ -81,7 +81,7 @@
                         </div>
 
                         <div class="text-xs bg-blue-500/10 p-3 rounded border border-blue-500/20">
-                            <strong class="text-blue-300">Chercheurs clés :</strong>
+                            <strong class="dl-accent-blue">Chercheurs clés :</strong>
                             <strong>Yann LeCun</strong> (Bell Labs → Meta AI) invente les CNN avec LeNet pour reconnaître les chiffres manuscrits.
                             <strong>Alex Krizhevsky</strong>, <strong>Ilya Sutskever</strong> et <strong>Geoffrey Hinton</strong> (U. Toronto) déclenchent la révolution Deep Learning avec AlexNet, réduisant l'erreur ImageNet de 26% à 15%.
                         </div>
@@ -96,11 +96,11 @@
                 <div class="flex items-start gap-4">
                     <div class="text-4xl">📜</div>
                     <div class="flex-grow">
-                        <h2 class="text-2xl font-bold text-green-400 mb-2">RNN / LSTM - Réseaux Récurrents</h2>
+                        <h2 class="text-2xl font-bold dl-accent-green mb-2">RNN / LSTM - Réseaux Récurrents</h2>
                         <p class="text-sm dl-text-muted mb-4">Recurrent Neural Networks / Long Short-Term Memory</p>
 
                         <div class="concept-box mb-4">
-                            <h4 class="font-bold text-green-300 mb-2">Principe</h4>
+                            <h4 class="font-bold dl-accent-green mb-2">Principe</h4>
                             <p class="text-sm dl-text-secondary">
                                 Les RNN traitent les séquences en maintenant une "mémoire cachée" des étapes précédentes. Les <dfn>LSTM</dfn> améliorent cette mémoire grâce à des "portes" qui contrôlent quoi retenir ou oublier.
                             </p>
@@ -108,13 +108,13 @@
 
                         <div class="analogy-box mb-4">
                             <p class="text-sm dl-text-secondary">
-                                <strong class="text-green-400">Analogie :</strong> Lire un livre en se souvenant des chapitres précédents. Chaque nouveau chapitre a du sens grâce à ce qu'on a déjà lu.
+                                <strong class="dl-accent-green">Analogie :</strong> Lire un livre en se souvenant des chapitres précédents. Chaque nouveau chapitre a du sens grâce à ce qu'on a déjà lu.
                             </p>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-4 text-xs mb-4">
                             <div>
-                                <h5 class="font-bold text-green-300 mb-2">Cas d'usage</h5>
+                                <h5 class="font-bold dl-accent-green mb-2">Cas d'usage</h5>
                                 <ul class="dl-text-muted space-y-1">
                                     <li>• Traduction automatique</li>
                                     <li>• Prédiction de texte</li>
@@ -123,7 +123,7 @@
                                 </ul>
                             </div>
                             <div>
-                                <h5 class="font-bold text-green-300 mb-2">Limite majeure</h5>
+                                <h5 class="font-bold dl-accent-green mb-2">Limite majeure</h5>
                                 <p class="dl-text-muted">
                                     Même les LSTM peinent avec les très longues dépendances (>500 tokens). La mémoire "s'estompe" progressivement.
                                 </p>
@@ -131,7 +131,7 @@
                         </div>
 
                         <div class="text-xs bg-green-500/10 p-3 rounded border border-green-500/20">
-                            <strong class="text-green-300">Chercheurs clés :</strong>
+                            <strong class="dl-accent-green">Chercheurs clés :</strong>
                             Les RNN classiques souffraient du <em>vanishing gradient</em> (gradient qui disparaît).
                             <strong>Sepp Hochreiter</strong> et <strong>Jürgen Schmidhuber</strong> (TU Munich, 1997) inventent les LSTM avec leurs "portes" (forget, input, output) pour résoudre ce problème.
                             Les GRU (2014) de <strong>Cho et al.</strong> simplifient le concept.
@@ -147,11 +147,11 @@
                 <div class="flex items-start gap-4">
                     <div class="text-4xl">🤖</div>
                     <div class="flex-grow">
-                        <h2 class="text-2xl font-bold text-purple-400 mb-2">Transformers</h2>
+                        <h2 class="text-2xl font-bold dl-accent-purple mb-2">Transformers</h2>
                         <p class="text-sm dl-text-muted mb-4">L'architecture dominante depuis 2017</p>
 
                         <div class="concept-box mb-4">
-                            <h4 class="font-bold text-purple-300 mb-2">Principe</h4>
+                            <h4 class="font-bold dl-accent-purple mb-2">Principe</h4>
                             <p class="text-sm dl-text-secondary">
                                 Le mécanisme d'<dfn>attention</dfn> permet de regarder tous les tokens de la séquence en parallèle et de comprendre leurs relations mutuelles. Plus de traitement séquentiel mot par mot.
                             </p>
@@ -159,13 +159,13 @@
 
                         <div class="analogy-box mb-4">
                             <p class="text-sm dl-text-secondary">
-                                <strong class="text-green-400">Analogie :</strong> Lire toute la page d'un coup plutôt que mot par mot. On voit les connexions entre le début et la fin sans "oublier" en chemin.
+                                <strong class="dl-accent-green">Analogie :</strong> Lire toute la page d'un coup plutôt que mot par mot. On voit les connexions entre le début et la fin sans "oublier" en chemin.
                             </p>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-4 text-xs mb-4">
                             <div>
-                                <h5 class="font-bold text-purple-300 mb-2">Cas d'usage</h5>
+                                <h5 class="font-bold dl-accent-purple mb-2">Cas d'usage</h5>
                                 <ul class="dl-text-muted space-y-1">
                                     <li>• NLP : traduction, résumé, génération</li>
                                     <li>• LLMs : ChatGPT, Claude, Gemini</li>
@@ -174,7 +174,7 @@
                                 </ul>
                             </div>
                             <div>
-                                <h5 class="font-bold text-purple-300 mb-2">Évolutions notables</h5>
+                                <h5 class="font-bold dl-accent-purple mb-2">Évolutions notables</h5>
                                 <ul class="dl-text-muted space-y-1">
                                     <li>• <strong>BERT</strong> (2018) : compréhension bidirectionnelle</li>
                                     <li>• <strong>GPT</strong> : génération autorégressive</li>
@@ -184,13 +184,13 @@
                         </div>
 
                         <div class="text-xs bg-purple-500/10 p-3 rounded border border-purple-500/20 mb-3">
-                            <strong class="text-purple-300">Papier fondateur :</strong>
+                            <strong class="dl-accent-purple">Papier fondateur :</strong>
                             <em>"Attention Is All You Need"</em> (2017) par <strong>Vaswani et al.</strong> chez Google Brain.
                             L'équipe : Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, Łukasz Kaiser et Illia Polosukhin — beaucoup ont depuis fondé des startups (Cohere, Character.ai, Adept...).
                         </div>
 
                         <div class="text-xs bg-purple-500/10 p-3 rounded border border-purple-500/20">
-                            <strong class="text-purple-300">⚠️ Limite :</strong> Complexité <strong>O(n²)</strong> avec la longueur de séquence — c'est ce qui motive les alternatives émergentes.
+                            <strong class="dl-accent-purple">⚠️ Limite :</strong> Complexité <strong>O(n²)</strong> avec la longueur de séquence — c'est ce qui motive les alternatives émergentes.
                         </div>
                     </div>
                 </div>
@@ -215,7 +215,7 @@
 
                         <div class="analogy-box mb-4">
                             <p class="text-sm dl-text-secondary">
-                                <strong class="text-green-400">Analogie :</strong> Sculpter une statue à partir du chaos. On commence avec du bruit aléatoire, puis on affine progressivement jusqu'à obtenir une image cohérente.
+                                <strong class="dl-accent-green">Analogie :</strong> Sculpter une statue à partir du chaos. On commence avec du bruit aléatoire, puis on affine progressivement jusqu'à obtenir une image cohérente.
                             </p>
                         </div>
 
@@ -270,10 +270,10 @@
                                 Des modèles inspirés de la théorie du contrôle, avec une <strong>complexité linéaire O(n)</strong> et une inférence O(1) par token.
                             </p>
                             <div class="text-xs dl-text-muted space-y-1">
-                                <p><strong class="text-teal-300">Chercheurs :</strong> <strong>Albert Gu</strong> et <strong>Tri Dao</strong> (CMU/Princeton, 2023)</p>
-                                <p><strong class="text-teal-300">Innovation :</strong> SSMs "sélectifs" — le modèle choisit quoi retenir</p>
-                                <p><strong class="text-teal-300">Perf :</strong> Throughput 5× supérieur aux Transformers, jusqu'à 1M tokens</p>
-                                <p><strong class="text-teal-300">Adoption :</strong> Codestral Mamba (Mistral), Jamba (AI21), IBM Granite 4.0</p>
+                                <p><strong class="dl-accent-cyan">Chercheurs :</strong> <strong>Albert Gu</strong> et <strong>Tri Dao</strong> (CMU/Princeton, 2023)</p>
+                                <p><strong class="dl-accent-cyan">Innovation :</strong> SSMs "sélectifs" — le modèle choisit quoi retenir</p>
+                                <p><strong class="dl-accent-cyan">Perf :</strong> Throughput 5× supérieur aux Transformers, jusqu'à 1M tokens</p>
+                                <p><strong class="dl-accent-cyan">Adoption :</strong> Codestral Mamba (Mistral), Jamba (AI21), IBM Granite 4.0</p>
                             </div>
                         </div>
                     </div>
@@ -290,10 +290,10 @@
                                 Un RNN qui <strong>scale comme un Transformer</strong> — entraînement parallèle, inférence O(1).
                             </p>
                             <div class="text-xs dl-text-muted space-y-1">
-                                <p><strong class="text-amber-300">Créateur :</strong> <strong>Bo Peng</strong> (BlinkDL), 2021-2023</p>
-                                <p><strong class="text-amber-300">Innovation :</strong> 100% sans attention, contexte illimité</p>
-                                <p><strong class="text-amber-300">Organisation :</strong> Linux Foundation depuis 2023</p>
-                                <p><strong class="text-amber-300">Version :</strong> RWKV-7 "Goose" (2025)</p>
+                                <p><strong class="dl-accent-yellow">Créateur :</strong> <strong>Bo Peng</strong> (BlinkDL), 2021-2023</p>
+                                <p><strong class="dl-accent-yellow">Innovation :</strong> 100% sans attention, contexte illimité</p>
+                                <p><strong class="dl-accent-yellow">Organisation :</strong> Linux Foundation depuis 2023</p>
+                                <p><strong class="dl-accent-yellow">Version :</strong> RWKV-7 "Goose" (2025)</p>
                             </div>
                         </div>
                     </div>
@@ -312,9 +312,9 @@
                                 Remplace les MLP classiques par des fonctions sur les <strong>arêtes</strong> (splines) au lieu des nœuds — hautement interprétable.
                             </p>
                             <div class="text-xs dl-text-muted space-y-1">
-                                <p><strong class="text-rose-300">Chercheurs :</strong> <strong>Ziming Liu</strong> et <strong>Max Tegmark</strong> (MIT, 2024)</p>
-                                <p><strong class="text-rose-300">Base :</strong> Théorème de Kolmogorov-Arnold (1957)</p>
-                                <p><strong class="text-rose-300">Atout :</strong> Visualisation des fonctions apprises, découverte de lois physiques</p>
+                                <p><strong class="dl-accent-red">Chercheurs :</strong> <strong>Ziming Liu</strong> et <strong>Max Tegmark</strong> (MIT, 2024)</p>
+                                <p><strong class="dl-accent-red">Base :</strong> Théorème de Kolmogorov-Arnold (1957)</p>
+                                <p><strong class="dl-accent-red">Atout :</strong> Visualisation des fonctions apprises, découverte de lois physiques</p>
                             </div>
                         </div>
                     </div>
@@ -331,9 +331,9 @@
                                 Foundation models basés sur les <strong>neurones liquides</strong> — compacts, efficaces, interprétables.
                             </p>
                             <div class="text-xs dl-text-muted space-y-1">
-                                <p><strong class="text-indigo-300">Fondateurs :</strong> <strong>Ramin Hasani</strong>, <strong>Daniela Rus</strong> (MIT CSAIL)</p>
-                                <p><strong class="text-indigo-300">Financement :</strong> $250M levés, valorisation $2.35B (2024)</p>
-                                <p><strong class="text-indigo-300">LFM2 :</strong> 2× plus rapide que Qwen3 sur CPU (2025)</p>
+                                <p><strong class="dl-accent-blue">Fondateurs :</strong> <strong>Ramin Hasani</strong>, <strong>Daniela Rus</strong> (MIT CSAIL)</p>
+                                <p><strong class="dl-accent-blue">Financement :</strong> $250M levés, valorisation $2.35B (2024)</p>
+                                <p><strong class="dl-accent-blue">LFM2 :</strong> 2× plus rapide que Qwen3 sur CPU (2025)</p>
                             </div>
                         </div>
                     </div>
@@ -342,7 +342,7 @@
 
             <div class="dl-card bg-gradient-to-r from-teal-500/10 to-purple-500/10 border-l-4 border-teal-500 p-4">
                 <p class="text-sm dl-text-secondary">
-                    <strong class="text-teal-400">Tendance 2024-2025 :</strong> Les modèles <strong>hybrides</strong> combinent le meilleur des deux mondes — couches d'attention pour les dépendances complexes, et SSM/convolutions pour l'efficacité. Exemples : Jamba (Mamba + attention), StripedHyena, IBM Granite 4.0.
+                    <strong class="dl-accent-cyan">Tendance 2024-2025 :</strong> Les modèles <strong>hybrides</strong> combinent le meilleur des deux mondes — couches d'attention pour les dépendances complexes, et SSM/convolutions pour l'efficacité. Exemples : Jamba (Mamba + attention), StripedHyena, IBM Granite 4.0.
                 </p>
             </div>
         </section>
@@ -366,19 +366,19 @@
                     </thead>
                     <tbody class="divide-y divide-blue-500/20">
                         <tr>
-                            <td class="py-3 px-2 text-blue-400 font-bold">CNN</td>
+                            <td class="py-3 px-2 dl-accent-blue font-bold">CNN</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">1998</td>
                             <td class="py-3 px-2 dl-text-secondary">Images, vision</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">O(k²·n)</td>
                         </tr>
                         <tr>
-                            <td class="py-3 px-2 text-green-400 font-bold">RNN/LSTM</td>
+                            <td class="py-3 px-2 dl-accent-green font-bold">RNN/LSTM</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">1997</td>
                             <td class="py-3 px-2 dl-text-secondary">Séquences</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">O(n) séquentiel</td>
                         </tr>
                         <tr>
-                            <td class="py-3 px-2 text-purple-400 font-bold">Transformer</td>
+                            <td class="py-3 px-2 dl-accent-purple font-bold">Transformer</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">2017</td>
                             <td class="py-3 px-2 dl-text-secondary">Tout (LLMs, vision...)</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">O(n²) ⚠️</td>
@@ -390,25 +390,25 @@
                             <td class="py-3 px-2 dl-text-muted text-xs">~100 étapes</td>
                         </tr>
                         <tr class="bg-teal-500/5">
-                            <td class="py-3 px-2 text-teal-400 font-bold">Mamba/SSM</td>
+                            <td class="py-3 px-2 dl-accent-cyan font-bold">Mamba/SSM</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">2023</td>
                             <td class="py-3 px-2 dl-text-secondary">Séquences longues</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">O(n) ✓</td>
                         </tr>
                         <tr class="bg-amber-500/5">
-                            <td class="py-3 px-2 text-amber-400 font-bold">RWKV</td>
+                            <td class="py-3 px-2 dl-accent-yellow font-bold">RWKV</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">2023</td>
                             <td class="py-3 px-2 dl-text-secondary">RNN scalable</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">O(n) train, O(1) infer</td>
                         </tr>
                         <tr class="bg-orange-500/5">
-                            <td class="py-3 px-2 text-orange-400 font-bold">KAN</td>
+                            <td class="py-3 px-2 dl-accent-orange font-bold">KAN</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">2024</td>
                             <td class="py-3 px-2 dl-text-secondary">Fonctions interprétables</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">Splines sur arêtes</td>
                         </tr>
                         <tr class="bg-cyan-500/5">
-                            <td class="py-3 px-2 text-cyan-400 font-bold">LFM (Liquid)</td>
+                            <td class="py-3 px-2 dl-accent-cyan font-bold">LFM (Liquid)</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">2024</td>
                             <td class="py-3 px-2 dl-text-secondary">Edge AI, temps réel</td>
                             <td class="py-3 px-2 dl-text-muted text-xs">10x moins de params</td>
@@ -419,7 +419,7 @@
 
             <div class="dl-card bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-l-4 border-purple-500 p-6">
                 <p class="text-sm dl-text-secondary">
-                    <strong class="text-purple-400">Note :</strong> Ces architectures peuvent se combiner ! Les modèles multimodaux modernes (GPT-4 Vision, Gemini) fusionnent Transformers et techniques de vision. Les modèles de diffusion utilisent souvent des U-Net (variante de CNN) avec de l'attention (Transformers). L'avenir est probablement aux <strong>hybrides</strong>.
+                    <strong class="dl-accent-purple">Note :</strong> Ces architectures peuvent se combiner ! Les modèles multimodaux modernes (GPT-4 Vision, Gemini) fusionnent Transformers et techniques de vision. Les modèles de diffusion utilisent souvent des U-Net (variante de CNN) avec de l'attention (Transformers). L'avenir est probablement aux <strong>hybrides</strong>.
                 </p>
             </div>
         </section>

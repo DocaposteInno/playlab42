@@ -51,22 +51,22 @@
 
                 <div class="space-y-3 my-6">
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1970</span>
+                        <span class="dl-accent-cyan font-mono text-xs mb-1 block">1970</span>
                         <h4 class="text-base font-semibold dl-text-primary">Seppo Linnainmaa</h4>
                         <p class="dl-text-muted mt-1 text-sm">Formalise le "mode inverse" de la différentiation automatique. Tous les frameworks modernes (TensorFlow, PyTorch) reposent encore sur son algorithme.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1974</span>
+                        <span class="dl-accent-cyan font-mono text-xs mb-1 block">1974</span>
                         <h4 class="text-base font-semibold dl-text-primary">Paul Werbos</h4>
                         <p class="dl-text-muted mt-1 text-sm">Propose d'appliquer la règle de la chaîne aux réseaux de neurones dans sa thèse à Harvard. C'est l'hiver de l'IA — ses travaux passent inaperçus.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">1986</span>
+                        <span class="dl-accent-cyan font-mono text-xs mb-1 block">1986</span>
                         <h4 class="text-base font-semibold dl-text-primary">Rumelhart, Hinton & Williams</h4>
                         <p class="dl-text-muted mt-1 text-sm">Leur article dans <em>Nature</em> popularise enfin la technique et démontre la résolution du problème XOR par apprentissage.</p>
                     </div>
                     <div class="history-card">
-                        <span class="text-cyan-400 font-mono text-xs mb-1 block">2012</span>
+                        <span class="dl-accent-cyan font-mono text-xs mb-1 block">2012</span>
                         <h4 class="text-base font-semibold dl-text-primary">AlexNet</h4>
                         <p class="dl-text-muted mt-1 text-sm">Victoire écrasante sur ImageNet. 8 couches, 60M paramètres, GPU. Le Deep Learning moderne est né.</p>
                     </div>
@@ -79,7 +79,7 @@
 
                 <!-- INTRODUCTION PÉDAGOGIQUE -->
                 <div class="concept-box mb-6">
-                    <h4 class="font-bold text-blue-400 mb-3">Le problème à résoudre</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Le problème à résoudre</h4>
                     <p class="dl-text-secondary text-sm mb-4">
                         Notre réseau vient de faire une prédiction. Il s'est trompé. Maintenant on veut <strong>corriger ses poids</strong> pour qu'il se trompe moins la prochaine fois. Mais le réseau a des milliers de poids... <em>Lequel modifier ? Dans quel sens ? De combien ?</em>
                     </p>
@@ -92,7 +92,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">🔍</span>
                         <div>
-                            <h4 class="font-bold text-green-400 mb-1">L'analogie du détective</h4>
+                            <h4 class="font-bold dl-accent-green mb-1">L'analogie du détective</h4>
                             <p class="dl-text-secondary text-sm">
                                 Imaginez un match de foot perdu 3-0. Qui est responsable ? Le gardien qui a raté un arrêt ? Le défenseur mal placé ? L'attaquant qui n'a pas marqué ? En réalité, <strong>chacun porte une fraction de la responsabilité</strong>. La rétropropagation fait exactement ce travail : elle remonte du résultat (la défaite) vers chaque joueur (chaque poids) pour calculer <em>"de combien es-tu responsable ?"</em>
                             </p>
@@ -114,12 +114,12 @@
 
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div class="dl-card p-3 rounded-xl border">
-                        <p class="text-sm"><strong class="text-red-400">Gradient positif (+)</strong></p>
+                        <p class="text-sm"><strong class="dl-accent-red">Gradient positif (+)</strong></p>
                         <p class="text-xs dl-text-muted">Si j'augmente ce poids → l'erreur augmente</p>
                         <p class="text-xs dl-text-muted">Donc je dois <strong>diminuer</strong> ce poids</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border">
-                        <p class="text-sm"><strong class="text-green-400">Gradient négatif (−)</strong></p>
+                        <p class="text-sm"><strong class="dl-accent-green">Gradient négatif (−)</strong></p>
                         <p class="text-xs dl-text-muted">Si j'augmente ce poids → l'erreur diminue</p>
                         <p class="text-xs dl-text-muted">Donc je dois <strong>augmenter</strong> ce poids</p>
                     </div>
@@ -134,17 +134,17 @@
                 <div class="grid md:grid-cols-3 gap-3 mb-8">
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">1️⃣</div>
-                        <p class="text-sm font-bold text-cyan-400">Forward</p>
+                        <p class="text-sm font-bold dl-accent-cyan">Forward</p>
                         <p class="text-xs dl-text-muted">Calculer la prédiction et l'erreur</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">2️⃣</div>
-                        <p class="text-sm font-bold text-orange-400">Backward</p>
+                        <p class="text-sm font-bold dl-accent-orange">Backward</p>
                         <p class="text-xs dl-text-muted">Remonter pour trouver la responsabilité de chaque poids</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">3️⃣</div>
-                        <p class="text-sm font-bold text-green-400">Update</p>
+                        <p class="text-sm font-bold dl-accent-green">Update</p>
                         <p class="text-xs dl-text-muted">Corriger chaque poids proportionnellement</p>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 </p>
 
                 <div class="concept-box mb-6">
-                    <h4 class="font-bold text-blue-400 mb-3">La Règle de la Chaîne</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">La Règle de la Chaîne</h4>
                     <p class="dl-text-secondary text-sm mb-4">
                         Si \(L\) dépend de \(a\), qui dépend de \(z\), qui dépend de \(w\), alors :
                     </p>
@@ -189,7 +189,7 @@
 
                 <!-- Visualisation tanh et sa dérivée -->
                 <div class="my-6 p-4 dl-card rounded-xl border">
-                    <h4 class="font-bold text-orange-400 mb-2 text-sm text-center">Le Problème de la Saturation</h4>
+                    <h4 class="font-bold dl-accent-orange mb-2 text-sm text-center">Le Problème de la Saturation</h4>
                     <p class="text-sm dl-text-secondary mb-3">
                         Dans la formule, on <strong>multiplie par σ'(z)</strong> à chaque couche. Problème : quand un neurone est <em>saturé</em> (z très grand ou très petit), sa dérivée σ'(z) ≈ 0. Le gradient se retrouve multiplié par ~0 et <strong>disparaît</strong>.
                     </p>
@@ -209,7 +209,7 @@
                     </div>
                     <div class="mt-3 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
                         <p class="text-xs dl-text-secondary">
-                            <strong class="text-red-400">Vanishing Gradient :</strong> avec 10 couches et σ'(z) ≈ 0.1 à chaque couche, le gradient est multiplié par 0.1<sup>10</sup> = <strong>0.0000000001</strong>. Les premières couches ne reçoivent plus aucun signal d'apprentissage.
+                            <strong class="dl-accent-red">Vanishing Gradient :</strong> avec 10 couches et σ'(z) ≈ 0.1 à chaque couche, le gradient est multiplié par 0.1<sup>10</sup> = <strong>0.0000000001</strong>. Les premières couches ne reçoivent plus aucun signal d'apprentissage.
                         </p>
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">💡</span>
                         <div>
-                            <h4 class="font-bold text-green-400 mb-1">Le jeu du téléphone inversé</h4>
+                            <h4 class="font-bold dl-accent-green mb-1">Le jeu du téléphone inversé</h4>
                             <p class="dl-text-secondary text-sm">
                                 Le dernier reçoit "tu t'es trompé de X", chuchote à celui devant "c'est en partie ta faute". À la fin, chacun connaît <strong>sa part de responsabilité</strong> dans l'erreur.
                             </p>
@@ -339,14 +339,14 @@
 
                 <!-- Visualisation descente de gradient -->
                 <div class="my-6 p-4 dl-card rounded-xl border">
-                    <h4 class="font-bold text-blue-400 mb-3 text-center">Descente de Gradient Interactive</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3 text-center">Descente de Gradient Interactive</h4>
                     <div class="flex flex-col items-center gap-3">
                         <canvas id="gradientCanvas" width="480" height="220" class="rounded-lg" style="max-width: 480px;"></canvas>
                         <div class="flex flex-wrap justify-center gap-3">
                             <div class="flex items-center gap-2">
                                 <label class="text-sm dl-text-secondary">η =</label>
                                 <input type="range" id="learningRate" min="0.01" max="1.5" step="0.01" value="0.3" class="w-20">
-                                <span id="lrValue" class="font-mono text-cyan-400 w-10 text-sm">0.30</span>
+                                <span id="lrValue" class="font-mono dl-accent-cyan w-10 text-sm">0.30</span>
                             </div>
                             <button id="resetGradient" class="px-3 py-1 text-xs bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 rounded-lg">Reset</button>
                             <button id="stepGradient" class="px-3 py-1 text-xs bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 rounded-lg">Step</button>
@@ -482,11 +482,11 @@
 
                 <div class="grid md:grid-cols-2 gap-3 my-6">
                     <div class="bg-red-500/10 border border-red-500/30 p-3 rounded-xl">
-                        <h4 class="font-bold text-red-400 mb-1 text-sm">η trop grand</h4>
+                        <h4 class="font-bold dl-accent-red mb-1 text-sm">η trop grand</h4>
                         <p class="text-xs dl-text-muted">On "saute" par-dessus le minimum, oscillations, divergence.</p>
                     </div>
                     <div class="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl">
-                        <h4 class="font-bold text-yellow-500 mb-1 text-sm">η trop petit</h4>
+                        <h4 class="font-bold dl-accent-yellow mb-1 text-sm">η trop petit</h4>
                         <p class="text-xs dl-text-muted">Convergence très lente, risque de rester dans un minimum local.</p>
                     </div>
                 </div>
@@ -502,14 +502,14 @@
 
                 <div class="grid md:grid-cols-2 gap-4 my-6">
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-purple-400 mb-2 text-sm">Momentum</h4>
+                        <h4 class="font-bold dl-accent-purple mb-2 text-sm">Momentum</h4>
                         <p class="text-xs dl-text-muted mb-2">
                             Moyenne mobile des gradients passés → "lisse" la trajectoire et accélère.
                         </p>
                         <div class="math-block text-xs py-1">$$ m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t $$</div>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-orange-400 mb-2 text-sm">Taux Adaptatif</h4>
+                        <h4 class="font-bold dl-accent-orange mb-2 text-sm">Taux Adaptatif</h4>
                         <p class="text-xs dl-text-muted mb-2">
                             Chaque poids a son propre η ajusté selon la variance de ses gradients.
                         </p>
@@ -519,14 +519,14 @@
 
                 <!-- Visualisation Adam vs GD -->
                 <div class="my-6 p-4 dl-card rounded-xl border">
-                    <h4 class="font-bold text-blue-400 mb-3 text-center text-sm">Adam vs Descente de Gradient</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3 text-center text-sm">Adam vs Descente de Gradient</h4>
                     <div class="flex flex-col items-center gap-3">
                         <canvas id="adamCanvas" width="480" height="200" class="rounded-lg" style="max-width: 480px;"></canvas>
                         <div class="flex flex-wrap justify-center gap-3">
                             <div class="flex items-center gap-2">
                                 <label class="text-sm dl-text-secondary">η =</label>
                                 <input type="range" id="adamLR" min="0.01" max="1.0" step="0.01" value="0.3" class="w-16">
-                                <span id="adamLRValue" class="font-mono text-cyan-400 w-10 text-sm">0.30</span>
+                                <span id="adamLRValue" class="font-mono dl-accent-cyan w-10 text-sm">0.30</span>
                             </div>
                             <button id="resetAdam" class="px-2 py-1 text-xs bg-blue-500/20 border border-blue-500/50 rounded-lg">Reset</button>
                             <button id="runAdam" class="px-2 py-1 text-xs bg-purple-500/20 border border-purple-500/50 rounded-lg">▶ Run</button>
@@ -659,7 +659,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">⚽</span>
                         <div>
-                            <h4 class="font-bold text-green-400 mb-1">La balle qui roule</h4>
+                            <h4 class="font-bold dl-accent-green mb-1">La balle qui roule</h4>
                             <p class="dl-text-secondary text-sm">
                                 <strong>Momentum</strong> = inertie : elle accélère si elle roule toujours dans la même direction. <strong>Taux adaptatif</strong> = freinage automatique sur terrain chaotique, accélération sur lignes droites.
                             </p>
@@ -681,7 +681,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Gradients minuscules dans les réseaux profonds → les premières couches n'apprennent plus.
                         </p>
-                        <div class="text-xs text-blue-400 font-mono">ReLU, BatchNorm, ResNets</div>
+                        <div class="text-xs dl-accent-blue font-mono">ReLU, BatchNorm, ResNets</div>
                     </div>
 
                     <div class="card-hover dl-card p-4 rounded-xl border">
@@ -692,7 +692,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Gradients énormes → poids explosent vers l'infini, loss = NaN.
                         </p>
-                        <div class="text-xs text-orange-400 font-mono">Gradient Clipping, Init Xavier</div>
+                        <div class="text-xs dl-accent-orange font-mono">Gradient Clipping, Init Xavier</div>
                     </div>
 
                     <div class="card-hover dl-card p-4 rounded-xl border">
@@ -703,7 +703,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Le réseau apprend par cœur au lieu de généraliser.
                         </p>
-                        <div class="text-xs text-yellow-500 font-mono">Dropout, Early Stopping, L2</div>
+                        <div class="text-xs dl-accent-yellow font-mono">Dropout, Early Stopping, L2</div>
                     </div>
 
                     <div class="card-hover dl-card p-4 rounded-xl border">
@@ -714,7 +714,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             En haute dimension, moins problématique que prévu (souvent des points-selle).
                         </p>
-                        <div class="text-xs text-purple-400 font-mono">Adam, Momentum</div>
+                        <div class="text-xs dl-accent-purple font-mono">Adam, Momentum</div>
                     </div>
                 </div>
 
@@ -722,7 +722,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">🎯</span>
                         <div>
-                            <h4 class="font-bold text-blue-400 mb-1">Récapitulatif</h4>
+                            <h4 class="font-bold dl-accent-blue mb-1">Récapitulatif</h4>
                             <p class="dl-text-secondary text-sm">
                                 <strong>Rétropropagation</strong> = calcul efficace des gradients via la règle de la chaîne.<br>
                                 <strong>Optimisation</strong> = utilisation de ces gradients pour corriger les poids.<br>

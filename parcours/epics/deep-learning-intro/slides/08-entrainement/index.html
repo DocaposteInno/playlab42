@@ -52,22 +52,22 @@
                 <div class="grid md:grid-cols-4 gap-3 my-6">
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">1️⃣</div>
-                        <p class="text-sm font-bold text-cyan-400">Forward</p>
+                        <p class="text-sm font-bold dl-accent-cyan">Forward</p>
                         <p class="text-xs dl-text-muted">Calculer la prédiction</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">2️⃣</div>
-                        <p class="text-sm font-bold text-red-400">Loss</p>
+                        <p class="text-sm font-bold dl-accent-red">Loss</p>
                         <p class="text-xs dl-text-muted">Mesurer l'erreur</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">3️⃣</div>
-                        <p class="text-sm font-bold text-orange-400">Backward</p>
+                        <p class="text-sm font-bold dl-accent-orange">Backward</p>
                         <p class="text-xs dl-text-muted">Calculer les gradients</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border text-center">
                         <div class="text-2xl mb-2">4️⃣</div>
-                        <p class="text-sm font-bold text-green-400">Update</p>
+                        <p class="text-sm font-bold dl-accent-green">Update</p>
                         <p class="text-xs dl-text-muted">Corriger les poids</p>
                     </div>
                 </div>
@@ -76,16 +76,16 @@
                     <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
                         training_loop.py
                     </div>
-                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-pink-400">pour</span> <span class="text-purple-400">epoch</span> <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> nb_epochs:
-    <span class="text-pink-400">pour</span> <span class="text-purple-400">batch</span> <span class="text-pink-400">dans</span> données_entraînement:
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-pink-400">pour</span> <span class="dl-accent-purple">epoch</span> <span class="text-pink-400">de</span> <span class="dl-accent-cyan">1</span> <span class="text-pink-400">à</span> nb_epochs:
+    <span class="text-pink-400">pour</span> <span class="dl-accent-purple">batch</span> <span class="text-pink-400">dans</span> données_entraînement:
         <span class="text-slate-500"># 1. Forward : calculer la prédiction</span>
-        <span class="text-purple-400">prédiction</span> = réseau.forward(batch.entrées)
+        <span class="dl-accent-purple">prédiction</span> = réseau.forward(batch.entrées)
 
         <span class="text-slate-500"># 2. Loss : mesurer l'erreur</span>
-        <span class="text-purple-400">erreur</span> = fonction_perte(prédiction, batch.cibles)
+        <span class="dl-accent-purple">erreur</span> = fonction_perte(prédiction, batch.cibles)
 
         <span class="text-slate-500"># 3. Backward : calculer les gradients</span>
-        <span class="text-purple-400">gradients</span> = réseau.backward(erreur)
+        <span class="dl-accent-purple">gradients</span> = réseau.backward(erreur)
 
         <span class="text-slate-500"># 4. Update : corriger les poids</span>
         optimiseur.mettre_à_jour(réseau.poids, gradients)</code></pre>
@@ -97,24 +97,24 @@
                 <h3 id="epochs" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Epochs, Itérations et Batchs</h3>
 
                 <div class="concept-box mb-6">
-                    <h4 class="font-bold text-blue-400 mb-3">Les définitions clés</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Les définitions clés</h4>
                     <div class="space-y-3">
                         <div class="flex items-start gap-3">
-                            <span class="text-cyan-400 font-bold text-lg">📦</span>
+                            <span class="dl-accent-cyan font-bold text-lg">📦</span>
                             <div>
                                 <p class="font-bold dl-text-primary"><dfn>Batch</dfn> (lot)</p>
                                 <p class="text-sm dl-text-muted">Sous-ensemble de données traité en une fois. Tailles typiques : 32, 64, 128.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="text-orange-400 font-bold text-lg">🔁</span>
+                            <span class="dl-accent-orange font-bold text-lg">🔁</span>
                             <div>
                                 <p class="font-bold dl-text-primary">Itération (step)</p>
                                 <p class="text-sm dl-text-muted">Une mise à jour des poids = traitement d'un batch.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="text-purple-400 font-bold text-lg">🔄</span>
+                            <span class="dl-accent-purple font-bold text-lg">🔄</span>
                             <div>
                                 <p class="font-bold dl-text-primary"><dfn>Epoch</dfn></p>
                                 <p class="text-sm dl-text-muted">Une passe complète sur TOUTES les données d'entraînement.</p>
@@ -124,7 +124,7 @@
                 </div>
 
                 <div class="dl-card p-4 rounded-xl border mb-6">
-                    <h4 class="font-bold text-green-400 mb-3 text-sm">Exemple concret</h4>
+                    <h4 class="font-bold dl-accent-green mb-3 text-sm">Exemple concret</h4>
                     <p class="text-sm dl-text-secondary mb-2">
                         Vous avez <strong>1000 images</strong> et des batchs de <strong>32 images</strong> :
                     </p>
@@ -139,19 +139,19 @@
 
                 <div class="grid md:grid-cols-3 gap-3 mb-6">
                     <div class="dl-card p-3 rounded-xl border">
-                        <h5 class="font-bold text-cyan-400 mb-1 text-sm">Tout d'un coup</h5>
+                        <h5 class="font-bold dl-accent-cyan mb-1 text-sm">Tout d'un coup</h5>
                         <p class="text-xs dl-text-muted mb-1">Gradient précis mais très lent</p>
-                        <p class="text-xs text-red-400">❌ Ne rentre pas en mémoire</p>
+                        <p class="text-xs dl-accent-red">❌ Ne rentre pas en mémoire</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border">
-                        <h5 class="font-bold text-orange-400 mb-1 text-sm">Un par un (SGD)</h5>
+                        <h5 class="font-bold dl-accent-orange mb-1 text-sm">Un par un (SGD)</h5>
                         <p class="text-xs dl-text-muted mb-1">Très rapide mais chaotique</p>
-                        <p class="text-xs text-yellow-400">⚠️ Gradient bruité</p>
+                        <p class="text-xs dl-accent-yellow">⚠️ Gradient bruité</p>
                     </div>
                     <div class="dl-card p-3 rounded-xl border border-green-500/50">
-                        <h5 class="font-bold text-green-400 mb-1 text-sm">Mini-batch ✓</h5>
+                        <h5 class="font-bold dl-accent-green mb-1 text-sm">Mini-batch ✓</h5>
                         <p class="text-xs dl-text-muted mb-1">Équilibre vitesse/précision</p>
-                        <p class="text-xs text-green-400">✓ Optimisé pour GPU</p>
+                        <p class="text-xs dl-accent-green">✓ Optimisé pour GPU</p>
                     </div>
                 </div>
 
@@ -168,7 +168,7 @@
                     <div class="dl-card p-4 rounded-xl border">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="text-2xl">📚</span>
-                            <h4 class="font-bold text-cyan-400">Training (70-80%)</h4>
+                            <h4 class="font-bold dl-accent-cyan">Training (70-80%)</h4>
                         </div>
                         <p class="text-xs dl-text-muted">
                             Les données sur lesquelles le modèle apprend. C'est le <strong>manuel de cours</strong>.
@@ -177,7 +177,7 @@
                     <div class="dl-card p-4 rounded-xl border">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="text-2xl">📝</span>
-                            <h4 class="font-bold text-orange-400">Validation (10-15%)</h4>
+                            <h4 class="font-bold dl-accent-orange">Validation (10-15%)</h4>
                         </div>
                         <p class="text-xs dl-text-muted">
                             Pour ajuster les hyperparamètres et détecter l'overfitting. C'est l'<strong>examen blanc</strong>.
@@ -186,7 +186,7 @@
                     <div class="dl-card p-4 rounded-xl border">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="text-2xl">🎓</span>
-                            <h4 class="font-bold text-green-400">Test (10-15%)</h4>
+                            <h4 class="font-bold dl-accent-green">Test (10-15%)</h4>
                         </div>
                         <p class="text-xs dl-text-muted">
                             Évaluation finale, utilisé UNE SEULE FOIS. C'est l'<strong>examen final</strong>.
@@ -203,7 +203,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">🎓</span>
                         <div>
-                            <h4 class="font-bold text-green-400 mb-1">L'analogie de l'étudiant</h4>
+                            <h4 class="font-bold dl-accent-green mb-1">L'analogie de l'étudiant</h4>
                             <p class="dl-text-secondary text-sm">
                                 <strong>Underfitting</strong> : L'étudiant ne lit que les titres des chapitres. Il ne comprend pas assez pour répondre aux questions.<br>
                                 <strong>Overfitting</strong> : L'étudiant mémorise chaque mot du manuel. Il récite parfaitement les exercices, mais face à une question légèrement différente, il est perdu.<br>
@@ -215,12 +215,12 @@
 
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div class="dl-card p-4 rounded-xl border border-yellow-500/30">
-                        <h4 class="font-bold text-yellow-500 mb-2"><dfn>Underfitting</dfn></h4>
+                        <h4 class="font-bold dl-accent-yellow mb-2"><dfn>Underfitting</dfn></h4>
                         <p class="text-sm dl-text-muted mb-2">Le modèle est trop simple. Il n'apprend pas assez.</p>
                         <p class="text-xs dl-text-secondary"><strong>Symptôme</strong> : Loss élevée sur train ET validation</p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border border-red-500/30">
-                        <h4 class="font-bold text-red-400 mb-2"><dfn>Overfitting</dfn></h4>
+                        <h4 class="font-bold dl-accent-red mb-2"><dfn>Overfitting</dfn></h4>
                         <p class="text-sm dl-text-muted mb-2">Le modèle mémorise au lieu de comprendre.</p>
                         <p class="text-xs dl-text-secondary"><strong>Symptôme</strong> : Loss basse sur train, élevée sur validation</p>
                     </div>
@@ -228,7 +228,7 @@
 
                 <!-- Visualisation Learning Curves -->
                 <div class="my-6 p-4 dl-card rounded-xl border">
-                    <h4 class="font-bold text-blue-400 mb-3 text-center">Courbes d'Apprentissage</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3 text-center">Courbes d'Apprentissage</h4>
                     <div class="flex flex-col items-center">
                         <canvas id="learningCurvesCanvas" width="600" height="220" class="rounded-lg" style="max-width: 600px;"></canvas>
                         <div class="flex gap-6 mt-3">
@@ -373,7 +373,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Arrêter l'entraînement quand la validation loss cesse de s'améliorer.
                         </p>
-                        <p class="text-xs text-green-400">Le plus simple et le plus efficace</p>
+                        <p class="text-xs dl-accent-green">Le plus simple et le plus efficace</p>
                     </div>
 
                     <div class="dl-card p-4 rounded-xl border">
@@ -384,7 +384,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             "Éteindre" aléatoirement certains neurones pendant l'entraînement.
                         </p>
-                        <p class="text-xs text-purple-400">Force le réseau à ne pas trop dépendre d'un neurone</p>
+                        <p class="text-xs dl-accent-purple">Force le réseau à ne pas trop dépendre d'un neurone</p>
                     </div>
 
                     <div class="dl-card p-4 rounded-xl border">
@@ -395,7 +395,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Pénaliser les poids trop grands pour garder le modèle simple.
                         </p>
-                        <p class="text-xs text-blue-400">L1 = sélection de features, L2 = lissage</p>
+                        <p class="text-xs dl-accent-blue">L1 = sélection de features, L2 = lissage</p>
                     </div>
 
                     <div class="dl-card p-4 rounded-xl border">
@@ -406,7 +406,7 @@
                         <p class="text-xs dl-text-muted mb-2">
                             Créer des variations des données (rotation, zoom, flip...).
                         </p>
-                        <p class="text-xs text-orange-400">Plus de données = moins d'overfitting</p>
+                        <p class="text-xs dl-accent-orange">Plus de données = moins d'overfitting</p>
                     </div>
                 </div>
 
@@ -414,7 +414,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-xl">🎯</span>
                         <div>
-                            <h4 class="font-bold text-blue-400 mb-1">Ce qu'il faut retenir</h4>
+                            <h4 class="font-bold dl-accent-blue mb-1">Ce qu'il faut retenir</h4>
                             <ul class="text-sm space-y-1 dl-text-muted">
                                 <li>• <strong>Boucle</strong> : Forward → Loss → Backward → Update (répéter)</li>
                                 <li>• <strong>Epoch</strong> = 1 passage complet sur les données</li>

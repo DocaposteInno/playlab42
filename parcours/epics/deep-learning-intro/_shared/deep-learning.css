@@ -152,6 +152,35 @@ body {
 
 .dl-border { border-color: var(--dl-border-color) !important; }
 
+/* === Couleurs d'accent adaptatives (lisibles en light et dark) === */
+/* En light mode : teintes -700/-800 pour un bon contraste sur fond clair */
+.dl-accent-yellow { color: #b45309 !important; }  /* amber-700 */
+.dl-accent-cyan { color: #0e7490 !important; }    /* cyan-700 */
+.dl-accent-green { color: #047857 !important; }   /* emerald-700 */
+.dl-accent-red { color: #b91c1c !important; }     /* red-700 */
+.dl-accent-purple { color: #6d28d9 !important; }  /* violet-700 */
+.dl-accent-blue { color: #1d4ed8 !important; }    /* blue-700 */
+.dl-accent-orange { color: #c2410c !important; }  /* orange-700 */
+
+/* En thème sombre, on utilise des teintes plus claires pour plus de contraste */
+:root:not([data-theme="light"]) .dl-accent-yellow { color: #fbbf24 !important; }  /* amber-400 */
+:root:not([data-theme="light"]) .dl-accent-cyan { color: #22d3ee !important; }    /* cyan-400 */
+:root:not([data-theme="light"]) .dl-accent-green { color: #34d399 !important; }   /* emerald-400 */
+:root:not([data-theme="light"]) .dl-accent-red { color: #f87171 !important; }     /* red-400 */
+:root:not([data-theme="light"]) .dl-accent-purple { color: #a78bfa !important; }  /* violet-400 */
+:root:not([data-theme="light"]) .dl-accent-blue { color: #60a5fa !important; }    /* blue-400 */
+:root:not([data-theme="light"]) .dl-accent-orange { color: #fb923c !important; }  /* orange-400 */
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .dl-accent-yellow { color: #fbbf24 !important; }
+    :root:not([data-theme]) .dl-accent-cyan { color: #22d3ee !important; }
+    :root:not([data-theme]) .dl-accent-green { color: #34d399 !important; }
+    :root:not([data-theme]) .dl-accent-red { color: #f87171 !important; }
+    :root:not([data-theme]) .dl-accent-purple { color: #a78bfa !important; }
+    :root:not([data-theme]) .dl-accent-blue { color: #60a5fa !important; }
+    :root:not([data-theme]) .dl-accent-orange { color: #fb923c !important; }
+}
+
 .dl-card {
     background-color: var(--dl-bg-card) !important;
     border-color: var(--dl-border-color) !important;

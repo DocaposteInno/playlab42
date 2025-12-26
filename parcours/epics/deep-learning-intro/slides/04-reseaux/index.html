@@ -35,7 +35,7 @@
 
                 <!-- VISUALISATION INTERACTIVE -->
                 <div class="concept-box mb-8">
-                    <h4 class="font-bold text-blue-400 mb-3">Explorez un Réseau de Neurones</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Explorez un Réseau de Neurones</h4>
                     <div class="my-4">
                         <canvas id="networkCanvas" width="700" height="350" class="w-full rounded-lg" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
                         <p class="text-center text-xs dl-text-muted mt-2">Survolez les neurones pour voir leurs valeurs • Cliquez sur une entrée pour la modifier</p>
@@ -44,17 +44,17 @@
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">Entrée x₁</label>
                             <input type="range" id="input1" min="-1" max="1" step="0.1" value="0.5" class="w-24">
-                            <span id="input1Val" class="text-cyan-400 text-xs font-mono block">0.5</span>
+                            <span id="input1Val" class="dl-accent-cyan text-xs font-mono block">0.5</span>
                         </div>
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">Entrée x₂</label>
                             <input type="range" id="input2" min="-1" max="1" step="0.1" value="-0.3" class="w-24">
-                            <span id="input2Val" class="text-cyan-400 text-xs font-mono block">-0.3</span>
+                            <span id="input2Val" class="dl-accent-cyan text-xs font-mono block">-0.3</span>
                         </div>
                         <div class="text-center">
                             <label class="text-xs dl-text-muted block mb-1">Entrée x₃</label>
                             <input type="range" id="input3" min="-1" max="1" step="0.1" value="0.8" class="w-24">
-                            <span id="input3Val" class="text-cyan-400 text-xs font-mono block">0.8</span>
+                            <span id="input3Val" class="dl-accent-cyan text-xs font-mono block">0.8</span>
                         </div>
                     </div>
                 </div>
@@ -298,19 +298,19 @@
 
                 <div class="grid md:grid-cols-3 gap-4 my-6">
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-cyan-400 mb-2">Couche d'Entrée</h4>
+                        <h4 class="font-bold dl-accent-cyan mb-2">Couche d'Entrée</h4>
                         <p class="text-sm dl-text-muted">
                             Reçoit les données brutes (pixels, valeurs numériques, etc.). Ne fait aucun calcul — elle transmet simplement les features à la couche suivante.
                         </p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-purple-400 mb-2">Couches Cachées</h4>
+                        <h4 class="font-bold dl-accent-purple mb-2">Couches Cachées</h4>
                         <p class="text-sm dl-text-muted">
                             Le cœur du réseau. Chaque couche transforme les données en appliquant poids, biais et activation. Les premières couches capturent des patterns simples, les couches plus profondes des concepts abstraits.
                         </p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-green-400 mb-2">Couche de Sortie</h4>
+                        <h4 class="font-bold dl-accent-green mb-2">Couche de Sortie</h4>
                         <p class="text-sm dl-text-muted">
                             Produit la prédiction finale. Pour une classification, chaque neurone représente une classe. Pour une régression, un seul neurone donne une valeur continue.
                         </p>
@@ -325,7 +325,7 @@
                 </p>
 
                 <div class="concept-box mb-6">
-                    <h4 class="font-bold text-blue-400 mb-3">Pourquoi la profondeur compte</h4>
+                    <h4 class="font-bold dl-accent-blue mb-3">Pourquoi la profondeur compte</h4>
                     <p class="text-sm dl-text-secondary mb-3">
                         En théorie, un réseau à une seule couche cachée (suffisamment large) peut approximer n'importe quelle fonction. Mais en pratique :
                     </p>
@@ -338,7 +338,7 @@
 
                 <div class="grid md:grid-cols-2 gap-4 my-6">
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-yellow-400 mb-2">Largeur (Width)</h4>
+                        <h4 class="font-bold dl-accent-yellow mb-2">Largeur (Width)</h4>
                         <p class="text-sm dl-text-muted mb-2">
                             Nombre de neurones par couche. Plus de neurones = plus de paramètres à ajuster, plus de capacité d'expression.
                         </p>
@@ -385,25 +385,25 @@
 
                 <div class="grid md:grid-cols-2 gap-4 my-6">
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-blue-400 mb-2">CNN — Vision</h4>
+                        <h4 class="font-bold dl-accent-blue mb-2">CNN — Vision</h4>
                         <p class="text-sm dl-text-muted">
                             <strong>Réseaux convolutifs</strong>. Exploitent la structure spatiale des images avec des filtres locaux. Efficaces et toujours très utilisés pour la vision embarquée.
                         </p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-purple-400 mb-2">Transformers — Texte & Vision</h4>
+                        <h4 class="font-bold dl-accent-purple mb-2">Transformers — Texte & Vision</h4>
                         <p class="text-sm dl-text-muted">
                             Architecture dominante depuis 2017. Le mécanisme d'<strong>attention</strong> permet de capturer les relations entre tous les éléments d'une séquence simultanément.
                         </p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-green-400 mb-2">RNN/LSTM — Séquences</h4>
+                        <h4 class="font-bold dl-accent-green mb-2">RNN/LSTM — Séquences</h4>
                         <p class="text-sm dl-text-muted">
                             <strong>Réseaux récurrents</strong>. Traitent les données séquentiellement, avec une "mémoire". Largement supplantés par les Transformers, mais pertinents pour le temps réel.
                         </p>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-orange-400 mb-2">Mamba/SSM — Émergent</h4>
+                        <h4 class="font-bold dl-accent-orange mb-2">Mamba/SSM — Émergent</h4>
                         <p class="text-sm dl-text-muted">
                             <strong>State Space Models</strong>. Alternative récente aux Transformers avec complexité linéaire. Prometteur pour les très longues séquences.
                         </p>
@@ -436,19 +436,19 @@
                         network.py
                     </div>
                     <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Architecture : [3, 4, 4, 2]</span>
-<span class="text-purple-400">couches</span> = [3, 4, 4, 2]
+<span class="dl-accent-purple">couches</span> = [3, 4, 4, 2]
 
 <span class="text-slate-500"># Initialisation des poids et biais</span>
-<span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> nb_couches:
-    <span class="text-purple-400">W[l]</span> = matrice_aleatoire(couches[l], couches[l-1])
-    <span class="text-purple-400">b[l]</span> = vecteur_zeros(couches[l])
+<span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="dl-accent-cyan">1</span> <span class="text-pink-400">à</span> nb_couches:
+    <span class="dl-accent-purple">W[l]</span> = matrice_aleatoire(couches[l], couches[l-1])
+    <span class="dl-accent-purple">b[l]</span> = vecteur_zeros(couches[l])
 
 <span class="text-slate-500"># Propagation avant (forward pass)</span>
 <span class="text-pink-400">fonction</span> forward(entree):
-    <span class="text-purple-400">a</span> = entree
-    <span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="text-cyan-400">1</span> <span class="text-pink-400">à</span> nb_couches:
-        <span class="text-purple-400">z</span> = W[l] · a + b[l]    <span class="text-slate-500"># Produit matriciel + biais</span>
-        <span class="text-purple-400">a</span> = activation(z)      <span class="text-slate-500"># tanh, ReLU, etc.</span>
+    <span class="dl-accent-purple">a</span> = entree
+    <span class="text-pink-400">pour</span> l <span class="text-pink-400">de</span> <span class="dl-accent-cyan">1</span> <span class="text-pink-400">à</span> nb_couches:
+        <span class="dl-accent-purple">z</span> = W[l] · a + b[l]    <span class="text-slate-500"># Produit matriciel + biais</span>
+        <span class="dl-accent-purple">a</span> = activation(z)      <span class="text-slate-500"># tanh, ReLU, etc.</span>
     <span class="text-pink-400">retourner</span> a</code></pre>
                 </div>
 
@@ -461,23 +461,23 @@
 
                 <div class="grid md:grid-cols-2 gap-4 my-6">
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-blue-400 mb-3">📦 Formats de modèles</h4>
+                        <h4 class="font-bold dl-accent-blue mb-3">📦 Formats de modèles</h4>
                         <ul class="text-sm dl-text-secondary space-y-2">
-                            <li><strong class="text-cyan-400"><dfn>ONNX</dfn></strong> — Format universel (PyTorch → TensorFlow → mobile)</li>
-                            <li><strong class="text-green-400">SavedModel</strong> — Format natif TensorFlow</li>
-                            <li><strong class="text-purple-400">TorchScript</strong> — PyTorch sans Python</li>
-                            <li><strong class="text-orange-400">CoreML</strong> — Apple (iPhone/Mac)</li>
-                            <li><strong class="text-yellow-400">TensorRT</strong> — NVIDIA, ultra-rapide sur GPU</li>
+                            <li><strong class="dl-accent-cyan"><dfn>ONNX</dfn></strong> — Format universel (PyTorch → TensorFlow → mobile)</li>
+                            <li><strong class="dl-accent-green">SavedModel</strong> — Format natif TensorFlow</li>
+                            <li><strong class="dl-accent-purple">TorchScript</strong> — PyTorch sans Python</li>
+                            <li><strong class="dl-accent-orange">CoreML</strong> — Apple (iPhone/Mac)</li>
+                            <li><strong class="dl-accent-yellow">TensorRT</strong> — NVIDIA, ultra-rapide sur GPU</li>
                         </ul>
                     </div>
                     <div class="dl-card p-4 rounded-xl border">
-                        <h4 class="font-bold text-green-400 mb-3">🎯 Cibles de déploiement</h4>
+                        <h4 class="font-bold dl-accent-green mb-3">🎯 Cibles de déploiement</h4>
                         <ul class="text-sm dl-text-secondary space-y-2">
-                            <li><strong class="text-cyan-400">Cloud</strong> — AWS SageMaker, Google Vertex AI</li>
-                            <li><strong class="text-purple-400">Edge</strong> — Raspberry Pi, Jetson Nano, TPU Coral</li>
+                            <li><strong class="dl-accent-cyan">Cloud</strong> — AWS SageMaker, Google Vertex AI</li>
+                            <li><strong class="dl-accent-purple">Edge</strong> — Raspberry Pi, Jetson Nano, TPU Coral</li>
                             <li><strong class="text-pink-400">Mobile</strong> — TensorFlow Lite, CoreML</li>
-                            <li><strong class="text-orange-400">Navigateur</strong> — TensorFlow.js, ONNX.js, WebGPU</li>
-                            <li><strong class="text-green-400">Embarqué</strong> — TinyML, voitures, drones</li>
+                            <li><strong class="dl-accent-orange">Navigateur</strong> — TensorFlow.js, ONNX.js, WebGPU</li>
+                            <li><strong class="dl-accent-green">Embarqué</strong> — TinyML, voitures, drones</li>
                         </ul>
                     </div>
                 </div>
@@ -491,7 +491,7 @@
                     <div class="flex items-start gap-3">
                         <span class="text-2xl">🎯</span>
                         <div>
-                            <h4 class="font-bold text-blue-400 mb-2">Ce qu'il faut retenir</h4>
+                            <h4 class="font-bold dl-accent-blue mb-2">Ce qu'il faut retenir</h4>
                             <ul class="text-sm space-y-2 dl-text-muted">
                                 <li>• Un réseau = des neurones organisés en <strong>couches successives</strong></li>
                                 <li>• "Deep" signifie <strong>≥ 2 couches cachées</strong></li>

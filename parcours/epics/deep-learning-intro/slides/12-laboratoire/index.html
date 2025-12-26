@@ -39,6 +39,22 @@
         .dl-select { background: var(--dl-bg-tertiary); color: var(--dl-text-primary); border-color: var(--dl-border-color); }
         .dl-input { background: var(--dl-bg-tertiary); }
 
+        /* Couleurs adaptatives pour le texte */
+        .dl-accent-purple { color: #c084fc !important; }
+        .dl-accent-green { color: #4ade80 !important; }
+        .dl-accent-red { color: #f87171 !important; }
+        .dl-accent-yellow { color: #fbbf24 !important; }
+        .dl-accent-cyan { color: #22d3ee !important; }
+        .dl-accent-orange { color: #fb923c !important; }
+        .dl-accent-blue { color: #60a5fa !important; }
+        [data-theme="light"] .dl-accent-purple { color: #7c3aed !important; }
+        [data-theme="light"] .dl-accent-green { color: #16a34a !important; }
+        [data-theme="light"] .dl-accent-red { color: #dc2626 !important; }
+        [data-theme="light"] .dl-accent-yellow { color: #ca8a04 !important; }
+        [data-theme="light"] .dl-accent-cyan { color: #0891b2 !important; }
+        [data-theme="light"] .dl-accent-orange { color: #ea580c !important; }
+        [data-theme="light"] .dl-accent-blue { color: #2563eb !important; }
+
         .lab-sidebar { background: var(--dl-bg-secondary); border-color: var(--dl-border-color); }
         .lab-panel { background: var(--dl-bg-tertiary); border-color: var(--dl-border-color); }
         .lab-metric { background: var(--dl-bg-secondary); border-color: var(--dl-border-color); }
@@ -105,7 +121,7 @@
                 <div>
                     <div class="flex justify-between text-xs dl-text-muted mb-2">
                         <span>Learning Rate (η)</span>
-                        <span id="lr-val" class="text-blue-400 font-mono font-semibold">0.01</span>
+                        <span id="lr-val" class="dl-accent-blue font-mono font-semibold">0.01</span>
                     </div>
                     <input type="range" id="lr-input" min="0.001" max="0.1" step="0.001" value="0.01" class="dl-input w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-blue-500">
                 </div>
@@ -129,15 +145,15 @@
                     </div>
                     <div class="lab-metric p-2 rounded-lg border">
                         <span class="text-[10px] dl-text-muted block">Train Loss</span>
-                        <span id="metric-loss" class="text-sm font-mono text-red-400 font-bold">0.000</span>
+                        <span id="metric-loss" class="text-sm font-mono dl-accent-red font-bold">0.000</span>
                     </div>
                     <div class="lab-metric p-2 rounded-lg border">
                         <span class="text-[10px] dl-text-muted block">Val Loss</span>
-                        <span id="metric-val-loss" class="text-sm font-mono text-yellow-500 font-bold">0.000</span>
+                        <span id="metric-val-loss" class="text-sm font-mono dl-accent-yellow font-bold">0.000</span>
                     </div>
                     <div class="lab-metric p-2 rounded-lg border relative">
                         <span class="text-[10px] dl-text-muted block">Best Val</span>
-                        <span id="metric-best-loss" class="text-sm font-mono text-green-400 font-bold">∞</span>
+                        <span id="metric-best-loss" class="text-sm font-mono dl-accent-green font-bold">∞</span>
                         <div id="overfit-indicator" class="absolute top-1 right-1 hidden">
                             <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" title="Sur-apprentissage"></div>
                         </div>
@@ -187,7 +203,7 @@
     <div id="toast" class="toast">
         <div class="dl-bg-secondary border dl-border rounded-xl shadow-2xl p-4 flex items-center gap-3 max-w-sm">
             <div id="toast-icon" class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 dl-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
