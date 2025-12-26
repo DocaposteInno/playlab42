@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frameworks & Hardware - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="module">
+        import { initSlide, sendTOC, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+        sendTOC([
+            { id: 'frameworks', label: 'Frameworks', icon: '📦' },
+            { id: 'pytorch', label: 'PyTorch', icon: '🔥' },
+            { id: 'tensorflow', label: 'TensorFlow', icon: '🧮' },
+            { id: 'autres-frameworks', label: 'JAX & Cie', icon: '⚡' },
+            { id: 'nvidia', label: 'NVIDIA', icon: '💚' },
+            { id: 'alternatives', label: 'TPU & AMD', icon: '🔷' },
+            { id: 'cloud', label: 'Cloud GPU', icon: '☁️' }
+        ]);
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- INTRODUCTION -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🛠️</span>
+                <h2 class="text-3xl font-bold dl-text-primary">L'Écosystème du Deep Learning</h2>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    Pour entraîner un réseau de neurones, il faut du <strong>logiciel</strong> (frameworks) et du <strong>matériel</strong> (GPU, TPU). Ces deux mondes sont intimement liés : NVIDIA domine grâce à CUDA, Google pousse JAX sur ses TPU, AMD tente de rattraper avec ROCm.
+                </p>
+
+                <div class="concept-box mb-8">
+                    <h4 class="font-bold text-blue-400 mb-3">Le marché en chiffres (2025)</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-orange-400">85%</div>
+                            <div class="text-xs dl-text-muted">Papers ML en PyTorch</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-green-400">90%+</div>
+                            <div class="text-xs dl-text-muted">GPUs IA = NVIDIA</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-cyan-400">$527 Mds</div>
+                            <div class="text-xs dl-text-muted">Marché DL 2030</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-purple-400">4M+</div>
+                            <div class="text-xs dl-text-muted">Développeurs CUDA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FRAMEWORKS OVERVIEW -->
+        <section id="frameworks" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">📦</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Les Frameworks de Deep Learning</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Un framework fournit les briques de base : tenseurs, autograd, optimiseurs, couches pré-construites. Le choix du framework dépend de votre cas d'usage : recherche, production, ou les deux.
+                </p>
+
+                <!-- Tableau comparatif -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm dl-card rounded-xl border">
+                        <thead class="bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left text-cyan-400">Framework</th>
+                                <th class="p-3 text-left">Éditeur</th>
+                                <th class="p-3 text-left">Usage recherche</th>
+                                <th class="p-3 text-left">Usage production</th>
+                                <th class="p-3 text-left">Force</th>
+                            </tr>
+                        </thead>
+                        <tbody class="dl-text-muted">
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-orange-400">PyTorch</td>
+                                <td class="p-3">Meta</td>
+                                <td class="p-3 text-green-400">~85%</td>
+                                <td class="p-3">~25%</td>
+                                <td class="p-3">Recherche, flexibilité</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-yellow-400">TensorFlow</td>
+                                <td class="p-3">Google</td>
+                                <td class="p-3">~10%</td>
+                                <td class="p-3 text-green-400">~38%</td>
+                                <td class="p-3">Production, mobile</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-purple-400">JAX</td>
+                                <td class="p-3">Google</td>
+                                <td class="p-3">↗ 5%</td>
+                                <td class="p-3">↗</td>
+                                <td class="p-3">Performance, TPU</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-red-400">Keras</td>
+                                <td class="p-3">Indépendant</td>
+                                <td class="p-3">—</td>
+                                <td class="p-3">~17%</td>
+                                <td class="p-3">Simplicité, multi-backend</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs dl-text-muted italic mb-6">
+                    Note : "Usage recherche" = % des papers ML publiés. "Usage production" = part de marché dans les déploiements entreprise. PyTorch domine la recherche (85%), TensorFlow domine la production (38%).
+                </p>
+            </div>
+        </section>
+
+        <!-- PYTORCH -->
+        <section id="pytorch" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🔥</span>
+                <h3 class="text-2xl font-bold dl-text-primary">PyTorch — Le favori des chercheurs</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-orange-400 mb-3">Pourquoi PyTorch domine la recherche</h5>
+                        <ul class="text-sm dl-text-muted space-y-2">
+                            <li>• <strong>Python-first</strong> : code naturel, débugage facile</li>
+                            <li>• <strong>Eager execution</strong> : résultats immédiats</li>
+                            <li>• <strong>85%</strong> des papers ML l'utilisent</li>
+                            <li>• GPT, Llama, Stable Diffusion = PyTorch</li>
+                        </ul>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-cyan-400 mb-3">Chiffres clés</h5>
+                        <ul class="text-sm dl-text-muted space-y-2">
+                            <li>• <strong>72 000</strong> étoiles GitHub</li>
+                            <li>• <strong>17 000+</strong> entreprises utilisatrices</li>
+                            <li>• <strong>torch.compile()</strong> : +25% perf gratuit</li>
+                            <li>• Domaine : NLP, génératif, vision</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Code exemple -->
+                <div class="dl-card rounded-xl border overflow-hidden mb-6">
+                    <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
+                        exemple_pytorch.py
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-purple-400">import</span> torch
+<span class="text-purple-400">import</span> torch.nn <span class="text-purple-400">as</span> nn
+
+<span class="text-slate-500"># Définir un réseau simple</span>
+<span class="text-pink-400">class</span> <span class="text-cyan-400">MLP</span>(nn.Module):
+    <span class="text-pink-400">def</span> <span class="text-yellow-400">__init__</span>(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(<span class="text-green-400">784</span>, <span class="text-green-400">128</span>),
+            nn.ReLU(),
+            nn.Linear(<span class="text-green-400">128</span>, <span class="text-green-400">10</span>)
+        )
+
+    <span class="text-pink-400">def</span> <span class="text-yellow-400">forward</span>(self, x):
+        <span class="text-pink-400">return</span> self.layers(x)
+
+<span class="text-slate-500"># Entraînement en 3 lignes</span>
+model = MLP().cuda()  <span class="text-slate-500"># GPU</span>
+optimizer = torch.optim.Adam(model.parameters())
+loss_fn = nn.CrossEntropyLoss()</code></pre>
+                </div>
+
+                <p class="text-sm dl-text-muted">
+                    <a href="https://pytorch.org/" target="_blank" class="text-blue-400 hover:underline">→ pytorch.org</a> •
+                    <a href="https://pytorch.org/tutorials/" target="_blank" class="text-blue-400 hover:underline">Tutoriels officiels</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- TENSORFLOW -->
+        <section id="tensorflow" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🧮</span>
+                <h3 class="text-2xl font-bold dl-text-primary">TensorFlow — Le champion de la production</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-yellow-400 mb-3">Forces de TensorFlow</h5>
+                        <ul class="text-sm dl-text-muted space-y-2">
+                            <li>• <strong>TF Serving</strong> : déploiement à grande échelle</li>
+                            <li>• <strong>TF Lite</strong> : mobile (Android, iOS, embarqué)</li>
+                            <li>• <strong>TPU</strong> : accélération native Google Cloud</li>
+                            <li>• Robustesse enterprise, SLA production</li>
+                        </ul>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-green-400 mb-3">Keras 3 — La révolution</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Un seul code, trois backends : TensorFlow, PyTorch, ou JAX. Changez de backend avec une ligne.
+                        </p>
+                        <pre class="text-xs bg-slate-800 p-2 rounded"><code><span class="text-purple-400">import</span> os
+os.environ[<span class="text-green-400">"KERAS_BACKEND"</span>] = <span class="text-green-400">"torch"</span>
+<span class="text-purple-400">import</span> keras</code></pre>
+                    </div>
+                </div>
+
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">📱</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">TensorFlow Lite — IA sur mobile</h5>
+                            <p class="text-sm dl-text-secondary">
+                                Conversion et optimisation de modèles pour appareils mobiles et embarqués. Quantization automatique, support Android/iOS/Raspberry Pi. Idéal pour l'inférence on-device.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-sm dl-text-muted">
+                    <a href="https://www.tensorflow.org/" target="_blank" class="text-blue-400 hover:underline">→ tensorflow.org</a> •
+                    <a href="https://keras.io/" target="_blank" class="text-blue-400 hover:underline">keras.io</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- JAX ET AUTRES -->
+        <section id="autres-frameworks" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">⚡</span>
+                <h3 class="text-2xl font-bold dl-text-primary">JAX & Autres Frameworks</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <!-- JAX -->
+                <div class="dl-card p-4 rounded-xl border mb-6">
+                    <h5 class="font-bold text-purple-400 mb-3">JAX — Performance maximale</h5>
+                    <p class="text-sm dl-text-muted mb-3">
+                        Développé par Google, JAX est un "NumPy accéléré" avec différentiation automatique et compilation JIT via XLA. Paradigme fonctionnel pur.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs font-bold text-green-400 mb-1">Avantages</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• Plus rapide que TF/PyTorch sur GPU/TPU</li>
+                                <li>• Idéal pour calcul scientifique</li>
+                                <li>• Croissance rapide en recherche</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-red-400 mb-1">Inconvénients</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• Courbe d'apprentissage raide</li>
+                                <li>• Moins de modèles pré-entraînés</li>
+                                <li>• Écosystème moins mature</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-3">
+                        <a href="https://jax.readthedocs.io/" target="_blank" class="text-blue-400 hover:underline">→ jax.readthedocs.io</a>
+                    </p>
+                </div>
+
+                <!-- Autres frameworks -->
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-cyan-400 mb-2">🤗 Hugging Face</h5>
+                        <p class="text-xs dl-text-muted">
+                            <strong>130 000+ modèles</strong> pré-entraînés. Compatible PyTorch, TF, JAX. Le hub de l'IA open-source.
+                        </p>
+                        <a href="https://huggingface.co/" target="_blank" class="text-xs text-blue-400 hover:underline">huggingface.co</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-blue-400 mb-2">⚡ Lightning</h5>
+                        <p class="text-xs dl-text-muted">
+                            Surcouche PyTorch qui élimine le boilerplate. Training distribué simplifié.
+                        </p>
+                        <a href="https://lightning.ai/" target="_blank" class="text-xs text-blue-400 hover:underline">lightning.ai</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-green-400 mb-2">📦 ONNX</h5>
+                        <p class="text-xs dl-text-muted">
+                            Format universel d'échange. Convertir PyTorch → TF → mobile. Jusqu'à <strong>5x</strong> plus rapide.
+                        </p>
+                        <a href="https://onnx.ai/" target="_blank" class="text-xs text-blue-400 hover:underline">onnx.ai</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NVIDIA -->
+        <section id="nvidia" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">💚</span>
+                <h3 class="text-2xl font-bold dl-text-primary">NVIDIA — Le leader incontesté du GPU</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    NVIDIA détient <strong>90%+</strong> du marché des GPU pour l'IA. Son avantage ? 20 ans d'écosystème CUDA, des milliers de librairies optimisées, et une communauté massive.
+                </p>
+
+                <!-- Tableau GPUs -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm dl-card rounded-xl border">
+                        <thead class="bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left text-green-400">GPU</th>
+                                <th class="p-3 text-left">Mémoire</th>
+                                <th class="p-3 text-left">Performance</th>
+                                <th class="p-3 text-left">Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody class="dl-text-muted text-xs">
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-cyan-400">H100</td>
+                                <td class="p-3">80 GB HBM3</td>
+                                <td class="p-3">2 000 TFLOPS FP16</td>
+                                <td class="p-3">~$25-30K</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-purple-400">H200</td>
+                                <td class="p-3">141 GB HBM3e</td>
+                                <td class="p-3">+76% mémoire vs H100</td>
+                                <td class="p-3">~$30-40K</td>
+                            </tr>
+                            <tr class="border-t border-slate-700 bg-slate-800/50">
+                                <td class="p-3 font-bold text-green-400">B200 (Blackwell)</td>
+                                <td class="p-3">192 GB HBM3e</td>
+                                <td class="p-3">20 PFLOPS FP4</td>
+                                <td class="p-3">~$6/h cloud</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CUDA -->
+                <div class="concept-box mb-6">
+                    <h4 class="font-bold text-blue-400 mb-3">CUDA & cuDNN — L'avantage logiciel</h4>
+                    <p class="text-sm dl-text-secondary mb-3">
+                        <strong>CUDA</strong> est le standard de facto du GPU computing. <strong>cuDNN</strong> fournit des primitives ultra-optimisées pour les réseaux de neurones.
+                    </p>
+                    <ul class="text-sm dl-text-muted space-y-1">
+                        <li>• <strong>4 millions</strong> de développeurs CUDA</li>
+                        <li>• <strong>3 000+</strong> applications accélérées</li>
+                        <li>• Support natif : PyTorch, TensorFlow, JAX, tous les frameworks</li>
+                        <li>• Effet de lock-in : coûts de migration élevés vers AMD/Intel</li>
+                    </ul>
+                </div>
+
+                <p class="text-sm dl-text-muted">
+                    <a href="https://developer.nvidia.com/cuda-zone" target="_blank" class="text-blue-400 hover:underline">→ CUDA Zone</a> •
+                    <a href="https://developer.nvidia.com/cudnn" target="_blank" class="text-blue-400 hover:underline">cuDNN</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- ALTERNATIVES -->
+        <section id="alternatives" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🔷</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Alternatives : TPU, AMD, Apple</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <!-- Google TPU -->
+                <div class="dl-card p-4 rounded-xl border mb-6">
+                    <h5 class="font-bold text-blue-400 mb-3">Google TPU — Conçu pour les Transformers</h5>
+                    <p class="text-sm dl-text-muted mb-3">
+                        Les TPU (Tensor Processing Units) sont des ASIC optimisés pour les opérations matricielles. Exclusifs à Google Cloud.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs font-bold text-cyan-400 mb-1">TPU v7 (Ironwood) — 2025</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• <strong>4 614 TFLOPS</strong> BF16 (10x vs v5p)</li>
+                                <li>• 100% meilleur perf/watt vs v6</li>
+                                <li>• Pods jusqu'à 9 216 chips</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-purple-400 mb-1">Clients majeurs</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• Anthropic (Claude)</li>
+                                <li>• Midjourney</li>
+                                <li>• Salesforce, Snap</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-3">
+                        <a href="https://cloud.google.com/tpu" target="_blank" class="text-blue-400 hover:underline">→ cloud.google.com/tpu</a>
+                    </p>
+                </div>
+
+                <!-- AMD -->
+                <div class="dl-card p-4 rounded-xl border mb-6">
+                    <h5 class="font-bold text-red-400 mb-3">AMD Instinct — Le challenger mémoire</h5>
+                    <p class="text-sm dl-text-muted mb-3">
+                        AMD mise sur la capacité mémoire pour les très grands modèles. MI300X : <strong>192 GB</strong> vs 80 GB pour le H100.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs font-bold text-green-400 mb-1">MI350X (juin 2025)</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• <strong>288 GB</strong> HBM3e</li>
+                                <li>• 4 PFLOPS FP8</li>
+                                <li>• 40% tokens/$ en plus</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-yellow-400 mb-1">ROCm — Le "CUDA d'AMD"</p>
+                            <ul class="text-xs dl-text-muted space-y-1">
+                                <li>• Open-source</li>
+                                <li>• Support PyTorch, vLLM, DeepSpeed</li>
+                                <li>• Maturité en retard sur CUDA</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apple -->
+                <div class="dl-card p-4 rounded-xl border mb-6">
+                    <h5 class="font-bold text-slate-300 mb-3">Apple Silicon — IA on-device</h5>
+                    <p class="text-sm dl-text-muted mb-3">
+                        Les puces M-series intègrent un Neural Engine dédié. Mémoire unifiée CPU/GPU/NPU pour une latence minimale.
+                    </p>
+                    <ul class="text-xs dl-text-muted space-y-1">
+                        <li>• <strong>M5</strong> (oct 2025) : 4x compute GPU vs M4, Neural Accelerators dans chaque cœur GPU</li>
+                        <li>• <strong>MLX</strong> : Framework ML optimisé Apple Silicon</li>
+                        <li>• Idéal pour inférence locale, prototypage, edge AI</li>
+                    </ul>
+                </div>
+
+                <!-- Startups -->
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🚀</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">Startups à surveiller</h5>
+                            <ul class="text-sm dl-text-secondary space-y-1">
+                                <li>• <strong>Cerebras</strong> — Chips à l'échelle du wafer, 40M tokens/sec Llama 70B</li>
+                                <li>• <strong>Groq</strong> — Licence technologique à NVIDIA ($20 Mds, déc 2025), continue en indépendant</li>
+                                <li>• <strong>SambaNova</strong> — Architecture reconfigurable, partenariat SoftBank</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOUD -->
+        <section id="cloud" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">☁️</span>
+                <h3 class="text-2xl font-bold dl-text-primary">GPU dans le Cloud</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Pas besoin d'acheter un GPU à $30K : les cloud providers louent des instances GPU à l'heure. Les "NeoClouds" offrent souvent de meilleurs prix que les Big 3.
+                </p>
+
+                <!-- Tableau cloud -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm dl-card rounded-xl border">
+                        <thead class="bg-slate-800">
+                            <tr>
+                                <th class="p-3 text-left text-cyan-400">Provider</th>
+                                <th class="p-3 text-left">H100 (8x)</th>
+                                <th class="p-3 text-left">A100</th>
+                                <th class="p-3 text-left">Spécificité</th>
+                            </tr>
+                        </thead>
+                        <tbody class="dl-text-muted text-xs">
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-orange-400">AWS</td>
+                                <td class="p-3">~$55/h</td>
+                                <td class="p-3">~$22/h (8x)</td>
+                                <td class="p-3">Leader, intégration services</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-blue-400">GCP</td>
+                                <td class="p-3">~$29/h spot</td>
+                                <td class="p-3">~$17/h spot (8x)</td>
+                                <td class="p-3">TPU exclusifs, Vertex AI</td>
+                            </tr>
+                            <tr class="border-t border-slate-700">
+                                <td class="p-3 font-bold text-cyan-400">Azure</td>
+                                <td class="p-3">Variable</td>
+                                <td class="p-3">~$3-12/h (4x V100)</td>
+                                <td class="p-3">InfiniBand 200 Gbps</td>
+                            </tr>
+                            <tr class="border-t border-slate-700 bg-green-900/20">
+                                <td class="p-3 font-bold text-green-400">Lambda Labs</td>
+                                <td class="p-3">$2.49-3.29/h</td>
+                                <td class="p-3">$1.29/h</td>
+                                <td class="p-3">Meilleur rapport qualité/prix</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="concept-box mb-6">
+                    <h4 class="font-bold text-blue-400 mb-3">Conseils pour économiser</h4>
+                    <ul class="text-sm dl-text-muted space-y-2">
+                        <li>• <strong>Spot/Preemptible</strong> : jusqu'à 90% de réduction (mais interruptible)</li>
+                        <li>• <strong>NeoClouds</strong> (Lambda, CoreWeave, Vast.ai) : 50-70% moins cher que Big 3</li>
+                        <li>• <strong>Engagements courts</strong> : 1 an max (la techno IA évolue trop vite)</li>
+                        <li>• <strong>Google Colab</strong> : gratuit pour débuter (T4), Pro à $10/mois</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section class="mb-16">
+            <div class="concept-box">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <h4 class="font-bold text-blue-400 mb-3">Ce qu'il faut retenir</h4>
+                        <ul class="text-sm space-y-2 dl-text-muted">
+                            <li>• <strong>PyTorch</strong> domine la recherche (85% des papers), <strong>TensorFlow</strong> la production</li>
+                            <li>• <strong>NVIDIA + CUDA</strong> = 90% du marché, verrouillage technologique fort</li>
+                            <li>• <strong>TPU</strong> excellent pour Transformers sur GCP, <strong>AMD</strong> pour l'inférence haute capacité</li>
+                            <li>• Le cloud démocratise l'accès : H100 à $2-3/h en spot</li>
+                            <li>• <strong>Keras 3</strong> et <strong>ONNX</strong> permettent la portabilité entre frameworks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOURCES -->
+        <section class="mb-16">
+            <details class="dl-card p-4 rounded-xl border">
+                <summary class="font-bold dl-text-primary cursor-pointer">📚 Sources et références</summary>
+                <div class="mt-4 text-sm dl-text-secondary space-y-4">
+
+                    <div>
+                        <h5 class="font-bold text-cyan-400 mb-2">Frameworks</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://pytorch.org/" target="_blank" class="text-blue-400 hover:underline">PyTorch Official</a></li>
+                            <li>• <a href="https://www.tensorflow.org/" target="_blank" class="text-blue-400 hover:underline">TensorFlow Official</a></li>
+                            <li>• <a href="https://jax.readthedocs.io/" target="_blank" class="text-blue-400 hover:underline">JAX Documentation</a></li>
+                            <li>• <a href="https://6sense.com/tech/data-science-machine-learning/pytorch-market-share" target="_blank" class="text-blue-400 hover:underline">PyTorch Market Share - 6sense</a></li>
+                            <li>• <a href="https://huggingface.co/blog/convert-transformers-to-onnx" target="_blank" class="text-blue-400 hover:underline">ONNX Conversion - Hugging Face</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold text-cyan-400 mb-2">Hardware</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://www.exxactcorp.com/blog/hpc/comparing-nvidia-tensor-core-gpus" target="_blank" class="text-blue-400 hover:underline">Blackwell vs Hopper - Exxact</a></li>
+                            <li>• <a href="https://cloud.google.com/tpu/docs/v5p" target="_blank" class="text-blue-400 hover:underline">TPU v5p Documentation - GCP</a></li>
+                            <li>• <a href="https://www.bentoml.com/blog/amd-data-center-gpus-mi250x-mi300x-mi350x-and-beyond" target="_blank" class="text-blue-400 hover:underline">AMD MI Series - BentoML</a></li>
+                            <li>• <a href="https://habana.ai/products/gaudi3/" target="_blank" class="text-blue-400 hover:underline">Intel Gaudi 3 - Habana</a></li>
+                            <li>• <a href="https://machinelearning.apple.com/research/exploring-llms-mlx-m5" target="_blank" class="text-blue-400 hover:underline">M5 MLX Performance - Apple ML Research</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold text-cyan-400 mb-2">Cloud</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://lambdalabs.com/service/gpu-cloud" target="_blank" class="text-blue-400 hover:underline">Lambda Labs GPU Cloud</a></li>
+                            <li>• <a href="https://cast.ai/blog/cloud-pricing-comparison/" target="_blank" class="text-blue-400 hover:underline">Cloud Pricing Comparison - Cast.ai</a></li>
+                            <li>• <a href="https://modal.com/blog/nvidia-b200-pricing" target="_blank" class="text-blue-400 hover:underline">B200 Cloud Pricing - Modal</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Slide 9/11</p>
+    </footer>
+
+</body>
+</html>

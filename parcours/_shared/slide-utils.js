@@ -9,12 +9,106 @@ import { ParcoursGlossary } from '/lib/parcours/ParcoursGlossary.js';
 let _glossaryInstance = null;
 
 /**
- * Initialise la slide avec le thème
+ * Initialise la slide avec le thème et la numérotation automatique du footer.
+ *
+ * Le footer sera automatiquement mis à jour avec le format :
+ * "Titre de l'epic — Titre de la slide (X/Y)"
+ *
+ * Pour que cela fonctionne, le footer doit contenir un élément avec
+ * l'attribut `data-slide-footer` ou être un élément `.dl-footer p`.
+ *
+ * @example
+ * <footer class="dl-footer">
+ *   <p data-slide-footer></p>
+ * </footer>
  */
 export async function initSlide() {
   // Importer et initialiser le thème
   const { initTheme } = await import('/lib/theme.js');
   initTheme();
+
+  // Initialiser la numérotation du footer
+  await initSlideFooter();
+}
+
+/**
+ * Extrait les IDs de slides depuis la structure content de l'epic.
+ * Gère les structures imbriquées (sections avec content).
+ *
+ * @param {Array} content - Structure content de l'epic
+ * @returns {string[]} Liste ordonnée des IDs de slides
+ */
+function extractSlideIds(content) {
+  const ids = [];
+
+  for (const item of content) {
+    if (item.content && Array.isArray(item.content)) {
+      // Section avec sous-éléments (ex: { id: "theorie", content: [...] })
+      ids.push(...extractSlideIds(item.content));
+    } else if (item.id) {
+      // Slide directe (ex: { id: "01-introduction" })
+      ids.push(item.id);
+    }
+  }
+
+  return ids;
+}
+
+/**
+ * Initialise le footer de la slide avec la numérotation automatique.
+ * Charge epic.json et slide.json pour déterminer la position.
+ */
+async function initSlideFooter() {
+  try {
+    // Détecter l'epic et la slide depuis l'URL
+    // URL typique : /parcours/epics/mon-epic/slides/01-intro/index.html
+    const pathMatch = window.location.pathname.match(
+      /\/parcours\/epics\/([^/]+)\/slides\/([^/]+)\//
+    );
+    if (!pathMatch) return;
+
+    const [, epicId, slideId] = pathMatch;
+
+    // Charger epic.json et slide.json en parallèle
+    const [epicResponse, slideResponse] = await Promise.all([
+      fetch('../../epic.json'),
+      fetch('./slide.json')
+    ]);
+
+    if (!epicResponse.ok || !slideResponse.ok) return;
+
+    const [epicData, slideData] = await Promise.all([
+      epicResponse.json(),
+      slideResponse.json()
+    ]);
+
+    // Extraire la liste ordonnée des slides depuis la structure content
+    const slideIds = extractSlideIds(epicData.content || []);
+
+    // Trouver la position de la slide courante
+    const currentIndex = slideIds.indexOf(slideId);
+    if (currentIndex === -1) return;
+
+    const slideNumber = currentIndex + 1;
+    const totalSlides = slideIds.length;
+
+    // Construire le texte du footer
+    const epicTitle = epicData.title || epicId;
+    const slideTitle = slideData.title || slideId;
+    const footerText = `${epicTitle} — ${slideTitle} (${slideNumber}/${totalSlides})`;
+
+    // Mettre à jour le footer
+    const footerElement =
+      document.querySelector('[data-slide-footer]') ||
+      document.querySelector('.dl-footer p');
+
+    if (footerElement) {
+      footerElement.textContent = footerText;
+    }
+  } catch (error) {
+    // Silencieux en cas d'erreur (fallback sur le contenu statique)
+    console.debug('[slide-utils] Footer auto-numbering failed:', error.message);
+  }
 }
 
 /**

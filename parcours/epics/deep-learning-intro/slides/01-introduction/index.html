@@ -26,10 +26,10 @@
                 Comment les réseaux de neurones <span class="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-500 bg-clip-text text-transparent">apprennent</span>
             </h1>
             <p class="max-w-2xl mx-auto text-lg dl-text-muted mb-8 leading-relaxed">
-                Un voyage pédagogique de zéro à expert, avec des analogies, des mathématiques progressives, et un laboratoire interactif pour expérimenter en temps réel.
+                Un voyage pédagogique du débutant à l'intermédiaire, avec des analogies, des mathématiques progressives, et un laboratoire interactif pour expérimenter en temps réel.
             </p>
             <div class="flex flex-wrap justify-center gap-4 text-sm">
-                <span class="dl-badge px-3 py-1 rounded-full">~30 min de lecture</span>
+                <span class="dl-badge px-3 py-1 rounded-full">~45 min de lecture</span>
                 <span class="dl-badge px-3 py-1 rounded-full">Niveau : Débutant → Intermédiaire</span>
                 <span class="dl-badge px-3 py-1 rounded-full">Lab interactif inclus</span>
             </div>
@@ -39,32 +39,157 @@
 
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-        <!-- CHAPITRE 1: L'OBJECTIF -->
-        <section id="objectif" class="mb-16">
+        <!-- SECTION 1: Où se place le Deep Learning -->
+        <section id="position" class="mb-16">
             <div class="flex items-center gap-3 mb-6">
                 <span class="text-3xl">🎯</span>
-                <h2 class="text-3xl font-bold dl-text-primary">L'Objectif</h2>
+                <h2 class="text-3xl font-bold dl-text-primary">Où se place le Deep Learning ?</h2>
+            </div>
+
+            <p class="dl-text-secondary mb-8">
+                Avant de plonger dans les détails, situons notre sujet. Le Deep Learning est un sous-ensemble du Machine Learning, lui-même sous-ensemble de l'Intelligence Artificielle.
+            </p>
+
+            <!-- Cercles concentriques -->
+            <div class="relative h-80 flex items-center justify-center mb-8">
+                <!-- IA (plus grand cercle) -->
+                <div class="absolute w-72 h-72 rounded-full border-2 border-blue-500/30 bg-blue-500/5 flex items-start justify-center pt-4">
+                    <span class="text-sm font-bold text-blue-400">Intelligence Artificielle</span>
+                </div>
+
+                <!-- ML (cercle moyen) -->
+                <div class="absolute w-52 h-52 rounded-full border-2 border-cyan-500/40 bg-cyan-500/8 flex items-start justify-center pt-4">
+                    <span class="text-sm font-bold text-cyan-400">Machine Learning</span>
+                </div>
+
+                <!-- DL (cercle le plus petit) -->
+                <div class="absolute w-32 h-32 rounded-full border-2 border-purple-500 bg-purple-500/20 flex items-center justify-center">
+                    <span class="text-xs font-bold text-purple-300 text-center">Deep<br>Learning</span>
+                </div>
+            </div>
+
+            <!-- Ce qui distingue le DL -->
+            <div class="concept-box mb-6">
+                <h4 class="font-bold text-blue-400 mb-4">Ce qui distingue le Deep Learning</h4>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="mb-2"><strong class="text-purple-400">Réseaux profonds</strong></p>
+                        <p class="dl-text-muted text-xs">Plusieurs couches cachées qui transforment progressivement les données en représentations abstraites.</p>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong class="text-purple-400">Features automatiques</strong></p>
+                        <p class="dl-text-muted text-xs">Le réseau découvre seul les caractéristiques pertinentes (pas de feature engineering manuel).</p>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong class="text-purple-400">Big Data</strong></p>
+                        <p class="dl-text-muted text-xs">Nécessite beaucoup de données (10K à millions d'exemples) pour bien généraliser.</p>
+                    </div>
+                    <div>
+                        <p class="mb-2"><strong class="text-purple-400">Puissance GPU</strong></p>
+                        <p class="dl-text-muted text-xs">Les calculs massifs sont accélérés par des processeurs graphiques (GPU/TPU).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pourquoi maintenant -->
+            <div class="dl-card border-l-4 border-yellow-500 p-4 bg-yellow-500/5">
+                <p class="font-bold text-yellow-400 mb-2">Pourquoi le Deep Learning explose maintenant ?</p>
+                <div class="grid md:grid-cols-3 gap-3 text-xs dl-text-secondary">
+                    <div class="flex items-center gap-2">
+                        <span>📲</span>
+                        <span><strong>Big Data</strong> : internet, IoT, réseaux sociaux</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span>⚙️</span>
+                        <span><strong>GPUs</strong> : calcul parallèle abordable</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span>📚</span>
+                        <span><strong>Frameworks</strong> : TensorFlow, PyTorch</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: L'inversion du paradigme -->
+        <section id="paradigme" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🔄</span>
+                <h2 class="text-3xl font-bold dl-text-primary">L'inversion du paradigme</h2>
+            </div>
+
+            <p class="dl-text-secondary mb-6">
+                La différence fondamentale entre la <dfn>programmation classique</dfn> et le <dfn>Machine Learning</dfn> tient en une phrase : <strong>qui écrit les règles ?</strong>
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <!-- Programmation classique -->
+                <div class="dl-card p-6 rounded-xl border border-blue-500/30 bg-blue-500/5">
+                    <h3 class="text-lg font-bold text-blue-400 mb-4">Programmation Classique</h3>
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center gap-2 text-sm">
+                            <span class="px-3 py-1 rounded bg-blue-500/20">Règles</span>
+                            <span>+</span>
+                            <span class="px-3 py-1 rounded bg-blue-500/20">Données</span>
+                            <span>→</span>
+                            <span class="px-3 py-1 rounded bg-blue-500/30 font-bold">Résultat</span>
+                        </div>
+                    </div>
+                    <p class="text-sm dl-text-secondary mb-3">
+                        <strong>Vous</strong> écrivez explicitement les règles. L'ordinateur les applique.
+                    </p>
+                    <div class="text-xs dl-text-muted bg-black/20 p-3 rounded font-mono">
+                        if (oreilles_pointues && moustaches)<br>
+                        &nbsp;&nbsp;return "chat";
+                    </div>
+                </div>
+
+                <!-- Machine Learning -->
+                <div class="dl-card p-6 rounded-xl border border-purple-500/30 bg-purple-500/5">
+                    <h3 class="text-lg font-bold text-purple-400 mb-4">Machine Learning</h3>
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center gap-2 text-sm">
+                            <span class="px-3 py-1 rounded bg-purple-500/20">Données</span>
+                            <span>+</span>
+                            <span class="px-3 py-1 rounded bg-purple-500/20">Résultats</span>
+                            <span>→</span>
+                            <span class="px-3 py-1 rounded bg-purple-500/30 font-bold">Règles</span>
+                        </div>
+                    </div>
+                    <p class="text-sm dl-text-secondary mb-3">
+                        <strong>L'algorithme</strong> découvre les règles à partir d'exemples.
+                    </p>
+                    <div class="text-xs dl-text-muted bg-black/20 p-3 rounded font-mono">
+                        model = train(10000_photos_chat)<br>
+                        model.predict(nouvelle_photo)
+                    </div>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🍰</span>
+                    <div>
+                        <h4 class="font-bold text-green-400 mb-2">Analogie : La recette vs l'intuition</h4>
+                        <p class="dl-text-secondary text-sm">
+                            <strong>Classique</strong> : Suivre une recette précise (200g de farine, 30 min à 180°C).<br>
+                            <strong>ML</strong> : Goûter 100 gâteaux et développer une intuition des bons ingrédients.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Le processus d'apprentissage -->
+        <section id="processus" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🔁</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Le processus d'apprentissage</h2>
             </div>
 
             <div class="prose-content dl-text-secondary">
                 <p class="mb-6">
-                    Imaginez que vous devez apprendre à un enfant à reconnaître des chats dans des photos. Vous ne lui donnez pas une liste de règles ("un chat a des oreilles pointues, des moustaches..."). À la place, vous lui montrez des milliers de photos en disant "chat" ou "pas chat". Petit à petit, il <em>apprend</em> à reconnaître les patterns.
-                </p>
-
-                <div class="analogy-box">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">🧠</span>
-                        <div>
-                            <h4 class="font-bold text-green-400 mb-2">Analogie : L'élève et le professeur</h4>
-                            <p class="dl-text-secondary text-sm">
-                                Un réseau de neurones est comme un élève qui fait un exercice, vérifie sa réponse, puis <strong>corrige ses erreurs</strong>. La rétropropagation est le mécanisme qui lui permet de savoir <em>comment</em> corriger chaque partie de son raisonnement.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <p class="mb-6">
-                    Le processus d'apprentissage d'un réseau de neurones se résume en <strong>3 étapes</strong> répétées des milliers de fois :
+                    Un réseau de neurones apprend comme un élève qui fait un exercice, vérifie sa réponse, puis <strong>corrige ses erreurs</strong>. Ce cycle se répète des milliers de fois :
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-4 my-8">
@@ -86,22 +211,44 @@
                 </div>
 
                 <div class="concept-box">
-                    <h4 class="font-bold text-blue-400 mb-3">Ce que vous allez apprendre</h4>
-                    <ul class="list-disc list-inside space-y-2 text-sm dl-text-secondary">
-                        <li>Comment fonctionne un <strong>neurone artificiel</strong></li>
-                        <li>La <strong>propagation avant</strong> et le calcul des prédictions</li>
-                        <li>La <strong>rétropropagation</strong> et la règle de la chaîne</li>
-                        <li>L'optimiseur <strong>Adam</strong> et la descente de gradient</li>
-                        <li>Les <strong>pièges classiques</strong> (vanishing gradient, overfitting...)</li>
-                    </ul>
+                    <h4 class="font-bold text-blue-400 mb-2">La rétropropagation</h4>
+                    <p class="text-sm dl-text-secondary">
+                        C'est le mécanisme qui permet au réseau de savoir <em>comment</em> corriger chaque partie de son raisonnement. Nous l'explorerons en détail dans les slides suivants.
+                    </p>
                 </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Ce parcours -->
+        <section id="plan">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">📝</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Ce parcours</h2>
+            </div>
+
+            <div class="dl-card bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-l-4 border-purple-500 p-6">
+                <p class="dl-text-secondary mb-4">
+                    Ce parcours se concentre sur <strong class="text-yellow-400">l'apprentissage supervisé</strong> avec des réseaux de neurones — le cas le plus courant et le fondement des autres approches.
+                </p>
+
+                <h4 class="font-bold text-blue-400 mb-3">Vous allez découvrir :</h4>
+                <ul class="list-disc list-inside space-y-2 text-sm dl-text-secondary">
+                    <li>Les différents <strong>types d'apprentissage</strong> (supervisé, non-supervisé, renforcement)</li>
+                    <li>Comment fonctionne un <strong>neurone artificiel</strong></li>
+                    <li>La <strong>propagation avant</strong> et le calcul des prédictions</li>
+                    <li>La <strong>rétropropagation</strong> et la règle de la chaîne</li>
+                    <li>L'optimiseur <strong>Adam</strong> et la descente de gradient</li>
+                    <li>Les <strong>pièges classiques</strong> (vanishing gradient, overfitting...)</li>
+                    <li>Les <strong>architectures modernes</strong> (CNN, RNN, Transformers)</li>
+                    <li>Un <strong>laboratoire interactif</strong> pour expérimenter</li>
+                </ul>
             </div>
         </section>
 
     </main>
 
     <footer class="dl-footer border-t py-8 text-center text-sm">
-        <p>Deep Learning pour l'impatient — Slide 1/8</p>
+        <p>Deep Learning pour l'impatient — Introduction</p>
     </footer>
 
 </body>

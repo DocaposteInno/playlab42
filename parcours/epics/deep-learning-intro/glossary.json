@@ -204,6 +204,150 @@
       "long": "Ensemble de méthodes pour améliorer la généralisation : L1/L2 regularization (pénalité sur les poids), dropout, early stopping, data augmentation, batch normalization. L'idée est de contraindre le modèle pour éviter qu'il mémorise les données.",
       "see": ["overfitting", "dropout"],
       "category": "Techniques"
+    },
+    "apprentissage supervisé": {
+      "short": "Apprendre à partir de données étiquetées où la réponse attendue est connue",
+      "long": "Type d'apprentissage où le modèle dispose d'exemples avec leur label (étiquette). Comme un élève avec un professeur qui corrige. Le modèle apprend à prédire le label à partir des caractéristiques. Exemples : classification d'images, prédiction de prix, détection de spam.",
+      "see": ["apprentissage non supervisé", "apprentissage par renforcement", "classification", "régression"],
+      "category": "Types d'apprentissage"
+    },
+    "apprentissage non supervisé": {
+      "short": "Découvrir des structures cachées dans les données sans étiquettes",
+      "long": "Type d'apprentissage où les données n'ont pas de labels. Le modèle doit découvrir lui-même des patterns, des groupes ou des anomalies. Utilisé pour le clustering (segmentation clients), la détection d'anomalies, la réduction de dimensionnalité.",
+      "see": ["apprentissage supervisé", "clustering"],
+      "category": "Types d'apprentissage"
+    },
+    "apprentissage par renforcement": {
+      "short": "Apprendre par essai-erreur en recevant des récompenses ou punitions",
+      "long": "Type d'apprentissage où un agent interagit avec un environnement et apprend à maximiser une récompense cumulative. Pas de labels, mais des signaux de reward après chaque action. Utilisé pour les jeux (AlphaGo), la robotique, les systèmes de contrôle.",
+      "see": ["agent", "récompense", "politique", "apprentissage supervisé"],
+      "category": "Types d'apprentissage"
+    },
+    "label": {
+      "short": "Étiquette associée à une donnée indiquant la réponse attendue",
+      "long": "En apprentissage supervisé, chaque exemple d'entraînement est accompagné d'un label (ou étiquette) qui indique la bonne réponse. Pour une image de chat, le label est 'chat'. Pour une maison, le label peut être son prix. L'annotation de labels est souvent coûteuse et réalisée par des humains.",
+      "see": ["apprentissage supervisé", "classification"],
+      "category": "Types d'apprentissage"
+    },
+    "clustering": {
+      "short": "Regrouper automatiquement des données similaires sans labels",
+      "long": "Technique d'apprentissage non supervisé qui partitionne les données en groupes (clusters) de points similaires. Algorithmes courants : K-means, DBSCAN, hierarchical clustering. Utilisé pour la segmentation clients, l'organisation de documents, la compression.",
+      "see": ["apprentissage non supervisé"],
+      "category": "Types d'apprentissage"
+    },
+    "agent": {
+      "short": "Entité qui apprend et agit dans un environnement (apprentissage par renforcement)",
+      "long": "En apprentissage par renforcement, l'agent est l'entité qui observe l'état de l'environnement, choisit une action, reçoit une récompense, et apprend de cette expérience. L'agent peut être un robot, un personnage de jeu vidéo, ou un programme de trading.",
+      "see": ["apprentissage par renforcement", "récompense", "politique"],
+      "category": "Types d'apprentissage"
+    },
+    "récompense": {
+      "short": "Signal numérique indiquant la qualité d'une action (reward)",
+      "long": "En apprentissage par renforcement, la récompense (reward) est le feedback que l'agent reçoit après une action. Positive pour les bonnes actions, négative pour les mauvaises. L'objectif de l'agent est de maximiser la somme des récompenses sur le long terme.",
+      "see": ["agent", "politique", "apprentissage par renforcement"],
+      "category": "Types d'apprentissage"
+    },
+    "politique": {
+      "short": "Stratégie apprise par l'agent pour choisir ses actions (policy)",
+      "long": "En apprentissage par renforcement, la politique (policy) est la fonction qui détermine quelle action l'agent doit prendre dans chaque état. Elle peut être déterministe (une action par état) ou stochastique (distribution de probabilités sur les actions).",
+      "see": ["agent", "récompense", "apprentissage par renforcement"],
+      "category": "Types d'apprentissage"
+    },
+    "CNN": {
+      "short": "Réseau convolutif : architecture spécialisée pour les images",
+      "long": "Convolutional Neural Network. Architecture utilisant des convolutions pour détecter des patterns locaux (lignes, textures, formes) à différentes échelles. Chaque couche convolutive apprend des filtres. Domine la vision par ordinateur depuis AlexNet (2012).",
+      "see": ["convolution", "RNN", "Transformer"],
+      "category": "Architectures"
+    },
+    "convolution": {
+      "short": "Opération qui scanne une image avec un filtre pour détecter des patterns",
+      "long": "Opération mathématique où un petit filtre (kernel, typiquement 3×3) glisse sur l'image et calcule une somme pondérée à chaque position. Permet de détecter des caractéristiques locales (bords, coins, textures) indépendamment de leur position.",
+      "see": ["CNN"],
+      "category": "Architectures"
+    },
+    "RNN": {
+      "short": "Réseau récurrent : architecture avec mémoire pour les séquences",
+      "long": "Recurrent Neural Network. Architecture où les neurones ont des connexions qui bouclent sur eux-mêmes, créant une mémoire des entrées précédentes. Adaptée aux séquences (texte, audio, séries temporelles). Limite : difficulté avec les longues dépendances.",
+      "see": ["LSTM", "Transformer", "CNN"],
+      "category": "Architectures"
+    },
+    "LSTM": {
+      "short": "RNN amélioré avec des portes pour contrôler la mémoire à long terme",
+      "long": "Long Short-Term Memory. Variante de RNN avec des mécanismes de portes (forget, input, output) qui contrôlent le flux d'information. Résout partiellement le problème du vanishing gradient et permet de capturer des dépendances plus longues.",
+      "see": ["RNN", "vanishing gradient", "Transformer"],
+      "category": "Architectures"
+    },
+    "Transformer": {
+      "short": "Architecture basée sur l'attention, base des LLMs modernes",
+      "long": "Architecture révolutionnaire (2017) qui remplace la récurrence par l'attention. Traite toute la séquence en parallèle et modélise les relations entre tous les tokens. Base de BERT, GPT, et tous les grands modèles de langage (LLMs). S'étend aussi à la vision (ViT).",
+      "see": ["attention", "RNN", "CNN"],
+      "category": "Architectures"
+    },
+    "attention": {
+      "short": "Mécanisme permettant au modèle de se concentrer sur les parties pertinentes de l'entrée",
+      "long": "Mécanisme qui calcule des poids d'importance entre tous les éléments d'une séquence. Permet au modèle de 'regarder' n'importe quelle partie du contexte, pas seulement les voisins proches. Self-attention : chaque token attend sur tous les autres. Clé du succès des Transformers.",
+      "see": ["Transformer"],
+      "category": "Architectures"
+    },
+    "diffusion": {
+      "short": "Architecture qui génère des images en débruitant progressivement du bruit",
+      "long": "Modèle de diffusion. Approche générative où le modèle apprend à inverser un processus de bruitage. Pour générer, on part de bruit pur et on applique itérativement le débruitage. Utilisé par DALL-E, Midjourney, Stable Diffusion pour la génération d'images.",
+      "see": ["CNN", "Transformer"],
+      "category": "Architectures"
+    },
+    "SNN": {
+      "short": "Réseau de neurones à impulsions : communique par trains de spikes comme le cerveau",
+      "long": "Spiking Neural Network. Troisième génération de réseaux de neurones (Maass, 1997). Les neurones communiquent par impulsions binaires (spikes) au lieu de valeurs continues. Plus proche de la biologie, très efficace énergétiquement. Nécessite du hardware spécialisé (Intel Loihi, IBM TrueNorth).",
+      "see": ["neurone", "neuromorphique"],
+      "category": "Neurones alternatifs"
+    },
+    "neurone liquide": {
+      "short": "Neurone dont les constantes de temps varient selon l'entrée (LTC)",
+      "long": "Liquid Time-Constant Network. Développé par Ramin Hasani (MIT CSAIL, 2020), inspiré du ver C. elegans. Les paramètres temporels s'adaptent dynamiquement au contexte. Permet une compacité remarquable (navigation de drone avec 19 neurones). Commercialisé par Liquid AI.",
+      "see": ["neurone", "SNN"],
+      "category": "Neurones alternatifs"
+    },
+    "reservoir computing": {
+      "short": "Paradigme où un réseau récurrent fixe est utilisé comme réservoir de calcul",
+      "long": "Echo State Networks (Jaeger, 2001) et Liquid State Machines (Maass, 2002). Un réseau récurrent aléatoire et fixe transforme les entrées, seule la couche de sortie est entraînée. Avantage : entraînement ultra-rapide (régression linéaire). Excellent pour les séries temporelles.",
+      "see": ["RNN", "neurone liquide"],
+      "category": "Neurones alternatifs"
+    },
+    "neuromorphique": {
+      "short": "Hardware spécialisé qui émule le fonctionnement du cerveau",
+      "long": "Neuromorphic computing. Processeurs conçus pour exécuter efficacement les réseaux de neurones à impulsions (SNNs). Exemples : Intel Loihi (1M neurones), IBM TrueNorth. Avantages : très faible consommation énergétique, traitement événementiel. Utilisé en edge computing.",
+      "see": ["SNN"],
+      "category": "Neurones alternatifs"
+    },
+    "Mamba": {
+      "short": "Alternative aux Transformers avec complexité linéaire basée sur les State Space Models",
+      "long": "Architecture développée par Albert Gu et Tri Dao (2023). Utilise des State Space Models sélectifs : les paramètres dépendent de l'entrée, permettant de choisir quoi retenir. Complexité O(n) au lieu de O(n²), throughput 5× supérieur, contexte jusqu'à 1M tokens.",
+      "see": ["Transformer", "SSM", "RWKV"],
+      "category": "Architectures émergentes"
+    },
+    "SSM": {
+      "short": "State Space Model : modèle mathématique issu de la théorie du contrôle",
+      "long": "Modèle d'espace d'états. Représentation mathématique de systèmes dynamiques avec équations différentielles. Appliqué au deep learning par Albert Gu (S4, 2021). Permet un traitement linéaire des séquences. Mamba ajoute la sélectivité pour améliorer les performances.",
+      "see": ["Mamba", "RNN"],
+      "category": "Architectures émergentes"
+    },
+    "RWKV": {
+      "short": "RNN qui scale comme un Transformer : entraînement parallèle, inférence O(1)",
+      "long": "Receptance Weighted Key Value. Créé par Bo Peng (2021-2023), maintenu par la Linux Foundation. Premier RNN scalé à des dizaines de milliards de paramètres. 100% sans attention, contexte théoriquement illimité. Combine les avantages RNN (inférence O(1)) et Transformer (entraînement parallèle).",
+      "see": ["RNN", "Transformer", "Mamba"],
+      "category": "Architectures émergentes"
+    },
+    "KAN": {
+      "short": "Réseau où les fonctions d'activation sont sur les arêtes, pas les nœuds",
+      "long": "Kolmogorov-Arnold Network. Développé par Ziming Liu et Max Tegmark (MIT, 2024). Basé sur le théorème de Kolmogorov-Arnold (1957). Remplace les poids scalaires par des fonctions apprises (splines). Avantages : haute interprétabilité, découverte de lois physiques, efficacité en paramètres.",
+      "see": ["neurone", "activation"],
+      "category": "Architectures émergentes"
+    },
+    "LFM": {
+      "short": "Foundation model basé sur les neurones liquides (Liquid AI)",
+      "long": "Liquid Foundation Model. Modèles développés par Liquid AI (startup MIT, valorisation $2.35B). Combinent neurones liquides et techniques modernes. LFM2 (2025) : 2× plus rapide que Qwen3 sur CPU. Optimisés pour l'edge computing et l'inférence sur appareil.",
+      "see": ["neurone liquide", "Mamba"],
+      "category": "Architectures émergentes"
     }
   }
 }

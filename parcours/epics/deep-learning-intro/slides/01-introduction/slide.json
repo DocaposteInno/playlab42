@@ -1,8 +1,8 @@
 {
   "id": "01-introduction",
   "title": "Introduction",
-  "description": "Découvrez comment les réseaux de neurones apprennent",
+  "description": "ML vs programmation classique, les 3 types d'apprentissage, et où se place le Deep Learning",
   "type": "page",
   "icon": "🎯",
-  "duration": "3 min"
+  "duration": "8 min"
 }

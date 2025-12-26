@@ -30,7 +30,7 @@
 
                 <!-- INTRODUCTION NARRATIVE -->
                 <p class="text-lg mb-6 dl-text-primary font-medium">
-                    Le neurone artificiel est probablement l'algorithme le plus simple que vous verrez dans ce cours : une somme pondérée et une fonction d'activation. La vraie question n'est pas <em>"comment ça marche ?"</em> mais <em>"comment quelque chose d'aussi basique peut-il apprendre à conduire une voiture ou battre un champion du monde aux échecs ?"</em>
+                    Le neurone artificiel est l'une des briques les plus simples du Deep Learning : une somme pondérée et une fonction d'activation. La vraie question n'est pas <em>"comment ça marche ?"</em> mais <em>"comment quelque chose d'aussi basique peut-il apprendre à conduire une voiture ou battre un champion du monde aux échecs ?"</em>
                 </p>
 
                 <h3 class="text-xl font-bold dl-text-primary mt-8 mb-4">Un peu d'histoire</h3>
@@ -40,7 +40,7 @@
                 </p>
 
                 <p class="mb-4">
-                    En <strong>1958</strong>, Frank Rosenblatt concrétise cette vision avec le <strong>Perceptron</strong>, une machine capable d'<em>apprendre</em> en ajustant automatiquement ses paramètres. L'enthousiasme est immense... jusqu'en 1969, quand Minsky et Papert démontrent qu'un seul neurone ne peut pas résoudre des problèmes aussi simples que le XOR. C'est le premier "hiver de l'IA".
+                    En <strong>1958</strong>, Frank Rosenblatt concrétise cette vision avec le <strong>Perceptron</strong>, une machine capable d'<em>apprendre</em> en ajustant automatiquement ses paramètres. L'enthousiasme est immense... jusqu'en 1969, quand Minsky et Papert démontrent qu'un seul neurone ne peut pas résoudre des problèmes aussi simples que le XOR. C'est le premier "hiver du connexionnisme".
                 </p>
 
                 <p class="mb-6">
@@ -338,6 +338,17 @@
                             <p class="dl-text-muted text-xs mt-1">max(0, z). La plus populaire aujourd'hui.</p>
                         </div>
                     </div>
+
+                    <!-- POURQUOI LA NON-LINÉARITÉ -->
+                    <div class="mt-4 p-3 rounded border border-yellow-500/30 bg-yellow-500/5">
+                        <div class="flex items-start gap-2">
+                            <span class="text-lg">💡</span>
+                            <p class="dl-text-secondary text-xs">
+                                <strong class="text-yellow-500">Pourquoi la non-linéarité ?</strong>
+                                Sans fonction d'activation, un réseau de 100 couches serait équivalent à... une seule couche ! La composition de fonctions linéaires reste linéaire. C'est la non-linéarité qui permet au réseau d'apprendre des patterns complexes.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <script>
@@ -555,30 +566,101 @@ z += biais
                     </div>
                 </div>
 
-                <!-- POURQUOI LA NON-LINÉARITÉ -->
-                <div class="warning-box mt-8">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">💡</span>
-                        <div>
-                            <h4 class="font-bold text-yellow-500 mb-2">Pourquoi la non-linéarité ?</h4>
-                            <p class="dl-text-secondary text-sm">
-                                Sans fonction d'activation, un réseau de 100 couches serait équivalent à... une seule couche ! La composition de fonctions linéaires reste linéaire. C'est la non-linéarité qui permet au réseau d'apprendre des patterns complexes.
-                            </p>
+                <!-- AUTRES TYPES DE NEURONES -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Au-delà de McCulloch-Pitts</h3>
+
+                <p class="mb-6">
+                    Le neurone que nous venons de voir (somme pondérée + activation) n'est pas le seul modèle. D'autres approches tentent de se rapprocher du fonctionnement biologique ou d'apporter des propriétés intéressantes.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <!-- Neurones à impulsions -->
+                    <div class="dl-card p-4 rounded-xl border border-cyan-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">⚡</span>
+                            <div>
+                                <h4 class="font-bold text-cyan-400 mb-1">Neurones à impulsions</h4>
+                                <p class="text-xs dl-text-muted mb-2">Spiking Neural Networks (SNNs)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Au lieu de valeurs continues, ces neurones communiquent par <strong>trains d'impulsions</strong> (spikes), comme les vrais neurones biologiques.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="text-cyan-300">Origine :</strong> <strong>Hodgkin & Huxley</strong> (Cambridge, 1952) — Prix Nobel 1963 pour leur modèle du potentiel d'action</p>
+                                    <p><strong class="text-cyan-300">Théorisé :</strong> <strong>Wolfgang Maass</strong> (TU Graz, 1997) — "3ème génération" de réseaux</p>
+                                    <p><strong class="text-cyan-300">Atout :</strong> Efficacité énergétique exceptionnelle</p>
+                                    <p><strong class="text-cyan-300">Hardware :</strong> Intel Loihi (1M neurones), IBM TrueNorth</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neurones liquides -->
+                    <div class="dl-card p-4 rounded-xl border border-purple-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">💧</span>
+                            <div>
+                                <h4 class="font-bold text-purple-400 mb-1">Neurones liquides</h4>
+                                <p class="text-xs dl-text-muted mb-2">Liquid Time-Constant (LTC)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Des neurones dont les <strong>constantes de temps varient</strong> selon l'entrée, s'adaptant dynamiquement au contexte.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="text-purple-300">Origine :</strong> <strong>Ramin Hasani</strong> (MIT CSAIL, 2020), sous la direction de <strong>Daniela Rus</strong></p>
+                                    <p><strong class="text-purple-300">Inspiration :</strong> Le ver <em>C. elegans</em> (302 neurones, comportements complexes)</p>
+                                    <p><strong class="text-purple-300">Atout :</strong> Compacité remarquable — un drone navigue avec <strong>19 neurones</strong> !</p>
+                                    <p><strong class="text-purple-300">Startup :</strong> Liquid AI (valorisation $2.35B en 2024)</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="concept-box mt-8">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">🧱</span>
-                        <div>
-                            <h4 class="font-bold text-blue-400 mb-2">Pourquoi c'est important ?</h4>
-                            <p class="dl-text-secondary text-sm">
-                                Cette structure est la <strong>brique de base</strong> du Deep Learning. En empilant des milliers de ces neurones, on crée des réseaux capables de reconnaître des visages ou de traduire des textes, simplement en ajustant les <strong>poids</strong> et les <strong>biais</strong> par l'entraînement.
-                            </p>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <!-- Reservoir Computing -->
+                    <div class="dl-card p-4 rounded-xl border border-green-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🌊</span>
+                            <div>
+                                <h4 class="font-bold text-green-400 mb-1">Réservoir Computing</h4>
+                                <p class="text-xs dl-text-muted mb-2">Echo State Networks (ESN)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Un réseau récurrent <strong>fixe et aléatoire</strong> (le "réservoir") transforme les entrées, et seule la couche de sortie est entraînée.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="text-green-300">Origine :</strong> <strong>Herbert Jaeger</strong> (GMD, 2001) — ESN</p>
+                                    <p><strong class="text-green-300">Parallèle :</strong> <strong>Wolfgang Maass</strong> — Liquid State Machines</p>
+                                    <p><strong class="text-green-300">Atout :</strong> Entraînement ultra-rapide (régression linéaire)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neurones dendritiques -->
+                    <div class="dl-card p-4 rounded-xl border border-orange-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🌳</span>
+                            <div>
+                                <h4 class="font-bold text-orange-400 mb-1">Neurones dendritiques</h4>
+                                <p class="text-xs dl-text-muted mb-2">Dendritic Neural Networks</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Modélisent la <strong>structure arborescente</strong> des dendrites, où l'intégration spatiale des entrées compte.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="text-orange-300">Motivation :</strong> Les dendrites occupent 90% de l'organisation cellulaire nerveuse</p>
+                                    <p><strong class="text-orange-300">Atout :</strong> Moins de paramètres pour atteindre la même précision</p>
+                                    <p><strong class="text-orange-300">Applications :</strong> Résolution du problème d'oubli catastrophique</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="analogy-box">
+                    <p class="text-sm dl-text-secondary">
+                        <strong class="text-green-400">Pour aller plus loin :</strong> Ces approches restent de niche, mais elles illustrent que le neurone de McCulloch-Pitts n'est qu'<em>une</em> façon de modéliser le calcul neural. L'avenir pourrait voir émerger des hybrides combinant efficacité énergétique des SNNs, adaptabilité des neurones liquides et puissance des architectures classiques.
+                    </p>
+                </div>
+
             </div>
         </section>
 
