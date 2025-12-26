@@ -29,6 +29,9 @@ export async function initSlide() {
 
   // Initialiser la numérotation du footer
   await initSlideFooter();
+
+  // Configurer le handler pour les clics TOC du viewer
+  setupScrollHandler();
 }
 
 /**
