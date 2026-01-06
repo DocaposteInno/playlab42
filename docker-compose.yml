@@ -3,7 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: playlab42-dev
+    # Nom de container dynamique basé sur COMPOSE_PROJECT_NAME
+    container_name: ${COMPOSE_PROJECT_NAME:-playlab42}-dev
     # Utiliser l'UID/GID de l'utilisateur host pour les bons droits sur les fichiers
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     volumes:
@@ -11,7 +12,7 @@ services:
       - node_modules:/workspace/node_modules
     working_dir: /workspace
     ports:
-      - "5242:5242"      # Application
+      - "${PLAYLAB_PORT:-5242}:5242"      # Application (port externe configurable)
     environment:
       - NODE_ENV=development
       # Home temporaire pour npm/node (évite les erreurs de permissions)

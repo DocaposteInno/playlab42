@@ -168,6 +168,27 @@
       "description": "Développement visuel assisté par IA",
       "icon": "🏗️",
       "tags": ["no-code", "visual", "cms"]
+    },
+    {
+      "url": "https://github.com/smtg-ai/claude-squad",
+      "title": "Claude Squad",
+      "description": "TUI pour orchestrer plusieurs Claude Code en parallèle",
+      "icon": "🎯",
+      "tags": ["cli", "orchestration", "multi-agent"]
+    },
+    {
+      "url": "https://github.com/coderabbitai/git-worktree-runner",
+      "title": "git-worktree-runner",
+      "description": "Automatisation des worktrees pour agents IA (CodeRabbit)",
+      "icon": "🔀",
+      "tags": ["cli", "worktree", "orchestration"]
+    },
+    {
+      "url": "https://github.com/kbwo/ccmanager",
+      "title": "CCManager",
+      "description": "Gestionnaire multi-instances Claude Code",
+      "icon": "📊",
+      "tags": ["cli", "orchestration", "multi-agent"]
     }
   ]
 }

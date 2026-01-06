@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow complet - Développement parallèle avec agents IA</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .workflow-pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-xs);
+      margin: var(--space-xl) 0;
+    }
+    .pipeline-step {
+      background: var(--color-bg-secondary);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-size: var(--font-size-sm);
+      font-weight: bold;
+      border-bottom: 3px solid var(--color-accent);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .pipeline-step:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .pipeline-step .number {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    .pipeline-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--color-accent);
+      font-size: 1.2rem;
+    }
+    .step-section {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+      border-left: 4px solid var(--color-accent);
+    }
+    .step-section h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .step-section h3 .step-number {
+      background: var(--color-accent);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+    }
+    .code-block {
+      background: var(--color-bg-code);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: var(--space-md) 0;
+    }
+    .code-block-header {
+      background: var(--color-bg-tertiary);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .code-block pre {
+      margin: 0;
+      padding: var(--space-md);
+      overflow-x: auto;
+      font-size: var(--font-size-sm);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+      margin: var(--space-lg) 0;
+    }
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .stat-card {
+      background: var(--color-bg-primary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+    .stat-card .value {
+      font-size: var(--font-size-xl);
+      font-weight: bold;
+    }
+    .stat-card .label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .stat-card.green .value { color: var(--color-success); }
+    .stat-card.yellow .value { color: var(--color-warning); }
+    .stat-card.orange .value { color: #f59e0b; }
+    .stat-card.red .value { color: var(--color-error); }
+    .merge-order {
+      background: var(--color-bg-primary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      margin: var(--space-md) 0;
+    }
+    .merge-order ol {
+      margin: 0;
+      padding-left: var(--space-lg);
+    }
+    .callout {
+      background: var(--color-bg-primary);
+      border-left: 4px solid var(--color-info);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-md) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+    .callout.warning {
+      border-left-color: var(--color-warning);
+    }
+    .comment { color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>🔄 Workflow complet : de la préparation au merge</h1>
+
+    <h2>Vue d'ensemble</h2>
+
+    <div class="workflow-pipeline">
+      <div class="pipeline-step">
+        <span class="number">1</span>
+        PRÉPARER
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <span class="number">2</span>
+        LANCER
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <span class="number">3</span>
+        SURVEILLER
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <span class="number">4</span>
+        REVIEW
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <span class="number">5</span>
+        MERGER
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">
+        <span class="number">6</span>
+        NETTOYER
+      </div>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">1</span> Préparer</h3>
+
+      <p><strong>Décomposer la tâche</strong> en sous-tâches avec fichiers disjoints :</p>
+
+      <div class="code-block">
+        <div class="code-block-header">Exemple de décomposition</div>
+        <pre><code>Tâche globale : "Ajouter système de notifications"
+
+Agent 1 : Backend notifications (src/services/notifications/*)
+Agent 2 : API endpoints (src/api/notifications/*)
+Agent 3 : Frontend composants (src/components/notifications/*)</code></pre>
+      </div>
+
+      <p><strong>Écrire les specs</strong> dans <code>specs/</code> et <strong>créer les worktrees</strong> :</p>
+
+      <div class="code-block">
+        <div class="code-block-header">bash</div>
+        <pre><code>git worktree add ../notif-backend -b feature/notif-backend main
+git worktree add ../notif-api -b feature/notif-api main
+git worktree add ../notif-frontend -b feature/notif-frontend main</code></pre>
+      </div>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">2</span> Lancer</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">bash</div>
+        <pre><code><span class="comment"># Créer une session tmux</span>
+tmux new-session -s agents
+
+<span class="comment"># Dans chaque pane, aller dans un worktree et lancer l'agent avec sa spec</span>
+cd ../notif-backend && claude "Implémente @specs/notif-backend.md"
+<span class="comment"># Ctrl-A | (split), puis :</span>
+cd ../notif-api && claude "Implémente @specs/notif-api.md"
+<span class="comment"># etc.</span></code></pre>
+      </div>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">3</span> Surveiller</h3>
+
+      <p><strong>Ne pas micro-manager.</strong> Laissez les agents travailler. Check-in toutes les 15-30 minutes :</p>
+      <ul>
+        <li>Est-ce qu'un agent est bloqué ?</li>
+        <li>Est-ce qu'un agent part dans une mauvaise direction ?</li>
+        <li>Y a-t-il des erreurs répétées ?</li>
+      </ul>
+
+      <p>Pendant ce temps, vous pouvez faire autre chose — ou commencer à review le travail du premier agent terminé.</p>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">4</span> Review</h3>
+
+      <div class="callout warning">
+        ⚠️ C'est le <strong>goulot d'étranglement</strong>. Attendez-vous à y passer ~50% du temps total.
+      </div>
+
+      <p><strong>Pour chaque agent :</strong></p>
+      <ol>
+        <li>Lire le diff : <code>git diff main...feature/notif-backend</code></li>
+        <li>Vérifier que le scope a été respecté</li>
+        <li>Lancer les tests : <code>npm test</code> ou équivalent</li>
+        <li>Vérifier la logique métier (l'agent pattern-matche, il ne "comprend" pas)</li>
+        <li>Demander des corrections si nécessaire</li>
+      </ol>
+
+      <p><strong>Taux de succès réalistes</strong> (d'après retours d'expérience) :</p>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="value">~10%</div>
+          <div class="label">Parfait, prêt à merger</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="value">~20%</div>
+          <div class="label">Retouches mineures</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="value">~40%</div>
+          <div class="label">Travail supplémentaire</div>
+        </div>
+        <div class="stat-card red">
+          <div class="value">~30%</div>
+          <div class="label">À jeter et refaire</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">5</span> Merger</h3>
+
+      <div class="merge-order">
+        <strong>Ordre recommandé :</strong>
+        <ol>
+          <li>Types et interfaces (si applicable)</li>
+          <li>Backend / services</li>
+          <li>API</li>
+          <li>Frontend</li>
+          <li>Tests d'intégration</li>
+        </ol>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">bash</div>
+        <pre><code><span class="comment"># Depuis le worktree main</span>
+git checkout main
+git merge feature/notif-backend --no-ff
+git merge feature/notif-api --no-ff
+git merge feature/notif-frontend --no-ff</code></pre>
+      </div>
+
+      <div class="callout">
+        <strong>En cas de conflit</strong> : c'est souvent signe que la décomposition n'était pas assez disjointe.
+        Résolvez, puis notez pour mieux découper la prochaine fois.
+      </div>
+
+      <div class="callout">
+        <strong>Astuce</strong> : Activez <code>git rerere</code> pour mémoriser les résolutions de conflits.
+        <br><code>git config rerere.enabled true</code>
+      </div>
+    </div>
+
+    <div class="step-section">
+      <h3><span class="step-number">6</span> Nettoyer</h3>
+
+      <div class="code-block">
+        <div class="code-block-header">bash</div>
+        <pre><code><span class="comment"># Supprimer les worktrees</span>
+git worktree remove ../notif-backend
+git worktree remove ../notif-api
+git worktree remove ../notif-frontend
+
+<span class="comment"># Nettoyer les références orphelines</span>
+git worktree prune
+
+<span class="comment"># Supprimer les branches mergées</span>
+git branch -d feature/notif-backend feature/notif-api feature/notif-frontend</code></pre>
+      </div>
+    </div>
+  </article>
+</body>
+</html>

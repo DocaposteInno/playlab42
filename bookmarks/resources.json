@@ -112,6 +112,34 @@
       "description": "Guide complet des outils IA pour développeurs",
       "icon": "📚",
       "tags": ["guide", "outils", "complet"]
+    },
+    {
+      "url": "https://git-scm.com/docs/git-worktree",
+      "title": "Git Worktree Documentation",
+      "description": "Documentation officielle Git Worktree",
+      "icon": "📖",
+      "tags": ["git", "documentation", "worktree"]
+    },
+    {
+      "url": "https://github.com/tmux/tmux/wiki",
+      "title": "tmux Wiki",
+      "description": "Documentation et guides tmux",
+      "icon": "📖",
+      "tags": ["tmux", "documentation", "terminal"]
+    },
+    {
+      "url": "https://docs.agentinterviews.com/blog/parallel-ai-coding-with-gitworktrees/",
+      "title": "Parallel AI Coding with Git Worktrees",
+      "description": "Guide sur le développement parallèle avec worktrees",
+      "icon": "📝",
+      "tags": ["article", "worktree", "multi-agent"]
+    },
+    {
+      "url": "https://www.ywian.com/blog/the-git-worktree-claude-code-playbook",
+      "title": "The Git Worktree + Claude Code Playbook",
+      "description": "Playbook complet worktrees et Claude Code",
+      "icon": "📝",
+      "tags": ["article", "worktree", "claude-code"]
     }
   ]
 }

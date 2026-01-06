@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Références et annexes - Développement parallèle avec agents IA</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .links-section {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+    }
+    .links-section h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-sm);
+    }
+    .link-card {
+      background: var(--color-bg-primary);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--color-accent);
+    }
+    .link-card a {
+      color: var(--color-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .link-card a:hover {
+      text-decoration: underline;
+    }
+    .link-card p {
+      margin: var(--space-xs) 0 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .annexe-section {
+      margin: var(--space-xl) 0;
+    }
+    .annexe-section h2 {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .code-block {
+      background: var(--color-bg-code);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: var(--space-md) 0;
+    }
+    .code-block-header {
+      background: var(--color-bg-secondary);
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .code-block pre {
+      margin: 0;
+      padding: var(--space-md);
+      overflow-x: auto;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      max-height: 400px;
+    }
+    .footer-note {
+      text-align: center;
+      font-style: italic;
+      color: var(--color-text-muted);
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+    }
+    .comment { color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>📚 Références et annexes</h1>
+
+    <div class="links-section">
+      <h3>📖 Documentation officielle</h3>
+      <div class="links-grid">
+        <div class="link-card">
+          <a href="https://git-scm.com/docs/git-worktree" target="_blank" rel="noopener">Git Worktree</a>
+          <p>Documentation officielle</p>
+        </div>
+        <div class="link-card">
+          <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code</a>
+          <p>Documentation Anthropic</p>
+        </div>
+        <div class="link-card">
+          <a href="https://aider.chat/" target="_blank" rel="noopener">Aider</a>
+          <p>Pair programming IA</p>
+        </div>
+        <div class="link-card">
+          <a href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener">tmux</a>
+          <p>Wiki et guides</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="links-section">
+      <h3>📋 Spec-driven development</h3>
+      <div class="links-grid">
+        <div class="link-card">
+          <a href="https://github.com/Fission-AI/OpenSpec" target="_blank" rel="noopener">OpenSpec</a>
+          <p>Framework léger, multi-outils</p>
+        </div>
+        <div class="link-card">
+          <a href="https://github.com/github/spec-kit" target="_blank" rel="noopener">Spec Kit</a>
+          <p>Par GitHub, workflow 4 phases</p>
+        </div>
+        <div class="link-card">
+          <a href="https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/" target="_blank" rel="noopener">Article GitHub Blog</a>
+          <p>Spec-driven development with AI</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="links-section">
+      <h3>🎮 Outils d'orchestration</h3>
+      <div class="links-grid">
+        <div class="link-card">
+          <a href="https://github.com/smtg-ai/claude-squad" target="_blank" rel="noopener">Claude Squad</a>
+          <p>TUI tmux + worktrees</p>
+        </div>
+        <div class="link-card">
+          <a href="https://github.com/coderabbitai/git-worktree-runner" target="_blank" rel="noopener">git-worktree-runner</a>
+          <p>Automatisation CodeRabbit</p>
+        </div>
+        <div class="link-card">
+          <a href="https://github.com/kbwo/ccmanager" target="_blank" rel="noopener">CCManager</a>
+          <p>Gestionnaire multi-instances</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="links-section">
+      <h3>📝 Articles et retours d'expérience</h3>
+      <div class="links-grid">
+        <div class="link-card">
+          <a href="https://www.anthropic.com/engineering/claude-code-best-practices" target="_blank" rel="noopener">Claude Code Best Practices</a>
+          <p>Anthropic Engineering</p>
+        </div>
+        <div class="link-card">
+          <a href="https://docs.agentinterviews.com/blog/parallel-ai-coding-with-gitworktrees/" target="_blank" rel="noopener">Parallel AI Coding</a>
+          <p>Agent Interviews</p>
+        </div>
+        <div class="link-card">
+          <a href="https://www.ywian.com/blog/the-git-worktree-claude-code-playbook" target="_blank" rel="noopener">Git Worktree + Claude Code Playbook</a>
+          <p>Guide complet</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="annexe-section">
+      <h2>📎 Annexe A : Script de démarrage automatisé</h2>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>start-agents.sh</span>
+        </div>
+        <pre><code>#!/bin/bash
+<span class="comment"># start-agents.sh &lt;project&gt; &lt;spec1&gt; [spec2] [spec3] ...</span>
+<span class="comment"># Exemple : start-agents.sh myapp auth-oauth api-notifications fix-tests</span>
+
+set -e
+
+PROJECT="$1"
+shift
+SPECS=("$@")
+
+if [ ${#SPECS[@]} -eq 0 ]; then
+    echo "Usage: start-agents.sh &lt;project&gt; &lt;spec1&gt; [spec2] ..."
+    echo "Les specs doivent exister dans specs/&lt;name&gt;.md"
+    exit 1
+fi
+
+SESSION="agents-$PROJECT"
+PROJECT_ROOT="$HOME/projects/$PROJECT"
+
+if [[ ! -d "$PROJECT_ROOT/.git" ]] && [[ ! -d "$PROJECT_ROOT/.bare" ]]; then
+    echo "❌ Projet Git non trouvé: $PROJECT_ROOT"
+    exit 1
+fi
+
+<span class="comment"># Session tmux</span>
+tmux new-session -d -s "$SESSION" -n main -c "$PROJECT_ROOT"
+
+for i in "${!SPECS[@]}"; do
+    SPEC="${SPECS[$i]}"
+    BRANCH="agent-$((i+1))-$SPEC"
+    WORKTREE="$PROJECT_ROOT-worktrees/$BRANCH"
+
+    <span class="comment"># Vérifier que la spec existe</span>
+    if [[ ! -f "$PROJECT_ROOT/specs/$SPEC.md" ]]; then
+        echo "⚠️  Spec non trouvée: specs/$SPEC.md — skip"
+        continue
+    fi
+
+    cd "$PROJECT_ROOT"
+    git worktree add -b "$BRANCH" "$WORKTREE" HEAD
+
+    <span class="comment"># Copier .env si présent</span>
+    [[ -f "$PROJECT_ROOT/.env.development" ]] && cp "$PROJECT_ROOT/.env.development" "$WORKTREE/"
+
+    tmux new-window -t "$SESSION" -n "agent-$((i+1))" -c "$WORKTREE"
+    tmux send-keys -t "$SESSION:agent-$((i+1))" "claude \"Implémente @specs/$SPEC.md\"" C-m
+
+    echo "✅ Agent $((i+1)) sur specs/$SPEC.md dans $WORKTREE"
+done
+
+tmux new-window -t "$SESSION" -n "monitor" -c "$PROJECT_ROOT"
+tmux send-keys -t "$SESSION:monitor" "watch -n 5 'git worktree list'" C-m
+
+echo "🚀 Attacher avec: tmux attach -t $SESSION"
+tmux attach-session -t "$SESSION"</code></pre>
+      </div>
+    </div>
+
+    <div class="annexe-section">
+      <h2>📎 Annexe B : Script de nettoyage</h2>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>cleanup-agents.sh</span>
+        </div>
+        <pre><code>#!/bin/bash
+<span class="comment"># cleanup-agents.sh &lt;project&gt;</span>
+
+PROJECT="$1"
+PROJECT_ROOT="$HOME/projects/$PROJECT"
+WORKTREES_DIR="$PROJECT_ROOT-worktrees"
+
+[[ ! -d "$WORKTREES_DIR" ]] && echo "Rien à nettoyer" && exit 0
+
+read -p "Supprimer tous les worktrees de $PROJECT ? (y/N) " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    cd "$PROJECT_ROOT"
+    for wt in "$WORKTREES_DIR"/*; do
+        [[ -d "$wt" ]] && git worktree remove --force "$wt" 2>/dev/null
+    done
+    git worktree prune
+    rmdir "$WORKTREES_DIR" 2>/dev/null || true
+    echo "🧹 Nettoyé"
+fi</code></pre>
+      </div>
+    </div>
+
+    <div class="annexe-section">
+      <h2>📎 Annexe C : Templates</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>CLAUDE.md (template)</span>
+        </div>
+        <pre><code><span class="comment"># CLAUDE.md</span>
+
+## Stack
+- [Langage, framework, versions]
+- [Base de données]
+- [Outils de test]
+
+## Conventions
+- [Style de commits]
+- [Règles de code]
+- [Ce qui nécessite validation humaine]
+
+## Structure du projet
+- src/[dossier]/ — [description]
+- tests/ — [description]</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span>specs/[feature].md (template)</span>
+        </div>
+        <pre><code><span class="comment"># Spec: [Nom de la feature/fix]</span>
+
+## Objectif
+[Ce qu'on veut accomplir en 1-2 phrases]
+
+## Scope
+- Fichiers à créer/modifier : [liste]
+- Tests : [fichiers de test]
+
+## Hors scope
+- Ne PAS modifier [fichiers]
+- Ne PAS toucher à [composants]
+
+## Critères de succès
+- [ ] [Critère mesurable 1]
+- [ ] [Critère mesurable 2]
+- [ ] Tests passent
+
+## Ressources
+- [Liens vers docs, exemples existants]</code></pre>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      Guide rédigé en décembre 2025. Testé avec Claude Code, Aider et Cline sur des projets Node.js et Python.
+    </p>
+  </article>
+</body>
+</html>

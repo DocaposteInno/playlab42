@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Les pièges à éviter - Développement parallèle avec agents IA</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .pitfalls-section {
+      margin: var(--space-xl) 0;
+    }
+    .pitfalls-section h2 {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+    .pitfall-card {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-lg);
+      margin: var(--space-md) 0;
+      overflow: hidden;
+      border-left: 4px solid var(--color-error);
+    }
+    .pitfall-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .pitfall-header .icon {
+      font-size: 1.5rem;
+    }
+    .pitfall-header .title {
+      font-weight: bold;
+      color: var(--color-error);
+    }
+    .pitfall-solution {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+    .pitfall-solution .icon {
+      color: var(--color-success);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .pitfall-solution .text {
+      flex: 1;
+    }
+    .category-icon {
+      font-size: 1.5rem;
+    }
+    .warning-stat {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      border: 1px solid var(--color-error);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-md) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .warning-stat .value {
+      font-size: var(--font-size-xl);
+      font-weight: bold;
+      color: var(--color-error);
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>🚫 Les pièges à éviter</h1>
+
+    <div class="pitfalls-section">
+      <h2><span class="category-icon">📋</span> Erreurs de décomposition</h2>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Tâches qui touchent les mêmes fichiers</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Revoir le découpage. <strong>Un fichier = un seul agent.</strong></span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Scope trop vague dans CLAUDE.md</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Lister explicitement les fichiers/dossiers autorisés.</span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Pas d'interface définie entre tâches dépendantes</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Définir les types/interfaces <strong>AVANT</strong> de lancer les agents.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pitfalls-section">
+      <h2><span class="category-icon">👀</span> Erreurs de supervision</h2>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Micro-management en temps réel</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Lancer, puis review à la fin. Les interruptions constantes cassent le flow de l'agent.</span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Zéro supervision</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Check-in toutes les 15-30 min pour éviter qu'un agent parte en vrille pendant 2h.</span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Merger sans review</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Toujours review. Le code généré par IA contient des failles de sécurité dans 40-48% des cas.</span>
+        </div>
+      </div>
+
+      <div class="warning-stat">
+        <span class="value">40-48%</span>
+        <span>du code IA contient des failles de sécurité (étude CodeRabbit)</span>
+      </div>
+    </div>
+
+    <div class="pitfalls-section">
+      <h2><span class="category-icon">⚙️</span> Erreurs techniques</h2>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Agents dans le même répertoire</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text"><strong>Un worktree par agent, sans exception.</strong></span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Pas de stratégie de merge</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Définir l'ordre de merge <strong>AVANT</strong> de lancer les agents.</span>
+        </div>
+      </div>
+
+      <div class="pitfall-card">
+        <div class="pitfall-header">
+          <span class="icon">❌</span>
+          <span class="title">Oublier le cleanup</span>
+        </div>
+        <div class="pitfall-solution">
+          <span class="icon">✅</span>
+          <span class="text">Les worktrees s'accumulent. Nettoyez après chaque session.</span>
+        </div>
+      </div>
+    </div>
+  </article>
+</body>
+</html>
