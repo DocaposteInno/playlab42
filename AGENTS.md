@@ -73,6 +73,10 @@ make security           # Audit complet (npm + Docker)
 
 **Ne jamais exécuter npm, node, ou autres outils directement sur le host.**
 
+### Multi-worktree
+
+Le projet supporte le développement parallèle via git worktrees. Chaque worktree obtient automatiquement un nom de projet Docker et un port uniques. Utiliser `make info` pour voir l'instance courante.
+
 ## Workflow OpenSpec
 
 <!-- OPENSPEC:START -->

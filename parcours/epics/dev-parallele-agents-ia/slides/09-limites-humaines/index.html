@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprendre les limites humaines - Développement parallèle avec agents IA</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .intro-text {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-muted);
+      font-style: italic;
+      margin: var(--space-lg) 0;
+      padding-left: var(--space-lg);
+      border-left: 3px solid var(--color-accent);
+    }
+    .concept-section {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+    }
+    .concept-section h3 {
+      margin-top: 0;
+    }
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .stat-highlight {
+      background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+      border: 2px solid var(--color-accent);
+    }
+    .stat-highlight .value {
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--color-accent);
+      line-height: 1;
+    }
+    .stat-highlight .unit {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-muted);
+    }
+    .stat-highlight .label {
+      margin-top: var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .memory-gauge {
+      background: var(--color-bg-code);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+    .gauge-bar {
+      display: flex;
+      gap: var(--space-xs);
+      margin: var(--space-md) 0;
+    }
+    .gauge-slot {
+      flex: 1;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: var(--font-size-sm);
+    }
+    .gauge-slot.filled {
+      background: var(--color-accent);
+      color: white;
+    }
+    .gauge-slot.empty {
+      background: var(--color-bg-secondary);
+      color: var(--color-text-muted);
+      border: 2px dashed var(--color-border);
+    }
+    .gauge-label {
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .timeline-visual {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--space-lg) 0;
+    }
+    .timeline-bar {
+      height: 20px;
+      background: linear-gradient(90deg, var(--color-error) 0%, var(--color-error) 40%, var(--color-success) 40%, var(--color-success) 100%);
+      border-radius: var(--radius-md);
+      margin: var(--space-md) 0;
+      position: relative;
+    }
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .implication-box {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-xl) 0;
+    }
+    .implication-box h3 {
+      margin-top: 0;
+      color: var(--color-accent);
+    }
+    .references-section {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-xl);
+    }
+    .references-section h3 {
+      margin-top: 0;
+    }
+    .references-section ul {
+      font-size: var(--font-size-sm);
+      margin-bottom: 0;
+    }
+    .references-section li {
+      margin-bottom: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <h1>🧠 Pour aller plus loin : comprendre les limites humaines</h1>
+
+    <p class="intro-text">
+      Cette section est pour ceux qui veulent comprendre pourquoi on recommande 4-6 agents max, pas 20.
+    </p>
+
+    <div class="concept-section">
+      <h3>📊 La mémoire de travail</h3>
+
+      <p>
+        George Miller (1956) identifiait une limite de <strong>7±2 éléments</strong> en mémoire de travail.
+        Les recherches de Cowan (2001) ont révisé cette estimation à <strong>4 chunks</strong> —
+        des unités d'information liées entre elles.
+      </p>
+
+      <div class="memory-gauge">
+        <div class="gauge-bar">
+          <div class="gauge-slot filled">1</div>
+          <div class="gauge-slot filled">2</div>
+          <div class="gauge-slot filled">3</div>
+          <div class="gauge-slot filled">4</div>
+          <div class="gauge-slot empty">5</div>
+          <div class="gauge-slot empty">6</div>
+          <div class="gauge-slot empty">7</div>
+        </div>
+        <div class="gauge-label">
+          Capacité réelle : ~4 chunks (Cowan, 2001) vs 7±2 (Miller, 1956)
+        </div>
+      </div>
+
+      <p>
+        <strong>Concrètement</strong> : maintenir le contexte de plus de 4 tâches distinctes devient difficile.
+      </p>
+    </div>
+
+    <div class="concept-section">
+      <h3>⏱️ Le coût du context-switching</h3>
+
+      <p>
+        L'étude de Rubinstein, Meyer et Evans (2001) montre que le basculement entre tâches
+        peut consommer jusqu'à <strong>40% du temps productif</strong>.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-highlight">
+          <div class="value">40<span class="unit">%</span></div>
+          <div class="label">du temps perdu en context-switching</div>
+        </div>
+        <div class="stat-highlight">
+          <div class="value">23<span class="unit">min</span></div>
+          <div class="label">pour retrouver la concentration</div>
+        </div>
+      </div>
+
+      <p>
+        Gloria Mark (UC Irvine) a mesuré qu'il faut en moyenne <strong>23 minutes</strong>
+        pour retrouver une concentration complète après une interruption.
+      </p>
+    </div>
+
+    <div class="concept-section">
+      <h3>🔀 Le parallélisme humain réel</h3>
+
+      <p>
+        Le cerveau peut traiter <strong>2 tâches en parallèle réel</strong> maximum.
+        Au-delà, on passe en time-slicing — alternance rapide qui donne l'illusion du parallélisme
+        mais dégrade la performance.
+      </p>
+
+      <div class="timeline-visual">
+        <p><strong>Temps productif vs temps perdu :</strong></p>
+        <div class="timeline-bar"></div>
+        <div class="timeline-labels">
+          <span>Productif (~60%)</span>
+          <span>Perdu en switching (~40%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="implication-box">
+      <h3>💡 Implication pour le multi-agent</h3>
+
+      <p>
+        Avec des agents qui travaillent de façon <strong>autonome</strong> (vous les lancez, ils bossent, vous reviewez à la fin),
+        vous n'avez pas besoin de maintenir leur contexte en permanence.
+      </p>
+
+      <p>
+        C'est pourquoi <strong>4-6 agents restent gérables</strong> alors que 4-6 tâches manuelles parallèles seraient impossibles.
+      </p>
+
+      <p>
+        Mais la <strong>review reste séquentielle</strong> — et c'est elle qui limite le scaling, pas le nombre d'agents qu'on peut lancer.
+      </p>
+    </div>
+
+    <div class="references-section">
+      <h3>📚 Références scientifiques</h3>
+      <ul>
+        <li>Miller, G.A. (1956). "The magical number seven, plus or minus two". <em>Psychological Review</em>, 63(2), 81-97.</li>
+        <li>Cowan, N. (2001). "The magical number 4 in short-term memory". <em>Behavioral and Brain Sciences</em>, 24(1), 87-114.</li>
+        <li>Rubinstein, J.S., Meyer, D.E., & Evans, J.E. (2001). "Executive control of cognitive processes in task switching". <em>Journal of Experimental Psychology</em>.</li>
+        <li>Mark, G., Gonzalez, V.M., & Harris, J. (2005). "No task left behind? Examining the nature of fragmented work". <em>CHI '05</em>.</li>
+      </ul>
+    </div>
+  </article>
+</body>
+</html>

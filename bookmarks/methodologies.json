@@ -42,6 +42,27 @@
       "description": "Évolution des pratiques - MIT Tech Review",
       "icon": "📰",
       "tags": ["vibe-coding", "context-engineering", "tendances"]
+    },
+    {
+      "url": "https://github.com/Fission-AI/OpenSpec",
+      "title": "OpenSpec",
+      "description": "Framework léger pour spec-driven development avec IA",
+      "icon": "📋",
+      "tags": ["spec-driven", "framework", "workflow"]
+    },
+    {
+      "url": "https://github.com/github/spec-kit",
+      "title": "Spec Kit",
+      "description": "Toolkit GitHub pour développement piloté par specs",
+      "icon": "🛠️",
+      "tags": ["spec-driven", "github", "toolkit"]
+    },
+    {
+      "url": "https://github.blog/ai-and-ml/generative-ai/spec-driven-development-with-ai-get-started-with-a-new-open-source-toolkit/",
+      "title": "Spec-driven development with AI",
+      "description": "Introduction au spec-driven development (GitHub Blog)",
+      "icon": "📰",
+      "tags": ["spec-driven", "article", "github"]
     }
   ]
 }

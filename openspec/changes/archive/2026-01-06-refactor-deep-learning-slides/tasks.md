@@ -75,12 +75,12 @@
   - Commande : `make build-parcours`
   - Vérifier que l'epic apparaît correctement
 
-- [ ] **Tester la navigation**
+- [x] **Tester la navigation**
   - Vérifier les 7 slides dans le viewer
   - Tester la progression
   - Tester le lab en isolation
 
-- [ ] **Vérifier le rendu**
+- [x] **Vérifier le rendu**
   - Tester sur desktop et mobile
   - Vérifier MathJax sur toutes les slides
   - Vérifier le lab interactif

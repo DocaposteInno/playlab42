@@ -122,6 +122,18 @@ make npm CMD="..."      # Commandes npm (ex: "install lodash")
 make dev                # Serveur TypeScript
 make lint               # Vérification qualité
 make test               # Tests Jest
+make info               # Infos de l'instance (port, container)
+```
+
+### Multi-worktree
+
+Le projet supporte le développement parallèle via git worktrees. Chaque worktree obtient automatiquement :
+- Un nom de projet Docker unique (basé sur le nom du dossier)
+- Un port dédié (plage 5200-5299)
+
+```bash
+# Vérifier l'instance courante
+make info
 ```
 
 ## Documentation
