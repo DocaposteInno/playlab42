@@ -137,10 +137,10 @@ Ce fichier contient l'article complet en Markdown. Chaque section correspond à 
 - [x] Vérifier que tous les fichiers sont créés
 - [x] Lancer `make build-parcours` pour générer le catalogue
 - [x] Vérifier l'absence d'erreurs de build
-- [ ] Tester la navigation dans le viewer de parcours
-- [ ] Vérifier le rendu responsive (mobile/desktop)
-- [ ] Vérifier la coloration syntaxique des blocs de code
-- [ ] Vérifier que les liens externes fonctionnent
+- [x] Tester la navigation dans le viewer de parcours
+- [x] Vérifier le rendu responsive (mobile/desktop)
+- [x] Vérifier la coloration syntaxique des blocs de code
+- [x] Vérifier que les liens externes fonctionnent
 
 ## Phase 4 : Bookmarks
 
@@ -168,5 +168,5 @@ Ajouter les références de l'article aux bookmarks existants.
 ## Phase 5 : Finalisation
 
 - [x] Lancer `make build-bookmarks` pour régénérer le catalogue
-- [ ] Commit avec message descriptif
-- [ ] Archiver la proposition (`/openspec:archive`)
+- [x] Commit avec message descriptif
+- [x] Archiver la proposition (`/openspec:archive`)
