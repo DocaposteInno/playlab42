@@ -1,0 +1,8 @@
+{
+  "id": "10-architectures",
+  "title": "Les Grandes Architectures",
+  "description": "CNN, RNN, Transformers, Modèles de Diffusion : les familles de réseaux",
+  "type": "page",
+  "icon": "🏗️",
+  "duration": "5 min"
+}

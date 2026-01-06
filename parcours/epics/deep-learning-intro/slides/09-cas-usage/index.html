@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cas d'Usage - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="module">
+        import { initSlide, sendTOC, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+        sendTOC([
+            { id: 'vision', label: 'Vision', icon: '👁️' },
+            { id: 'nlp', label: 'Langage', icon: '💬' },
+            { id: 'recommandation', label: 'Recommandation', icon: '🎯' },
+            { id: 'jeux-science', label: 'Jeux & Science', icon: '🎮' },
+            { id: 'finance', label: 'Finance', icon: '💰' },
+            { id: 'sante', label: 'Santé', icon: '🏥' },
+            { id: 'robotique', label: 'Robotique', icon: '🤖' },
+            { id: 'creativite', label: 'Créativité', icon: '🎨' }
+        ]);
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- INTRODUCTION -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🌍</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Le Deep Learning dans le Monde Réel</h2>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    Le deep learning n'est plus une curiosité de laboratoire. Il est au cœur des produits que vous utilisez quotidiennement : Netflix, Google Translate, Spotify, les filtres photo, la reconnaissance faciale, les voitures Tesla... Cette page explore les <strong>applications concrètes</strong> qui transforment notre quotidien.
+                </p>
+
+                <div class="concept-box mb-8">
+                    <h4 class="font-bold dl-accent-blue mb-3">Un marché en explosion</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold dl-accent-cyan">$200 Mds</div>
+                            <div class="text-xs dl-text-muted">Marché IA (2025)</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold dl-accent-green">300M+</div>
+                            <div class="text-xs dl-text-muted">Utilisateurs Netflix</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold dl-accent-purple">249</div>
+                            <div class="text-xs dl-text-muted">Langues Google Translate</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold dl-accent-orange">78%</div>
+                            <div class="text-xs dl-text-muted">Créateurs utilisant l'IA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course mondiale -->
+                <div class="warning-box">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🌐</span>
+                        <div>
+                            <h4 class="font-bold text-yellow-500 mb-3">Course mondiale à l'IA</h4>
+                            <p class="text-sm dl-text-secondary mb-3">
+                                L'IA est devenue un enjeu géopolitique majeur. Les États-Unis imposent des sanctions sur les puces Nvidia vers la Chine, mais celle-ci développe ses propres alternatives et modèles compétitifs.
+                            </p>
+                            <div class="grid md:grid-cols-3 gap-4 text-center">
+                                <div class="p-3 rounded-lg bg-blue-500/10">
+                                    <div class="text-lg mb-1">🇺🇸</div>
+                                    <div class="text-xs font-bold dl-accent-blue">États-Unis</div>
+                                    <div class="text-xs dl-text-muted">OpenAI, Anthropic, Google, Meta, Nvidia</div>
+                                </div>
+                                <div class="p-3 rounded-lg bg-red-500/10">
+                                    <div class="text-lg mb-1">🇨🇳</div>
+                                    <div class="text-xs font-bold dl-accent-red">Chine</div>
+                                    <div class="text-xs dl-text-muted">DeepSeek, Alibaba, Baidu, Huawei, ByteDance</div>
+                                </div>
+                                <div class="p-3 rounded-lg bg-indigo-500/10">
+                                    <div class="text-lg mb-1">🇪🇺</div>
+                                    <div class="text-xs font-bold dl-accent-purple">Europe</div>
+                                    <div class="text-xs dl-text-muted">Mistral (🇫🇷), Aleph Alpha (🇩🇪), AI Act</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISION PAR ORDINATEUR -->
+        <section id="vision" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">👁️</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Vision par Ordinateur</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    La vision par ordinateur est le domaine où le deep learning a eu l'impact le plus spectaculaire. Depuis <a href="https://papers.nips.cc/paper_files/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" class="dl-accent-cyan hover:underline">AlexNet (2012)</a>, les réseaux convolutifs ont révolutionné la reconnaissance d'images.
+                </p>
+
+                <!-- Reconnaissance faciale -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Reconnaissance faciale</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-cyan mb-2">Apple Face ID</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Depuis l'iPhone X (2017), un scanner 3D analyse <strong>30 000+ points</strong> de votre visage. Fonctionne dans le noir, avec des lunettes, même si vous changez de coiffure.
+                        </p>
+                        <a href="https://support.apple.com/en-us/102381" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Documentation Apple</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">Amazon Rekognition</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            API cloud pour identifier visages, objets, texte, scènes. Utilisé par la police (controversé), le retail, et les médias.
+                        </p>
+                        <a href="https://aws.amazon.com/rekognition/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ AWS Rekognition</a>
+                    </div>
+                </div>
+
+                <!-- Véhicules autonomes -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Véhicules autonomes</h4>
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-red mb-2">🇺🇸 Tesla — Vision pure</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            8 caméras, <strong>pas de LiDAR</strong>. Architecture IA end-to-end qui remplace le code modulaire. Objectif : millions de véhicules autonomes.
+                        </p>
+                        <p class="text-xs dl-text-secondary italic">Avantage : coût réduit. Risque : robustesse dans conditions extrêmes.</p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">🇺🇸 Waymo — Multi-capteurs</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            29 caméras + 5 LiDAR + RADAR. <strong>250 000+ trajets/semaine</strong> à Phoenix, San Francisco, Los Angeles. Architecture EMMA (End-to-End).
+                        </p>
+                        <a href="https://waymo.com/research/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Waymo Research</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border border-red-500/30">
+                        <h5 class="font-bold dl-accent-yellow mb-2">🇨🇳 Baidu Apollo Go</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>17M+ trajets</strong>, 240M km, 22 villes. <strong>100% sans conducteur</strong> depuis février 2025. Plus grand service robotaxi au monde.
+                        </p>
+                        <p class="text-xs dl-text-secondary italic">Partenariat CATL pour batteries et châssis.</p>
+                        <a href="https://apollo.auto/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Apollo Auto</a>
+                    </div>
+                </div>
+
+                <!-- Imagerie médicale -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Imagerie médicale</h4>
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🏥</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">Diagnostic assisté par IA (2025)</h5>
+                            <ul class="text-sm dl-text-secondary space-y-1">
+                                <li>• <strong class="dl-accent-cyan">Gleamer ChestView</strong> — Interprétation automatique des radiographies thoraciques (FDA 2025)</li>
+                                <li>• <strong class="dl-accent-purple">Median eyonis™</strong> — Dépistage du cancer du poumon par scanner</li>
+                                <li>• <strong class="dl-accent-green">Viz.ai</strong> — Détection d'AVC en temps réel sur angio-scanner</li>
+                            </ul>
+                            <p class="text-xs mt-2 dl-text-muted">Le deep learning segmente les organes, détecte les anomalies, et réduit le temps de diagnostic.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Détection d'objets -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Détection d'objets — YOLO</h4>
+                <p class="text-sm dl-text-muted mb-4">
+                    <a href="https://github.com/ultralytics/ultralytics" target="_blank" class="dl-accent-cyan hover:underline">YOLO11</a> (2024) est l'état de l'art pour la détection temps réel. Applications industrielles : contrôle qualité, tri de produits, guidage robotique, surveillance.
+                </p>
+            </div>
+        </section>
+
+        <!-- TRAITEMENT DU LANGAGE -->
+        <section id="nlp" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">💬</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Traitement du Langage Naturel</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Le NLP a connu une révolution avec les <dfn>Transformers</dfn> (2017). Aujourd'hui, les <dfn>LLM</dfn> comme ChatGPT ou Claude peuvent écrire, traduire, résumer, coder, et converser naturellement.
+                </p>
+
+                <!-- Traduction -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Traduction automatique</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">Google Translate</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>249 langues</strong>. Des milliards de traductions par jour. Architecture : encodeur Transformer + décodeur RNN (depuis 2020).
+                        </p>
+                        <a href="https://translate.google.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ translate.google.com</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-cyan mb-2">DeepL</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>37 langues</strong>, mais qualité supérieure selon les experts. 82% des traducteurs pro utilisent DeepL (ALC 2024). Basé Transformers.
+                        </p>
+                        <a href="https://www.deepl.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ deepl.com</a>
+                    </div>
+                </div>
+
+                <!-- LLMs -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Large Language Models (LLMs)</h4>
+
+                <!-- LLMs US -->
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">🇺🇸 États-Unis</p>
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-green mb-2">ChatGPT</h5>
+                        <p class="text-sm dl-text-muted">
+                            OpenAI. GPT-4o (2024) puis GPT-5 (2025). Le LLM le plus populaire.
+                        </p>
+                        <a href="https://openai.com/chatgpt" target="_blank" class="text-xs dl-accent-blue hover:underline">→ openai.com</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-orange mb-2">Claude</h5>
+                        <p class="text-sm dl-text-muted">
+                            Anthropic. Claude Opus 4.5 (2025). 200K tokens de contexte. "Constitutional AI" pour la sécurité.
+                        </p>
+                        <a href="https://www.anthropic.com/claude" target="_blank" class="text-xs dl-accent-blue hover:underline">→ anthropic.com</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">Gemini</h5>
+                        <p class="text-sm dl-text-muted">
+                            Google DeepMind. Gemini 2.5 Pro. "Deep Think" pour raisonnement complexe. Natif multimodal.
+                        </p>
+                        <a href="https://gemini.google.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ gemini.google.com</a>
+                    </div>
+                </div>
+
+                <!-- LLMs Chine -->
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">🇨🇳 Chine</p>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border border-red-500/30">
+                        <h5 class="font-bold dl-accent-red mb-2">DeepSeek</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>671B params</strong> (37B actifs via MoE). Open-source MIT. Médaille d'or aux Olympiades de maths 2025 (35/42). A fait perdre <strong>$593 Mds en capitalisation boursière</strong> à Nvidia en une semaine.
+                        </p>
+                        <p class="text-xs dl-text-secondary italic">Entraîné malgré les sanctions US sur les puces Nvidia.</p>
+                        <a href="https://github.com/deepseek-ai" target="_blank" class="text-xs dl-accent-blue hover:underline">→ github.com/deepseek-ai</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">Qwen (Alibaba)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Qwen3 : <strong>36T tokens</strong>, 119 langues, Apache 2.0. <strong>300M+ téléchargements</strong>, 100K+ modèles dérivés sur Hugging Face.
+                        </p>
+                        <a href="https://github.com/QwenLM/Qwen3" target="_blank" class="text-xs dl-accent-blue hover:underline">→ github.com/QwenLM</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-cyan mb-2">ERNIE (Baidu)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            ERNIE 5.0 : multimodal natif (texte, image, audio, vidéo). Compétitif avec GPT-5 et Gemini sur les benchmarks.
+                        </p>
+                        <a href="https://yiyan.baidu.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ ERNIE Bot</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-yellow mb-2">PanGu (Huawei)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            PanGu 5.5 : 718B "ultra-MoE". Entraîné sur puces <strong>Ascend</strong> (pas Nvidia). Open-source depuis juin 2025.
+                        </p>
+                        <a href="https://www.huaweicloud.com/intl/en-us/product/pangu.html" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Huawei Cloud PanGu</a>
+                    </div>
+                </div>
+
+                <!-- LLM France -->
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">🇫🇷 France</p>
+                <div class="dl-card p-4 rounded-xl border border-blue-500/30 mb-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-1">
+                            <h5 class="font-bold dl-accent-blue mb-2">Mistral AI</h5>
+                            <p class="text-sm dl-text-muted mb-2">
+                                Champion européen. <strong>Mistral Large 3</strong> : 675B params MoE (41B actifs), #2 sur LMArena (open-source). <strong>Ministral 3</strong> : modèles edge pour drones, robots, téléphones. <strong>Devstral 2</strong> : spécialiste code.
+                            </p>
+                            <p class="text-xs dl-text-secondary">Valorisation : <strong>$14 Mds</strong> (2025). Licence Apache 2.0. Partenariat NVIDIA.</p>
+                        </div>
+                        <div class="text-right">
+                            <a href="https://mistral.ai/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ mistral.ai</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assistants vocaux -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Assistants vocaux</h4>
+                <p class="text-sm dl-text-muted mb-4">
+                    <strong>Siri</strong>, <strong>Alexa</strong>, <strong>Google Assistant</strong> utilisent tous un pipeline : ASR (parole → texte) + NLP (compréhension) + TTS (synthèse vocale). Les RNN détectent "Hey Siri", les Transformers comprennent l'intention.
+                </p>
+
+                <!-- Analyse de sentiment -->
+                <div class="concept-box mb-6">
+                    <h4 class="font-bold dl-accent-blue mb-3">Analyse de sentiment</h4>
+                    <p class="text-sm dl-text-secondary mb-2">
+                        Les LLMs analysent les émotions dans le texte : positif, négatif, neutre, avec intensité. Applications :
+                    </p>
+                    <ul class="text-sm dl-text-muted space-y-1">
+                        <li>• <strong>Brand24</strong> — Monitoring de marque en temps réel</li>
+                        <li>• <strong>Crowd Analyzer</strong> — Spécialiste de l'arabe et du sarcasme</li>
+                        <li>• <strong>John Snow Labs</strong> — État de l'art en NLP médical</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECOMMANDATION -->
+        <section id="recommandation" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🎯</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Systèmes de Recommandation</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Les algorithmes de recommandation génèrent des milliards de dollars de revenus. Ils combinent <strong>filtrage collaboratif</strong> ("les gens comme vous aiment...") et <strong>deep learning</strong> pour modéliser vos préférences.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-red-500 mb-2">Netflix</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>75-80%</strong> des heures de visionnage viennent des recommandations. 300M+ utilisateurs. Économie : $1 Md/an en réduction du churn.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Tech : Foundation models, RNN/LSTM, VAEs, multi-task learning.</p>
+                        <a href="https://netflixtechblog.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Netflix Tech Blog</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-green-500 mb-2">Spotify</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>Discover Weekly</strong> : 30 morceaux personnalisés chaque lundi. 50M de morceaux, 4 Mds de playlists. CNN sur spectrogrammes audio.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Tech : CNN, RNN, reinforcement learning, collaborative filtering.</p>
+                        <a href="https://engineering.atspotify.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Spotify Engineering</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-red-600 mb-2">YouTube</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Modèle à <strong>1 milliard de paramètres</strong>. 2 étapes : génération de candidats → classement. Défis : échelle, fraîcheur, équilibre nouveauté/popularité.
+                        </p>
+                        <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Google Research Paper</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold text-orange-500 mb-2">Amazon</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Pionnier du "item-to-item collaborative filtering" (1998). LSTM/GRU pour les séquences d'achat. 35% du chiffre d'affaires via recommandations.
+                        </p>
+                        <a href="https://www.amazon.science/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Amazon Science</a>
+                    </div>
+                </div>
+
+                <!-- TikTok -->
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🇨🇳</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">TikTok — L'algorithme le plus addictif au monde</h5>
+                            <p class="text-sm dl-text-secondary mb-2">
+                                <strong>1,5 milliard</strong> d'utilisateurs actifs. ByteDance a investi <strong>$20 Mds en 2025</strong> dans son infrastructure IA. Contrairement aux autres réseaux sociaux, TikTok ne recommande pas selon votre graphe social, mais selon vos <strong>intérêts</strong>.
+                            </p>
+                            <ul class="text-sm dl-text-muted space-y-1">
+                                <li>• <strong>30-50%</strong> de vidéos ciblant vos intérêts connus, le reste pour explorer</li>
+                                <li>• Adaptation en temps réel aux préférences selon l'heure de la journée</li>
+                                <li>• Architecture propriétaire : "Monolith" avec embeddings sans collision</li>
+                            </ul>
+                            <a href="https://moderndiplomacy.eu/2025/12/21/how-tiktoks-algorithm-knows-you-better-than-you-do/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ TikTok Algorithm Deep Dive</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- JEUX ET SCIENCE -->
+        <section id="jeux-science" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🎮</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Jeux & Découvertes Scientifiques</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Les jeux ont été un terrain d'expérimentation privilégié pour le deep learning. Les mêmes techniques révolutionnent maintenant la recherche scientifique.
+                </p>
+
+                <!-- AlphaGo -->
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">AlphaGo (2016)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            DeepMind bat Lee Sedol au Go (4-1), regardé par <strong>200 millions</strong> de personnes. Le Go a 10<sup>170</sup> configurations possibles.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Architecture : Policy Network + Value Network + Monte Carlo Tree Search.</p>
+                        <a href="https://deepmind.google/research/breakthroughs/alphago/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ DeepMind AlphaGo</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">OpenAI Five (2019)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Bat les champions du monde de Dota 2. <strong>180 ans de parties/jour</strong> en self-play. 256 GPUs, 128K CPU cores. 99,4% de victoires.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Tech : LSTM 4096 unités, 150M paramètres, PPO massivement parallélisé.</p>
+                        <a href="https://openai.com/index/openai-five/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ OpenAI Five</a>
+                    </div>
+                </div>
+
+                <!-- AlphaFold -->
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🧬</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">AlphaFold — Prix Nobel 2024</h5>
+                            <p class="text-sm dl-text-secondary mb-2">
+                                <strong>200+ millions</strong> de structures protéiques prédites. Utilisé par 3,5M de chercheurs dans 190 pays. Demis Hassabis et John Jumper reçoivent le Nobel de chimie.
+                            </p>
+                            <ul class="text-sm dl-text-muted space-y-1">
+                                <li>• <strong>AlphaFold 2</strong> (2020) : Précision atomique sur le problème du "protein folding"</li>
+                                <li>• <strong>AlphaFold 3</strong> (2024) : Complexes protéiques avec ADN, ARN, modifications</li>
+                            </ul>
+                            <a href="https://deepmind.google/science/alphafold/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ DeepMind AlphaFold</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINANCE -->
+        <section id="finance" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">💰</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Finance & Trading</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <!-- Trading algorithmique -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Trading algorithmique</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-green mb-2">Renaissance Technologies</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Medallion Fund : <strong>~66% de rendement annuel</strong> avant frais (1988-2018). Fondé par Jim Simons (mathématicien). ML propriétaire + NLP sur actualités.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">Two Sigma</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Analyse les minutes de la Fed avec du NLP pour prédire les taux. Modèles qui apprennent et s'adaptent en continu. Big data + ML.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Détection de fraude -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Détection de fraude</h4>
+                <div class="concept-box mb-6">
+                    <p class="text-sm dl-text-secondary mb-3">
+                        <strong>90%</strong> des banques mondiales utilisent l'IA/ML pour détecter la fraude. Marché : $17,9 Mds (2025) → $60,6 Mds (2033).
+                    </p>
+                    <ul class="text-sm dl-text-muted space-y-1">
+                        <li>• <strong>Technologies</strong> : CNN, LSTM, Transformers, Graph Neural Networks, Autoencoders</li>
+                        <li>• <strong>Applications</strong> : Transactions suspectes, identités synthétiques, phishing, deepfakes</li>
+                        <li>• <strong>Défi</strong> : 50%+ des fraudes utilisent maintenant l'IA elles-mêmes</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SANTÉ -->
+        <section id="sante" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🏥</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Santé & Pharmaceutique</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    Le deep learning accélère la découverte de médicaments, le diagnostic, et la médecine personnalisée. Les laboratoires "autonomes" combinent robotique et IA.
+                </p>
+
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Découverte de médicaments</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-cyan mb-2">Insilico Medicine</h5>
+                        <p class="text-sm dl-text-muted">
+                            Phase IIa positive pour ISM001-055 (fibrose pulmonaire). Premier médicament "AI-native" en essais cliniques avancés.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">Recursion + Exscientia</h5>
+                        <p class="text-sm dl-text-muted">
+                            Fusion créant une plateforme end-to-end : screening phénomique + chimie de précision automatisée.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-green mb-2">Atomwise</h5>
+                        <p class="text-sm dl-text-muted">
+                            Premier réseau de neurones pour la découverte structure-based de médicaments. Milliards de molécules criblées virtuellement.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">AstraZeneca</h5>
+                        <p class="text-sm dl-text-muted">
+                            Analyse de 2 millions de séquences génomiques d'ici 2026 pour identifier de nouvelles cibles thérapeutiques.
+                        </p>
+                    </div>
+                </div>
+
+                <p class="text-sm dl-text-muted italic">
+                    Technologies clés : Graph Neural Networks pour les molécules, Transformers pour les protéines, reinforcement learning pour l'optimisation de leads.
+                </p>
+            </div>
+        </section>
+
+        <!-- ROBOTIQUE -->
+        <section id="robotique" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🤖</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Robotique & Automatisation</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    L'IA "embodied" — c'est-à-dire incarnée dans un corps physique — est le prochain grand défi. Marché : $4,4 Mds (2025) → $23 Mds (2030).
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-red mb-2">Tesla Optimus</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Robot humanoïde pour tâches dangereuses, ennuyeuses, répétitives. Prix cible : <strong>$20-30K</strong>. Production de masse prévue 2026.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Utilise la même IA de vision que les voitures Tesla.</p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-yellow mb-2">Boston Dynamics Atlas</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Démonstrations spectaculaires : backflips, parkour. Version électrique (2024). Pilotes avec Hyundai en usine automobile.
+                        </p>
+                        <a href="https://www.bostondynamics.com/atlas" target="_blank" class="text-xs dl-accent-blue hover:underline">→ Boston Dynamics Atlas</a>
+                    </div>
+                </div>
+
+                <div class="warning-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🇺🇸</span>
+                        <div>
+                            <h5 class="font-bold text-yellow-500 mb-2">Course à la robotique</h5>
+                            <p class="text-sm dl-text-secondary">
+                                Mars 2025 : Tesla, Boston Dynamics et Agility Robotics rencontrent les législateurs américains pour promouvoir une stratégie nationale. L'Association for Advanced Automation avertit : "Sans leadership, les US perdront la course à la robotique ET celle de l'IA."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRÉATIVITÉ -->
+        <section id="creativite" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-2xl">🎨</span>
+                <h3 class="text-2xl font-bold dl-text-primary">Art & Créativité Générative</h3>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+                <p class="mb-6">
+                    L'IA générative transforme la création artistique. <strong>78% des producteurs professionnels</strong> utilisent au moins un générateur IA. Réduction du temps de production : 62% en moyenne.
+                </p>
+
+                <!-- Génération d'images -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Génération d'images</h4>
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">Midjourney</h5>
+                        <p class="text-sm dl-text-muted">
+                            Standard d'or pour la qualité artistique. Rendu "cinématographique". 50M+ créateurs sur les plateformes principales.
+                        </p>
+                        <a href="https://www.midjourney.com/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ midjourney.com</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-green mb-2">DALL-E 3</h5>
+                        <p class="text-sm dl-text-muted">
+                            OpenAI. Excellent en compréhension du langage naturel. Peut écrire du texte dans les images. Intégré à ChatGPT.
+                        </p>
+                        <a href="https://openai.com/dall-e-3" target="_blank" class="text-xs dl-accent-blue hover:underline">→ openai.com/dall-e-3</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-orange mb-2">Stable Diffusion</h5>
+                        <p class="text-sm dl-text-muted">
+                            Open-source. Exécution locale possible. Centaines de modèles spécialisés (anime, architecture...).
+                        </p>
+                        <a href="https://stability.ai/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ stability.ai</a>
+                    </div>
+                </div>
+
+                <!-- Génération musicale -->
+                <h4 class="text-lg font-bold dl-text-primary mb-4">Génération musicale</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-purple mb-2">Suno</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            <strong>12M+ utilisateurs actifs</strong>. Valorisation : $2,45 Mds (Série C, nov 2025). Génère des chansons complètes à partir d'un prompt texte.
+                        </p>
+                        <p class="text-xs dl-text-secondary">Controversé : poursuivi par les labels pour droits d'auteur.</p>
+                        <a href="https://www.suno.ai/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ suno.ai</a>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <h5 class="font-bold dl-accent-blue mb-2">OpenAI Jukebox (2020)</h5>
+                        <p class="text-sm dl-text-muted mb-2">
+                            Génération de musique en audio brut avec paroles. Discontinué mais historique. OpenAI développe un nouvel outil musical (2025).
+                        </p>
+                        <a href="https://openai.com/index/jukebox/" target="_blank" class="text-xs dl-accent-blue hover:underline">→ OpenAI Jukebox</a>
+                    </div>
+                </div>
+
+                <p class="text-sm dl-text-muted italic mb-6">
+                    Fait marquant : 28% des morceaux uploadés sur Deezer sont entièrement générés par IA (septembre 2024).
+                </p>
+            </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section class="mb-16">
+            <div class="concept-box">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <h4 class="font-bold dl-accent-blue mb-3">Ce qu'il faut retenir</h4>
+                        <ul class="text-sm space-y-2 dl-text-muted">
+                            <li>• Le deep learning est <strong>partout</strong> : téléphone, streaming, voiture, hôpital, banque</li>
+                            <li>• Les mêmes techniques (CNN, Transformers, RL) s'appliquent à des domaines très différents</li>
+                            <li>• Les géants tech investissent des milliards, mais les startups innovent aussi (Suno, Insilico...)</li>
+                            <li>• Les enjeux éthiques et réglementaires sont majeurs (deepfakes, biais, emploi)</li>
+                            <li>• <strong>AlphaFold</strong> a montré que le deep learning peut résoudre des problèmes scientifiques fondamentaux</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOURCES -->
+        <section class="mb-16">
+            <details class="dl-card p-4 rounded-xl border">
+                <summary class="font-bold dl-text-primary cursor-pointer">📚 Sources et références</summary>
+                <div class="mt-4 text-sm dl-text-secondary space-y-4">
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">Vision par ordinateur</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://www.digitalocean.com/resources/articles/computer-vision-applications" target="_blank" class="dl-accent-blue hover:underline">Computer Vision Applications 2025 - DigitalOcean</a></li>
+                            <li>• <a href="https://blog.roboflow.com/computer-vision-companies/" target="_blank" class="dl-accent-blue hover:underline">Best Computer Vision Companies - Roboflow</a></li>
+                            <li>• <a href="https://www.thinkautonomous.ai/blog/tesla-vs-waymo-two-opposite-visions/" target="_blank" class="dl-accent-blue hover:underline">Tesla vs Waymo - ThinkAutonomous</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">NLP et LLMs</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://www.shakudo.io/blog/top-9-large-language-models" target="_blank" class="dl-accent-blue hover:underline">Top 9 LLMs December 2025 - Shakudo</a></li>
+                            <li>• <a href="https://www.weglot.com/guides/deepl-vs-google-translate" target="_blank" class="dl-accent-blue hover:underline">DeepL vs Google Translate - Weglot</a></li>
+                            <li>• <a href="https://brand24.com/blog/sentiment-analysis/" target="_blank" class="dl-accent-blue hover:underline">Sentiment Analysis 2025 - Brand24</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">Recommandation</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" class="dl-accent-blue hover:underline">Netflix Foundation Model - Netflix Tech Blog</a></li>
+                            <li>• <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/" target="_blank" class="dl-accent-blue hover:underline">YouTube Recommendations - Google Research</a></li>
+                            <li>• <a href="https://sander.ai/2014/08/05/spotify-cnns.html" target="_blank" class="dl-accent-blue hover:underline">Spotify CNNs - Sander Dieleman</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">Jeux et science</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://deepmind.google/research/breakthroughs/alphago/" target="_blank" class="dl-accent-blue hover:underline">AlphaGo - DeepMind</a></li>
+                            <li>• <a href="https://deepmind.google/science/alphafold/" target="_blank" class="dl-accent-blue hover:underline">AlphaFold - DeepMind</a></li>
+                            <li>• <a href="https://openai.com/index/openai-five/" target="_blank" class="dl-accent-blue hover:underline">OpenAI Five - OpenAI</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">Finance et santé</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://www.tredence.com/blog/ai-for-fraud-detection-in-banking" target="_blank" class="dl-accent-blue hover:underline">AI Fraud Detection in Banking - Tredence</a></li>
+                            <li>• <a href="https://www.sciencedirect.com/science/article/pii/S0031699925075118" target="_blank" class="dl-accent-blue hover:underline">AI-driven Drug Discovery 2025 - ScienceDirect</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">Robotique et créativité</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://www.bostondynamics.com/atlas" target="_blank" class="dl-accent-blue hover:underline">Atlas - Boston Dynamics</a></li>
+                            <li>• <a href="https://vertu.com/lifestyle/midjourney-vs-dall-e-3-vs-stable-diffusion-2025-ai-image-generation/" target="_blank" class="dl-accent-blue hover:underline">Midjourney vs DALL-E vs Stable Diffusion 2025</a></li>
+                            <li>• <a href="https://openai.com/index/jukebox/" target="_blank" class="dl-accent-blue hover:underline">Jukebox - OpenAI</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">LLMs chinois et français</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://arxiv.org/html/2512.02556v1" target="_blank" class="dl-accent-blue hover:underline">DeepSeek-V3.2 Technical Report - arXiv</a></li>
+                            <li>• <a href="https://www.alibabacloud.com/blog/alibaba-introduces-qwen3-setting-new-benchmark-in-open-source-ai-with-hybrid-reasoning_602192" target="_blank" class="dl-accent-blue hover:underline">Qwen3 - Alibaba Cloud</a></li>
+                            <li>• <a href="https://mistral.ai/news/mistral-3" target="_blank" class="dl-accent-blue hover:underline">Mistral 3 - Mistral AI</a></li>
+                            <li>• <a href="https://www.huaweicloud.com/intl/en-us/news/20250620192415143.html" target="_blank" class="dl-accent-blue hover:underline">PanGu 5.5 - Huawei Cloud</a></li>
+                            <li>• <a href="https://www.prnewswire.com/news-releases/baidu-unveils-ernie-5-0-and-a-series-of-ai-applications-at-baidu-world-2025--ramps-up-global-push-302614531.html" target="_blank" class="dl-accent-blue hover:underline">ERNIE 5.0 & Apollo Go - Baidu</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="font-bold dl-accent-cyan mb-2">TikTok et ByteDance</h5>
+                        <ul class="space-y-1 dl-text-muted">
+                            <li>• <a href="https://moderndiplomacy.eu/2025/12/21/how-tiktoks-algorithm-knows-you-better-than-you-do/" target="_blank" class="dl-accent-blue hover:underline">TikTok Algorithm Deep Dive - Modern Diplomacy</a></li>
+                            <li>• <a href="https://thenewstack.io/what-makes-tiktoks-algorithms-so-effective/" target="_blank" class="dl-accent-blue hover:underline">TikTok Algorithms - The New Stack</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Slide 8/11</p>
+    </footer>
+
+</body>
+</html>

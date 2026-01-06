@@ -1,0 +1,8 @@
+{
+  "id": "09-outils",
+  "title": "Frameworks & Hardware",
+  "description": "PyTorch, TensorFlow, JAX et les GPU/TPU qui font tourner le deep learning",
+  "type": "page",
+  "icon": "🛠️",
+  "duration": "8 min"
+}

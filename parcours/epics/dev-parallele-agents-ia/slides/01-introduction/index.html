@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introduction - Développement parallèle avec agents IA</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+  <style>
+    .hero {
+      text-align: center;
+      padding: var(--space-xl) 0;
+    }
+    .hero-emoji {
+      font-size: 4rem;
+      margin-bottom: var(--space-md);
+    }
+    .hero h1 {
+      border: none;
+      padding: 0;
+      font-size: 2rem;
+    }
+    .tagline {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-muted);
+      font-style: italic;
+      margin-bottom: var(--space-xl);
+    }
+    .intro-text {
+      font-size: var(--font-size-md);
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto var(--space-xl);
+    }
+    .objectives {
+      background: var(--color-bg-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--space-xl) 0;
+    }
+    .objectives h2 {
+      margin-top: 0;
+      font-size: var(--font-size-lg);
+    }
+    .objectives ul {
+      margin-bottom: 0;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+    }
+    .toc-chip {
+      background: var(--color-bg-secondary);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      text-align: center;
+      border-left: 3px solid var(--color-accent);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .toc-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .toc-chip-icon {
+      display: block;
+      font-size: 1.5rem;
+      margin-bottom: var(--space-xs);
+    }
+  </style>
+</head>
+<body>
+  <article class="slide">
+    <div class="hero">
+      <div class="hero-emoji">🔀</div>
+      <h1>Développement parallèle avec agents IA</h1>
+      <p class="tagline">Comment faire travailler plusieurs agents de code sur le même projet sans tout casser</p>
+    </div>
+
+    <p class="intro-text">
+      Beaucoup de développeurs m'ont posé la question : "Comment tu fais pour utiliser plusieurs agents en parallèle sur un même projet ?"
+      Ce guide est ma réponse — un retour d'expérience avec les solutions techniques que j'ai testées et les workflows qui fonctionnent.
+    </p>
+
+    <p class="intro-text">
+      L'objectif n'est pas de lister tous les outils du marché, mais de donner une <strong>méthode concrète</strong> pour passer
+      de "un agent à la fois" à "plusieurs agents en parallèle" sans perdre le contrôle.
+    </p>
+
+    <div class="objectives">
+      <h2>🎯 Ce que vous allez apprendre</h2>
+      <ul>
+        <li>Isoler chaque agent avec <strong>Git Worktree</strong></li>
+        <li>Superviser plusieurs agents avec un <strong>multiplexeur terminal</strong></li>
+        <li>Structurer le contexte avec l'approche <strong>spec-driven</strong></li>
+        <li>Maîtriser le <strong>workflow complet</strong> de la préparation au merge</li>
+        <li>Éviter les <strong>pièges courants</strong> et comprendre les limites humaines</li>
+      </ul>
+    </div>
+
+    <h2>📑 Table des matières</h2>
+
+    <div class="toc-grid">
+      <div class="toc-chip">
+        <span class="toc-chip-icon">⚠️</span>
+        Le problème
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🔀</span>
+        Git Worktree
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🖥️</span>
+        Multiplexeur
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">📋</span>
+        Specs & Contexte
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🔄</span>
+        Workflow
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🪟</span>
+        Windows
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🚫</span>
+        Pièges
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">🧠</span>
+        Limites humaines
+      </div>
+      <div class="toc-chip">
+        <span class="toc-chip-icon">📚</span>
+        Références
+      </div>
+    </div>
+  </article>
+</body>
+</html>

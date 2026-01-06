@@ -1,18 +1,38 @@
 {
   "id": "deep-learning-intro",
-  "title": "Introduction au Deep Learning",
-  "description": "Cours interactif sur les fondamentaux du deep learning : neurones, propagation, rétropropagation et optimisation, avec un laboratoire de simulation en temps réel.",
+  "title": "Deep Learning pour l'impatient",
+  "description": "Comprendre les réseaux de neurones de zéro à expert : types d'apprentissage, neurones, propagation, rétropropagation, architectures modernes et laboratoire interactif.",
   "hierarchy": ["ia"],
   "tags": ["ia", "deep-learning", "neural-network", "machine-learning", "interactif"],
   "metadata": {
     "author": "cyrille",
     "created": "2025-12-15",
-    "duration": "30 min",
+    "duration": "45 min",
     "difficulty": "beginner",
     "language": "fr"
   },
   "icon": "🧠",
+  "thumbnail": "thumbnail.jpg",
   "content": [
-    { "id": "01-retropropagation" }
+    {
+      "id": "theorie",
+      "title": "Théorie",
+      "icon": "📚",
+      "content": [
+        { "id": "01-introduction" },
+        { "id": "02-types-apprentissage" },
+        { "id": "03-neurone" },
+        { "id": "04-reseaux" },
+        { "id": "05-forward-propagation" },
+        { "id": "06-loss-functions" },
+        { "id": "07-backpropagation" },
+        { "id": "08-entrainement" }
+      ]
+    },
+    { "id": "09-cas-usage" },
+    { "id": "10-architectures" },
+    { "id": "11-outils" },
+    { "id": "12-laboratoire" },
+    { "id": "13-glossaire", "type": "glossary", "optional": true }
   ]
 }

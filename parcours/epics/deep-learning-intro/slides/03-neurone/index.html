@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Neurone - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script type="module">
+        import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <section id="neuron" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">⚡</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Anatomie d'un Neurone</h2>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <!-- INTRODUCTION NARRATIVE -->
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    Le neurone artificiel est l'une des briques les plus simples du Deep Learning : une somme pondérée et une fonction d'activation. La vraie question n'est pas <em>"comment ça marche ?"</em> mais <em>"comment quelque chose d'aussi basique peut-il apprendre à conduire une voiture ou battre un champion du monde aux échecs ?"</em>
+                </p>
+
+                <h3 class="text-xl font-bold dl-text-primary mt-8 mb-4">Un peu d'histoire</h3>
+
+                <p class="mb-4">
+                    L'histoire du neurone artificiel commence en <strong>1943</strong>, quand Warren McCulloch et Walter Pitts proposent le premier modèle mathématique inspiré du cerveau. Leur idée est élégante : un neurone reçoit des signaux, les combine, et "s'active" si le total dépasse un seuil. Simple, mais révolutionnaire.
+                </p>
+
+                <p class="mb-4">
+                    En <strong>1958</strong>, Frank Rosenblatt concrétise cette vision avec le <strong>Perceptron</strong>, une machine capable d'<em>apprendre</em> en ajustant automatiquement ses paramètres. L'enthousiasme est immense... jusqu'en 1969, quand Minsky et Papert démontrent qu'un seul neurone ne peut pas résoudre des problèmes aussi simples que le XOR. C'est le premier "hiver du connexionnisme".
+                </p>
+
+                <p class="mb-6">
+                    Il faudra attendre <strong>1986</strong> et la popularisation de la <dfn>rétropropagation</dfn> pour que les réseaux multicouches prennent leur essor — et <strong>2012</strong> pour que le Deep Learning explose avec AlexNet. Mais au cœur de toutes ces avancées, la brique fondamentale reste la même : le neurone artificiel que nous allons explorer.
+                </p>
+
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">L'analogie du recruteur</h3>
+
+                <p class="mb-4">
+                    Pour comprendre intuitivement le fonctionnement d'un neurone, imaginons un <strong>recruteur</strong> qui doit décider s'il embauche un candidat.
+                </p>
+
+                <p class="mb-4">
+                    Le candidat arrive avec plusieurs <strong>compétences</strong> — disons un diplôme noté sur 10, des années d'expérience, et un score de motivation. Ce sont les <strong class="dl-accent-cyan">entrées</strong> du neurone, notées \(x_1, x_2, x_3\).
+                </p>
+
+                <p class="mb-4">
+                    Mais toutes les compétences ne se valent pas. Pour un poste technique, le diplôme compte peut-être plus que la motivation. Le recruteur attribue donc un <dfn class="dl-accent-purple">poids</dfn> à chaque critère : \(w_1 = 0.4\) pour le diplôme, \(w_2 = 0.35\) pour l'expérience, \(w_3 = 0.25\) pour la motivation.
+                </p>
+
+                <p class="mb-4">
+                    Le recruteur calcule ensuite un <strong>score total</strong> : il multiplie chaque compétence par son poids, puis additionne le tout. C'est la <em>somme pondérée</em>. Mais il ajoute aussi un <dfn class="dl-accent-orange">biais</dfn> \(b\), qui représente son niveau d'exigence global. Un biais très négatif ? Recruteur sévère. Un biais positif ? Facile à convaincre.
+                </p>
+
+                <p class="mb-6">
+                    Enfin, si le score dépasse un certain seuil, le neurone <strong class="dl-accent-green">"s'active"</strong> et transmet le signal. Sinon, il reste silencieux. C'est le rôle de la <dfn data-term="activation">fonction d'activation</dfn>.
+                </p>
+
+                <p class="mb-8 text-sm dl-text-muted italic">
+                    Manipulez la visualisation ci-dessous pour voir ce mécanisme en action. Ajustez les compétences du candidat et observez comment le neurone décide de s'activer — ou non.
+                </p>
+
+                <!-- VISUALISATION INTERACTIVE DU NEURONE -->
+                <div class="concept-box mb-8">
+                    <h4 class="font-bold dl-accent-blue mb-3">Expérimentez</h4>
+                    <div class="my-4">
+                        <canvas id="neuronCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
+                        <p class="text-center text-xs dl-text-muted mt-2">Ajustez les curseurs pour voir l'effet sur la sortie</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                        <div class="text-center">
+                            <label class="text-xs dl-text-muted block mb-1">x₁ (Diplôme)</label>
+                            <input type="range" id="x1" min="0" max="10" value="7" class="w-full">
+                            <span id="x1Val" class="dl-accent-cyan text-xs font-mono">7</span>
+                        </div>
+                        <div class="text-center">
+                            <label class="text-xs dl-text-muted block mb-1">x₂ (Expérience)</label>
+                            <input type="range" id="x2" min="0" max="10" value="5" class="w-full">
+                            <span id="x2Val" class="dl-accent-cyan text-xs font-mono">5</span>
+                        </div>
+                        <div class="text-center">
+                            <label class="text-xs dl-text-muted block mb-1">x₃ (Motivation)</label>
+                            <input type="range" id="x3" min="0" max="10" value="8" class="w-full">
+                            <span id="x3Val" class="dl-accent-cyan text-xs font-mono">8</span>
+                        </div>
+                        <div class="text-center">
+                            <label class="text-xs dl-text-muted block mb-1">Biais (b)</label>
+                            <input type="range" id="biasSlider" min="-5" max="5" step="0.5" value="-3" class="w-full">
+                            <span id="biasVal" class="dl-accent-orange text-xs font-mono">-3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('neuronCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+
+                    // Poids fixes (pour la démo)
+                    const weights = [0.4, 0.35, 0.25];
+                    const labels = ['Diplôme', 'Expérience', 'Motivation'];
+
+                    function relu(z) { return Math.max(0, z); }
+
+                    function draw() {
+                        const x1 = parseFloat(document.getElementById('x1').value);
+                        const x2 = parseFloat(document.getElementById('x2').value);
+                        const x3 = parseFloat(document.getElementById('x3').value);
+                        const bias = parseFloat(document.getElementById('biasSlider').value);
+
+                        document.getElementById('x1Val').textContent = x1;
+                        document.getElementById('x2Val').textContent = x2;
+                        document.getElementById('x3Val').textContent = x3;
+                        document.getElementById('biasVal').textContent = bias;
+
+                        const inputs = [x1, x2, x3];
+                        const z = inputs.reduce((s, x, i) => s + x * weights[i], 0) + bias;
+                        const output = relu(z);
+
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const textColor = isDark ? '#e2e8f0' : '#334155';
+                        const mutedColor = isDark ? '#64748b' : '#94a3b8';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Positions
+                        const inputX = 80;
+                        const sumX = 280;
+                        const actX = 420;
+                        const outX = 540;
+                        const centerY = H / 2;
+                        const inputSpacing = 70;
+
+                        // Dessiner les entrées
+                        for (let i = 0; i < 3; i++) {
+                            const y = centerY + (i - 1) * inputSpacing;
+                            const weight = weights[i];
+                            const lineWidth = 1 + weight * 6;
+
+                            // Ligne vers somme
+                            ctx.strokeStyle = `rgba(168, 85, 247, ${0.3 + weight * 0.7})`;
+                            ctx.lineWidth = lineWidth;
+                            ctx.beginPath();
+                            ctx.moveTo(inputX + 30, y);
+                            ctx.lineTo(sumX - 35, centerY);
+                            ctx.stroke();
+
+                            // Cercle entrée
+                            ctx.fillStyle = '#22d3ee';
+                            ctx.beginPath();
+                            ctx.arc(inputX, y, 25, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            // Valeur entrée
+                            ctx.fillStyle = '#0f172a';
+                            ctx.font = 'bold 14px monospace';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(inputs[i].toString(), inputX, y + 5);
+
+                            // Label
+                            ctx.fillStyle = mutedColor;
+                            ctx.font = '10px sans-serif';
+                            ctx.fillText(labels[i], inputX, y + 40);
+
+                            // Poids sur la ligne
+                            const midX = (inputX + 30 + sumX - 35) / 2;
+                            const midY = (y + centerY) / 2;
+                            ctx.fillStyle = '#a855f7';
+                            ctx.font = 'bold 11px monospace';
+                            ctx.fillText(`w=${weight}`, midX, midY - 5);
+                        }
+
+                        // Biais (flèche vers le haut)
+                        ctx.strokeStyle = '#f97316';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(sumX, centerY + 50);
+                        ctx.lineTo(sumX, centerY + 35);
+                        ctx.stroke();
+                        ctx.fillStyle = '#f97316';
+                        ctx.font = 'bold 11px monospace';
+                        ctx.fillText(`b=${bias}`, sumX, centerY + 65);
+
+                        // Cercle somme (Σ)
+                        ctx.fillStyle = isDark ? '#374151' : '#e2e8f0';
+                        ctx.beginPath();
+                        ctx.arc(sumX, centerY, 30, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = mutedColor;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        ctx.fillStyle = textColor;
+                        ctx.font = 'bold 20px serif';
+                        ctx.fillText('Σ', sumX, centerY + 7);
+
+                        // Valeur z sous le cercle
+                        ctx.fillStyle = mutedColor;
+                        ctx.font = '11px monospace';
+                        ctx.fillText(`z = ${z.toFixed(1)}`, sumX, centerY - 40);
+
+                        // Ligne somme -> activation
+                        ctx.strokeStyle = mutedColor;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(sumX + 30, centerY);
+                        ctx.lineTo(actX - 35, centerY);
+                        ctx.stroke();
+
+                        // Cercle activation (σ)
+                        ctx.fillStyle = isDark ? '#374151' : '#e2e8f0';
+                        ctx.beginPath();
+                        ctx.arc(actX, centerY, 30, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#22c55e';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#22c55e';
+                        ctx.font = 'bold 16px serif';
+                        ctx.fillText('ReLU', actX, centerY + 6);
+
+                        // Ligne activation -> sortie
+                        const outputAlpha = Math.min(1, output / 10);
+                        ctx.strokeStyle = `rgba(34, 197, 94, ${0.3 + outputAlpha * 0.7})`;
+                        ctx.lineWidth = 2 + output / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(actX + 30, centerY);
+                        ctx.lineTo(outX - 25, centerY);
+                        ctx.stroke();
+
+                        // Cercle sortie
+                        const outColor = output > 0 ? '#22c55e' : '#ef4444';
+                        ctx.fillStyle = outColor;
+                        ctx.beginPath();
+                        ctx.arc(outX, centerY, 25, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 14px monospace';
+                        ctx.fillText(output.toFixed(1), outX, centerY + 5);
+
+                        // Label sortie
+                        ctx.fillStyle = mutedColor;
+                        ctx.font = '10px sans-serif';
+                        ctx.fillText('Sortie', outX, centerY + 40);
+
+                        // Verdict
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.fillStyle = output > 0 ? '#22c55e' : '#ef4444';
+                        ctx.fillText(output > 0 ? '✓ Activé !' : '✗ Inactif', outX, centerY + 55);
+                    }
+
+                    ['x1', 'x2', 'x3', 'biasSlider'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', draw);
+                    });
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    draw();
+                })();
+                </script>
+
+                <!-- FORMULES -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Les Formules</h3>
+
+                <div class="step-indicator">
+                    <span class="step-number">1</span>
+                    <span class="dl-text-primary font-semibold">Somme pondérée</span>
+                </div>
+                <p class="mb-4 ml-10">
+                    Chaque entrée \(x_i\) est multipliée par un <strong>poids</strong> \(w_i\), puis on additionne avec le <strong>biais</strong> \(b\) :
+                </p>
+                <div class="math-block text-center">
+                    $$ z = w_1 x_1 + w_2 x_2 + ... + w_n x_n + b = \sum_{i=1}^{n} w_i x_i + b $$
+                </div>
+
+                <div class="step-indicator">
+                    <span class="step-number">2</span>
+                    <span class="dl-text-primary font-semibold">Fonction d'activation</span>
+                </div>
+                <p class="mb-4 ml-10">
+                    Cette somme passe dans une <strong>fonction d'activation</strong> qui introduit de la non-linéarité :
+                </p>
+                <div class="math-block text-center">
+                    $$ a = \sigma(z) $$
+                </div>
+
+                <!-- 4. FONCTIONS D'ACTIVATION -->
+                <div class="concept-box mt-8">
+                    <h4 class="font-bold dl-accent-blue mb-3">Fonctions d'Activation Courantes</h4>
+
+                    <!-- Visualisation interactive -->
+                    <div class="my-4 relative">
+                        <canvas id="activationCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
+                        <div class="flex justify-center gap-4 mt-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showTanh" checked class="accent-cyan-400">
+                                <span class="dl-accent-cyan text-sm font-mono">tanh</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showSigmoid" checked class="accent-purple-400">
+                                <span class="dl-accent-purple text-sm font-mono">sigmoid</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="showRelu" checked class="accent-green-400">
+                                <span class="dl-accent-green text-sm font-mono">ReLU</span>
+                            </label>
+                        </div>
+                        <p class="text-center text-xs dl-text-muted mt-2">Survolez pour voir les valeurs</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4 text-sm mt-4">
+                        <div>
+                            <span class="font-mono dl-accent-cyan">tanh(z)</span>
+                            <p class="dl-text-muted text-xs mt-1">Sortie entre -1 et 1. Utilisée dans notre simulation.</p>
+                        </div>
+                        <div>
+                            <span class="font-mono dl-accent-purple">sigmoid(z)</span>
+                            <p class="dl-text-muted text-xs mt-1">Sortie entre 0 et 1. Idéale pour les probabilités.</p>
+                        </div>
+                        <div>
+                            <span class="font-mono dl-accent-green">ReLU(z)</span>
+                            <p class="dl-text-muted text-xs mt-1">max(0, z). La plus populaire aujourd'hui.</p>
+                        </div>
+                    </div>
+
+                    <!-- POURQUOI LA NON-LINÉARITÉ -->
+                    <div class="mt-4 p-3 rounded border border-yellow-500/30 bg-yellow-500/5">
+                        <div class="flex items-start gap-2">
+                            <span class="text-lg">💡</span>
+                            <p class="dl-text-secondary text-xs">
+                                <strong class="text-yellow-500">Pourquoi la non-linéarité ?</strong>
+                                Sans fonction d'activation, un réseau de 100 couches serait équivalent à... une seule couche ! La composition de fonctions linéaires reste linéaire. C'est la non-linéarité qui permet au réseau d'apprendre des patterns complexes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('activationCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    // Fonctions d'activation
+                    const tanh = z => Math.tanh(z);
+                    const sigmoid = z => 1 / (1 + Math.exp(-z));
+                    const relu = z => Math.max(0, z);
+
+                    // Échelles
+                    const xMin = -4, xMax = 4;
+                    const yMin = -1.5, yMax = 1.5;
+                    const toCanvasX = x => margin.left + (x - xMin) / (xMax - xMin) * plotW;
+                    const toCanvasY = y => margin.top + (yMax - y) / (yMax - yMin) * plotH;
+                    const fromCanvasX = cx => xMin + (cx - margin.left) / plotW * (xMax - xMin);
+
+                    let mouseX = null;
+
+                    function draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const axisColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Grille
+                        ctx.strokeStyle = gridColor;
+                        ctx.lineWidth = 1;
+                        for (let x = -4; x <= 4; x++) {
+                            ctx.beginPath();
+                            ctx.moveTo(toCanvasX(x), margin.top);
+                            ctx.lineTo(toCanvasX(x), H - margin.bottom);
+                            ctx.stroke();
+                        }
+                        for (let y = -1; y <= 1; y += 0.5) {
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, toCanvasY(y));
+                            ctx.lineTo(W - margin.right, toCanvasY(y));
+                            ctx.stroke();
+                        }
+
+                        // Axes
+                        ctx.strokeStyle = axisColor;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(toCanvasX(0), margin.top);
+                        ctx.lineTo(toCanvasX(0), H - margin.bottom);
+                        ctx.moveTo(margin.left, toCanvasY(0));
+                        ctx.lineTo(W - margin.right, toCanvasY(0));
+                        ctx.stroke();
+
+                        // Labels
+                        ctx.fillStyle = textColor;
+                        ctx.font = '11px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('z', W - margin.right + 10, toCanvasY(0) + 4);
+                        ctx.fillText('-4', toCanvasX(-4), H - margin.bottom + 15);
+                        ctx.fillText('0', toCanvasX(0), H - margin.bottom + 15);
+                        ctx.fillText('4', toCanvasX(4), H - margin.bottom + 15);
+                        ctx.textAlign = 'right';
+                        ctx.fillText('1', margin.left - 5, toCanvasY(1) + 4);
+                        ctx.fillText('-1', margin.left - 5, toCanvasY(-1) + 4);
+
+                        // Fonctions
+                        const showTanh = document.getElementById('showTanh').checked;
+                        const showSigmoid = document.getElementById('showSigmoid').checked;
+                        const showRelu = document.getElementById('showRelu').checked;
+
+                        function drawCurve(fn, color, clip = false) {
+                            ctx.strokeStyle = color;
+                            ctx.lineWidth = 2.5;
+                            ctx.beginPath();
+                            let started = false;
+                            for (let px = margin.left; px <= W - margin.right; px++) {
+                                const x = fromCanvasX(px);
+                                let y = fn(x);
+                                if (clip) y = Math.min(Math.max(y, yMin), yMax);
+                                const py = toCanvasY(y);
+                                if (!started) { ctx.moveTo(px, py); started = true; }
+                                else ctx.lineTo(px, py);
+                            }
+                            ctx.stroke();
+                        }
+
+                        if (showTanh) drawCurve(tanh, '#22d3ee');
+                        if (showSigmoid) drawCurve(sigmoid, '#a855f7');
+                        if (showRelu) drawCurve(relu, '#22c55e', true);
+
+                        // Curseur et valeurs
+                        if (mouseX !== null && mouseX >= margin.left && mouseX <= W - margin.right) {
+                            const x = fromCanvasX(mouseX);
+
+                            ctx.strokeStyle = axisColor;
+                            ctx.lineWidth = 1;
+                            ctx.setLineDash([4, 4]);
+                            ctx.beginPath();
+                            ctx.moveTo(mouseX, margin.top);
+                            ctx.lineTo(mouseX, H - margin.bottom);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+
+                            // Points et valeurs
+                            let yOffset = 15;
+                            ctx.font = 'bold 11px monospace';
+                            ctx.textAlign = 'left';
+
+                            ctx.fillStyle = textColor;
+                            ctx.fillText(`z = ${x.toFixed(2)}`, mouseX + 8, margin.top + yOffset);
+                            yOffset += 15;
+
+                            if (showTanh) {
+                                const y = tanh(x);
+                                ctx.fillStyle = '#22d3ee';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(y), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`tanh = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                                yOffset += 15;
+                            }
+                            if (showSigmoid) {
+                                const y = sigmoid(x);
+                                ctx.fillStyle = '#a855f7';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(y), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`σ = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                                yOffset += 15;
+                            }
+                            if (showRelu) {
+                                const y = relu(x);
+                                ctx.fillStyle = '#22c55e';
+                                ctx.beginPath();
+                                ctx.arc(mouseX, toCanvasY(Math.min(y, yMax)), 5, 0, Math.PI * 2);
+                                ctx.fill();
+                                ctx.fillText(`ReLU = ${y.toFixed(3)}`, mouseX + 8, margin.top + yOffset);
+                            }
+                        }
+                    }
+
+                    canvas.addEventListener('mousemove', e => {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = (e.clientX - rect.left) * (W / rect.width);
+                        draw();
+                    });
+                    canvas.addEventListener('mouseleave', () => { mouseX = null; draw(); });
+
+                    document.getElementById('showTanh').addEventListener('change', draw);
+                    document.getElementById('showSigmoid').addEventListener('change', draw);
+                    document.getElementById('showRelu').addEventListener('change', draw);
+
+                    // Observer le changement de thème
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                    draw();
+                })();
+                </script>
+
+                <!-- 5. PSEUDO-CODE -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Pseudo-Code</h3>
+
+                <div class="dl-card rounded-xl border overflow-hidden">
+                    <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
+                        neurone.py
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-slate-500"># Entrées (ex: Diplôme=7, Expérience=5, Motivation=8)</span>
+<span class="dl-accent-purple">entrees</span> = [x1, x2, ..., xn]
+
+<span class="text-slate-500"># Paramètres du neurone</span>
+<span class="dl-accent-purple">poids</span> = [w1, w2, ..., wn]
+<span class="dl-accent-purple">biais</span> = b
+
+<span class="text-slate-500"># 1. Calcul de la somme pondérée</span>
+<span class="dl-accent-purple">z</span> = <span class="dl-accent-cyan">0</span>
+<span class="text-pink-400">pour</span> i <span class="text-pink-400">de</span> <span class="dl-accent-cyan">0</span> <span class="text-pink-400">à</span> n:
+    z += entrees[i] * poids[i]
+z += biais
+
+<span class="text-slate-500"># 2. Fonction d'activation (ReLU)</span>
+<span class="text-pink-400">si</span> z > <span class="dl-accent-cyan">0</span>:
+    <span class="dl-accent-purple">sortie</span> = z
+<span class="text-pink-400">sinon</span>:
+    <span class="dl-accent-purple">sortie</span> = <span class="dl-accent-cyan">0</span>
+
+<span class="text-pink-400">retourner</span> sortie</code></pre>
+                </div>
+
+                <!-- LIMITES DE L'ANALOGIE BIOLOGIQUE -->
+                <div class="warning-box mt-10">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">⚠️</span>
+                        <div>
+                            <h4 class="font-bold text-yellow-500 mb-2">Attention à l'analogie biologique</h4>
+                            <p class="dl-text-secondary text-sm mb-3">
+                                Le terme "neurone" est trompeur. Les neurones artificiels sont une <em>simplification extrême</em> de leurs cousins biologiques :
+                            </p>
+                            <ul class="text-sm space-y-1 dl-text-muted">
+                                <li>• <strong>Timing</strong> : les vrais neurones communiquent par impulsions temporelles précises, pas par des valeurs continues</li>
+                                <li>• <strong>Chimie</strong> : neurotransmetteurs, récepteurs, plasticité synaptique — tout cela est ignoré</li>
+                                <li>• <strong>Énergie</strong> : votre cerveau consomme ~20W pour 86 milliards de neurones ; un GPU en consomme 300W pour quelques milliards d'opérations</li>
+                            </ul>
+                            <p class="dl-text-secondary text-sm mt-3">
+                                L'analogie reste utile pour l'intuition, mais gardez à l'esprit que les réseaux de neurones sont avant tout des <strong>outils mathématiques</strong>, pas des simulations du cerveau.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUTRES TYPES DE NEURONES -->
+                <h3 class="text-xl font-bold dl-text-primary mt-10 mb-4">Au-delà de McCulloch-Pitts</h3>
+
+                <p class="mb-6">
+                    Le neurone que nous venons de voir (somme pondérée + activation) n'est pas le seul modèle. D'autres approches tentent de se rapprocher du fonctionnement biologique ou d'apporter des propriétés intéressantes.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <!-- Neurones à impulsions -->
+                    <div class="dl-card p-4 rounded-xl border border-cyan-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">⚡</span>
+                            <div>
+                                <h4 class="font-bold dl-accent-cyan mb-1">Neurones à impulsions</h4>
+                                <p class="text-xs dl-text-muted mb-2">Spiking Neural Networks (SNNs)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Au lieu de valeurs continues, ces neurones communiquent par <strong>trains d'impulsions</strong> (spikes), comme les vrais neurones biologiques.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="dl-accent-cyan">Origine :</strong> <strong>Hodgkin & Huxley</strong> (Cambridge, 1952) — Prix Nobel 1963 pour leur modèle du potentiel d'action</p>
+                                    <p><strong class="dl-accent-cyan">Théorisé :</strong> <strong>Wolfgang Maass</strong> (TU Graz, 1997) — "3ème génération" de réseaux</p>
+                                    <p><strong class="dl-accent-cyan">Atout :</strong> Efficacité énergétique exceptionnelle</p>
+                                    <p><strong class="dl-accent-cyan">Hardware :</strong> Intel Loihi (1M neurones), IBM TrueNorth</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neurones liquides -->
+                    <div class="dl-card p-4 rounded-xl border border-purple-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">💧</span>
+                            <div>
+                                <h4 class="font-bold dl-accent-purple mb-1">Neurones liquides</h4>
+                                <p class="text-xs dl-text-muted mb-2">Liquid Time-Constant (LTC)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Des neurones dont les <strong>constantes de temps varient</strong> selon l'entrée, s'adaptant dynamiquement au contexte.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="dl-accent-purple">Origine :</strong> <strong>Ramin Hasani</strong> (MIT CSAIL, 2020), sous la direction de <strong>Daniela Rus</strong></p>
+                                    <p><strong class="dl-accent-purple">Inspiration :</strong> Le ver <em>C. elegans</em> (302 neurones, comportements complexes)</p>
+                                    <p><strong class="dl-accent-purple">Atout :</strong> Compacité remarquable — un drone navigue avec <strong>19 neurones</strong> !</p>
+                                    <p><strong class="dl-accent-purple">Startup :</strong> Liquid AI (valorisation $2.35B en 2024)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <!-- Reservoir Computing -->
+                    <div class="dl-card p-4 rounded-xl border border-green-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🌊</span>
+                            <div>
+                                <h4 class="font-bold dl-accent-green mb-1">Réservoir Computing</h4>
+                                <p class="text-xs dl-text-muted mb-2">Echo State Networks (ESN)</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Un réseau récurrent <strong>fixe et aléatoire</strong> (le "réservoir") transforme les entrées, et seule la couche de sortie est entraînée.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="dl-accent-green">Origine :</strong> <strong>Herbert Jaeger</strong> (GMD, 2001) — ESN</p>
+                                    <p><strong class="dl-accent-green">Parallèle :</strong> <strong>Wolfgang Maass</strong> — Liquid State Machines</p>
+                                    <p><strong class="dl-accent-green">Atout :</strong> Entraînement ultra-rapide (régression linéaire)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neurones dendritiques -->
+                    <div class="dl-card p-4 rounded-xl border border-orange-500/30">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">🌳</span>
+                            <div>
+                                <h4 class="font-bold dl-accent-orange mb-1">Neurones dendritiques</h4>
+                                <p class="text-xs dl-text-muted mb-2">Dendritic Neural Networks</p>
+                                <p class="text-sm dl-text-secondary mb-2">
+                                    Modélisent la <strong>structure arborescente</strong> des dendrites, où l'intégration spatiale des entrées compte.
+                                </p>
+                                <div class="text-xs dl-text-muted space-y-1">
+                                    <p><strong class="dl-accent-orange">Motivation :</strong> Les dendrites occupent 90% de l'organisation cellulaire nerveuse</p>
+                                    <p><strong class="dl-accent-orange">Atout :</strong> Moins de paramètres pour atteindre la même précision</p>
+                                    <p><strong class="dl-accent-orange">Applications :</strong> Résolution du problème d'oubli catastrophique</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <p class="text-sm dl-text-secondary">
+                        <strong class="dl-accent-green">Pour aller plus loin :</strong> Ces approches restent de niche, mais elles illustrent que le neurone de McCulloch-Pitts n'est qu'<em>une</em> façon de modéliser le calcul neural. L'avenir pourrait voir émerger des hybrides combinant efficacité énergétique des SNNs, adaptabilité des neurones liquides et puissance des architectures classiques.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Slide 2/8</p>
+    </footer>
+
+</body>
+</html>

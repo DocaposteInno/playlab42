@@ -1,0 +1,145 @@
+{
+  "category": "resources",
+  "bookmarks": [
+    {
+      "url": "https://anthropic.skilljar.com",
+      "title": "Anthropic Academy",
+      "description": "Cours officiels Anthropic sur Claude",
+      "icon": "🎓",
+      "tags": ["cours", "anthropic", "formation"]
+    },
+    {
+      "url": "https://learn.deeplearning.ai",
+      "title": "DeepLearning.AI Courses",
+      "description": "Cours IA par Andrew Ng",
+      "icon": "🧠",
+      "tags": ["cours", "deeplearning", "andrew-ng"]
+    },
+    {
+      "url": "https://www.latent.space",
+      "title": "Latent Space Podcast",
+      "description": "Podcast sur l'IA et le développement",
+      "icon": "🎙️",
+      "tags": ["podcast", "ia", "actualités"]
+    },
+    {
+      "url": "https://www.latent.space/p/claude-code",
+      "title": "Claude Code Deep Dive - Latent Space",
+      "description": "Épisode approfondi sur Claude Code",
+      "icon": "🎧",
+      "tags": ["podcast", "claude-code", "interview"]
+    },
+    {
+      "url": "https://www.anthropic.com/news",
+      "title": "Anthropic News",
+      "description": "Actualités officielles d'Anthropic",
+      "icon": "📰",
+      "tags": ["blog", "anthropic", "actualités"]
+    },
+    {
+      "url": "https://www.anthropic.com/engineering",
+      "title": "Anthropic Engineering Blog",
+      "description": "Blog technique d'Anthropic",
+      "icon": "🔧",
+      "tags": ["blog", "anthropic", "technique"]
+    },
+    {
+      "url": "https://openai.com/news",
+      "title": "OpenAI Blog",
+      "description": "Actualités officielles d'OpenAI",
+      "icon": "📰",
+      "tags": ["blog", "openai", "actualités"]
+    },
+    {
+      "url": "https://simonwillison.net",
+      "title": "Simon Willison's Weblog",
+      "description": "Blog influent sur l'IA et le développement",
+      "icon": "📝",
+      "tags": ["blog", "simon-willison", "ia"]
+    },
+    {
+      "url": "https://www.technologyreview.com/2025/12/15/1128352/rise-of-ai-coding-developers-2026/",
+      "title": "AI Coding is Now Everywhere",
+      "description": "Article MIT Tech Review sur l'adoption",
+      "icon": "📰",
+      "tags": ["article", "mit", "tendances"]
+    },
+    {
+      "url": "https://ainativedev.io",
+      "title": "AI Native Dev",
+      "description": "Ressources pour développeurs IA-native",
+      "icon": "🚀",
+      "tags": ["ressources", "ia-native", "communauté"]
+    },
+    {
+      "url": "https://blog.n8n.io/best-ai-for-coding/",
+      "title": "Best AI for Coding - n8n",
+      "description": "Comparatif des outils IA de coding",
+      "icon": "📊",
+      "tags": ["comparatif", "n8n", "outils"]
+    },
+    {
+      "url": "https://www.builder.io/blog/best-ai-coding-tools-2025",
+      "title": "Best AI Coding Tools 2025",
+      "description": "Guide des meilleurs outils IA 2025 par Builder.io",
+      "icon": "🏆",
+      "tags": ["comparatif", "builder-io", "guide"]
+    },
+    {
+      "url": "https://www.thedroidsonroids.com/blog/best-ai-coding-assistant-tools",
+      "title": "Best AI Coding Assistants",
+      "description": "Comparatif des assistants IA de code",
+      "icon": "🤖",
+      "tags": ["comparatif", "assistants", "guide"]
+    },
+    {
+      "url": "https://www.qodo.ai/blog/best-ai-coding-assistant-tools/",
+      "title": "Best AI Coding Tools - Qodo",
+      "description": "Guide des outils IA par Qodo",
+      "icon": "✅",
+      "tags": ["comparatif", "qodo", "guide"]
+    },
+    {
+      "url": "https://pieces.app/blog/9-best-ai-code-generation-tools",
+      "title": "Best AI Code Generators",
+      "description": "Top 9 des générateurs de code IA",
+      "icon": "⚡",
+      "tags": ["comparatif", "pieces", "génération"]
+    },
+    {
+      "url": "https://www.pragmaticcoders.com/resources/ai-developer-tools",
+      "title": "AI Developer Tools Guide",
+      "description": "Guide complet des outils IA pour développeurs",
+      "icon": "📚",
+      "tags": ["guide", "outils", "complet"]
+    },
+    {
+      "url": "https://git-scm.com/docs/git-worktree",
+      "title": "Git Worktree Documentation",
+      "description": "Documentation officielle Git Worktree",
+      "icon": "📖",
+      "tags": ["git", "documentation", "worktree"]
+    },
+    {
+      "url": "https://github.com/tmux/tmux/wiki",
+      "title": "tmux Wiki",
+      "description": "Documentation et guides tmux",
+      "icon": "📖",
+      "tags": ["tmux", "documentation", "terminal"]
+    },
+    {
+      "url": "https://docs.agentinterviews.com/blog/parallel-ai-coding-with-gitworktrees/",
+      "title": "Parallel AI Coding with Git Worktrees",
+      "description": "Guide sur le développement parallèle avec worktrees",
+      "icon": "📝",
+      "tags": ["article", "worktree", "multi-agent"]
+    },
+    {
+      "url": "https://www.ywian.com/blog/the-git-worktree-claude-code-playbook",
+      "title": "The Git Worktree + Claude Code Playbook",
+      "description": "Playbook complet worktrees et Claude Code",
+      "icon": "📝",
+      "tags": ["article", "worktree", "claude-code"]
+    }
+  ]
+}

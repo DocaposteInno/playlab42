@@ -7,7 +7,7 @@
 
 import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
-import { escapeHtml, cloneTemplate } from '../lib/dom.js';
+import { cloneTemplate } from '../lib/dom.js';
 
 /**
  * Charge le catalogue bookmarks depuis le serveur
@@ -96,8 +96,8 @@ function createBookmarkItemElement(bookmark) {
   link.href = bookmark.url;
   link.dataset.bookmarkUrl = bookmark.url;
   icon.textContent = bookmark.icon || '🔗';
-  title.textContent = escapeHtml(bookmark.displayTitle || bookmark.title);
-  description.textContent = escapeHtml(bookmark.displayDescription || bookmark.description || '');
+  title.textContent = bookmark.displayTitle || bookmark.title;
+  description.textContent = bookmark.displayDescription || bookmark.description || '';
   domain.textContent = bookmark.domain;
 
   // Stocker les données pour la preview
@@ -169,30 +169,37 @@ export function showBookmarkPreview(bookmarkData, anchorElement) {
     imageEl.classList.remove('has-image');
   }
 
-  // Positionner la preview
+  // Positionner la preview intelligemment
   const rect = anchorElement.getBoundingClientRect();
   const previewWidth = 320;
   const previewHeight = 200;
   const margin = 12;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
 
-  // Position par défaut : à droite de l'élément
-  let left = rect.right + margin;
-  let top = rect.top;
+  let left, top;
 
-  // Si déborde à droite, afficher à gauche
-  if (left + previewWidth > window.innerWidth) {
+  // Déterminer la position horizontale
+  const spaceRight = viewportWidth - rect.right - margin;
+  const spaceLeft = rect.left - margin;
+
+  if (spaceRight >= previewWidth) {
+    // Assez de place à droite
+    left = rect.right + margin;
+  } else if (spaceLeft >= previewWidth) {
+    // Assez de place à gauche
     left = rect.left - previewWidth - margin;
+  } else {
+    // Pas assez de place ni à droite ni à gauche : centrer horizontalement
+    left = Math.max(margin, (viewportWidth - previewWidth) / 2);
   }
 
-  // Si déborde en bas, remonter
-  if (top + previewHeight > window.innerHeight) {
-    top = window.innerHeight - previewHeight - margin;
-  }
+  // Déterminer la position verticale : centrer par rapport à l'élément
+  top = rect.top + (rect.height / 2) - (previewHeight / 2);
 
-  // Si déborde en haut, descendre
-  if (top < margin) {
-    top = margin;
-  }
+  // Contraindre dans le viewport
+  top = Math.max(margin, Math.min(top, viewportHeight - previewHeight - margin));
+  left = Math.max(margin, Math.min(left, viewportWidth - previewWidth - margin));
 
   preview.style.left = `${left}px`;
   preview.style.top = `${top}px`;

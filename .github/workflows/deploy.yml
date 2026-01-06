@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout du code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configuration Node.js
         uses: actions/setup-node@v6
@@ -46,7 +46,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload de l'artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           # Déploie tout le répertoire racine
           path: '.'

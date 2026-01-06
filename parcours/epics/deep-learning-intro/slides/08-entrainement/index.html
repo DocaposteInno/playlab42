@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Entraînement - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script type="module">
+        import { initSlide, initGlossary, sendTOC, setupScrollHandler } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+        setupScrollHandler();
+        sendTOC([
+            { id: 'loop', label: 'La Boucle', icon: '🔄' },
+            { id: 'epochs', label: 'Epochs & Batchs', icon: '📦' },
+            { id: 'split', label: 'Train/Val/Test', icon: '✂️' },
+            { id: 'overfit', label: 'Overfitting', icon: '📈' },
+            { id: 'regularization', label: 'Régularisation', icon: '🛡️' },
+        ]);
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <section id="training" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🏋️</span>
+                <h2 class="text-3xl font-bold dl-text-primary">L'Entraînement</h2>
+            </div>
+
+            <div class="prose-content dl-text-secondary">
+
+                <p class="text-lg mb-6 dl-text-primary font-medium">
+                    Vous connaissez maintenant la propagation avant et la rétropropagation. Mais comment orchestrer tout ça pour qu'un réseau <strong>apprenne vraiment</strong> ? C'est le rôle de la boucle d'entraînement.
+                </p>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 1 : LA BOUCLE D'ENTRAÎNEMENT
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="loop" class="text-xl font-bold dl-text-primary mt-10 mb-4 scroll-mt-24">La Boucle d'Entraînement</h3>
+
+                <p class="mb-4">
+                    Entraîner un réseau, c'est répéter le même cycle de 4 étapes :
+                </p>
+
+                <div class="grid md:grid-cols-4 gap-3 my-6">
+                    <div class="dl-card p-3 rounded-xl border text-center">
+                        <div class="text-2xl mb-2">1️⃣</div>
+                        <p class="text-sm font-bold dl-accent-cyan">Forward</p>
+                        <p class="text-xs dl-text-muted">Calculer la prédiction</p>
+                    </div>
+                    <div class="dl-card p-3 rounded-xl border text-center">
+                        <div class="text-2xl mb-2">2️⃣</div>
+                        <p class="text-sm font-bold dl-accent-red">Loss</p>
+                        <p class="text-xs dl-text-muted">Mesurer l'erreur</p>
+                    </div>
+                    <div class="dl-card p-3 rounded-xl border text-center">
+                        <div class="text-2xl mb-2">3️⃣</div>
+                        <p class="text-sm font-bold dl-accent-orange">Backward</p>
+                        <p class="text-xs dl-text-muted">Calculer les gradients</p>
+                    </div>
+                    <div class="dl-card p-3 rounded-xl border text-center">
+                        <div class="text-2xl mb-2">4️⃣</div>
+                        <p class="text-sm font-bold dl-accent-green">Update</p>
+                        <p class="text-xs dl-text-muted">Corriger les poids</p>
+                    </div>
+                </div>
+
+                <div class="dl-card rounded-xl border overflow-hidden mb-6">
+                    <div class="bg-slate-800 px-4 py-2 text-xs text-slate-400 border-b border-slate-700">
+                        training_loop.py
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code class="text-slate-300"><span class="text-pink-400">pour</span> <span class="dl-accent-purple">epoch</span> <span class="text-pink-400">de</span> <span class="dl-accent-cyan">1</span> <span class="text-pink-400">à</span> nb_epochs:
+    <span class="text-pink-400">pour</span> <span class="dl-accent-purple">batch</span> <span class="text-pink-400">dans</span> données_entraînement:
+        <span class="text-slate-500"># 1. Forward : calculer la prédiction</span>
+        <span class="dl-accent-purple">prédiction</span> = réseau.forward(batch.entrées)
+
+        <span class="text-slate-500"># 2. Loss : mesurer l'erreur</span>
+        <span class="dl-accent-purple">erreur</span> = fonction_perte(prédiction, batch.cibles)
+
+        <span class="text-slate-500"># 3. Backward : calculer les gradients</span>
+        <span class="dl-accent-purple">gradients</span> = réseau.backward(erreur)
+
+        <span class="text-slate-500"># 4. Update : corriger les poids</span>
+        optimiseur.mettre_à_jour(réseau.poids, gradients)</code></pre>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 2 : EPOCHS ET BATCHS
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="epochs" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Epochs, Itérations et Batchs</h3>
+
+                <div class="concept-box mb-6">
+                    <h4 class="font-bold dl-accent-blue mb-3">Les définitions clés</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="dl-accent-cyan font-bold text-lg">📦</span>
+                            <div>
+                                <p class="font-bold dl-text-primary"><dfn>Batch</dfn> (lot)</p>
+                                <p class="text-sm dl-text-muted">Sous-ensemble de données traité en une fois. Tailles typiques : 32, 64, 128.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="dl-accent-orange font-bold text-lg">🔁</span>
+                            <div>
+                                <p class="font-bold dl-text-primary">Itération (step)</p>
+                                <p class="text-sm dl-text-muted">Une mise à jour des poids = traitement d'un batch.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="dl-accent-purple font-bold text-lg">🔄</span>
+                            <div>
+                                <p class="font-bold dl-text-primary"><dfn>Epoch</dfn></p>
+                                <p class="text-sm dl-text-muted">Une passe complète sur TOUTES les données d'entraînement.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dl-card p-4 rounded-xl border mb-6">
+                    <h4 class="font-bold dl-accent-green mb-3 text-sm">Exemple concret</h4>
+                    <p class="text-sm dl-text-secondary mb-2">
+                        Vous avez <strong>1000 images</strong> et des batchs de <strong>32 images</strong> :
+                    </p>
+                    <ul class="text-sm dl-text-muted space-y-1">
+                        <li>• 1 epoch = 1000 ÷ 32 ≈ <strong>31 itérations</strong></li>
+                        <li>• 10 epochs = 31 × 10 = <strong>310 itérations</strong> (mises à jour des poids)</li>
+                        <li>• Le réseau voit chaque image <strong>10 fois</strong> au total</li>
+                    </ul>
+                </div>
+
+                <h4 class="font-bold dl-text-primary mb-3">Pourquoi des batchs ?</h4>
+
+                <div class="grid md:grid-cols-3 gap-3 mb-6">
+                    <div class="dl-card p-3 rounded-xl border">
+                        <h5 class="font-bold dl-accent-cyan mb-1 text-sm">Tout d'un coup</h5>
+                        <p class="text-xs dl-text-muted mb-1">Gradient précis mais très lent</p>
+                        <p class="text-xs dl-accent-red">❌ Ne rentre pas en mémoire</p>
+                    </div>
+                    <div class="dl-card p-3 rounded-xl border">
+                        <h5 class="font-bold dl-accent-orange mb-1 text-sm">Un par un (SGD)</h5>
+                        <p class="text-xs dl-text-muted mb-1">Très rapide mais chaotique</p>
+                        <p class="text-xs dl-accent-yellow">⚠️ Gradient bruité</p>
+                    </div>
+                    <div class="dl-card p-3 rounded-xl border border-green-500/50">
+                        <h5 class="font-bold dl-accent-green mb-1 text-sm">Mini-batch ✓</h5>
+                        <p class="text-xs dl-text-muted mb-1">Équilibre vitesse/précision</p>
+                        <p class="text-xs dl-accent-green">✓ Optimisé pour GPU</p>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 3 : TRAIN/VAL/TEST SPLIT
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="split" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Séparer ses données : Train / Validation / Test</h3>
+
+                <p class="mb-4">
+                    On ne peut pas évaluer un modèle sur les données qu'il a utilisées pour apprendre — ce serait comme un étudiant qui passe l'examen avec les réponses sous les yeux.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-3 my-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-2xl">📚</span>
+                            <h4 class="font-bold dl-accent-cyan">Training (70-80%)</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted">
+                            Les données sur lesquelles le modèle apprend. C'est le <strong>manuel de cours</strong>.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-2xl">📝</span>
+                            <h4 class="font-bold dl-accent-orange">Validation (10-15%)</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted">
+                            Pour ajuster les hyperparamètres et détecter l'overfitting. C'est l'<strong>examen blanc</strong>.
+                        </p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-2xl">🎓</span>
+                            <h4 class="font-bold dl-accent-green">Test (10-15%)</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted">
+                            Évaluation finale, utilisé UNE SEULE FOIS. C'est l'<strong>examen final</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 4 : OVERFITTING
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="overfit" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Le piège de l'Overfitting</h3>
+
+                <div class="analogy-box mb-6">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">🎓</span>
+                        <div>
+                            <h4 class="font-bold dl-accent-green mb-1">L'analogie de l'étudiant</h4>
+                            <p class="dl-text-secondary text-sm">
+                                <strong>Underfitting</strong> : L'étudiant ne lit que les titres des chapitres. Il ne comprend pas assez pour répondre aux questions.<br>
+                                <strong>Overfitting</strong> : L'étudiant mémorise chaque mot du manuel. Il récite parfaitement les exercices, mais face à une question légèrement différente, il est perdu.<br>
+                                <strong>Bon ajustement</strong> : L'étudiant comprend les concepts et sait les appliquer à de nouvelles situations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="dl-card p-4 rounded-xl border border-yellow-500/30">
+                        <h4 class="font-bold dl-accent-yellow mb-2"><dfn>Underfitting</dfn></h4>
+                        <p class="text-sm dl-text-muted mb-2">Le modèle est trop simple. Il n'apprend pas assez.</p>
+                        <p class="text-xs dl-text-secondary"><strong>Symptôme</strong> : Loss élevée sur train ET validation</p>
+                    </div>
+                    <div class="dl-card p-4 rounded-xl border border-red-500/30">
+                        <h4 class="font-bold dl-accent-red mb-2"><dfn>Overfitting</dfn></h4>
+                        <p class="text-sm dl-text-muted mb-2">Le modèle mémorise au lieu de comprendre.</p>
+                        <p class="text-xs dl-text-secondary"><strong>Symptôme</strong> : Loss basse sur train, élevée sur validation</p>
+                    </div>
+                </div>
+
+                <!-- Visualisation Learning Curves -->
+                <div class="my-6 p-4 dl-card rounded-xl border">
+                    <h4 class="font-bold dl-accent-blue mb-3 text-center">Courbes d'Apprentissage</h4>
+                    <div class="flex flex-col items-center">
+                        <canvas id="learningCurvesCanvas" width="600" height="220" class="rounded-lg" style="max-width: 600px;"></canvas>
+                        <div class="flex gap-6 mt-3">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-4 h-1 rounded" style="background: #22d3ee;"></span>
+                                <span class="text-xs dl-text-secondary">Training Loss</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="inline-block w-4 h-1 rounded" style="background: #f97316;"></span>
+                                <span class="text-xs dl-text-secondary">Validation Loss</span>
+                            </div>
+                        </div>
+                        <p class="text-xs dl-text-muted mt-2 italic">L'écart entre les courbes révèle l'overfitting. Le point optimal est juste avant que la validation ne remonte.</p>
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const canvas = document.getElementById('learningCurvesCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const W = canvas.width, H = canvas.height;
+                    const margin = { top: 20, right: 20, bottom: 30, left: 45 };
+                    const plotW = W - margin.left - margin.right;
+                    const plotH = H - margin.top - margin.bottom;
+
+                    function draw() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        const bgColor = isDark ? '#1a1a2e' : '#f8fafc';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, W, H);
+
+                        // Grille
+                        ctx.strokeStyle = gridColor;
+                        ctx.lineWidth = 1;
+                        for (let i = 0; i <= 5; i++) {
+                            const y = margin.top + (i / 5) * plotH;
+                            ctx.beginPath();
+                            ctx.moveTo(margin.left, y);
+                            ctx.lineTo(W - margin.right, y);
+                            ctx.stroke();
+                        }
+
+                        // Axes labels
+                        ctx.fillStyle = textColor;
+                        ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Epochs', W / 2, H - 5);
+                        ctx.save();
+                        ctx.translate(12, H / 2);
+                        ctx.rotate(-Math.PI / 2);
+                        ctx.fillText('Loss', 0, 0);
+                        ctx.restore();
+
+                        // Générer les données
+                        const epochs = 50;
+                        const trainLoss = [];
+                        const valLoss = [];
+
+                        for (let i = 0; i < epochs; i++) {
+                            const t = i / epochs;
+                            // Training loss diminue continuellement
+                            trainLoss.push(1.5 * Math.exp(-3 * t) + 0.1 + Math.random() * 0.02);
+                            // Validation loss atteint un minimum puis remonte
+                            const valBase = 1.6 * Math.exp(-2.5 * t) + 0.15;
+                            const overfit = t > 0.4 ? (t - 0.4) * 0.8 : 0;
+                            valLoss.push(valBase + overfit + Math.random() * 0.03);
+                        }
+
+                        const toX = i => margin.left + (i / (epochs - 1)) * plotW;
+                        const toY = v => margin.top + (1 - v / 1.8) * plotH;
+
+                        // Zone d'overfitting
+                        const overfitStart = Math.floor(epochs * 0.4);
+                        ctx.fillStyle = isDark ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+                        ctx.fillRect(toX(overfitStart), margin.top, plotW - toX(overfitStart) + margin.left, plotH);
+
+                        // Point optimal
+                        const optimalEpoch = overfitStart;
+                        ctx.strokeStyle = '#22c55e';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([5, 5]);
+                        ctx.beginPath();
+                        ctx.moveTo(toX(optimalEpoch), margin.top);
+                        ctx.lineTo(toX(optimalEpoch), margin.top + plotH);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        ctx.fillStyle = '#22c55e';
+                        ctx.font = 'bold 9px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Optimal', toX(optimalEpoch), margin.top - 5);
+
+                        // Zone overfitting label
+                        ctx.fillStyle = '#ef4444';
+                        ctx.font = '9px sans-serif';
+                        ctx.fillText('Overfitting', toX(optimalEpoch + 15), margin.top + 15);
+
+                        // Training Loss
+                        ctx.strokeStyle = '#22d3ee';
+                        ctx.lineWidth = 2.5;
+                        ctx.beginPath();
+                        trainLoss.forEach((v, i) => {
+                            const x = toX(i), y = toY(v);
+                            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                        });
+                        ctx.stroke();
+
+                        // Validation Loss
+                        ctx.strokeStyle = '#f97316';
+                        ctx.lineWidth = 2.5;
+                        ctx.beginPath();
+                        valLoss.forEach((v, i) => {
+                            const x = toX(i), y = toY(v);
+                            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                        });
+                        ctx.stroke();
+                    }
+
+                    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    draw();
+                })();
+                </script>
+
+                <!-- ═══════════════════════════════════════════════════════════
+                     PARTIE 5 : RÉGULARISATION
+                     ═══════════════════════════════════════════════════════════ -->
+                <h3 id="regularization" class="text-xl font-bold dl-text-primary mt-12 mb-4 scroll-mt-24">Combattre l'Overfitting : La Régularisation</h3>
+
+                <p class="mb-4">
+                    La <dfn>régularisation</dfn> regroupe toutes les techniques qui empêchent le modèle de "tricher" en mémorisant.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-3 mb-6">
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">⏹️</div>
+                            <h4 class="text-sm font-bold dl-text-primary">Early Stopping</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Arrêter l'entraînement quand la validation loss cesse de s'améliorer.
+                        </p>
+                        <p class="text-xs dl-accent-green">Le plus simple et le plus efficace</p>
+                    </div>
+
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">🎲</div>
+                            <h4 class="text-sm font-bold dl-text-primary"><dfn>Dropout</dfn></h4>
+                        </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            "Éteindre" aléatoirement certains neurones pendant l'entraînement.
+                        </p>
+                        <p class="text-xs dl-accent-purple">Force le réseau à ne pas trop dépendre d'un neurone</p>
+                    </div>
+
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">📏</div>
+                            <h4 class="text-sm font-bold dl-text-primary">L1 / L2</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Pénaliser les poids trop grands pour garder le modèle simple.
+                        </p>
+                        <p class="text-xs dl-accent-blue">L1 = sélection de features, L2 = lissage</p>
+                    </div>
+
+                    <div class="dl-card p-4 rounded-xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">🔄</div>
+                            <h4 class="text-sm font-bold dl-text-primary">Data Augmentation</h4>
+                        </div>
+                        <p class="text-xs dl-text-muted mb-2">
+                            Créer des variations des données (rotation, zoom, flip...).
+                        </p>
+                        <p class="text-xs dl-accent-orange">Plus de données = moins d'overfitting</p>
+                    </div>
+                </div>
+
+                <div class="concept-box mt-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">🎯</span>
+                        <div>
+                            <h4 class="font-bold dl-accent-blue mb-1">Ce qu'il faut retenir</h4>
+                            <ul class="text-sm space-y-1 dl-text-muted">
+                                <li>• <strong>Boucle</strong> : Forward → Loss → Backward → Update (répéter)</li>
+                                <li>• <strong>Epoch</strong> = 1 passage complet sur les données</li>
+                                <li>• <strong>Train/Val/Test</strong> : 3 ensembles séparés pour apprendre, ajuster, évaluer</li>
+                                <li>• <strong>Overfitting</strong> : le modèle mémorise au lieu de comprendre</li>
+                                <li>• <strong>Early stopping</strong> : s'arrêter quand la validation stagne</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Slide 7/9</p>
+    </footer>
+
+</body>
+</html>

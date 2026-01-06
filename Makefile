@@ -6,11 +6,25 @@
 export LOCAL_UID := $(shell id -u)
 export LOCAL_GID := $(shell id -g)
 
-.PHONY: help up down build shell logs status claude install test lint
+# Support multi-worktree : Nom de projet basé sur le dossier courant
+# Permet d'avoir plusieurs instances Docker en parallèle (une par worktree)
+CURRENT_DIR := $(notdir $(CURDIR))
+export COMPOSE_PROJECT_NAME ?= $(CURRENT_DIR)
+
+# Port dynamique pour éviter les conflits entre worktrees
+# Calcule un hash simple du nom de projet pour obtenir un port unique
+# Plage : 5200-5299 (100 ports disponibles)
+PORT_HASH := $(shell echo "$(COMPOSE_PROJECT_NAME)" | cksum | cut -d' ' -f1)
+PORT_OFFSET := $(shell echo $$(( $(PORT_HASH) % 100 )))
+export PLAYLAB_PORT ?= $(shell echo $$(( 5200 + $(PORT_OFFSET) )))
+
+.PHONY: help up down build shell logs status info claude install test lint
 
 # Affiche l'aide par défaut
 help:
 	@echo "Playlab42 - Commandes disponibles"
+	@echo ""
+	@echo "Instance: $(COMPOSE_PROJECT_NAME) (port $(PLAYLAB_PORT))"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make build    - Construire les containers"
@@ -20,6 +34,7 @@ help:
 	@echo "  make status   - État des containers"
 	@echo "  make logs     - Suivre les logs"
 	@echo "  make shell    - Shell dans le container dev"
+	@echo "  make info     - Infos de l'instance (worktree, port)"
 	@echo ""
 	@echo "Développement:"
 	@echo "  make install         - Installer les dépendances npm"
@@ -70,6 +85,17 @@ logs:
 shell:
 	docker compose exec dev sh
 
+# Afficher les infos de l'instance (utile en mode multi-worktree)
+info:
+	@echo "Instance Docker Playlab42"
+	@echo "========================="
+	@echo "Projet:     $(COMPOSE_PROJECT_NAME)"
+	@echo "Port:       $(PLAYLAB_PORT)"
+	@echo "Dossier:    $(CURDIR)"
+	@echo "Container:  $(COMPOSE_PROJECT_NAME)-dev"
+	@echo ""
+	@echo "URL:        http://localhost:$(PLAYLAB_PORT)"
+
 # === Développement ===
 
 install:
@@ -93,12 +119,17 @@ lint-fix:
 
 # Serveur statique pour tester tools/games (mode interactif)
 serve:
-	docker compose exec dev npm run serve
+	@echo "════════════════════════════════════════════════════════════"
+	@echo "  Serveur accessible sur http://localhost:$(PLAYLAB_PORT)"
+	@echo "  (ignorer le port 5242 affiché ci-dessous, c'est le port interne)"
+	@echo "════════════════════════════════════════════════════════════"
+	@echo ""
+	@docker compose exec dev npm run serve
 
 # Serveur statique en arrière-plan
 serve-bg:
 	docker compose exec -d dev npm run serve
-	@echo "Serveur démarré sur http://localhost:5242"
+	@echo "Serveur démarré sur http://localhost:$(PLAYLAB_PORT)"
 
 # Arrêter le serveur en arrière-plan
 serve-stop:

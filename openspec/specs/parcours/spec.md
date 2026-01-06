@@ -19,6 +19,9 @@
 10. [Responsive](#10-responsive)
 11. [Contraintes techniques](#11-contraintes-techniques)
 12. [Structure des fichiers](#12-structure-des-fichiers)
+13. [Architecture du Viewer](#13-architecture-du-viewer)
+14. [Communication slide ↔ viewer](#14-communication-slide--viewer)
+15. [Glossaire](#15-glossaire)
 
 ---
 
@@ -919,9 +922,13 @@ playlab42/
 │   └── parcours.json               # Epics (généré)
 │
 ├── lib/
-│   ├── parcours-viewer.js          # Viewer de slides
+│   ├── parcours-viewer.js          # Viewer de parcours (orchestrateur)
 │   ├── parcours-viewer.css         # Styles du viewer
-│   └── parcours-slide.css          # Styles communs slides
+│   ├── parcours-slide.css          # Styles communs slides
+│   └── parcours/                   # Modules du viewer
+│       ├── ParcoursProgress.js     # Gestion progression utilisateur
+│       ├── ParcoursNavigation.js   # Navigation entre slides
+│       └── ParcoursUI.js           # Rendu HTML du viewer
 │
 └── index.html                      # SPA entry point
 ```
@@ -935,6 +942,600 @@ playlab42/
 | Fichiers config | `epic.json`, `slide.json`, `index.json` |
 | Contenu | `index.html` ou `index.md` |
 | Vignette | `thumbnail.{png,jpg,webp}` |
+
+---
+
+## 13. Architecture du Viewer
+
+Le viewer de parcours utilise une architecture modulaire pour séparer les responsabilités.
+
+### Vue d'ensemble
+
+```
+lib/
+├── parcours-viewer.js          # Orchestrateur principal
+└── parcours/
+    ├── ParcoursProgress.js     # Gestion de la progression
+    ├── ParcoursNavigation.js   # Navigation entre slides
+    └── ParcoursUI.js           # Rendu HTML
+```
+
+### ParcoursViewer (orchestrateur)
+
+Classe principale qui coordonne les trois modules.
+
+```typescript
+class ParcoursViewer {
+  private progress: ParcoursProgress;
+  private navigation: ParcoursNavigation;
+  private ui: ParcoursUI;
+
+  /**
+   * Charge un epic et affiche la première slide.
+   */
+  async load(epicId: string): Promise<void>;
+
+  /**
+   * Ferme le viewer et retourne au catalogue.
+   */
+  close(): void;
+
+  /**
+   * Libère les ressources.
+   */
+  dispose(): void;
+}
+```
+
+### ParcoursProgress
+
+Gère la progression utilisateur dans les epics.
+
+```typescript
+class ParcoursProgress {
+  /**
+   * Marque une slide comme visitée.
+   */
+  markVisited(epicId: string, slideId: string): void;
+
+  /**
+   * Retourne la liste des slides visitées pour un epic.
+   */
+  getVisited(epicId: string): string[];
+
+  /**
+   * Retourne la dernière slide visitée pour un epic.
+   */
+  getCurrent(epicId: string): string | null;
+
+  /**
+   * Sauvegarde la progression en localStorage.
+   */
+  save(): void;
+
+  /**
+   * Charge la progression depuis localStorage.
+   */
+  load(): void;
+}
+```
+
+**Clé localStorage** : `playlab42_parcours_progress`
+
+**Format de stockage** :
+```typescript
+interface StoredProgress {
+  [epicId: string]: {
+    visited: string[];
+    current: string | null;
+  };
+}
+```
+
+### ParcoursNavigation
+
+Gère la navigation entre slides et les raccourcis clavier.
+
+```typescript
+class ParcoursNavigation {
+  /**
+   * Va à la slide précédente.
+   */
+  prev(): void;
+
+  /**
+   * Va à la slide suivante.
+   */
+  next(): void;
+
+  /**
+   * Va à une slide spécifique.
+   */
+  goTo(slideId: string): void;
+
+  /**
+   * Retourne l'index de la slide courante.
+   */
+  getCurrentIndex(): number;
+
+  /**
+   * Active les raccourcis clavier.
+   */
+  enableKeyboardNavigation(): void;
+
+  /**
+   * Désactive les raccourcis clavier.
+   */
+  disableKeyboardNavigation(): void;
+}
+```
+
+**Raccourcis clavier** : Voir section 9. Accessibilité.
+
+### ParcoursUI
+
+Gère le rendu HTML du viewer.
+
+```typescript
+class ParcoursUI {
+  /**
+   * Rend le conteneur principal du viewer.
+   */
+  render(): HTMLElement;
+
+  /**
+   * Met à jour le contenu de la slide.
+   */
+  updateSlide(html: string): void;
+
+  /**
+   * Met à jour le breadcrumb.
+   */
+  updateBreadcrumb(epic: Epic, slide: Slide): void;
+
+  /**
+   * Met à jour la barre de progression.
+   */
+  updateProgress(current: number, total: number): void;
+
+  /**
+   * Affiche/masque le menu latéral.
+   */
+  toggleMenu(): void;
+
+  /**
+   * Rend le sommaire des slides.
+   */
+  renderTableOfContents(slides: Slide[], visited: string[]): void;
+}
+```
+
+### Communication entre modules
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ParcoursViewer                           │
+│                    (orchestrateur)                          │
+├─────────────────────────────────────────────────────────────┤
+│                          │                                  │
+│    ┌─────────────────────┼─────────────────────┐           │
+│    │                     │                     │           │
+│    ▼                     ▼                     ▼           │
+│ ┌──────────┐      ┌──────────────┐      ┌──────────┐      │
+│ │ Progress │◄────►│  Navigation  │◄────►│    UI    │      │
+│ └──────────┘      └──────────────┘      └──────────┘      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- **Progress** notifie Navigation quand la progression change
+- **Navigation** notifie UI pour mettre à jour l'affichage
+- **UI** notifie Navigation des clics utilisateur
+- **ParcoursViewer** coordonne l'initialisation et le cleanup
+
+---
+
+## 14. Communication slide ↔ viewer
+
+Les slides chargées dans l'iframe peuvent communiquer avec le viewer parent via `postMessage`.
+
+### 14.1 Protocole
+
+#### Messages slide → viewer
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `slide:toc` | `{ items: TocItem[] }` | Envoie la table des matières interne |
+| `slide:toc:clear` | - | Efface la TOC (optionnel, auto au changement) |
+
+#### Messages viewer → slide
+
+| Type | Payload | Description |
+|------|---------|-------------|
+| `viewer:scroll-to` | `{ anchor: string }` | Demande de scroller vers une ancre |
+
+### 14.2 Format TocItem
+
+```typescript
+interface TocItem {
+  /** Identifiant de l'ancre (ex: "intro", "backprop") */
+  id: string;
+
+  /** Texte affiché dans la navigation (tronqué si trop long) */
+  label: string;
+
+  /** Emoji optionnel */
+  icon?: string;
+
+  /** Niveau de profondeur (1 = h2, 2 = h3) */
+  level?: number;
+}
+```
+
+### 14.3 Limites
+
+| Limite | Valeur | Raison |
+|--------|--------|--------|
+| Max items TOC | 15 | Éviter surcharge du menu |
+| Troncature labels | CSS `text-overflow: ellipsis` | Corrigé par redimensionnement |
+| Niveaux max | 2 (h2, h3) | Limiter la profondeur |
+
+### 14.4 API slide-utils.js
+
+```typescript
+/**
+ * Envoie la table des matières interne au viewer.
+ * La TOC sera affichée dans le menu latéral comme enfants de la slide.
+ */
+function sendTOC(items: TocItem[]): void;
+
+/**
+ * Efface la TOC du viewer.
+ * Appelé automatiquement au changement de slide.
+ */
+function clearTOC(): void;
+
+/**
+ * Détecte automatiquement la TOC depuis les headings.
+ * @param selector - Sélecteur CSS pour les headings (défaut: 'h2[id], h3[id]')
+ */
+function autoDetectTOC(selector?: string): TocItem[];
+```
+
+### 14.5 Comportement viewer
+
+#### Intégration dans le menu latéral
+
+```
+Menu (sidebar) :
+├── ✓ Slide 1
+├── ▼ ● Slide 2 (avec TOC)      ← slide courante, expandable
+│   ├── ○ Intro                  ← ancres intra-slide
+│   ├── ○ Chapitre 1
+│   ├── ● Chapitre 2             ← ancre active
+│   └── ○ Conclusion
+└── ○ Slide 3
+```
+
+#### Comportement
+
+- Quand une slide envoie `slide:toc`, elle devient **expansible** dans le menu
+- Les items TOC apparaissent comme **enfants** de la slide
+- La slide est automatiquement **dépliée** pour montrer ses ancres
+- Clic sur un item → envoie `viewer:scroll-to` à la slide
+- La slide scrolle vers l'ancre avec `scrollIntoView({ behavior: 'smooth' })`
+
+#### Reset
+
+- Au changement de slide, les sous-items TOC sont **retirés** du menu
+- L'ancienne slide redevient un item simple (non expansible)
+- La nouvelle slide peut envoyer sa propre TOC
+
+### 14.6 Sécurité
+
+- Vérification de l'origine des messages (même origin)
+- Validation du format des payloads
+- Pas d'exécution de code arbitraire
+
+### 14.7 Menu redimensionnable (Desktop)
+
+```
+┌──────────────────┬─║─────────────────────────────────────────┐
+│ Sidebar          │ ║ Contenu                                  │
+│ (200-400px)      │ ║                                          │
+│                  │ ║  Drag la bordure pour redimensionner     │
+└──────────────────┴─║─────────────────────────────────────────┘
+                     ↑
+                  Resize handle
+```
+
+**Comportement** :
+- Bordure droite de la sidebar draggable
+- Largeur min: 200px, max: 400px
+- Curseur `col-resize` au survol du handle
+- Largeur persistée en `localStorage` (`parcours-menu-width`)
+- Restaurée au prochain chargement
+
+---
+
+## 15. Glossaire
+
+Le glossaire permet de définir des termes techniques qui seront affichés au survol dans les slides.
+
+### 15.1 Concepts
+
+**Niveaux de définition :**
+- **Global** : `parcours/glossary.json` - Termes partagés entre tous les epics
+- **Epic** : `epic.json` (champ `glossary`) ou `glossary.json` dans le dossier epic
+
+**Priorité** : Epic > Global (l'epic peut redéfinir un terme global)
+
+### 15.2 Format du glossaire
+
+```typescript
+interface Glossary {
+  [term: string]: GlossaryEntry;
+}
+
+interface GlossaryEntry {
+  /** Définition courte (affichée dans le tooltip) */
+  short: string;
+
+  /** Définition longue (affichée dans la page glossaire) */
+  long?: string;
+
+  /** Termes liés */
+  see?: string[];
+
+  /** Catégorie pour regroupement */
+  category?: string;
+}
+```
+
+**Exemple :**
+
+```json
+{
+  "régression": {
+    "short": "Prédire une valeur numérique continue",
+    "long": "En machine learning, la régression consiste à prédire une valeur numérique continue (prix, température, âge) par opposition à la classification qui prédit des catégories.",
+    "see": ["classification"],
+    "category": "Machine Learning"
+  }
+}
+```
+
+### 15.3 Fichiers glossaire
+
+**Glossaire global :**
+```
+parcours/
+└── glossary.json    # Optionnel, termes partagés
+```
+
+**Glossaire epic (deux options) :**
+
+Option A - Dans `epic.json` :
+```json
+{
+  "id": "mon-epic",
+  "title": "Mon Epic",
+  "glossary": {
+    "terme1": { "short": "..." },
+    "terme2": { "short": "..." }
+  }
+}
+```
+
+Option B - Fichier séparé :
+```
+parcours/epics/mon-epic/
+├── epic.json
+└── glossary.json    # Glossaire de l'epic
+```
+
+### 15.4 Marquage des termes dans les slides
+
+**Important** : Le marquage est **explicite**. Les termes ne sont pas auto-détectés. L'auteur doit marquer chaque occurrence qu'il souhaite rendre interactive.
+
+**HTML :**
+```html
+<!-- Terme simple -->
+<dfn>régression</dfn>
+
+<!-- Terme avec texte différent -->
+<dfn data-term="régression">régresser</dfn>
+
+<!-- Classe alternative -->
+<span class="term" data-term="régression">régression</span>
+```
+
+**Markdown :**
+```markdown
+<!-- Syntaxe wiki-like -->
+La [[régression]] consiste à prédire...
+
+<!-- Terme avec texte différent -->
+La [[régression|forme régressive]] consiste à...
+```
+
+**Transformation Markdown → HTML :**
+- `[[terme]]` → `<dfn>terme</dfn>`
+- `[[terme|texte]]` → `<dfn data-term="terme">texte</dfn>`
+
+### 15.5 Affichage tooltip
+
+```
+Comportement :
+1. Terme affiché avec underline pointillé
+2. Au hover (desktop) ou tap (mobile) : tooltip apparaît
+3. Tooltip contient : terme + définition courte + "voir aussi"
+4. Clic sur "Plus" → navigation vers page glossaire (si existe)
+
+Positionnement :
+- Par défaut : au-dessus du terme
+- Si débordement haut : en-dessous
+- Si débordement latéral : ajustement horizontal
+```
+
+**Styles :**
+```css
+dfn, .term {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 2px;
+  cursor: help;
+}
+
+.glossary-tooltip {
+  position: absolute;
+  max-width: 300px;
+  padding: 0.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+}
+```
+
+### 15.6 Page glossaire auto-générée
+
+**Déclaration dans `epic.json` :**
+```json
+{
+  "content": [
+    { "id": "01-intro" },
+    { "id": "glossaire", "type": "glossary", "optional": true }
+  ]
+}
+```
+
+**Comportement :**
+- Le type `glossary` génère automatiquement le contenu
+- Pas besoin de créer de fichier `index.html`
+- Termes triés alphabétiquement
+- Regroupement par catégorie (si définie)
+- Liens vers les termes liés ("voir aussi")
+- Ancres pour chaque terme (`#term-regression`)
+
+**Template généré :**
+```html
+<section class="glossary">
+  <h2>Glossaire</h2>
+
+  <div class="glossary-category">
+    <h3>Machine Learning</h3>
+
+    <dl>
+      <dt id="term-classification">Classification</dt>
+      <dd>
+        <p class="short">Prédire une catégorie parmi plusieurs.</p>
+        <p class="long">Tâche de machine learning consistant à...</p>
+        <p class="see">Voir aussi : <a href="#term-regression">régression</a></p>
+      </dd>
+
+      <dt id="term-regression">Régression</dt>
+      <dd>...</dd>
+    </dl>
+  </div>
+</section>
+```
+
+### 15.7 Build & Validation
+
+**Chargement au build :**
+```
+1. Charger parcours/glossary.json (si existe)
+2. Pour chaque epic :
+   a. Charger epic.glossary ou glossary.json
+   b. Fusionner avec global (epic prioritaire)
+   c. Stocker dans le catalogue
+```
+
+**Validation :**
+
+| Règle | Niveau |
+|-------|--------|
+| Terme référencé dans `see` existe | Warning |
+| Terme marqué dans slide existe dans glossaire | Warning |
+| Définition `short` présente | Erreur |
+| Définition `short` < 200 caractères | Warning |
+
+**Output `data/parcours.json` :**
+```typescript
+interface ParcoursEntry {
+  // ... champs existants ...
+
+  /** Glossaire de l'epic (fusionné avec global) */
+  glossary?: Glossary;
+
+  /** Nombre de termes définis */
+  glossaryTermCount?: number;
+}
+```
+
+### 15.8 API JavaScript
+
+**Module `ParcoursGlossary.js` :**
+```typescript
+class ParcoursGlossary {
+  /**
+   * Charge le glossaire pour un epic.
+   */
+  async load(epicId: string): Promise<Glossary>;
+
+  /**
+   * Récupère la définition d'un terme.
+   */
+  get(term: string): GlossaryEntry | undefined;
+
+  /**
+   * Vérifie si un terme est défini.
+   */
+  has(term: string): boolean;
+
+  /**
+   * Liste tous les termes.
+   */
+  terms(): string[];
+
+  /**
+   * Attache les tooltips aux éléments dfn d'un conteneur.
+   */
+  attachTooltips(container: HTMLElement): void;
+
+  /**
+   * Détache les tooltips.
+   */
+  detachTooltips(): void;
+}
+```
+
+**Helper `slide-utils.js` :**
+```typescript
+/**
+ * Marque automatiquement les termes du glossaire dans le contenu.
+ * @param container - Élément contenant le texte
+ * @param terms - Liste des termes à marquer
+ */
+function markGlossaryTerms(container: HTMLElement, terms: string[]): void;
+```
+
+### 15.9 Accessibilité
+
+- Tooltips accessibles au clavier (focus sur le terme)
+- `role="tooltip"` et `aria-describedby` pour les lecteurs d'écran
+- Animation respecte `prefers-reduced-motion`
+- Contraste suffisant pour le underline
+
+### 15.10 Mobile
+
+- Tap sur le terme affiche le tooltip
+- Tap ailleurs ferme le tooltip
+- Pas de hover (incompatible tactile)
+- Tooltip positionné pour éviter le clavier virtuel
 
 ---
 

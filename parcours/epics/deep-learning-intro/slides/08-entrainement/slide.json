@@ -1,0 +1,8 @@
+{
+  "id": "07-entrainement",
+  "title": "L'Entraînement",
+  "description": "Epochs, batchs, overfitting et les secrets d'un entraînement réussi",
+  "type": "page",
+  "icon": "🏋️",
+  "duration": "6 min"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "02-types-apprentissage",
+  "title": "Types d'apprentissage",
+  "description": "Supervisé, non-supervisé, renforcement et auto-supervisé : les grandes familles du Machine Learning",
+  "type": "page",
+  "icon": "📚",
+  "duration": "6 min"
+}

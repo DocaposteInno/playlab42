@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Types d'Apprentissage - Deep Learning</title>
+
+    <link rel="stylesheet" href="../../../../../lib/theme.css">
+    <link rel="stylesheet" href="../../_shared/deep-learning.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="module">
+        import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
+        initSlide();
+        initGlossary();
+    </script>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Hero Section -->
+    <header class="hero-section relative py-16 overflow-hidden border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="inline-block mb-4 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 dl-accent-cyan text-xs font-medium">
+                Fondamentaux
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold dl-text-primary tracking-tight mb-4">
+                Les types d'<span class="bg-gradient-to-r from-yellow-400 via-cyan-400 to-red-400 bg-clip-text text-transparent">apprentissage</span>
+            </h1>
+            <p class="max-w-2xl text-lg dl-text-muted">
+                Supervisé, non-supervisé, par renforcement : trois philosophies pour apprendre à partir de données.
+            </p>
+        </div>
+        <div class="hero-grid absolute inset-0 bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none"></div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <!-- Introduction -->
+        <section id="intro" class="mb-16">
+            <p class="dl-text-secondary text-lg mb-6">
+                Comment une machine peut-elle <em>apprendre</em> ? Il existe plusieurs stratégies, chacune adaptée à un type de problème. Comprendre ces approches vous aidera à choisir la bonne méthode pour vos projets.
+            </p>
+
+            <!-- Vue d'ensemble visuelle -->
+            <div class="grid md:grid-cols-3 gap-4 mb-8">
+                <div class="dl-card p-4 rounded-xl border border-yellow-500/30 text-center">
+                    <div class="text-4xl mb-2">👨‍🏫</div>
+                    <h3 class="font-bold dl-accent-yellow">Supervisé</h3>
+                    <p class="text-xs dl-text-muted mt-1">Apprendre avec un professeur</p>
+                </div>
+                <div class="dl-card p-4 rounded-xl border border-cyan-500/30 text-center">
+                    <div class="text-4xl mb-2">🔍</div>
+                    <h3 class="font-bold dl-accent-cyan">Non-supervisé</h3>
+                    <p class="text-xs dl-text-muted mt-1">Découvrir des structures cachées</p>
+                </div>
+                <div class="dl-card p-4 rounded-xl border border-red-500/30 text-center">
+                    <div class="text-4xl mb-2">🎮</div>
+                    <h3 class="font-bold dl-accent-red">Renforcement</h3>
+                    <p class="text-xs dl-text-muted mt-1">Apprendre par essai-erreur</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Type 1: Supervisé -->
+        <section id="supervise" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">👨‍🏫</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Apprentissage Supervisé</h2>
+            </div>
+
+            <div class="dl-card p-6 rounded-xl border border-yellow-500/30 mb-6">
+                <p class="dl-text-secondary mb-4">
+                    L'apprentissage supervisé est le plus intuitif : on donne à la machine des <strong>exemples étiquetés</strong> (input + réponse attendue), et elle apprend à généraliser pour prédire sur de nouvelles données.
+                </p>
+
+                <div class="bg-yellow-500/10 p-4 rounded-lg border border-yellow-500/20 mb-6">
+                    <div class="text-center text-sm">
+                        <span class="px-3 py-1 rounded bg-yellow-500/20">Données</span>
+                        <span class="mx-2">+</span>
+                        <span class="px-3 py-1 rounded bg-yellow-500/20">Labels</span>
+                        <span class="mx-2">→</span>
+                        <span class="px-3 py-1 rounded bg-yellow-500/30 font-bold">Modèle prédictif</span>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Classification -->
+                    <div>
+                        <h4 class="font-bold dl-accent-yellow mb-3 flex items-center gap-2">
+                            <span>🏷️</span> Classification
+                        </h4>
+                        <p class="text-sm dl-text-muted mb-3">Prédire une <strong>catégorie</strong> parmi un ensemble fini.</p>
+                        <ul class="text-xs dl-text-muted space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Spam ou pas spam</strong> — Filtrage d'emails</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Chat, chien, oiseau</strong> — Reconnaissance d'images</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Positif, négatif, neutre</strong> — Analyse de sentiment</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Tumeur bénigne/maligne</strong> — Diagnostic médical</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Régression -->
+                    <div>
+                        <h4 class="font-bold dl-accent-yellow mb-3 flex items-center gap-2">
+                            <span>📈</span> Régression
+                        </h4>
+                        <p class="text-sm dl-text-muted mb-3">Prédire une <strong>valeur continue</strong> (un nombre).</p>
+                        <ul class="text-xs dl-text-muted space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Prix d'un appartement</strong> — Immobilier</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Température demain</strong> — Météo</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Chiffre d'affaires</strong> — Prévision business</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-400">•</span>
+                                <span><strong>Durée de vie</strong> — Maintenance prédictive</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulaire clé -->
+            <div class="concept-box">
+                <h4 class="font-bold text-blue-400 mb-3">Vocabulaire clé</h4>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p><dfn class="dl-accent-yellow">Label</dfn> — La réponse attendue (étiquette)</p>
+                    </div>
+                    <div>
+                        <p><dfn class="dl-accent-yellow">Feature</dfn> — Une caractéristique de l'entrée</p>
+                    </div>
+                    <div>
+                        <p><dfn class="dl-accent-yellow">Train set</dfn> — Données pour entraîner le modèle</p>
+                    </div>
+                    <div>
+                        <p><dfn class="dl-accent-yellow">Test set</dfn> — Données pour évaluer le modèle</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 rounded border border-yellow-500/30 bg-yellow-500/5">
+                <p class="text-sm dl-text-secondary">
+                    <strong class="dl-accent-yellow">C'est le type que nous explorons en détail dans ce parcours.</strong> La majorité des applications de Deep Learning (vision, NLP, prédiction) utilisent l'apprentissage supervisé.
+                </p>
+            </div>
+        </section>
+
+        <!-- Type 2: Non-supervisé -->
+        <section id="non-supervise" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🔍</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Apprentissage Non-Supervisé</h2>
+            </div>
+
+            <div class="dl-card p-6 rounded-xl border border-cyan-500/30 mb-6">
+                <p class="dl-text-secondary mb-4">
+                    Ici, pas de labels. La machine explore les données pour y découvrir des <strong>structures cachées</strong>, des groupes naturels, ou des anomalies. C'est une forme d'exploration de données.
+                </p>
+
+                <div class="bg-cyan-500/10 p-4 rounded-lg border border-cyan-500/20 mb-6">
+                    <div class="text-center text-sm">
+                        <span class="px-3 py-1 rounded bg-cyan-500/20">Données brutes</span>
+                        <span class="mx-2">→</span>
+                        <span class="px-3 py-1 rounded bg-cyan-500/30 font-bold">Patterns & Clusters</span>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                    <!-- Clustering -->
+                    <div class="p-4 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+                        <h4 class="font-bold dl-accent-cyan mb-2">Clustering</h4>
+                        <p class="text-xs dl-text-muted mb-2">Regrouper des données similaires.</p>
+                        <ul class="text-xs dl-text-muted space-y-1">
+                            <li>• Segmentation clients</li>
+                            <li>• Groupes de documents</li>
+                            <li>• Profils utilisateurs</li>
+                        </ul>
+                    </div>
+
+                    <!-- Réduction de dimension -->
+                    <div class="p-4 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+                        <h4 class="font-bold dl-accent-cyan mb-2">Réduction</h4>
+                        <p class="text-xs dl-text-muted mb-2">Compresser les données.</p>
+                        <ul class="text-xs dl-text-muted space-y-1">
+                            <li>• PCA, t-SNE, UMAP</li>
+                            <li>• Visualisation</li>
+                            <li>• Compression</li>
+                        </ul>
+                    </div>
+
+                    <!-- Détection d'anomalies -->
+                    <div class="p-4 rounded-lg bg-cyan-500/5 border border-cyan-500/20">
+                        <h4 class="font-bold dl-accent-cyan mb-2">Anomalies</h4>
+                        <p class="text-xs dl-text-muted mb-2">Trouver les points atypiques.</p>
+                        <ul class="text-xs dl-text-muted space-y-1">
+                            <li>• Détection de fraude</li>
+                            <li>• Pannes machines</li>
+                            <li>• Intrusions réseau</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemple concret -->
+            <div class="analogy-box">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🛒</span>
+                    <div>
+                        <h4 class="font-bold dl-accent-green mb-2">Exemple : Segmentation e-commerce</h4>
+                        <p class="dl-text-secondary text-sm">
+                            Un site e-commerce analyse le comportement de ses clients (achats, navigation, panier moyen) sans labels prédéfinis. L'algorithme découvre naturellement 5 segments : "chasseurs de promos", "acheteurs premium", "visiteurs occasionnels", etc. Ces insights guident la stratégie marketing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Type 3: Renforcement -->
+        <section id="renforcement" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🎮</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Apprentissage par Renforcement</h2>
+            </div>
+
+            <div class="dl-card p-6 rounded-xl border border-red-500/30 mb-6">
+                <p class="dl-text-secondary mb-4">
+                    Un <dfn>agent</dfn> interagit avec un <dfn>environnement</dfn> et apprend par <strong>essai-erreur</strong>. Chaque action génère une <dfn>récompense</dfn> (positive ou négative). L'objectif : maximiser les récompenses sur le long terme.
+                </p>
+
+                <div class="bg-red-500/10 p-4 rounded-lg border border-red-500/20 mb-6">
+                    <div class="flex items-center justify-center gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🤖</div>
+                            <span class="dl-accent-red">Agent</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-xs dl-text-muted">action →</span>
+                            <span class="text-xs dl-text-muted">← état, récompense</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🌍</div>
+                            <span class="dl-accent-red">Environnement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold dl-accent-red mb-3">Vocabulaire clé</h4>
+                        <ul class="text-sm dl-text-muted space-y-2">
+                            <li><dfn class="dl-accent-red">Agent</dfn> — L'entité qui apprend et agit</li>
+                            <li><dfn class="dl-accent-red">État</dfn> — La situation actuelle</li>
+                            <li><dfn class="dl-accent-red">Action</dfn> — Ce que l'agent peut faire</li>
+                            <li><dfn class="dl-accent-red">Reward</dfn> — Signal de récompense (+/-)</li>
+                            <li><dfn class="dl-accent-red">Policy</dfn> — Stratégie état → action</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold dl-accent-red mb-3">Applications célèbres</h4>
+                        <ul class="text-sm dl-text-muted space-y-2">
+                            <li><strong>AlphaGo</strong> — Victoire contre Lee Sedol (2016)</li>
+                            <li><strong>OpenAI Five</strong> — Dota 2 contre pros</li>
+                            <li><strong>AlphaStar</strong> — StarCraft II niveau Grand Master</li>
+                            <li><strong>Robotique</strong> — Manipulation, locomotion</li>
+                            <li><strong>Trading</strong> — Stratégies d'investissement</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analogie -->
+            <div class="analogy-box">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🚴</span>
+                    <div>
+                        <h4 class="font-bold dl-accent-green mb-2">Analogie : Apprendre à faire du vélo</h4>
+                        <p class="dl-text-secondary text-sm">
+                            Pas de manuel, pas de professeur qui donne les réponses. Juste des essais, des chutes (récompense négative), et progressivement l'intuition de l'équilibre (récompense positive). C'est exactement ainsi que fonctionne l'apprentissage par renforcement.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bonus: Auto-supervisé -->
+        <section id="auto-supervise" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">⭐</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Bonus : Auto-Supervisé</h2>
+            </div>
+
+            <div class="dl-card p-6 rounded-xl border border-purple-500/30 bg-purple-500/5">
+                <p class="dl-text-secondary mb-4">
+                    L'apprentissage auto-supervisé est une approche hybride révolutionnaire : le modèle <strong>crée ses propres labels</strong> à partir des données brutes. C'est ce qui a permis l'explosion des grands modèles de langage.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <h4 class="font-bold dl-accent-purple mb-2">Prédiction du mot suivant</h4>
+                        <p class="text-xs dl-text-muted mb-2">Utilisé par GPT, LLaMA, Claude...</p>
+                        <div class="text-xs font-mono bg-black/20 p-2 rounded">
+                            "Le chat dort sur le ___"<br>
+                            <span class="dl-accent-purple">→ Prédire : "canapé", "lit", "tapis"...</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <h4 class="font-bold dl-accent-purple mb-2">Masquage de mots</h4>
+                        <p class="text-xs dl-text-muted mb-2">Utilisé par BERT, RoBERTa...</p>
+                        <div class="text-xs font-mono bg-black/20 p-2 rounded">
+                            "Le [MASK] dort sur le canapé"<br>
+                            <span class="dl-accent-purple">→ Prédire : "chat"</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 rounded border border-purple-500/20">
+                    <p class="text-sm dl-text-secondary">
+                        <strong class="dl-accent-purple">Pourquoi c'est révolutionnaire ?</strong> Plus besoin d'annoter des millions de textes manuellement. Internet devient un dataset d'entraînement quasi-infini. C'est ce qui a permis d'entraîner GPT-4 sur des trillions de tokens.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Récapitulatif -->
+        <section id="recap">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">📝</span>
+                <h2 class="text-3xl font-bold dl-text-primary">Récapitulatif</h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="text-left py-3 px-4 dl-text-primary">Type</th>
+                            <th class="text-left py-3 px-4 dl-text-primary">Données</th>
+                            <th class="text-left py-3 px-4 dl-text-primary">Objectif</th>
+                            <th class="text-left py-3 px-4 dl-text-primary">Exemple</th>
+                        </tr>
+                    </thead>
+                    <tbody class="dl-text-secondary">
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4"><span class="dl-accent-yellow font-bold">Supervisé</span></td>
+                            <td class="py-3 px-4">Inputs + Labels</td>
+                            <td class="py-3 px-4">Prédire des labels</td>
+                            <td class="py-3 px-4">Reconnaissance d'images</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4"><span class="dl-accent-cyan font-bold">Non-supervisé</span></td>
+                            <td class="py-3 px-4">Inputs seuls</td>
+                            <td class="py-3 px-4">Trouver des patterns</td>
+                            <td class="py-3 px-4">Segmentation clients</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4"><span class="dl-accent-red font-bold">Renforcement</span></td>
+                            <td class="py-3 px-4">États + Récompenses</td>
+                            <td class="py-3 px-4">Maximiser le reward</td>
+                            <td class="py-3 px-4">Jouer à des jeux</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4"><span class="dl-accent-purple font-bold">Auto-supervisé</span></td>
+                            <td class="py-3 px-4">Données brutes</td>
+                            <td class="py-3 px-4">Création automatique de labels</td>
+                            <td class="py-3 px-4">GPT, BERT, LLaMA</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 dl-card bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 border-l-4 border-yellow-500 p-4">
+                <p class="text-sm dl-text-secondary">
+                    <strong class="dl-accent-yellow">Dans la suite de ce parcours</strong>, nous nous concentrons sur l'<strong>apprentissage supervisé</strong> — le fondement du Deep Learning moderne. Les concepts que vous allez apprendre (neurones, backpropagation, optimisation) s'appliquent ensuite aux autres types d'apprentissage.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="dl-footer border-t py-8 text-center text-sm">
+        <p>Deep Learning pour l'impatient — Types d'apprentissage</p>
+    </footer>
+
+</body>
+</html>

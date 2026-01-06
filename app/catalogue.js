@@ -7,7 +7,7 @@
 
 import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
-import { escapeHtml, cloneTemplate } from '../lib/dom.js';
+import { cloneTemplate } from '../lib/dom.js';
 
 /**
  * Charge le catalogue depuis le serveur
@@ -94,30 +94,30 @@ export function createCardElement(item, type) {
   card.dataset.path = item.path;
 
   // Thumbnail
-  if (type === 'game') {
-    const thumbSrc = item.path.replace('index.html', 'thumb.png');
-    const img = document.createElement('img');
-    img.src = thumbSrc;
-    img.alt = escapeHtml(item.name);
-    img.loading = 'lazy';
-    img.onerror = () => {
-      thumb.textContent = item.icon || '🎮';
-    };
-    thumb.appendChild(img);
-  } else {
-    thumb.textContent = item.icon || '🔧';
-  }
+  const defaultIcon = type === 'game' ? '🎮' : '🔧';
+  const thumbSrc = type === 'game'
+    ? item.path.replace('index.html', 'thumb.png')
+    : item.path.replace('.html', '-thumb.png');
+
+  const img = document.createElement('img');
+  img.src = thumbSrc;
+  img.alt = item.name;
+  img.loading = 'lazy';
+  img.onerror = () => {
+    thumb.textContent = item.icon || defaultIcon;
+  };
+  thumb.appendChild(img);
 
   // Info
-  title.textContent = (item.icon ? `${item.icon} ` : '') + escapeHtml(item.name);
-  desc.textContent = escapeHtml(item.description);
+  title.textContent = (item.icon ? `${item.icon} ` : '') + item.name;
+  desc.textContent = item.description;
 
   // Tags
   if (item.tags?.length) {
     for (const tag of item.tags.slice(0, 3)) {
       const tagFragment = cloneTemplate('tag-template');
       const tagEl = tagFragment.querySelector('.card-tag');
-      tagEl.textContent = escapeHtml(tag);
+      tagEl.textContent = tag;
       tagsContainer.appendChild(tagFragment);
     }
   }
