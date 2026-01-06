@@ -94,19 +94,19 @@ export function createCardElement(item, type) {
   card.dataset.path = item.path;
 
   // Thumbnail
-  if (type === 'game') {
-    const thumbSrc = item.path.replace('index.html', 'thumb.png');
-    const img = document.createElement('img');
-    img.src = thumbSrc;
-    img.alt = item.name;
-    img.loading = 'lazy';
-    img.onerror = () => {
-      thumb.textContent = item.icon || '🎮';
-    };
-    thumb.appendChild(img);
-  } else {
-    thumb.textContent = item.icon || '🔧';
-  }
+  const defaultIcon = type === 'game' ? '🎮' : '🔧';
+  const thumbSrc = type === 'game'
+    ? item.path.replace('index.html', 'thumb.png')
+    : item.path.replace('.html', '-thumb.png');
+
+  const img = document.createElement('img');
+  img.src = thumbSrc;
+  img.alt = item.name;
+  img.loading = 'lazy';
+  img.onerror = () => {
+    thumb.textContent = item.icon || defaultIcon;
+  };
+  thumb.appendChild(img);
 
   // Info
   title.textContent = (item.icon ? `${item.icon} ` : '') + item.name;
