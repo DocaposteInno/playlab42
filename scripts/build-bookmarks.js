@@ -298,8 +298,12 @@ async function enrichWithOGMetadata(categories) {
         stats.ogFailed++;
       }
 
-      // Enrichir le bookmark (titre/description manuels prioritaires, OG en fallback)
+      // Enrichir le bookmark (titre/description/image manuels prioritaires, OG en fallback)
       bookmark.meta = result.meta || {};
+      // Si une image est spécifiée manuellement dans le bookmark, l'utiliser
+      if (bookmark.image) {
+        bookmark.meta.ogImage = bookmark.image;
+      }
       bookmark.displayTitle = bookmark.title || result.meta?.ogTitle;
       bookmark.displayDescription = bookmark.description || result.meta?.ogDescription;
     }));

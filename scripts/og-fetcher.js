@@ -16,9 +16,10 @@ const IMAGES_DIR = join(ROOT, 'data', 'bookmarks-images');
 
 // Configuration
 const CONFIG = {
-  timeout: 5000,      // 5 secondes
+  timeout: 8000,      // 8 secondes (augmenté)
   cacheDays: 7,       // Validité du cache
-  userAgent: 'PlayLab42-Bot/1.0 (+https://playlab42.example.com)',
+  // User-Agent réaliste pour éviter les blocages
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
 };
 
 /**
