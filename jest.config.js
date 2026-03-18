@@ -53,6 +53,11 @@ export default {
     ],
   },
 
+  // Ne pas ignorer les fichiers ESM locaux (lib/*.js, games/*.js)
+  // Par défaut Jest ignore node_modules ; on garde ce comportement
+  // mais on s'assure que les sources locales .js sont bien traitées en ESM natif
+  transformIgnorePatterns: ['/node_modules/'],
+
   // Extensions à considérer
   moduleFileExtensions: ['js', 'mjs', 'ts', 'json'],
 
