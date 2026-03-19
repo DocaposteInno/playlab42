@@ -129,7 +129,7 @@ export class SmartBot {
         const piece = state.board[row][col];
         if (!piece) {continue;}
 
-        let pieceValue = 0;
+        let pieceValue;
 
         // Valeur de base
         if (piece.type === 'pawn') {
