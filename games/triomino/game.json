@@ -1,0 +1,27 @@
+{
+  "id": "triomino",
+  "name": "Triomino",
+  "description": "Posez vos tuiles triangulaires en faisant correspondre les chiffres, formez des ponts et des hexagones pour marquer un maximum de points !",
+  "players": {
+    "min": 1,
+    "max": 4
+  },
+  "type": "turn-based",
+  "tags": ["strategy", "classic", "family", "tiles", "1-4-players"],
+  "author": "Playlab42",
+  "icon": "🔺",
+  "version": "1.0.0",
+  "language": "typescript",
+  "engine": "engine.ts",
+  "controls": "mouse",
+  "orientation": "any",
+  "minWidth": 480,
+  "minHeight": 600,
+  "bots": {
+    "default": "Greedy",
+    "available": [
+      { "name": "Random", "file": "bots/random.ts", "difficulty": "easy" },
+      { "name": "Greedy", "file": "bots/greedy.ts", "difficulty": "medium" }
+    ]
+  }
+}

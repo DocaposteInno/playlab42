@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Triomino - Playlab42</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px;
+      }
+
+      h1 { color: white; font-size: 2em; margin-bottom: 4px; text-align: center; }
+      .subtitle { color: rgba(255,255,255,0.85); font-size: 0.9em; margin-bottom: 16px; text-align: center; }
+
+      /* — Écrans — */
+      .screen { display: none; }
+      .screen.active { display: block; }
+
+      /* — Setup — */
+      #setup-screen {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      }
+      #setup-screen h2 { text-align: center; margin-bottom: 24px; color: #333; }
+      .field { margin-bottom: 16px; }
+      .field label { display: block; font-size: 0.85em; color: #555; margin-bottom: 6px; font-weight: 600; }
+      .field select, .field input {
+        width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0;
+        border-radius: 10px; font-size: 1em; color: #333;
+        outline: none; transition: border-color 0.2s;
+      }
+      .field select:focus, .field input:focus { border-color: #f97316; }
+      .btn-primary {
+        width: 100%; padding: 14px; background: linear-gradient(135deg, #f97316, #dc2626);
+        color: white; border: none; border-radius: 12px; font-size: 1.1em;
+        font-weight: 600, cursor: pointer; transition: opacity 0.2s;
+      }
+      .btn-primary:hover { opacity: 0.9; }
+      .btn-secondary {
+        width: 100%; padding: 14px; background: transparent;
+        color: #666; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.1em;
+        font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s;
+        margin-top: 10px;
+      }
+      .btn-secondary:hover { background: #f1f5f9; color: #333; }
+      .btn-draw { background: #3b82f6; color: white; }
+      .btn-pass { background: #6b7280; color: white; }
+      .btn-quit { background: #dc2626; color: white; margin-top: 8px; }
+      .btn-rules { background: #8b5cf6; color: white; margin-top: 8px; text-decoration: none; text-align: center; display: block; }
+      .btn-draw:not(:disabled):hover, .btn-pass:not(:disabled):hover, .btn-quit:hover, .btn-rules:hover { opacity: 0.85; }
+
+      /* — Partie — */
+      #game-screen { width: 100%; max-width: 960px; }
+
+      /* Barre de statut */
+      .status-bar {
+        background: rgba(255,255,255,0.15);
+        border-radius: 14px;
+        padding: 10px 16px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 12px;
+        color: white;
+      }
+      .status-item { text-align: center; }
+      .status-label { font-size: 0.75em; opacity: 0.8; }
+      .status-value { font-size: 1.1em; font-weight: 700; }
+
+      /* Scores */
+      #scores-bar {
+        display: flex; gap: 10px; flex-wrap: wrap;
+        justify-content: center; margin-bottom: 12px;
+      }
+      .score-card {
+        background: rgba(255,255,255,0.2); border-radius: 12px;
+        padding: 8px 16px; color: white; text-align: center;
+        border: 2px solid transparent; transition: border-color 0.2s;
+      }
+      .score-card.active { border-color: white; background: rgba(255,255,255,0.35); }
+      .score-card .player-name { font-size: 0.8em; opacity: 0.9; }
+      .score-card .player-score { font-size: 1.4em; font-weight: 700; }
+
+      /* Zone de jeu principale */
+      #main-area {
+        display: flex; gap: 12px; align-items: flex-start;
+        flex-wrap: wrap; justify-content: center;
+      }
+
+      /* Plateau SVG */
+      #board-container {
+        background: white; border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        overflow: hidden; position: relative;
+        flex: 1; min-width: 320px;
+      }
+      #board-svg { display: block; width: 100%; height: 480px; cursor: default; }
+
+      /* Panneau latéral */
+      #side-panel {
+        background: white; border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        padding: 16px; min-width: 200px; max-width: 260px; width: 100%;
+      }
+      #side-panel h3 { font-size: 0.9em; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+      /* Réglette */
+      #rack-container { margin-bottom: 16px; }
+      #rack { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+      .rack-tile {
+        cursor: pointer; transition: transform 0.15s, filter 0.15s;
+      }
+      .rack-tile:hover { transform: scale(1.08); }
+      .rack-tile.selected { filter: drop-shadow(0 0 6px #f97316); }
+      .rack-tile.drawn { filter: drop-shadow(0 0 6px #3b82f6); }
+
+      /* Boutons d'action */
+      #actions { display: flex; flex-direction: column; gap: 8px; }
+      .btn-action {
+        padding: 10px 14px; border: none; border-radius: 10px;
+        font-size: 0.95em; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+      }
+      .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+      .btn-draw { background: #3b82f6; color: white; }
+      .btn-pass { background: #6b7280; color: white; }
+      .btn-quit { background: #dc2626; color: white; margin-top: 8px; }
+      .btn-rules { background: #8b5cf6; color: white; margin-top: 8px; text-decoration: none; text-align: center; display: block; }
+      .btn-draw:not(:disabled):hover, .btn-pass:not(:disabled):hover, .btn-quit:hover, .btn-rules:hover { opacity: 0.85; }
+
+      /* Notification de bonus */
+      #bonus-notif {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+        background: white; border-radius: 20px; padding: 24px 36px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4); text-align: center;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 100; pointer-events: none;
+      }
+      #bonus-notif.show { transform: translate(-50%, -50%) scale(1); }
+      #bonus-notif .bonus-emoji { font-size: 3em; }
+      #bonus-notif .bonus-text { font-size: 1.3em; font-weight: 700; color: #333; margin-top: 8px; }
+      #bonus-notif .bonus-pts { font-size: 2em; font-weight: 900; color: #f97316; }
+
+      /* Écran de fin */
+      #end-screen {
+        background: white; border-radius: 20px; padding: 36px;
+        max-width: 440px; width: 100%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+      }
+      #end-screen h2 { font-size: 2em; margin-bottom: 8px; color: #333; }
+      .podium { list-style: none; margin: 20px 0; }
+      .podium li {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 12px 16px; margin-bottom: 8px; border-radius: 12px;
+        font-weight: 600;
+      }
+      .podium li:nth-child(1) { background: #fef3c7; color: #92400e; font-size: 1.1em; }
+      .podium li:nth-child(2) { background: #f1f5f9; color: #475569; }
+      .podium li:nth-child(3) { background: #fef9f0; color: #92400e; }
+      .podium li:nth-child(n+4) { background: #f8fafc; color: #64748b; }
+      .podium .rank { font-size: 1.4em; }
+
+      /* Modale de confirmation */
+      #confirm-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 200;
+        justify-content: center; align-items: center;
+      }
+      #confirm-overlay.show { display: flex; }
+      #confirm-dialog {
+        background: white; border-radius: 20px; padding: 32px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4); text-align: center;
+        max-width: 340px; width: 90%;
+      }
+      #confirm-dialog p { color: #333; font-size: 1.1em; font-weight: 600; margin-bottom: 20px; }
+      #confirm-dialog .confirm-buttons { display: flex; gap: 10px; justify-content: center; }
+      #confirm-dialog .btn-confirm-yes {
+        padding: 10px 24px; background: #dc2626; color: white; border: none;
+        border-radius: 10px; font-size: 0.95em; font-weight: 600; cursor: pointer;
+      }
+      #confirm-dialog .btn-confirm-no {
+        padding: 10px 24px; background: #6b7280; color: white; border: none;
+        border-radius: 10px; font-size: 0.95em; font-weight: 600; cursor: pointer;
+      }
+      #confirm-dialog .btn-confirm-yes:hover, #confirm-dialog .btn-confirm-no:hover { opacity: 0.85; }
+    </style>
+  </head>
+  <body>
+    <h1>△ Triomino</h1>
+    <p class="subtitle">Posez vos tuiles, formez des hexagones, maximisez vos points !</p>
+
+    <!-- Écran de configuration -->
+    <div id="setup-screen" class="screen active">
+      <h2>Nouvelle partie</h2>
+
+      <div class="field">
+        <label for="num-players">Nombre de joueurs humans</label>
+        <select id="num-players">
+          <option value="1" selected>1 joueur</option>
+          <option value="2">2 joueurs</option>
+          <option value="3">3 joueurs</option>
+          <option value="4">4 joueurs</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="game-mode">Mode de jeu</label>
+        <select id="game-mode">
+          <option value="standard" selected>Standard</option>
+          <option value="simplified">Simplifié (points fixes)</option>
+          <option value="kids">Enfants (sans points)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bot-count">Bots adversaires</label>
+        <select id="bot-count">
+          <option value="0">Aucun (multi local)</option>
+          <option value="1" selected>1 bot (Greedy)</option>
+          <option value="2">2 bots</option>
+          <option value="3">3 bots</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="seed-input">Seed (laisser vide pour aléatoire)</label>
+        <input type="number" id="seed-input" placeholder="ex: 42" min="0" />
+      </div>
+
+      <button class="btn-primary" id="start-btn">Démarrer la partie</button>
+      <button class="btn-secondary" id="btn-rules-setup" onclick="window.open('https://www.regledujeu.fr/triominos/', '_blank')">📖 Règles du jeu</button>
+      <button class="btn-secondary" id="back-btn" onclick="window.location.href='../../index.html'">↩ Retour au menu principal</button>
+    </div>
+
+    <!-- Écran de jeu -->
+    <div id="game-screen" class="screen">
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="status-label">Tour</div>
+          <div class="status-value" id="turn-display">1</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Joueur actif</div>
+          <div class="status-value" id="current-player-display">—</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Pioche restante</div>
+          <div class="status-value" id="draw-pile-display">—</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Piochages ce tour</div>
+          <div class="status-value" id="draws-display">0 / 3</div>
+        </div>
+      </div>
+
+      <div id="scores-bar"></div>
+
+      <div id="main-area">
+        <div id="board-container">
+          <svg id="board-svg" viewBox="0 0 600 480"></svg>
+        </div>
+
+        <div id="side-panel">
+          <h3 id="rack-title">Ma réglette</h3>
+          <div id="rack-container">
+            <div id="rack"></div>
+          </div>
+
+          <h3>Actions</h3>
+          <div id="actions">
+            <button class="btn-action btn-draw" id="btn-draw" disabled>
+              Piocher (-5 pts)
+            </button>
+            <button class="btn-action btn-pass" id="btn-pass" disabled>
+              ? Passer mon tour
+            </button>
+            <button class="btn-action btn-quit" id="btn-quit">
+              ✕ Quitter la partie
+            </button>
+            <button class="btn-action btn-rules" onclick="window.open('https://www.regledujeu.fr/triominos/', '_blank')">
+              📖 Règles du jeu
+            </button>
+          </div>
+
+          <div id="hint" style="margin-top:12px; font-size:0.82em; color:#888; min-height:40px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Écran de fin -->
+    <div id="end-screen" class="screen">
+      <h2>Fin de partie</h2>
+      <p id="end-subtitle" style="color:#666; margin-bottom:16px;"></p>
+      <ul class="podium" id="podium"></ul>
+      <button class="btn-primary" id="restart-btn" style="margin-top:8px;">Rejouer</button>
+    </div>
+
+    <!-- Notification de bonus -->
+    <div id="bonus-notif">
+      <div class="bonus-emoji" id="bonus-emoji">⭐</div>
+      <div class="bonus-text" id="bonus-text">Bonus !</div>
+      <div class="bonus-pts" id="bonus-pts">+50</div>
+    </div>
+
+    <!-- Overlay de confirmation -->
+    <div id="confirm-overlay">
+      <div id="confirm-dialog">
+        <p>Êtes-vous sûr de vouloir abandonner la partie ?</p>
+        <div class="confirm-buttons">
+          <button class="btn-confirm-yes">Oui</button>
+          <button class="btn-confirm-no">Non</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { TriominoEngine, generateAllTiles, isValidPlacement, detectBonus } from './dist/engine.js';
+      import { SeededRandom } from '../../lib/seeded-random.js';
+      import { GreedyBot } from './bots/dist/greedy.js';
+      import { RandomBot } from './bots/dist/random.js';
+
+      // — Constantes visuelles —
+      // Côté d'un triangle équilatéral
+      const SIDE = 60;
+      // Demi-côté and hauteur
+      const HALF_SIDE = SIDE / 2;
+      const TRI_H = SIDE * Math.sqrt(3) / 2;
+
+      // — État global —
+      const engine = new TriominoEngine();
+      let gameState = null;
+      let selectedTileId = null;
+      let humanPlayerIds = [];
+      let botPlayers = []; // { id, bot }
+      let currentMode = 'standard';
+      let rng = null;
+      let lastPlacedPositionKey = null; // Clé de la dernière tuile posée
+      let hoveredTileId = null;         // Tuile survolée dans la réglette
+
+      // — Éléments DOM —
+      const setupScreen = document.getElementById('setup-screen');
+      const gameScreen = document.getElementById('game-screen');
+      const endScreen = document.getElementById('end-screen');
+      const boardSvg = document.getElementById('board-svg');
+      const rackEl = document.getElementById('rack');
+      const scoresBar = document.getElementById('scores-bar');
+      const btnDraw = document.getElementById('btn-draw');
+      const btnPass = document.getElementById('btn-pass');
+      const btnQuit = document.getElementById('btn-quit');
+      const hintEl = document.getElementById('hint');
+      const bonusNotif = document.getElementById('bonus-notif');
+      const confirmOverlay = document.getElementById('confirm-overlay');
+
+      // — Démarrage —
+      document.getElementById('start-btn').addEventListener('click', startGame);
+      document.getElementById('restart-btn').addEventListener('click', () => showScreen(setupScreen));
+
+      btnDraw.addEventListener('click', () => {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        gameState = engine.applyAction(gameState, { type: 'DRAW' }, currentPlayer.id);
+        selectedTileId = gameState.lastDrawnTile ? gameState.lastDrawnTile.id : null;
+        render();
+      });
+
+      btnPass.addEventListener('click', () => {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        gameState = engine.applyAction(gameState, { type: 'PASS' }, currentPlayer.id);
+        selectedTileId = null;
+        render();
+        if (gameState.phase === 'finished') { showEnd(); return; }
+        scheduleBotTurnIfNeeded();
+      });
+
+      btnQuit.addEventListener('click', () => {
+        confirmOverlay.classList.add('show');
+      });
+
+      // — Confirmation d'abandon —
+      confirmOverlay.addEventListener('click', (e) => {
+        if (e.target === confirmOverlay) {
+          confirmOverlay.classList.remove('show');
+        }
+      });
+
+      document.querySelectorAll('.btn-confirm-yes, .btn-confirm-no').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isYes = btn.classList.contains('btn-confirm-yes');
+          if (isYes) {
+            gameState = null;
+            selectedTileId = null;
+            confirmOverlay.classList.remove('show');
+            showScreen(setupScreen);
+          } else {
+            confirmOverlay.classList.remove('show');
+          }
+        });
+      });
+
+      function showScreen(screen) {
+        for (const s of [setupScreen, gameScreen, endScreen]) {
+          s.classList.remove('active');
+        }
+        screen.classList.add('active');
+      }
+
+      function startGame() {
+        const numHumans = parseInt(document.getElementById('num-players').value);
+        const numBots = parseInt(document.getElementById('bot-count').value);
+        currentMode = document.getElementById('game-mode').value;
+        const seedInput = document.getElementById('seed-input').value;
+        const seed = seedInput ? parseInt(seedInput) : Math.floor(Math.random() * 999999);
+
+        humanPlayerIds = Array.from({ length: numHumans }, (_, i) => `Joueur ${i + 1}`);
+        const botIds = Array.from({ length: numBots }, (_, i) => `Bot ${i + 1}`);
+        const allPlayerIds = [...humanPlayerIds, ...botIds];
+
+        if (allPlayerIds.length < 1 || allPlayerIds.length > 4) {
+          alert('Le nombre total de joueurs doit être entre 1 et 4.');
+          return;
+        }
+
+        botPlayers = botIds.map((id) => ({ id, bot: new GreedyBot() }));
+        rng = new SeededRandom(seed);
+
+        const config = {
+          mode: currentMode,
+          playerIds: allPlayerIds,
+          seed,
+        };
+
+        gameState = engine.init(config);
+        selectedTileId = null;
+        lastPlacedPositionKey = null;
+
+        showScreen(gameScreen);
+        render();
+
+        // Si le premier joueur est un bot, jouer automatiquement
+        scheduleBotTurnIfNeeded();
+      }
+
+      // — Rendu —
+      function render() {
+        if (!gameState) return;
+        renderStatus();
+        renderScores();
+        renderBoard();
+        renderRack();
+        renderActions();
+      }
+
+      function renderStatus() {
+        const current = gameState.players[gameState.currentPlayerIndex];
+        document.getElementById('turn-display').textContent = gameState.turn;
+        document.getElementById('current-player-display').textContent = current.id;
+        document.getElementById('draw-pile-display').textContent = gameState.drawPile.length;
+        document.getElementById('draws-display').textContent = `${gameState.drawsThisTurn} / 3`;
+      }
+
+      function renderScores() {
+        scoresBar.innerHTML = '';
+        gameState.players.forEach((p, i) => {
+          const card = document.createElement('div');
+          card.className = 'score-card' + (i === gameState.currentPlayerIndex ? ' active' : '');
+          card.innerHTML = `<div class="player-name">${p.id}</div><div class="player-score">${p.score} pts</div>`;
+          scoresBar.appendChild(card);
+        });
+      }
+
+      function renderBoard() {
+        // Vider le plateau sauf les defs
+        boardSvg.innerHTML = '<defs><filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.15"/></filter><filter id="last-tile-glow"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#f97316" flood-opacity="0.8"/></filter></defs>';
+
+        const legalPositions = getLegalPositionsForSelected();
+
+        // Collecter toutes les positions à afficher pour calculer le viewBox
+        const allPositions = [];
+        for (const key of Object.keys(gameState.board)) {
+          allPositions.push(gameState.board[key].position);
+        }
+        for (const { pos } of legalPositions) {
+          allPositions.push(pos);
+        }
+
+        // Calculer le viewBox englobant
+        if (allPositions.length > 0) {
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          for (const pos of allPositions) {
+            for (const [x, y] of triangleCorners(pos)) {
+              if (x < minX) minX = x;
+              if (y < minY) minY = y;
+              if (x > maxX) maxX = x;
+              if (y > maxY) maxY = y;
+            }
+          }
+          const pad = SIDE;
+          boardSvg.setAttribute('viewBox',
+            `${minX - pad} ${minY - pad} ${maxX - minX + 2 * pad} ${maxY - minY + 2 * pad}`);
+        }
+
+        // Dessiner les zones de drop disponibles
+        for (const { pos, placed } of legalPositions) {
+          const pts = trianglePoints(pos);
+          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          poly.setAttribute('points', pts);
+          poly.setAttribute('fill', 'rgba(249,115,22,0.18)');
+          poly.setAttribute('stroke', '#f97316');
+          poly.setAttribute('stroke-width', '2');
+          poly.setAttribute('stroke-dasharray', '4 3');
+          poly.style.cursor = 'pointer';
+          poly.addEventListener('click', () => placeTile(pos, placed));
+          boardSvg.appendChild(poly);
+        }
+
+        // Dessiner les tuiles posées
+        for (const key of Object.keys(gameState.board)) {
+          const cell = gameState.board[key];
+          drawPlacedTile(cell, key === lastPlacedPositionKey);
+        }
+      }
+
+      function drawPlacedTile(cell, isLastPlaced = false) {
+        const { position, placed } = cell;
+        const pts = trianglePoints(position);
+        const [cx, cy] = triangleCenter(position);
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        if (isLastPlaced) {
+          g.setAttribute('filter', 'url(#last-tile-glow)');
+        }
+
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly.setAttribute('points', pts);
+        poly.setAttribute('fill', isLastPlaced ? '#fed7aa' : '#fffff0');
+        poly.setAttribute('stroke', isLastPlaced ? '#f97316' : '#000000');
+        poly.setAttribute('stroke-width', isLastPlaced ? '3' : '2');
+        if (!isLastPlaced) poly.setAttribute('filter', 'url(#shadow)');
+        g.appendChild(poly);
+
+        // Afficher les 3 valeurs aux sommets, insetées vers le centre.
+        // placed[0] ? corners[0] (sommet), placed[1] ? corners[1], placed[2] ? corners[2]
+        const corners = triangleCorners(position);
+        const CORNER_INSET = 0.45;
+        placed.forEach((val, i) => {
+          const nx = corners[i][0] + (cx - corners[i][0]) * CORNER_INSET;
+          const ny = corners[i][1] + (cy - corners[i][1]) * CORNER_INSET;
+          const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tx.setAttribute('x', nx);
+          tx.setAttribute('y', ny);
+          tx.setAttribute('text-anchor', 'middle');
+          tx.setAttribute('dominant-baseline', 'central');
+          tx.setAttribute('font-size', '13');
+          tx.setAttribute('font-weight', '800');
+          tx.setAttribute('fill', '#7c1d0e');
+          tx.textContent = val;
+          g.appendChild(tx);
+        });
+
+        boardSvg.appendChild(g);
+      }
+
+      function renderRack() {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const isHuman = humanPlayerIds.includes(currentPlayer.id);
+
+        document.getElementById('rack-title').textContent =
+          isHuman ? `Ma réglette (${currentPlayer.rack.length} tuiles)` : `${currentPlayer.id} joue...`;
+
+        rackEl.innerHTML = '';
+        if (!isHuman) return;
+
+        // Trier les tuiles : par chiffre du sommet (values[0]) puis par nombre de points
+        const sortedRack = [...currentPlayer.rack].sort((a, b) => {
+          if (a.values[0] !== b.values[0]) return a.values[0] - b.values[0];
+          const sumA = a.values[0] + a.values[1] + a.values[2];
+          const sumB = b.values[0] + b.values[1] + b.values[2];
+          return sumA - sumB;
+        });
+
+        sortedRack.forEach((tile) => {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('width', '56');
+          svg.setAttribute('height', '56');
+          svg.setAttribute('viewBox', '-28 -28 56 56');
+          svg.classList.add('rack-tile');
+          if (tile.id === selectedTileId) svg.classList.add('selected');
+          if (gameState.lastDrawnTile && tile.id === gameState.lastDrawnTile.id) svg.classList.add('drawn');
+
+          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+          poly.setAttribute('points', '0,-22 -22,18 22,18');
+          poly.setAttribute('fill', tile.id === selectedTileId ? '#fed7aa' : '#fffff0');
+          poly.setAttribute('stroke', '#000000');
+          poly.setAttribute('stroke-width', '2');
+          svg.appendChild(poly);
+
+          // Valeurs aux Sommets (même convention que le plateau)
+          const rackCorners = [[0, -22], [-22, 18], [22, 18]];
+          const rackCx = 0;
+          const rackCy = (-22 + 18 + 18) / 3;
+          const RACK_INSET = 0.45;
+          tile.values.forEach((v, i) => {
+            const nx = rackCorners[i][0] + (rackCx - rackCorners[i][0]) * RACK_INSET;
+            const ny = rackCorners[i][1] + (rackCy - rackCorners[i][1]) * RACK_INSET;
+            const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            tx.setAttribute('x', nx);
+            tx.setAttribute('y', ny);
+            tx.setAttribute('text-anchor', 'middle');
+            tx.setAttribute('dominant-baseline', 'central');
+            tx.setAttribute('font-size', '11');
+            tx.setAttribute('font-weight', '800');
+            tx.setAttribute('fill', '#7c1d0e');
+            tx.textContent = v;
+            svg.appendChild(tx);
+          });
+
+          svg.addEventListener('click', () => {
+            selectedTileId = tile.id === selectedTileId ? null : tile.id;
+            render();
+          });
+
+          svg.addEventListener('mouseenter', () => {
+            hoveredTileId = tile.id;
+            renderBoard();
+          });
+
+          svg.addEventListener('mouseleave', () => {
+            hoveredTileId = null;
+            renderBoard();
+          });
+
+          rackEl.appendChild(svg);
+        });
+      }
+
+      function renderActions() {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const isHuman = humanPlayerIds.includes(currentPlayer.id);
+
+        btnDraw.disabled = !isHuman || !engine.isValidAction(gameState, { type: 'DRAW' }, currentPlayer.id);
+        btnPass.disabled = !isHuman || !engine.isValidAction(gameState, { type: 'PASS' }, currentPlayer.id);
+
+        if (isHuman) {
+          if (!selectedTileId) {
+            hintEl.textContent = '👆 Sélectionnez une tuile de votre réglette, puis cliquez sur une zone orange pour la poser.';
+          } else {
+            const lp = getLegalPositionsForSelected();
+            hintEl.textContent = lp.length > 0
+              ? `✅ ${lp.length} position(s) disponible(s) — cliquez sur une zone orange.`
+              : "⚠️ Cette tuile n'a pas de placement disponible. Essayez une autre tuile ou piochez.";
+          }
+        } else {
+          hintEl.textContent = '';
+        }
+      }
+
+      // — Interactions —
+      function getLegalPositionsForSelected() {
+        const activeId = selectedTileId ?? hoveredTileId;
+        if (!activeId || gameState.phase === 'finished') return [];
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        if (!humanPlayerIds.includes(currentPlayer.id)) return [];
+
+        const tile = currentPlayer.rack.find(t => t.id === activeId);
+        if (!tile) return [];
+
+        const actions = engine.getLegalActions(gameState, currentPlayer.id);
+        return actions
+          .filter(a => a.type === 'PLACE' && a.triominoId === activeId)
+          .map(a => ({ pos: a.position, placed: a.placed }));
+      }
+
+      function placeTile(pos, placed) {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        if (!selectedTileId) return;
+
+        const action = { type: 'PLACE', triominoId: selectedTileId, position: pos, placed };
+        if (!engine.isValidAction(gameState, action, currentPlayer.id)) return;
+
+        // Détecter le bonus avant d'appliquer (pour affichage)
+        const boardAfter = {
+          ...gameState.board,
+          [`${pos.col},${pos.row},${pos.orientation}`]: {
+            triomino: currentPlayer.rack.find(t => t.id === selectedTileId),
+            position: pos,
+            placed,
+          },
+        };
+        const bonus = detectBonus(boardAfter, pos);
+
+        lastPlacedPositionKey = `${pos.col},${pos.row},${pos.orientation}`;
+        gameState = engine.applyAction(gameState, action, currentPlayer.id);
+        selectedTileId = null;
+        render();
+
+        if (bonus) showBonus(bonus);
+
+        if (gameState.phase === 'finished') {
+          setTimeout(showEnd, bonus ? 1800 : 400);
+          return;
+        }
+
+        scheduleBotTurnIfNeeded();
+      }
+
+      // — Bots —
+      function scheduleBotTurnIfNeeded() {
+        if (!gameState || gameState.phase === 'finished') return;
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const botEntry = botPlayers.find(b => b.id === currentPlayer.id);
+        if (botEntry) {
+          setTimeout(() => playBotTurn(botEntry), 600);
+        }
+      }
+
+      function playBotTurn(botEntry) {
+        if (!gameState || gameState.phase === 'finished') return;
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        if (currentPlayer.id !== botEntry.id) return;
+
+        const view = engine.getPlayerView(gameState, botEntry.id);
+        const actions = engine.getLegalActions(gameState, botEntry.id);
+        if (actions.length === 0) return;
+
+        const action = botEntry.bot.chooseAction(view, actions, rng);
+
+        let bonus = null;
+        if (action.type === 'PLACE') {
+          const boardAfter = {
+            ...gameState.board,
+            [`${action.position.col},${action.position.row},${action.position.orientation}`]: {
+              triomino: currentPlayer.rack.find(t => t.id === action.triominoId),
+              position: action.position,
+              placed: action.placed,
+            },
+          };
+          bonus = detectBonus(boardAfter, action.position);
+          lastPlacedPositionKey = `${action.position.col},${action.position.row},${action.position.orientation}`;
+        }
+
+        gameState = engine.applyAction(gameState, action, botEntry.id);
+        render();
+
+        if (bonus) showBonus(bonus);
+
+        if (gameState.phase === 'finished') {
+          setTimeout(showEnd, bonus ? 1800 : 400);
+          return;
+        }
+
+        // Le bot continue s'il peut encore jouer (ex: DRAW en boucle)
+        const nextPlayer = gameState.players[gameState.currentPlayerIndex];
+        const nextBot = botPlayers.find(b => b.id === nextPlayer.id);
+        if (nextBot) {
+          setTimeout(() => playBotTurn(nextBot), 500);
+        }
+      }
+
+      // — Bonus —
+      function showBonus(bonus) {
+        const emojis = { bridge: '🌉', hexagon: '⬡', 'double-hexagon': '⬡⬡' };
+        const labels = { bridge: 'Pont !', hexagon: 'Hexagone !', 'double-hexagon': 'Double Hexagone !' };
+        document.getElementById('bonus-emoji').textContent = emojis[bonus.type] || '⭐';
+        document.getElementById('bonus-text').textContent = labels[bonus.type] || 'Bonus !';
+        document.getElementById('bonus-pts').textContent = `+${bonus.points} pts`;
+        bonusNotif.classList.add('show');
+        setTimeout(() => bonusNotif.classList.remove('show'), 1500);
+      }
+
+      // — Fin de partie —
+      function showEnd() {
+        const sorted = [...gameState.players].sort((a, b) => b.score - a.score);
+        const ranks = ['🥇', '🥈', '🥉', '4.'];
+        const podiumEl = document.getElementById('podium');
+        podiumEl.innerHTML = '';
+
+        sorted.forEach((p, i) => {
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="rank">${ranks[i] ?? (i+1)+'.'}</span> <span>${p.id}</span> <strong>${p.score} pts</strong>`;
+          podiumEl.appendChild(li);
+        });
+
+        const winners = gameState.winners ?? [];
+        const subtitleEl = document.getElementById('end-subtitle');
+        if (currentMode === 'kids') {
+          subtitleEl.textContent = winners.length > 0 ? `${winners.join(' & ')} a posé toutes ses tuiles en premier !` : 'Partie terminée !';
+        } else {
+          subtitleEl.textContent = winners.length > 0 ? `${winners.join(' & ')} remporte la partie !` : 'Partie terminée !';
+        }
+
+        showScreen(endScreen);
+      }
+
+      // — Géométrie SVG —
+
+      function triangleCorners(pos) {
+        const { col, row, orientation } = pos;
+        const seqX = col * 2 + (orientation === 'DOWN' ? 1 : 0);
+        const seqY = row;
+        const isVisualUp = ((seqX + seqY) % 2 + 2) % 2 === 0;
+
+        const leftX = seqX * HALF_SIDE;
+        const rightX = leftX + SIDE;
+        const midX = leftX + HALF_SIDE;
+        const topY = seqY * TRI_H;
+        const botY = topY + TRI_H;
+
+        if (isVisualUp) {
+          // △ : corners[0]=sommet haut, [1]=bas-gauche, [2]=bas-droit
+          return [
+            [midX,   topY],
+            [leftX,  botY],
+            [rightX, botY],
+          ];
+        } else {
+          // ▽ : corners[0]=sommet bas, [1]=haut-gauche, [2]=haut-droit
+          return [
+            [midX,   botY],
+            [leftX,  topY],
+            [rightX, topY],
+          ];
+        }
+      }
+
+      function isVisuallyUp(pos) {
+        const seqX = pos.col * 2 + (pos.orientation === 'DOWN' ? 1 : 0);
+        return ((seqX + pos.row) % 2 + 2) % 2 === 0;
+      }
+
+      function trianglePoints(pos) {
+        return triangleCorners(pos).map(c => c.join(',')).join(' ');
+      }
+
+      function triangleCenter(pos) {
+        const corners = triangleCorners(pos);
+        return [
+          (corners[0][0] + corners[1][0] + corners[2][0]) / 3,
+          (corners[0][1] + corners[1][1] + corners[2][1]) / 3,
+        ];
+      }
+
+      // — Debugging —
+      window.engine = engine;
+    </script>
+  </body>
+</html>
