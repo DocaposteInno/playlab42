@@ -37,7 +37,7 @@ export class GreedyBot {
     const bestActions = [];
 
     for (const action of validActions) {
-      let score = 0;
+      let score;
 
       if (action.type === 'place') {
         const simState = cloneState(view);

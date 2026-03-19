@@ -73,6 +73,7 @@ export default [
       'dist/**',
       'coverage/**',
       'data/**',
+      '**/*.html',
     ],
   },
 ];
