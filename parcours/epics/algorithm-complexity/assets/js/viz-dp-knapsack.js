@@ -168,7 +168,7 @@ export function initKnapsackViz(containerId) {
         if(p1) {p1.classList.add('bg-blue-500', 'text-white');}
         if(p2) {p2.classList.add('bg-green-500', 'text-white');}
 
-        let msg = '';
+        let msg;
         if (weight > w) {
           dp[i][w] = valWithout;
           msg = `Poids ${weight} > Cap ${w}. On reporte le haut (${valWithout}).`;

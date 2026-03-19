@@ -74,7 +74,7 @@ export class ScoreRenderer {
       this.ready = true;
     } catch (error) {
       console.error('Erreur lors du chargement de VexFlow:', error);
-      throw new Error('Impossible de charger VexFlow');
+      throw new Error('Impossible de charger VexFlow', { cause: error });
     }
   }
 
