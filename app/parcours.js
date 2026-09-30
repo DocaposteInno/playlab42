@@ -18,6 +18,7 @@ import { ParcoursViewer } from '../lib/parcours-viewer.js';
 // le rendu final reste piloté par le CSS (width/height 100% + object-fit).
 const THUMB_WIDTH = 380;
 const THUMB_HEIGHT = 180;
+let returnFocus = null;
 
 /**
  * Charge le catalogue parcours depuis le serveur
@@ -38,7 +39,7 @@ export async function loadParcoursCatalogue() {
  * @param {Object} epic - Données de l'epic
  * @returns {DocumentFragment} Fragment DOM
  */
-function createEpicCardElement(epic) {
+export function createEpicCardElement(epic) {
   const fragment = cloneTemplate('epic-card-template');
   const card = fragment.querySelector('.epic-card');
   const thumb = fragment.querySelector('.epic-thumb');
@@ -48,10 +49,12 @@ function createEpicCardElement(epic) {
   const slides = fragment.querySelector('.epic-slides');
   const tagsContainer = fragment.querySelector('.epic-tags');
   const progressBar = fragment.querySelector('.epic-progress-bar');
+  const progressLabel = fragment.querySelector('.epic-progress-label');
 
   // Data attributes
   card.dataset.epicId = epic.id;
   card.dataset.path = epic.path;
+  card.href = `#/parcours/${epic.id}`;
 
   // Thumbnail
   const defaultIcon = epic.icon || '📚';
@@ -74,6 +77,10 @@ function createEpicCardElement(epic) {
 
   // Info
   title.textContent = (epic.icon ? `${epic.icon} ` : '') + epic.title;
+  title.id = `epic-title-${epic.id}`;
+  progressLabel.id = `epic-progress-${epic.id}`;
+  card.setAttribute('aria-labelledby', title.id);
+  card.setAttribute('aria-describedby', progressLabel.id);
   desc.textContent = epic.description;
 
   // Meta
@@ -95,8 +102,11 @@ function createEpicCardElement(epic) {
   // Progress
   const progress = getEpicProgress(epic.id);
   const visitedCount = progress.visited?.length || 0;
-  const progressPercent = epic.slideCount > 0 ? (visitedCount / epic.slideCount) * 100 : 0;
+  const progressPercent = epic.slideCount > 0 ? Math.min(100, Math.round((visitedCount / epic.slideCount) * 100)) : 0;
   progressBar.style.width = `${progressPercent}%`;
+  progressBar.parentElement.setAttribute('aria-hidden', 'true');
+  progressLabel.textContent = progressPercent >= 100 ? 'Parcours terminé' :
+    (progressPercent > 0 ? `Progression : ${progressPercent} % · Reprendre` : 'Commencer le parcours');
 
   if (progressPercent >= 100) {
     card.classList.add('completed');
@@ -166,6 +176,7 @@ function renderParcoursCategoryFilters() {
   allBtn.className = `filter${!state.parcoursCategory ? ' active' : ''}`;
   allBtn.dataset.category = '';
   allBtn.textContent = 'Tous';
+  allBtn.setAttribute('aria-pressed', String(!state.parcoursCategory));
   el.parcoursCategoryFilters.appendChild(allBtn);
 
   // Boutons par catégorie (ordre: playlab42 en premier, autres en dernier)
@@ -184,6 +195,7 @@ function renderParcoursCategoryFilters() {
     btn.className = `filter${state.parcoursCategory === category.id ? ' active' : ''}`;
     btn.dataset.category = category.id;
     btn.textContent = `${category.icon || ''} ${category.label} (${category.count})`;
+    btn.setAttribute('aria-pressed', String(state.parcoursCategory === category.id));
     el.parcoursCategoryFilters.appendChild(btn);
   }
 }
@@ -345,6 +357,9 @@ export function renderParcours() {
  * @param {string} [slideId] - ID de la slide (optionnel)
  */
 export function openEpic(epicId, slideId = null) {
+  if (state.currentView !== 'parcours') {
+    returnFocus = document.activeElement;
+  }
   // Masquer les autres vues
   el.viewCatalogue.classList.remove('active');
   el.viewGame.classList.remove('active');
@@ -376,6 +391,9 @@ export function closeParcours() {
   el.viewParcours.classList.remove('active');
   el.viewCatalogue.classList.add('active');
   setState({ currentView: 'catalogue' });
+  if (returnFocus?.isConnected) {
+    returnFocus.focus();
+  }
 }
 
 /**

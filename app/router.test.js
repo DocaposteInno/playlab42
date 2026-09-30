@@ -26,9 +26,18 @@ describe('router: Hash routing for games and tools', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     state.currentView = 'catalogue';
+    state.parcoursViewer = null;
   });
 
   // ===== GAME ROUTES =====
+  it('nettoie le viewer et ses raccourcis lors du retour navigateur au catalogue', () => {
+    state.currentView = 'parcours';
+    state.parcoursViewer = { close: jest.fn() };
+    window.location.hash = '#/';
+    handleHashRoute();
+    expect(state.parcoursViewer.close).toHaveBeenCalledTimes(1);
+    expect(closeParcours).not.toHaveBeenCalled();
+  });
 
   describe('Route: #/games/:id', () => {
     it('parses #/games/tictactoe and calls openGame', () => {

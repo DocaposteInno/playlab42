@@ -6,20 +6,21 @@
 /* === Thème Dark (défaut) === */
 :root {
   /* Couleurs de fond */
-  --color-bg: #1a1a2e;
-  --color-bg-secondary: #16213e;
-  --color-bg-card: #0f3460;
-  --color-bg-hover: #1a4a7a;
+  color-scheme: dark;
+  --color-bg: #101827;
+  --color-bg-secondary: #162235;
+  --color-bg-card: #1c2b40;
+  --color-bg-hover: #26374f;
 
   /* Couleurs de texte */
-  --color-text: #eee;
-  --color-text-muted: #888;
-  --color-text-inverse: #1a1a2e;
+  --color-text: #f1f5fb;
+  --color-text-muted: #b8c3d4;
+  --color-text-inverse: #101827;
 
   /* Couleurs d'accent */
-  --color-accent: #e94560;
-  --color-accent-hover: #ff6b6b;
-  --color-accent-light: rgba(233, 69, 96, 0.1);
+  --color-accent: #ff8fa3;
+  --color-accent-hover: #ffb3c1;
+  --color-accent-light: rgba(255, 143, 163, 0.12);
 
   /* Couleurs sémantiques */
   --color-success: #4ade80;
@@ -30,7 +31,7 @@
   --color-info: #4fc3f7;
 
   /* Bordures et ombres */
-  --color-border: #333;
+  --color-border: #42516a;
   --color-shadow: rgba(0, 0, 0, 0.3);
 
   /* Jeux - couleurs spécifiques */
@@ -66,7 +67,7 @@
   /* Typographie */
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'Monaco', 'Menlo', 'Consolas', monospace;
-  --font-size-xs: 0.7rem;
+  --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
@@ -80,16 +81,20 @@
 
 /* === Thème Light === */
 [data-theme="light"] {
+  color-scheme: light;
   /* Couleurs de fond */
-  --color-bg: #f5f5f5;
+  --color-bg: #f6f8fc;
   --color-bg-secondary: #ffffff;
-  --color-bg-card: #e8e8e8;
-  --color-bg-hover: #d0d0d0;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #eef2f9;
 
   /* Couleurs de texte */
-  --color-text: #1a1a2e;
-  --color-text-muted: #666;
-  --color-text-inverse: #eee;
+  --color-text: #182338;
+  --color-text-muted: #52617a;
+  --color-text-inverse: #ffffff;
+  --color-accent: #b42349;
+  --color-accent-hover: #921c3c;
+  --color-accent-light: rgba(180, 35, 73, 0.08);
 
   /* Couleurs sémantiques (ajustées pour fond clair) */
   --color-success: #16a34a;
@@ -100,7 +105,7 @@
   --color-info: #0284c7;
 
   /* Bordures et ombres */
-  --color-border: #ccc;
+  --color-border: #c4cede;
   --color-shadow: rgba(0, 0, 0, 0.1);
 
   /* Syntaxe JSON (ajustée pour fond clair) */
@@ -114,16 +119,20 @@
 /* === Respect des préférences système === */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
+    color-scheme: light;
     /* Couleurs de fond */
-    --color-bg: #f5f5f5;
+    --color-bg: #f6f8fc;
     --color-bg-secondary: #ffffff;
-    --color-bg-card: #e8e8e8;
-    --color-bg-hover: #d0d0d0;
+    --color-bg-card: #ffffff;
+    --color-bg-hover: #eef2f9;
 
     /* Couleurs de texte */
-    --color-text: #1a1a2e;
-    --color-text-muted: #666;
-    --color-text-inverse: #eee;
+    --color-text: #182338;
+    --color-text-muted: #52617a;
+    --color-text-inverse: #ffffff;
+    --color-accent: #b42349;
+    --color-accent-hover: #921c3c;
+    --color-accent-light: rgba(180, 35, 73, 0.08);
 
     /* Couleurs sémantiques (ajustées pour fond clair) */
     --color-success: #16a34a;
@@ -134,7 +143,7 @@
     --color-info: #0284c7;
 
     /* Bordures et ombres */
-    --color-border: #ccc;
+    --color-border: #c4cede;
     --color-shadow: rgba(0, 0, 0, 0.1);
 
     /* Syntaxe JSON */

@@ -44,7 +44,11 @@ export function handleHashRoute() {
 
   // Pas de route spéciale, afficher le catalogue
   if (state.currentView === 'parcours') {
-    closeParcours();
+    if (state.parcoursViewer) {
+      state.parcoursViewer.close();
+    } else {
+      closeParcours();
+    }
   }
   if (state.currentView === 'game') {
     unloadGame();

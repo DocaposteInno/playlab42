@@ -44,6 +44,7 @@ function renderBookmarkFilters() {
   allBtn.className = `filter${!state.bookmarkTagFilter ? ' active' : ''}`;
   allBtn.dataset.tag = '';
   allBtn.textContent = 'Tous';
+  allBtn.setAttribute('aria-pressed', String(!state.bookmarkTagFilter));
   el.bookmarkFilters.appendChild(allBtn);
 
   // Boutons par tag (top 10)
@@ -52,6 +53,7 @@ function renderBookmarkFilters() {
     btn.className = `filter${state.bookmarkTagFilter === tag.id ? ' active' : ''}`;
     btn.dataset.tag = tag.id;
     btn.textContent = `${tag.id} (${tag.count})`;
+    btn.setAttribute('aria-pressed', String(state.bookmarkTagFilter === tag.id));
     el.bookmarkFilters.appendChild(btn);
   }
 }

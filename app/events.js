@@ -7,12 +7,12 @@
 
 import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
-import { on, delegate, debounce } from '../lib/dom.js';
+import { on, delegate, debounce, isEditableTarget } from '../lib/dom.js';
 import { THEMES } from '../lib/theme.js';
 
-import { switchTab, registerRenderCallbacks } from './tabs.js';
+import { switchTab, registerRenderCallbacks, handleTabKeydown } from './tabs.js';
 import { renderCatalogue } from './catalogue.js';
-import { renderParcours, openEpic, selectParcoursCategory } from './parcours.js';
+import { renderParcours, selectParcoursCategory } from './parcours.js';
 import { renderBookmarks, selectBookmarkTag, showBookmarkPreview, hideBookmarkPreview } from './bookmarks.js';
 import { unloadGame, toggleFullscreen, toggleSound } from './game-loader.js';
 import { showSettings, hideSettings, setSoundPreference, setThemePreference, clearAllData } from './settings.js';
@@ -21,6 +21,10 @@ import { showSettings, hideSettings, setSoundPreference, setThemePreference, cle
  * Configure tous les event listeners de l'application
  */
 export function setupEventListeners() {
+  on(document.querySelector('.skip-link'), 'click', (event) => {
+    event.preventDefault();
+    document.querySelector('#main').focus();
+  });
   // Enregistrer les callbacks de rendu pour tabs.js
   registerRenderCallbacks({
     renderCatalogue,
@@ -38,12 +42,7 @@ export function setupEventListeners() {
   on(el.tabTools, 'click', () => switchTab('tools'));
   on(el.tabGames, 'click', () => switchTab('games'));
   on(el.tabBookmarks, 'click', () => switchTab('bookmarks'));
-
-  // === Parcours - click sur carte epic (délégation) ===
-  delegate(document, 'click', '.epic-card', (card) => {
-    const epicId = card.dataset.epicId;
-    openEpic(epicId);
-  });
+  on(document.querySelector('.tabs'), 'keydown', handleTabKeydown);
 
   // === Parcours - click sur filtre de catégorie (délégation) ===
   delegate(el.parcoursCategoryFilters, 'click', '.filter', (btn) => {
@@ -86,6 +85,13 @@ export function setupEventListeners() {
         hideBookmarkPreview();
       }
     }, true);
+    el.bookmarkTree.addEventListener('focusin', (e) => {
+      const link = e.target.closest('a[data-bookmark]');
+      if (link) {
+        showBookmarkPreview(JSON.parse(link.dataset.bookmark), link);
+      }
+    });
+    el.bookmarkTree.addEventListener('focusout', hideBookmarkPreview);
   }
 
   // === Catalogue - recherche ===
@@ -115,50 +121,7 @@ export function setupEventListeners() {
   on(el.btnClearData, 'click', clearAllData);
 
   // === Raccourcis clavier ===
-  on(document, 'keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (state.currentView === 'game') {
-        unloadGame();
-      } else if (state.currentView === 'settings') {
-        hideSettings();
-      }
-    }
-
-    if (e.key === 'f' && state.currentView === 'game') {
-      toggleFullscreen();
-    }
-
-    if (e.key === 'm' && state.currentView === 'game') {
-      toggleSound();
-    }
-
-    if (e.key === '/' && state.currentView === 'catalogue') {
-      e.preventDefault();
-      el.search.focus();
-    }
-
-    if (e.key === '1' && state.currentView === 'catalogue' && document.activeElement.tagName !== 'INPUT') {
-      switchTab('parcours');
-    }
-
-    if (e.key === '2' && state.currentView === 'catalogue' && document.activeElement.tagName !== 'INPUT') {
-      switchTab('tools');
-    }
-
-    if (e.key === '3' && state.currentView === 'catalogue' && document.activeElement.tagName !== 'INPUT') {
-      switchTab('games');
-    }
-
-    if (e.key === '4' && state.currentView === 'catalogue' && document.activeElement.tagName !== 'INPUT') {
-      switchTab('bookmarks');
-    }
-
-    // Retour à l'accueil parcours (Backspace quand en mode catégorie)
-    if (e.key === 'Backspace' && state.activeTab === 'parcours' && state.parcoursCategory && document.activeElement.tagName !== 'INPUT') {
-      e.preventDefault();
-      selectParcoursCategory(null);
-    }
-  });
+  on(document, 'keydown', handlePortalKeydown);
 
   // === Messages du jeu ===
   on(window, 'message', (e) => {
@@ -179,4 +142,57 @@ export function setupEventListeners() {
         break;
     }
   });
+}
+
+/**
+ * Applique les raccourcis sans intercepter les contrôles de saisie.
+ * @param {KeyboardEvent} e - Événement clavier
+ */
+export function handlePortalKeydown(e) {
+  if (e.defaultPrevented) { return; }
+  if (e.key === 'Escape') {
+    hideBookmarkPreview();
+    if (state.currentView === 'game') {
+      unloadGame();
+    } else if (state.currentView === 'settings') {
+      hideSettings();
+    }
+  }
+
+  if (e.altKey || e.ctrlKey || e.metaKey || isEditableTarget(e.target)) { return; }
+
+  if (e.key === 'f' && state.currentView === 'game') {
+    toggleFullscreen();
+  }
+
+  if (e.key === 'm' && state.currentView === 'game') {
+    toggleSound();
+  }
+
+  if (e.key === '/' && state.currentView === 'catalogue') {
+    e.preventDefault();
+    el.search.focus();
+  }
+
+  if (e.key === '1' && state.currentView === 'catalogue') {
+    switchTab('parcours');
+  }
+
+  if (e.key === '2' && state.currentView === 'catalogue') {
+    switchTab('tools');
+  }
+
+  if (e.key === '3' && state.currentView === 'catalogue') {
+    switchTab('games');
+  }
+
+  if (e.key === '4' && state.currentView === 'catalogue') {
+    switchTab('bookmarks');
+  }
+
+  // Retour à l'accueil parcours (Backspace quand en mode catégorie)
+  if (e.key === 'Backspace' && state.currentView === 'catalogue' && state.activeTab === 'parcours' && state.parcoursCategory) {
+    e.preventDefault();
+    selectParcoursCategory(null);
+  }
 }
