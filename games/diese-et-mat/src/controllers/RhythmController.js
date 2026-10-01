@@ -148,7 +148,9 @@ export class RhythmController extends EventEmitter {
     track.appendChild(cursor);
 
     // Zone de tap
-    const tapZone = document.createElement('div');
+    const tapZone = document.createElement('button');
+    tapZone.type = 'button';
+    tapZone.setAttribute('aria-label', 'Taper le rythme, Entrée ou Espace');
     tapZone.className = 'rhythm-tap-zone';
     tapZone.id = 'rhythm-tap-zone';
     tapZone.textContent = 'TAP';
@@ -198,6 +200,15 @@ export class RhythmController extends EventEmitter {
     // Events tap
     tapZone.addEventListener('mousedown', this._handleTap);
     tapZone.addEventListener('touchstart', this._handleTap);
+    tapZone.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {return;}
+      event.preventDefault();
+      event.stopPropagation();
+      if (!event.repeat) {this._handleTap(event);}
+    });
+    tapZone.addEventListener('click', (event) => {
+      if (event.detail === 0) {this._handleTap(event);}
+    });
 
     // Initialiser l'état
     this._state = {
@@ -229,6 +240,7 @@ export class RhythmController extends EventEmitter {
     // Cacher le bouton démarrer
     const startBtn = document.getElementById('btn-start-rhythm');
     if (startBtn) {startBtn.style.display = 'none';}
+    document.getElementById('rhythm-tap-zone')?.focus();
 
     // Initialiser l'audio et le métronome
     try {
