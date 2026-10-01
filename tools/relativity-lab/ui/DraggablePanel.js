@@ -39,6 +39,9 @@ export function makeDraggable(element, storageKey = null) {
   handle.style.cursor = 'grab';
 
   const onMouseDown = (e) => {
+    if (window.matchMedia('(max-width: 1100px), (max-height: 650px)').matches) {
+      return;
+    }
     // Ignorer si c'est un élément interactif
     if (e.target.tagName === 'SELECT' ||
         e.target.tagName === 'INPUT' ||
