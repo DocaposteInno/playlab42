@@ -125,16 +125,26 @@ il ne prétend pas tester le gestionnaire de fenêtres de l'OS headless.
 
 **Réseau et dépendances réelles** : `e2e/fixtures.js` intercepte les URL CDN publiques
 et sert les distributions npm épinglées `three@0.160.0`, `lil-gui@0.19.2`
-et `mathjax@3.2.2` (scripts et fontes des formules des slides).
-Les importmaps et sources de production restent inchangées.
+pour les outils 3D qui utilisent encore ces importmaps. Tone 15.1.22,
+VexFlow 5.0.0 et MathJax 4.1.3 sont construits dans `assets/vendor/` par
+`build:runtime`, également lancé par `build:local`. Le navigateur charge
+les bundles et les fontes locales de production, sans substitution CDN.
 Ce ne sont pas les mocks Jest : le navigateur exécute réellement les bibliothèques,
 le rendu, les contrôles et les moteurs de production. Les images/fontes externes et
-les poids ML sont bloqués. Les scripts Magenta et Tone sont explicitement indisponibles :
-le test Dièse couvre les commandes du piano, pas la restitution sonore ; Neural Style
+les poids ML sont bloqués. Le script Magenta reste explicitement indisponible. Dièse
+utilise la vraie bibliothèque Tone ; les assertions headless ne constituent pas une
+mesure de la restitution sonore ni de sa qualité perceptive. Neural Style
 doit afficher l'erreur de chargement du modèle quand sa bibliothèque est absente,
 puis accepter les imports locaux ; aucune inférence ni exactitude ML n'est revendiquée.
 Le laboratoire Deep Learning/Chart.js n'est pas couvert par ce socle.
 La vieille arborescence TensorFlow de Magenta n'est pas ajoutée aux dépendances npm du projet.
+
+`e2e/local-data.spec.js` couvre le téléchargement natif et les octets du Blob
+réel, une restauration par choix de fichier au clavier, les exclusions,
+le rejet sans mutation et la réinitialisation confirmée dans les réglages.
+Le cas mobile contrôle aussi l'absence de débordement à 320 px.
+Le portail transmet sa préférence sonore à une nouvelle session GameKit
+sur `ready` ; ce contrat est exercé dans `e2e/portal.spec.js`.
 
 ### Lancer la suite navigateur
 

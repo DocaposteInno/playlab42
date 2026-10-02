@@ -196,6 +196,9 @@ export class AudioEngine extends EventEmitter {
 
     /** @type {boolean} Audio activé (user gesture) */
     this.started = false;
+    this._disposed = false;
+    this._initPromise = null;
+    this._startPromise = null;
 
     /** @type {boolean} Son coupé */
     this.muted = false;
@@ -270,16 +273,27 @@ export class AudioEngine extends EventEmitter {
    *
    * @returns {Promise<void>}
    */
-  async init() {
-    if (this.ready) {
-      return;
+  init() {
+    if (this._disposed) {
+      return Promise.reject(new Error('Moteur audio détruit'));
     }
+    if (this.ready) {
+      return Promise.resolve();
+    }
+    if (!this._initPromise) {
+      this._initPromise = this._initialize().finally(() => {
+        this._initPromise = null;
+      });
+    }
+    return this._initPromise;
+  }
 
+  async _initialize() {
     try {
       // Charger Tone.js dynamiquement
       const module = await import('tone');
-      // Tone.js peut exporter différemment selon la version
-      this.Tone = module.default || module;
+      if (this._disposed) {throw new Error('Moteur audio détruit');}
+      this.Tone = module;
 
       // Le contexte audio est créé mais pas encore démarré
       this.ready = true;
@@ -295,7 +309,19 @@ export class AudioEngine extends EventEmitter {
    *
    * @returns {Promise<void>}
    */
-  async start() {
+  start() {
+    if (this._disposed) {
+      return Promise.reject(new Error('Moteur audio détruit'));
+    }
+    if (!this._startPromise) {
+      this._startPromise = this._start().finally(() => {
+        this._startPromise = null;
+      });
+    }
+    return this._startPromise;
+  }
+
+  async _start() {
     if (!this.ready) {
       await this.init();
     }
@@ -305,25 +331,18 @@ export class AudioEngine extends EventEmitter {
     }
 
     try {
-      // Démarrer le contexte audio
-      const startFn = this.Tone.start || this.Tone.default?.start;
-      if (startFn) {
-        await startFn();
-      } else {
-        // Alternative : démarrer le contexte directement
-        const ctx = this.Tone.getContext?.() || this.Tone.context;
-        if (ctx && ctx.state !== 'running') {
-          await ctx.resume();
-        }
-      }
+      await this.Tone.start();
+      if (this._disposed) {throw new Error('Moteur audio détruit');}
 
       // Créer la chaîne d'effets puis le synthétiseur
       await this._createEffectsChain();
+      if (this._disposed) {throw new Error('Moteur audio détruit');}
       this._createSynth();
 
       this.started = true;
       this.emit('started');
     } catch (error) {
+      this._disposeResources();
       console.error('Erreur lors du démarrage audio:', error);
       throw error;
     }
@@ -365,6 +384,7 @@ export class AudioEngine extends EventEmitter {
 
     // Attendre que la reverb génère son impulse response
     await this.effects.reverb.ready;
+    if (this._disposed) {throw new Error('Moteur audio détruit');}
 
     // Chaîner : filter → delay → reverb → destination
     this.effects.filter.connect(this.effects.delay);
@@ -1188,6 +1208,8 @@ export class AudioEngine extends EventEmitter {
   stopAll() {
     if (this.synth && this.synth.releaseAll) {
       this.synth.releaseAll();
+    } else if (this.synth?.triggerRelease) {
+      this.synth.triggerRelease();
     }
   }
 
@@ -1195,11 +1217,27 @@ export class AudioEngine extends EventEmitter {
    * Nettoie et libère les ressources
    */
   dispose() {
+    this._disposed = true;
+    this._disposeResources();
+    this.ready = false;
+    this.started = false;
+    this.Tone = null;
+
+    // Nettoyer les listeners EventEmitter
+    super.dispose();
+  }
+
+  /** Libère aussi une chaîne partielle après un démarrage échoué. */
+  _disposeResources() {
     this.stopAll();
 
     if (this.synth) {
       this.synth.dispose();
       this.synth = null;
+    }
+    for (const key of ['distortion', 'noiseFilter']) {
+      this[key]?.dispose();
+      this[key] = null;
     }
 
     // Disposer les effets
@@ -1211,12 +1249,7 @@ export class AudioEngine extends EventEmitter {
       }
     }
 
-    this.ready = false;
     this.started = false;
-    this.Tone = null;
-
-    // Nettoyer les listeners EventEmitter
-    super.dispose();
   }
 }
 

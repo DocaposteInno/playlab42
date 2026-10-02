@@ -106,6 +106,45 @@ import { SeededRandom } from '../../lib/seeded-random.js';
 import { RandomBot } from './bots/random.js';
 ```
 
+#### Cycle de vie du SDK
+
+Pour les clients qui utilisent GameKit, appeler `GameKit.init('mon-jeu')`
+une fois par session. `dispose()` retire les écouteurs internes, libère les
+assets et autorise une nouvelle initialisation. Le hook `onGameDispose`
+peut encore sauvegarder la progression avant cette libération.
+
+```javascript
+import GameKit from '../../lib/gamekit.js';
+import { initTheme, onThemeChange } from '../../lib/theme.js';
+
+const stopTheme = initTheme();
+const unsubscribe = onThemeChange(() => render());
+GameKit.init('mon-jeu');
+
+window.onGameDispose = () => {
+  if (!GameKit.saveProgress(state)) {
+    console.error('La progression n’a pas pu être sauvegardée.');
+  }
+  unsubscribe();
+  stopTheme();
+};
+```
+
+L'initialisation du thème est idempotente ; son nettoyage ne retire pas les
+abonnements créés séparément avec `onThemeChange`. `syncTheme()` applique une
+préférence déjà importée sans écrire dans le stockage.
+
+Les chemins relatifs d'assets sont résolus depuis le dossier du jeu, en
+conservant le préfixe de déploiement du site. Les URLs absolues, `data:` et
+`blob:` restent explicites. Une promesse de chargement encore en cours
+rejette lors du nettoyage : le client doit traiter cette annulation.
+
+Les types du protocole portail/jeu sont disponibles dans `lib/types/` pour
+les consommateurs TypeScript, sans imposer TypeScript aux clients HTML.
+Les helpers de scores et progression conservent leur API publique ; une
+erreur de lecture est signalée et ne supprime plus les données corrompues.
+Voir [Données locales](local-data.md) pour la sauvegarde et la restauration.
+
 ### 4. Gérer l'état du client
 
 ```javascript

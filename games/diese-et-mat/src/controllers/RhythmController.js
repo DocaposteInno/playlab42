@@ -63,6 +63,7 @@ export class RhythmController extends EventEmitter {
 
     /** @type {Object|null} État du rythme en cours */
     this._state = null;
+    this._countdownTimers = new Set();
 
     // Bind des méthodes pour les event listeners
     this._handleTap = this._handleTap.bind(this);
@@ -235,7 +236,9 @@ export class RhythmController extends EventEmitter {
    * Démarre l'exercice de rythme avec compte à rebours.
    */
   async start() {
-    if (!this._state) {return;}
+    if (!this._state || this._state.starting || this._state.started) {return;}
+    const state = this._state;
+    state.starting = true;
 
     // Cacher le bouton démarrer
     const startBtn = document.getElementById('btn-start-rhythm');
@@ -245,6 +248,7 @@ export class RhythmController extends EventEmitter {
     // Initialiser l'audio et le métronome
     try {
       await this._ensureAudioReady();
+      if (this._state !== state) {return;}
 
       const metronome = this._getMetronome();
       if (metronome) {
@@ -252,11 +256,12 @@ export class RhythmController extends EventEmitter {
         metronome.setTimeSignature(this._state.beatsPerMeasure, 4);
       }
     } catch {
+      if (this._state !== state) {return;}
       console.warn('Audio non disponible, mode silencieux');
     }
 
     // Compte à rebours
-    this._countdown(3);
+    if (this._state === state) {this._countdown(3, state);}
   }
 
   /**
@@ -264,7 +269,8 @@ export class RhythmController extends EventEmitter {
    * @param {number} count - Nombre de temps
    * @private
    */
-  _countdown(count) {
+  _countdown(count, state = this._state) {
+    if (!state || this._state !== state) {return;}
     const feedbackContainer = document.getElementById('feedback-container');
     const beatDuration = this._state.beatDuration;
 
@@ -281,7 +287,7 @@ export class RhythmController extends EventEmitter {
       if (metronome?._clickSynth) {
         metronome._playClick(count === 1);
       }
-      setTimeout(() => this._countdown(count - 1), beatDuration);
+      this._scheduleCountdown(() => this._countdown(count - 1, state), beatDuration);
     } else {
       if (feedbackContainer) {
         feedbackContainer.innerHTML = `
@@ -290,7 +296,8 @@ export class RhythmController extends EventEmitter {
           </div>
         `;
       }
-      setTimeout(() => {
+      this._scheduleCountdown(() => {
+        if (this._state !== state) {return;}
         if (feedbackContainer) {feedbackContainer.innerHTML = '';}
         this._startPlayback();
       }, 300);
@@ -302,6 +309,7 @@ export class RhythmController extends EventEmitter {
    * @private
    */
   _startPlayback() {
+    if (!this._state) {return;}
     this._state.started = true;
     this._state.startTime = Date.now();
     this._state.currentBeat = -1;
@@ -309,7 +317,9 @@ export class RhythmController extends EventEmitter {
     // Démarrer le métronome
     const metronome = this._getMetronome();
     if (metronome) {
-      metronome.start();
+      metronome.start().catch((error) => {
+        console.warn('Audio du rythme indisponible:', error);
+      });
     }
 
     this.emit('rhythm-started', {});
@@ -562,6 +572,8 @@ export class RhythmController extends EventEmitter {
    * Arrête et nettoie le contrôleur.
    */
   stop() {
+    for (const timer of this._countdownTimers) {clearTimeout(timer);}
+    this._countdownTimers.clear();
     if (this._state) {
       this._state.started = false;
       if (this._state.animationId) {
@@ -575,6 +587,15 @@ export class RhythmController extends EventEmitter {
     }
 
     this._state = null;
+  }
+
+  /** Programme uniquement les délais du compte à rebours, annulables à l'arrêt. */
+  _scheduleCountdown(callback, delay) {
+    const timer = setTimeout(() => {
+      this._countdownTimers.delete(timer);
+      callback();
+    }, delay);
+    this._countdownTimers.add(timer);
   }
 
   /**

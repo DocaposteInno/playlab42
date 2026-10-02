@@ -7,7 +7,8 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../../parcours/_shared/mathjax-config.js"></script>
+    <script id="MathJax-script" async src="../../../../../assets/vendor/mathjax/tex-mml-chtml.js"></script>
 
     <script type="module">
         import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
@@ -167,14 +168,18 @@
 
                     function updateLossInfo() {
                         const loss = lossFunctions[currentLoss];
+                        const formula = document.getElementById('lossFormula');
+                        window.MathJax?.typesetClear?.([formula]);
                         document.getElementById('lossTitle').textContent = loss.title;
                         document.getElementById('lossTitle').style.color = loss.color;
-                        document.getElementById('lossFormula').innerHTML = loss.formula;
+                        formula.textContent = loss.formula;
                         document.getElementById('lossDescription').textContent = loss.description;
 
                         // Re-render MathJax
-                        if (window.MathJax) {
-                            MathJax.typesetPromise([document.getElementById('lossFormula')]);
+                        if (window.MathJax?.typesetPromise) {
+                            MathJax.typesetPromise([formula]).catch((error) => {
+                                console.error('Rendu mathématique indisponible:', error);
+                            });
                         }
                     }
 

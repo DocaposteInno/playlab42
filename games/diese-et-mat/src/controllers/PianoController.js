@@ -119,6 +119,7 @@ export class PianoController extends EventEmitter {
 
     /** @type {Function[]} Cleanup handlers pour les event listeners */
     this._cleanupHandlers = [];
+    this._noteRequests = new Map();
   }
 
   // --------------------------------------------------------------------------
@@ -288,6 +289,7 @@ export class PianoController extends EventEmitter {
       key.addEventListener('touchend', () => {
         this.stopNote(n.note, key);
       });
+      key.addEventListener('touchcancel', () => this.stopNote(n.note, key));
 
       key.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') {return;}
@@ -517,6 +519,9 @@ export class PianoController extends EventEmitter {
    * @param {HTMLElement} [keyElement] - Élément de la touche
    */
   async playNote(note, keyElement) {
+    if (this._noteRequests.has(note)) {return;}
+    const request = {};
+    this._noteRequests.set(note, request);
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.add('active');
@@ -531,7 +536,9 @@ export class PianoController extends EventEmitter {
     // Jouer via SynthManager
     try {
       await this.synthManager?.noteOn(note);
+      if (this._noteRequests.get(note) !== request) {return;}
     } catch (error) {
+      if (this._noteRequests.get(note) !== request) {return;}
       console.error('Erreur lecture audio du piano:', error);
       if (this.elements.noteDisplay) {
         const message = error instanceof Error ? error.message : String(error);
@@ -549,6 +556,7 @@ export class PianoController extends EventEmitter {
    * @param {HTMLElement} [keyElement] - Élément de la touche
    */
   stopNote(note, keyElement) {
+    this._noteRequests.delete(note);
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.remove('active');
@@ -564,6 +572,7 @@ export class PianoController extends EventEmitter {
    * Arrête toutes les notes actives.
    */
   stopAllNotes() {
+    this._noteRequests.clear();
     this.synthManager?.stopAllNotes();
 
     // Reset visuellement

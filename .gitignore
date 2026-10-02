@@ -4,6 +4,7 @@ node_modules/
 # Build (générés par npm run build:ts, le workflow deploy.yml les génère)
 dist/
 build/
+assets/vendor/
 
 # IDE
 .idea/

@@ -130,6 +130,13 @@ export function setupEventListeners() {
     switch (e.data.type) {
       case 'ready':
         console.log(`[Portal] Jeu prêt: ${e.data.game}`);
+        if (e.source === el.gameIframe.contentWindow && e.origin === window.location.origin) {
+          e.source.postMessage({
+            type: 'preference',
+            key: 'sound',
+            value: state.preferences.sound,
+          }, window.location.origin);
+        }
         break;
       case 'score':
         console.log(`[Portal] Score: ${e.data.score}`);

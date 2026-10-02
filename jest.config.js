@@ -38,7 +38,9 @@ export default {
     '/node_modules/',
     '/data/',
     '/dist/',
+    '/assets/vendor/',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/assets/vendor/'],
 
   // Transformation : esbuild pour TypeScript (transpilation seule, sans
   // vérification de types ; celle-ci est assurée par `npm run typecheck`)

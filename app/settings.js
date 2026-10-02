@@ -5,11 +5,14 @@
  * Affichage et modification des préférences.
  */
 
-import { state, setState, STORAGE_KEYS } from './state.js';
+import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
-import { savePreferences } from './storage.js';
+import { loadPreferences, savePreferences } from './storage.js';
 import { updateSoundButton } from './game-loader.js';
-import { getTheme, setTheme, THEMES } from '../lib/theme.js';
+import { getTheme, setTheme, syncTheme, THEMES } from '../lib/theme.js';
+import { clearLocalData } from '../lib/local-data.js';
+import { updateTabUI } from './tabs.js';
+import { renderParcours } from './parcours.js';
 
 let returnFocus = null;
 
@@ -89,29 +92,39 @@ export function setThemePreference(theme) {
 }
 
 /**
- * Efface toutes les données utilisateur
+ * Efface les données gérées, sans modifier les outils exclus.
  */
 export function clearAllData() {
-  if (!confirm('Effacer toutes les données (scores, progression, préférences) ?')) {
+  if (state.currentGame) {
+    alert('Fermez le jeu ou l’outil ouvert avant de réinitialiser les données.');
+    return;
+  }
+  if (!confirm('Fermez les autres onglets et jeux. Effacer les données compatibles (scores, progressions, préférences) ? Neural Style, Relativity et les données étrangères seront conservés.')) {
+    return;
+  }
+  try {
+    clearLocalData();
+  } catch (error) {
+    console.warn('Erreur réinitialisation données:', error);
+    alert(`Réinitialisation impossible : ${error instanceof Error ? error.message : String(error)}`);
     return;
   }
 
-  const keysToRemove = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('scores_') || key.startsWith('progress_') ||
-        key === STORAGE_KEYS.PLAYER || key === STORAGE_KEYS.PREFERENCES ||
-        key === STORAGE_KEYS.RECENT) {
-      keysToRemove.push(key);
-    }
-  }
-  keysToRemove.forEach(key => localStorage.removeItem(key));
-
   state.preferences = { sound: true, pseudo: 'Anonyme' };
   state.recentGames = [];
+  state.activeTab = 'parcours';
+  if (!loadPreferences()) {
+    alert('Données effacées, mais leur relecture a échoué. Rechargez le portail et vérifiez vos données.');
+    return;
+  }
+  syncTheme();
 
   el.inputPseudo.value = 'Anonyme';
   updateSoundToggles();
+  updateSoundButton();
+  updateThemeToggles();
+  updateTabUI();
+  renderParcours();
 
-  alert('Données effacées');
+  alert('Données compatibles effacées. Les données des outils exclus ont été conservées.');
 }
