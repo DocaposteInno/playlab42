@@ -35,7 +35,7 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 | **1** | Bibliothèques partagées (`lib/`) | 100% coverage |
 | **2** | Moteurs de jeux | 90%+ coverage |
 | **3** | Scripts de build | 80%+ coverage |
-| **4** | Code UI/DOM | Best effort (difficulté de test) |
+| **4** | Code UI/DOM | Contrats DOM Jest + interactions réelles Playwright en CI |
 
 ### Ce qu'on teste
 
@@ -45,10 +45,11 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 - Algorithmes (ex: bots IA)
 - Validations et transformations de données
 - Scripts de build
+- Interactions UI critiques : clavier natif, focus, dialogues, thèmes et petits écrans
 
 ❓ **À évaluer** :
-- Code UI/DOM (difficile, coût/bénéfice)
-- Intégrations externes (utiliser mocks)
+- Intégrations externes (fixtures versionnées, périmètre explicitement documenté)
+- Régression visuelle exhaustive et performances (hors suite navigateur minimale)
 
 ❌ **Ne pas tester** :
 - Fichiers de configuration (jest.config.js, eslint.config.js)
@@ -63,7 +64,7 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 
 **Objectif** : Tester une unité de code isolément (fonction, classe, module)
 
-**Scope** : 95% des tests
+**Scope** : Majorité des tests, notamment règles des jeux et calculs des simulations
 
 **Exemples** :
 - `lib/seeded-random.test.js` : Tests de SeededRandom
@@ -78,7 +79,7 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 
 **Objectif** : Tester l'interaction entre plusieurs modules
 
-**Scope** : 5% des tests (pour l'instant)
+**Scope** : Contrats entre modules et DOM, en complément des tests navigateur
 
 **Exemples** :
 - Tester le chargement d'un game via GameKit
@@ -91,15 +92,139 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 
 ### 3. Tests E2E (End-to-End)
 
-**Statut** : Pas encore implémentés (roadmap)
+**Statut** : Suite Playwright obligatoire en CI (`.github/workflows/ui-e2e.yml`).
 
-**Objectif** : Tester le système complet dans un navigateur
+**Objectif** : Un petit socle de contrats utilisateur dans Chromium réel, sans ferme de captures.
+Les tests vivent dans `e2e/`, séparés de la découverte Jest.
 
-**Exemples futurs** :
-- Ouvrir le portail → Cliquer sur un tool → Vérifier qu'il charge
-- Jouer une partie de Tic-Tac-Toe complète
+| Contrat | Couverture navigateur |
+|---------|------------------------|
+| Portail | Chargement des catalogues, quatre onglets aux flèches/Home/End, `/` dans la recherche et le pseudo, liens bookmarks versionnés, outil JSON en iframe |
+| Parcours | Activation d'une carte par Entrée, vraie slide chargée, navigation Précédent/Suivant, Échap ferme le plan avant le viewer, retour du focus, largeur du plan conservée |
+| Thèmes | Choix clavier, état accessible, persistance, préférence système, thème transmis à l'iframe outil, tokens calculés clair/sombre au seuil AA 4,5:1 |
+| Jeux | Dames : déplacement légal ; Go hot-seat : deux pierres et fin par passes ; Triomino seed 42 : sélection, rotation et placement exacts, dialogue piégé et retour du focus |
+| Commandes natives | Mastermind : palette/pions et tentative ; TicTacToe : victoire hot-seat ; Diese : filtre, piano pressé/relâché et fermeture du dialogue |
+| Outils | JSON courant/falsy/erreur et récupération ; Particle Life : rendu, pause et matrice ; Neural Style : sélecteurs de fichiers au clavier et aperçus, sans inférence |
+| Relativity | Vrais scripts Three.js/lil-gui, initialisation 3D, impulsion qui consomme de la masse, moteur pressé/relâché, focus déplacé et événement `window.blur` |
+| Mobile | Portail et viewer à 320/390 px et paysage 844×390 ; Relativity après redimensionnement, cible moteur visible/non recouverte et activation réelle |
+| Galerie UI | Formulaire et carte réels, texte échappé, dialogue natif au clavier avec retour du focus, thèmes et tokens à 320 px |
 
-**Stack future** : Playwright ou Cypress
+**Déterminisme** : contextes navigateur neufs, date fixe pour les seeds `Date.now()`,
+seed explicite de Triomino et générateur aléatoire fixe pour Particle Life. Les catalogues
+sont construits à partir des manifests actuels : aucun nombre global de cartes n'est figé.
+Les bookmarks proviennent de `bookmarks/` et des images versionnées, avec `--skip-og`.
+Les fichiers `data/catalogue.json`, `data/parcours.json` et `data/bookmarks.json`
+sont générés et ignorés par Git : un checkout neuf les reconstruit avant de servir.
+Les assertions attendent les locators/états ; aucun sommeil fixe ni retry qui masque un échec.
+Relativity dispose de 60 secondes par scénario pour le rendu 3D logiciel et
+la fermeture du contexte ; les assertions gardent leur délai de 10 secondes.
+Les exceptions navigateur, scripts externes non déclarés et erreurs HTTP des ressources
+locales nécessaires font échouer le test.
+Le test `window.blur` envoie cet événement au vrai handler après une pression clavier ;
+il ne prétend pas tester le gestionnaire de fenêtres de l'OS headless.
+
+**Réseau et dépendances réelles** : `e2e/fixtures.js` intercepte les URL CDN publiques
+et sert les distributions npm épinglées `three@0.160.0`, `lil-gui@0.19.2`
+et `mathjax@3.2.2` (scripts et fontes des formules des slides).
+Les importmaps et sources de production restent inchangées.
+Ce ne sont pas les mocks Jest : le navigateur exécute réellement les bibliothèques,
+le rendu, les contrôles et les moteurs de production. Les images/fontes externes et
+les poids ML sont bloqués. Les scripts Magenta et Tone sont explicitement indisponibles :
+le test Dièse couvre les commandes du piano, pas la restitution sonore ; Neural Style
+doit afficher l'erreur de chargement du modèle quand sa bibliothèque est absente,
+puis accepter les imports locaux ; aucune inférence ni exactitude ML n'est revendiquée.
+Le laboratoire Deep Learning/Chart.js n'est pas couvert par ce socle.
+La vieille arborescence TensorFlow de Magenta n'est pas ajoutée aux dépendances npm du projet.
+
+### Lancer la suite navigateur
+
+Toutes les commandes suivantes s'exécutent **dans l'environnement Docker isolé**,
+jamais sur l'hôte. Le runner navigateur doit utiliser une distribution supportée
+par Playwright (Debian/Ubuntu), pas le container Alpine de développement :
+
+```bash
+# Depuis la racine du worktree : aucun npm/node sur l'hote.
+docker build -f docker/e2e.Dockerfile -t playlab42-e2e .
+docker run --rm --init --ipc=host \
+  --user "$(id -u):$(id -g)" \
+  --mount type=bind,source="$PWD",target=/workspace \
+  --mount type=volume,target=/workspace/node_modules \
+  playlab42-e2e
+```
+
+`docker/e2e.Dockerfile` utilise les navigateurs et dépendances système de l'image
+officielle `mcr.microsoft.com/playwright:v1.63.0-noble`. Node 26 et npm sont copiés
+depuis `node:26-bookworm-slim` ; le build vérifie explicitement Node 26, compatible
+avec le contrat `engines.node >=24`. `npm ci` installe le lockfile **dans l'image**,
+pas dans le volume Alpine ni sur l'hôte. Le volume anonyme `node_modules` est
+initialisé depuis cette image et supprimé avec le container ; il masque les
+dépendances éventuellement présentes dans le bind du worktree. Reconstruire
+l'image après toute modification du lockfile. Les builds et rapports sont écrits
+dans le worktree monté avec l'UID/GID de l'utilisateur qui lance le runner, pas
+avec root. Le cache npm du runtime et son HOME sont sous `/tmp`.
+Les cibles Make `test-e2e`/`test-e2e-ui` doivent utiliser ce runner dédié, jamais
+`docker compose exec dev` pour lancer le navigateur natif.
+
+Pour ouvrir l'interface Playwright avec le même runner :
+
+```bash
+docker run --rm --init --ipc=host -p 8080:8080 \
+  --user "$(id -u):$(id -g)" \
+  --mount type=bind,source="$PWD",target=/workspace \
+  --mount type=volume,target=/workspace/node_modules \
+  playlab42-e2e npm run test:e2e:ui -- --ui-host=0.0.0.0 --ui-port=8080
+```
+
+En CI Ubuntu, après `npm ci`, l'installation reste
+`npx playwright install --with-deps chromium`. Ne pas tenter cette installation
+dans Alpine : le Chromium fourni par Playwright est lié à glibc.
+
+Sans `PLAYWRIGHT_BASE_URL`, Playwright lance `npm run build:local`, qui construit
+TS, catalogue, parcours et bookmarks avec `--skip-og`, puis lance et arrête son
+serveur local. CI et Docker utilisent ce même serveur géré et donc ce même build
+hors réseau, sans dépendre de catalogues préexistants.
+Le port par défaut est 4173 ; `PLAYWRIGHT_PORT` permet d'isoler plusieurs
+exécutions simultanées. Un serveur existant n'est jamais réutilisé implicitement.
+Ne pas utiliser `npm run build` pour cette suite : il lance les fetches Open Graph.
+
+Pour un serveur **déjà lancé** (accessible depuis le container du runner), préparer
+les mêmes artefacts avant de servir, puis :
+
+```bash
+npm run build:local
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:5242 npm run test:e2e
+```
+
+Avec cette variable, aucun serveur n'est créé ni arrêté par Playwright.
+`playwright-report/` et `test-results/` sont des sorties non versionnées. En cas
+d'échec, le rapport HTML, la trace et la capture du test permettent le diagnostic ;
+il n'y a pas de captures de référence à maintenir.
+
+### Repli de validation vers un Chromium existant
+
+Si le téléchargement de l'image navigateur est indisponible, le runner peut
+recevoir `PLAYLAB_CDP_ENDPOINT` (URL HTTP du navigateur ou WebSocket CDP) pour
+utiliser un **vrai Chromium déjà lancé** via `connectOverCDP`. Aucun navigateur
+local n'est alors lancé ; les tests créent leurs propres contextes isolés, gardent
+les mêmes fixtures CDN réelles et ferment leurs contextes/connexion à la fin.
+Une erreur de connexion fait échouer la suite, sans repli silencieux.
+Ce mode utilise un seul worker : un navigateur CDP partagé ne peut pas conserver
+simultanément le focus de plusieurs pages. La CI native garde deux workers.
+
+Les deux valeurs viennent de l'environnement, pas du dépôt :
+
+```bash
+# Dans le container du runner, dependances npm deja installees pour ce container.
+PLAYLAB_CDP_ENDPOINT="$CHROMIUM_CDP_URL" \
+  PLAYWRIGHT_BASE_URL="$APP_BASE_URL" npm run test:e2e
+```
+
+`APP_BASE_URL` doit être accessible **depuis Chromium** et depuis le runner.
+Un serveur sur `127.0.0.1` dans le container du runner ne convient pas à un
+navigateur situé dans un autre container. Exécuter `npm run build:local`
+dans l'environnement isolé qui sert le worktree. CDP est un repli de validation
+Chromium, moins complet que la connexion Playwright native ; la CI reste sur le
+navigateur officiel installé pour la version exacte du runner.
 
 ---
 
@@ -124,7 +249,7 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 | Moteurs de jeux | 70%+ | 90%+ | Logique métier critique |
 | Bots IA | 50%+ | 80%+ | Algorithmes complexes |
 | Scripts build | 60%+ | 80%+ | Génération catalogue/parcours |
-| UI/DOM | Best effort | 50%+ | Difficile à tester, coût élevé |
+| UI/DOM | Contrats Jest + E2E | Interactions critiques obligatoires | Une métrique de lignes ne prouve pas le focus, le clavier natif ou le layout |
 
 ### Configuration Codecov
 
@@ -161,12 +286,22 @@ coverage:
 
 **Version** : 30.2.0+
 
-**Configuration** : `jest.config.js`
+**Configuration** : `jest.config.js` (source de vérité ; Node/jsdom selon le test,
+transformation esbuild pour TypeScript).
+
+### Navigateur : Playwright
+
+**Configuration** : `playwright.config.js`, tests `e2e/*.spec.js`. Chromium est le
+socle CI actuel, pas une promesse de couverture Firefox/WebKit ou appareils physiques.
+Le contrat de contraste des tokens complète `lib/theme-contrast.test.js` ; il ne
+remplace pas un audit WCAG complet de toutes les combinaisons de composants.
+
+### Exemple de configuration unitaire
 
 ```javascript
 export default {
-  testEnvironment: 'node',        // Pas de DOM (pour l'instant)
-  transform: {},                  // Pas de transpilation (ES modules natifs)
+  testEnvironment: 'node',        // jsdom declare par les tests DOM
+  transform: {},                  // Exemple JS pur ; voir la config pour TypeScript
   testMatch: [
     '**/__tests__/**/*.js',
     '**/*.test.js',
@@ -617,24 +752,17 @@ describe('TicTacToeEngine', () => {
 
 ### Workflow GitHub Actions
 
-**Fichier** : `.github/workflows/ci.yml`
+**Fichiers** : `.github/workflows/ci.yml` (lint/Jest/types/build) et
+`.github/workflows/ui-e2e.yml` (contrats navigateur sur PR et main).
 
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run test:coverage
-      - uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-```
+Le job navigateur suit Node 26 et `npm ci`, installe Chromium avec la commande
+supportée `npx playwright install --with-deps chromium`, puis lance `test:e2e`.
+Il ne dépend d'aucun DNS de laboratoire, serveur partagé ou accès CDN au runtime.
+Le build hors réseau `build:local` est lancé par le serveur géré Playwright.
+Le rapport et les
+traces sont publiés comme artefact pendant 14 jours uniquement en cas d'échec.
+Tout échec UI doit être corrigé avant fusion ; ne pas le rendre optionnel ni
+remplacer les vraies bibliothèques par des globals factices pour verdir la CI.
 
 ### Statut dans les PRs
 
@@ -672,7 +800,7 @@ The diff coverage is `85.71%`.
 ### Phase 2
 
 - [ ] Tests d'intégration
-- [ ] Tests E2E avec Playwright
+- [x] Socle E2E avec Playwright en CI
 - [ ] Visual regression testing
 - [ ] Performance testing
 
@@ -694,4 +822,4 @@ The diff coverage is `85.71%`.
 ---
 
 *Document maintenu par l'équipe Docaposte*
-*Dernière mise à jour : 2025-12-14*
+*Dernière mise à jour : 2026-10-02*

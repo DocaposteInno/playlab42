@@ -1,6 +1,6 @@
 # Theme Specification
 
-## Overview
+## Purpose
 
 Le système de thèmes gère l'apparence visuelle de Playlab42 (clair/sombre). Il :
 

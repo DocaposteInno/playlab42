@@ -60,8 +60,9 @@ export async function openTool(toolId) {
     return;
   }
 
-  // Essayer d'abord le format complexe (dossier), puis le format simple (fichier)
-  const paths = [
+  const tool = state.catalogue?.tools.find(item => item.id === toolId);
+  // Le catalogue evite une requete 404 pour les outils au format fichier.
+  const paths = tool?.path ? [tool.path] : [
     `tools/${toolId}/index.html`,
     `tools/${toolId}.html`,
   ];
@@ -84,7 +85,7 @@ export async function openTool(toolId) {
     }
 
     // Charger l'outil
-    const name = state.catalogue?.tools.find(tool => tool.id === toolId)?.name || toolId;
+    const name = tool?.name || toolId;
     loadGame(validPath, name, 'tool', toolId);
 
     // Synchroniser le hash

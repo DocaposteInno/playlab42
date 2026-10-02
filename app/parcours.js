@@ -19,6 +19,7 @@ import { ParcoursViewer } from '../lib/parcours-viewer.js';
 const THUMB_WIDTH = 380;
 const THUMB_HEIGHT = 180;
 let returnFocus = null;
+let returnFocusEpicId = null;
 
 /**
  * Charge le catalogue parcours depuis le serveur
@@ -359,6 +360,7 @@ export function renderParcours() {
 export function openEpic(epicId, slideId = null) {
   if (state.currentView !== 'parcours') {
     returnFocus = document.activeElement;
+    returnFocusEpicId = returnFocus?.closest('.epic-card')?.dataset.epicId || null;
   }
   // Masquer les autres vues
   el.viewCatalogue.classList.remove('active');
@@ -391,9 +393,11 @@ export function closeParcours() {
   el.viewParcours.classList.remove('active');
   el.viewCatalogue.classList.add('active');
   setState({ currentView: 'catalogue' });
-  if (returnFocus?.isConnected) {
-    returnFocus.focus();
-  }
+  // Le rendu differe de la recherche peut remplacer la carte pendant la lecture.
+  const target = returnFocus?.isConnected ? returnFocus
+    : [...el.viewCatalogue.querySelectorAll('.epic-card')]
+      .find(card => card.dataset.epicId === returnFocusEpicId);
+  target?.focus();
 }
 
 /**

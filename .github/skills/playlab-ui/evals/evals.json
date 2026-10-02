@@ -1,0 +1,33 @@
+{
+  "skill_name": "playlab-ui",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Dans games/tictactoe/index.html, améliore le focus et les noms accessibles de la grille pour jouer au clavier et au tactile. Conserve strictement les règles et les bots ; garde les thèmes clair et sombre et n'ajoute pas de framework.",
+      "expected_output": "Une correction du client, fondée sur les helpers et styles existants, avec contrôles accessibles et sans modification du moteur.",
+      "files": ["games/tictactoe/index.html", "lib/ui.css", "lib/theme.css", "lib/dom.js"],
+      "assertions": [
+        "Le diff ne modifie ni games/tictactoe/engine.js ni games/tictactoe/bots/.",
+        "Les cellules jouables ont un nom accessible et un mécanisme d'activation clavier.",
+        "Le client conserve ou ajoute les imports relatifs de theme.css et ui.css et un focus visible.",
+        "Le diff n'ajoute aucune dépendance React ou Tailwind et aucune commande runtime sur le host."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Crée tools/compteur-accessible avec un champ de valeur initiale et des boutons augmenter, diminuer et réinitialiser. Je veux une page autonome intégrée au catalogue, accessible au clavier, adaptée au mobile et au thème du portail. Utilise le kit de contribution existant.",
+      "expected_output": "Un outil HTML/CSS/ESM avec manifeste, primitives partagées, labels et annonces de statut, issu du gabarit tool.",
+      "files": ["docs/guides/contribution-kit.md", "templates/tool/", "lib/theme.js", "lib/ui.css"],
+      "assertions": [
+        "tools/compteur-accessible/index.html et tool.json existent avec un id correspondant au dossier.",
+        "Le champ possède un label associé et les trois actions utilisent des boutons natifs.",
+        "La valeur change dans une région de statut accessible et les imports partagés sont relatifs.",
+        "Aucun fichier généré data/*.json n'est ajouté au diff."
+      ]
+    }
+  ],
+  "trigger_cases": [
+    {"query": "Le formulaire d'un outil perd le focus et reste sombre quand je change le thème du portail.", "should_trigger": true},
+    {"query": "Corrige getWinners dans le moteur du morpion, le match nul est mal calculé.", "should_trigger": false}
+  ]
+}

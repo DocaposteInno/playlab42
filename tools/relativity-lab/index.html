@@ -1078,6 +1078,13 @@
         overflow: visible;
       }
       [data-drag-handle] { cursor: default !important; }
+      /* Le statut ne doit pas deplacer un bouton pendant une poussee maintenue. */
+      .motor-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+      }
+      .motor-thrust-btn { min-height: 44px; }
       .simulation-actions {
         display: flex;
         flex-wrap: wrap;
