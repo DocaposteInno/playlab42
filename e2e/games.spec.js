@@ -116,15 +116,33 @@ test('Diese: filtre natif et note maintenue dans un dialogue clavier', async ({ 
   await expect.poll(() => dialog.evaluate(element => element.contains(document.activeElement))).toBe(true);
   const note = page.locator('.piano-key[data-note="F#5"]');
   await note.focus();
-  // Ce contrat couvre le clavier hors ligne, pas la synthese audio Tone.js.
   for (const key of ['Enter', 'Space']) {
     await page.keyboard.down(key);
     await expect(note).toHaveAttribute('aria-pressed', 'true');
     await page.keyboard.up(key);
     await expect(note).toHaveAttribute('aria-pressed', 'false');
   }
-  await expect(page.locator('#piano-note-display')).toContainText('Audio indisponible');
+  await expect.poll(() => page.evaluate(async () => {
+    const Tone = await import('tone');
+    return Tone.getContext().state;
+  })).toBe('running');
+  await expect(page.locator('#piano-note-display')).not.toContainText('Audio indisponible');
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
+  await expect(page.locator('#btn-piano')).toBeFocused();
+});
+
+test('Diese: echec du bundle audio annonce sans bloquer le clavier ni la fermeture', async ({ page }) => {
+  await page.route('**/assets/vendor/tone/tone.js', route => route.abort('internetdisconnected'));
+  await page.goto('/games/diese-et-mat/index.html');
+  await activate(page.locator('#btn-piano'));
+  const note = page.locator('.piano-key[data-note="C4"]');
+  await note.focus();
+  await page.keyboard.down('Enter');
+  await expect(page.locator('#piano-note-display')).toContainText('Audio indisponible');
+  await page.keyboard.up('Enter');
+  await expect(note).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#piano-overlay')).toBeHidden();
   await expect(page.locator('#btn-piano')).toBeFocused();
 });

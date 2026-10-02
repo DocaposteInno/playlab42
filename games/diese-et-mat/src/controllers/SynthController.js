@@ -674,9 +674,14 @@ export class SynthController extends EventEmitter {
     if (!btn) {return;}
 
     btn.addEventListener('click', async () => {
-      await this.synthManager.ensureAudioReady();
-      if (this.synthManager.isAudioReady) {
-        this.synthManager.audioEngine.playNote('C4', '8n');
+      btn.disabled = true;
+      try {
+        await this.synthManager.playNote('C4', '8n');
+      } catch (error) {
+        console.error('Audio du synthétiseur indisponible:', error);
+        btn.title = 'Audio indisponible : réessayez';
+      } finally {
+        btn.disabled = false;
       }
     });
   }

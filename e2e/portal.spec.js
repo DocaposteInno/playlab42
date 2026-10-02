@@ -88,6 +88,21 @@ test('portail: un outil catalogue demarre dans son iframe', async ({ page }) => 
   await expect(frame.locator('#output')).toHaveText('{"browser":true}');
 });
 
+test('portail: une nouvelle session GameKit recoit le son sauvegarde puis ses changements', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('preferences', '{"sound":false}'));
+  await page.goto('/#/games/tictactoe');
+  await expect(page.locator('#game-iframe')).toHaveAttribute('src', /tictactoe/);
+  const frame = page.frameLocator('#game-iframe');
+  const soundState = () => frame.locator('body').evaluate(async () => {
+    const { default: GameKit } = await import('../../lib/gamekit.js');
+    return { game: GameKit.gameName, sound: GameKit.isSoundEnabled() };
+  });
+  await expect.poll(soundState).toEqual({ game: 'tictactoe', sound: false });
+  await expect(page.locator('#btn-sound')).toHaveAttribute('aria-pressed', 'false');
+  await activate(page.locator('#btn-sound'));
+  await expect.poll(soundState).toEqual({ game: 'tictactoe', sound: true });
+});
+
 for (const viewport of [{ width: 320, height: 740 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
   test(`portail mobile ${viewport.width}x${viewport.height}: catalogue et viewer sans debordement`, async ({ page }) => {
     await page.setViewportSize(viewport);

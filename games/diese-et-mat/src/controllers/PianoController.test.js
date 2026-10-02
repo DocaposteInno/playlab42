@@ -3,6 +3,24 @@ import { jest } from '@jest/globals';
 import { PianoController } from './PianoController.js';
 
 describe('Piano : retour audio explicite', () => {
+  test('un relâchement pendant le démarrage ne produit pas un événement tardif', async () => {
+    let ready;
+    const synthManager = {
+      noteOn: jest.fn(() => new Promise((resolve) => { ready = resolve; })),
+      noteOff: jest.fn(),
+    };
+    const key = document.createElement('button');
+    const controller = new PianoController({}, { synthManager });
+    const on = jest.fn();
+    controller.on('note-on', on);
+    const pending = controller.playNote('C4', key);
+    controller.stopNote('C4', key);
+    ready();
+    await pending;
+    expect(on).not.toHaveBeenCalled();
+    expect(key.getAttribute('aria-pressed')).toBe('false');
+  });
+
   test('annonce un rejet audio sans annoncer une note jouee ni casser le relachement', async () => {
     const error = new Error('Impossible de charger Tone.js');
     const synthManager = {

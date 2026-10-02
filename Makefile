@@ -19,7 +19,7 @@ PORT_HASH := $(shell echo "$(COMPOSE_PROJECT_NAME)" | cksum | cut -d' ' -f1)
 PORT_OFFSET := $(shell echo $$(( $(PORT_HASH) % 100 )))
 export PLAYLAB_PORT ?= $(shell echo $$(( 5200 + $(PORT_OFFSET) )))
 
-.PHONY: help up down build shell logs status info claude install test lint typecheck build-ts test-e2e test-e2e-ui scaffold openspec-list openspec-validate
+.PHONY: help up down build shell logs status info claude install test lint typecheck build-ts build-runtime test-e2e test-e2e-ui scaffold openspec-list openspec-validate
 
 # Affiche l'aide par défaut
 help:
@@ -46,6 +46,7 @@ help:
 	@echo "  make build-catalogue - Générer data/catalogue.json"
 	@echo "  make build-parcours  - Générer data/parcours.json"
 	@echo "  make build-bookmarks - Générer data/bookmarks.json"
+	@echo "  make build-runtime   - Générer les bibliothèques navigateur locales"
 	@echo "  make test            - Lancer les tests"
 	@echo "  make test-e2e        - Lancer les parcours navigateur dans une image dédiée"
 	@echo "  make test-e2e-ui     - Interface Playwright sur localhost:8080"
@@ -139,6 +140,9 @@ typecheck:
 
 build-ts:
 	docker compose exec dev npm run build:ts
+
+build-runtime:
+	docker compose exec dev npm run build:runtime
 
 # Serveur statique pour tester tools/games (mode interactif)
 serve:

@@ -78,6 +78,8 @@ export class SynthManager extends EventEmitter {
 
     /** @type {Set<string>} Notes actuellement jouées */
     this._activeNotes = new Set();
+    this._pendingNotes = new Map();
+    this._disposed = false;
   }
 
   // --------------------------------------------------------------------------
@@ -167,6 +169,9 @@ export class SynthManager extends EventEmitter {
    * @returns {Promise<AudioEngine>}
    */
   ensureAudioReady() {
+    if (this._disposed) {
+      throw new Error('Gestionnaire audio détruit');
+    }
     if (this._audioReady && this._audioEngine) {
       return this._audioEngine;
     }
@@ -195,6 +200,7 @@ export class SynthManager extends EventEmitter {
 
       // Démarrer l'AudioEngine
       await this._audioEngine.start();
+      if (this._disposed) {throw new Error('Gestionnaire audio détruit');}
 
       // Appliquer la configuration sauvegardée
       this._audioEngine.applySettings(this._config);
@@ -413,16 +419,25 @@ export class SynthManager extends EventEmitter {
    * @returns {Promise<void>}
    */
   async noteOn(pitch) {
-    if (this._activeNotes.has(pitch)) {
+    if (this._disposed || this._activeNotes.has(pitch) || this._pendingNotes.has(pitch)) {
       return; // Déjà en cours de lecture
     }
 
-    await this.ensureAudioReady();
+    const request = {};
+    this._pendingNotes.set(pitch, request);
+    try {
+      await this.ensureAudioReady();
+      if (this._disposed || this._pendingNotes.get(pitch) !== request) {return;}
 
-    this._activeNotes.add(pitch);
-    this._audioEngine.noteOn(pitch);
+      this._audioEngine.noteOn(pitch);
+      this._activeNotes.add(pitch);
 
-    this.emit('note-on', { pitch });
+      this.emit('note-on', { pitch });
+    } finally {
+      if (this._pendingNotes.get(pitch) === request) {
+        this._pendingNotes.delete(pitch);
+      }
+    }
   }
 
   /**
@@ -431,6 +446,7 @@ export class SynthManager extends EventEmitter {
    * @param {string} pitch - Note à arrêter
    */
   noteOff(pitch) {
+    this._pendingNotes.delete(pitch);
     if (!this._activeNotes.has(pitch)) {
       return;
     }
@@ -448,6 +464,7 @@ export class SynthManager extends EventEmitter {
    * Arrête toutes les notes actives.
    */
   stopAllNotes() {
+    this._pendingNotes.clear();
     for (const pitch of this._activeNotes) {
       if (this._audioEngine) {
         this._audioEngine.noteOff(pitch);
@@ -466,6 +483,7 @@ export class SynthManager extends EventEmitter {
    */
   async playNote(pitch, duration = 0.5) {
     await this.ensureAudioReady();
+    if (this._disposed) {return;}
     this._audioEngine.playNote(pitch, duration);
     this.emit('note-played', { pitch, duration });
   }
@@ -479,6 +497,7 @@ export class SynthManager extends EventEmitter {
    */
   async playChord(pitches, duration = 0.5) {
     await this.ensureAudioReady();
+    if (this._disposed) {return;}
     this._audioEngine.playChord(pitches, duration);
     this.emit('chord-played', { pitches, duration });
   }
@@ -589,6 +608,7 @@ export class SynthManager extends EventEmitter {
    * Nettoie et libère les ressources.
    */
   dispose() {
+    this._disposed = true;
     this.stopAllNotes();
 
     if (this._audioEngine) {

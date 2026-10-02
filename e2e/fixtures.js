@@ -5,14 +5,12 @@ import { dirname, resolve } from 'node:path';
 const require = createRequire(import.meta.url);
 const threeRoot = resolve(dirname(require.resolve('three')), '..');
 const guiDist = dirname(require.resolve('lil-gui'));
-const mathjaxRoot = dirname(require.resolve('mathjax/package.json'));
 const publicScripts = new Map([
   ['https://unpkg.com/three@0.160.0/build/three.module.js', resolve(threeRoot, 'build/three.module.js')],
   ['https://unpkg.com/lil-gui@0.19.2/dist/lil-gui.esm.js', resolve(guiDist, 'lil-gui.esm.js')],
 ]);
 const unavailableScripts = new Set([
   'https://cdn.jsdelivr.net/npm/@magenta/image@0.2.1',
-  'https://cdn.skypack.dev/tone@14.7.77',
 ]);
 const cdpEndpoint = process.env.PLAYLAB_CDP_ENDPOINT;
 
@@ -59,10 +57,6 @@ export const test = base.extend({
       const addons = 'https://unpkg.com/three@0.160.0/examples/jsm/';
       if (url.href.startsWith(addons)) {
         file = resolve(threeRoot, 'examples/jsm', url.pathname.split('/examples/jsm/')[1]);
-      }
-      const mathjax = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/';
-      if (url.href.startsWith(mathjax)) {
-        file = resolve(mathjaxRoot, 'es5', url.pathname.split('/es5/')[1]);
       }
       if (file) {
         await route.fulfill({
