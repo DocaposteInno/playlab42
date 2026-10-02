@@ -11,10 +11,13 @@ import { savePreferences } from './storage.js';
 import { updateSoundButton } from './game-loader.js';
 import { getTheme, setTheme, THEMES } from '../lib/theme.js';
 
+let returnFocus = null;
+
 /**
  * Affiche la vue des paramètres
  */
 export function showSettings() {
+  returnFocus = document.activeElement;
   setState({ currentView: 'settings' });
   el.viewCatalogue.classList.remove('active');
   el.viewGame.classList.remove('active');
@@ -23,6 +26,7 @@ export function showSettings() {
   el.inputPseudo.value = state.preferences.pseudo;
   updateSoundToggles();
   updateThemeToggles();
+  el.inputPseudo.focus();
 }
 
 /**
@@ -36,6 +40,9 @@ export function hideSettings() {
   setState({ currentView: 'catalogue' });
   el.viewSettings.classList.remove('active');
   el.viewCatalogue.classList.add('active');
+  if (returnFocus?.isConnected) {
+    returnFocus.focus();
+  }
 }
 
 /**
@@ -44,6 +51,8 @@ export function hideSettings() {
 export function updateSoundToggles() {
   el.soundOn.classList.toggle('active', state.preferences.sound);
   el.soundOff.classList.toggle('active', !state.preferences.sound);
+  el.soundOn.setAttribute('aria-pressed', String(state.preferences.sound));
+  el.soundOff.setAttribute('aria-pressed', String(!state.preferences.sound));
 }
 
 /**
@@ -54,6 +63,9 @@ export function updateThemeToggles() {
   el.themeSystem.classList.toggle('active', theme === THEMES.SYSTEM);
   el.themeDark.classList.toggle('active', theme === THEMES.DARK);
   el.themeLight.classList.toggle('active', theme === THEMES.LIGHT);
+  el.themeSystem.setAttribute('aria-pressed', String(theme === THEMES.SYSTEM));
+  el.themeDark.setAttribute('aria-pressed', String(theme === THEMES.DARK));
+  el.themeLight.setAttribute('aria-pressed', String(theme === THEMES.LIGHT));
 }
 
 /**

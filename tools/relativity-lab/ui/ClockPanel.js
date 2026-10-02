@@ -50,18 +50,18 @@ export class ClockPanel {
       <div class="panel-header" data-drag-handle>
         <span class="panel-title">Oscilloscope</span>
         <div class="oscillo-controls">
-          <select id="oscillo-timewindow" class="oscillo-select" title="Fenêtre temporelle">
+          <select id="oscillo-timewindow" class="oscillo-select" title="Fenêtre temporelle" aria-label="Fenêtre temporelle de l’oscilloscope">
             <option value="10">10s</option>
             <option value="30" selected>30s</option>
             <option value="60">1min</option>
             <option value="120">2min</option>
           </select>
-          <button class="panel-close" title="Masquer">&times;</button>
+          <button class="panel-close" title="Masquer" aria-label="Masquer l’oscilloscope">&times;</button>
         </div>
       </div>
       <div class="oscillo-hint">Phase des horloges H/V dans le temps</div>
       <div class="oscillo-canvas-wrapper">
-        <canvas id="oscillo-canvas"></canvas>
+        <canvas id="oscillo-canvas" role="img" aria-label="Évolution des phases des horloges horizontales et verticales pour chaque observateur."></canvas>
       </div>
       <div class="oscillo-legend" id="oscillo-legend"></div>
     `;

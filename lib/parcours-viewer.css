@@ -16,7 +16,7 @@
 }
 
 .parcours-viewer.menu-open {
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: var(--pv-sidebar-width, 300px) 1fr;
 }
 
 /* === Header === */
@@ -121,7 +121,7 @@
   margin-bottom: var(--space-xs);
 }
 
-.pv-menu-section[aria-expanded="false"] > ul {
+.pv-menu-section.collapsed > ul {
   display: none;
 }
 
@@ -176,7 +176,7 @@
 
 .pv-menu-slide.current .pv-menu-item {
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .pv-menu-state {
@@ -518,25 +518,13 @@
   }
 }
 
-/* Desktop large - menu toujours visible */
+/* Desktop large - menu ouvert par défaut, toujours contrôlable au clavier */
 @media (min-width: 1200px) {
-  .parcours-viewer {
-    grid-template-columns: 280px 1fr;
+  .parcours-viewer.menu-open {
+    grid-template-columns: var(--pv-sidebar-width, 280px) 1fr;
   }
 
-  .pv-sidebar {
-    display: flex;
-  }
-
-  .pv-btn-menu {
-    display: none;
-  }
-
-  .pv-btn-close-menu {
-    display: none;
-  }
-
-  .pv-footer {
+  .parcours-viewer.menu-open .pv-footer {
     grid-column: 2;
   }
 }

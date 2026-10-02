@@ -58,6 +58,7 @@ html, body {
 
 .header-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-md);
 }
@@ -65,7 +66,7 @@ html, body {
 .level-badge {
   padding: var(--space-xs) var(--space-sm);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: bold;
@@ -97,10 +98,10 @@ html, body {
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -381,6 +382,7 @@ html, body {
 }
 
 .piano-key {
+  padding: 0 0 var(--space-xs);
   position: relative;
   cursor: pointer;
   transition: all 0.1s ease;
@@ -427,7 +429,7 @@ html, body {
 }
 
 .piano-key-black.active {
-  background: linear-gradient(to bottom, var(--color-accent), #7c3aed);
+  background: var(--color-accent);
   transform: translateY(2px);
 }
 
@@ -443,6 +445,10 @@ html, body {
 
 .piano-key-black .piano-key-label {
   color: #aaa;
+}
+
+.piano-key.active .piano-key-label {
+  color: var(--color-text-inverse);
 }
 
 .piano-note-display {
@@ -495,7 +501,6 @@ html, body {
 }
 
 .piano-select:focus {
-  outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
 }
@@ -532,7 +537,7 @@ html, body {
 
 .piano-octave-btn:hover {
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
   border-color: var(--color-accent);
 }
 
@@ -700,7 +705,8 @@ html, body {
   justify-content: center;
   font-size: var(--font-size-xl);
   font-weight: bold;
-  color: white;
+  color: var(--color-text-inverse);
+  border: 0;
   cursor: pointer;
   transition: transform 0.1s ease, background 0.1s ease;
   user-select: none;
@@ -781,13 +787,16 @@ html, body {
    ============================================================================ */
 
 .audio-banner {
+  border: 0;
+  width: 100%;
+  font: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   background: var(--color-warning);
-  color: white;
+  color: #111;
   cursor: pointer;
   transition: background var(--transition-fast);
 }
@@ -889,7 +898,7 @@ html, body {
 .filter-btn.active {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .filter-toggle {
@@ -927,11 +936,15 @@ html, body {
 
 .exercises-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: var(--space-md);
 }
 
 .exercise-card {
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  width: 100%;
   padding: var(--space-md);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
@@ -979,11 +992,13 @@ html, body {
 }
 
 .exercise-card-title {
+  display: block;
   font-weight: bold;
   margin-bottom: var(--space-xs);
 }
 
 .exercise-card-description {
+  display: block;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
@@ -994,6 +1009,7 @@ html, body {
 }
 
 .exercise-card-stars {
+  display: block;
   color: var(--color-warning);
   font-size: var(--font-size-sm);
 }
@@ -1170,7 +1186,7 @@ html, body {
   background: var(--color-accent);
   border: none;
   border-radius: var(--radius-md);
-  color: white;
+  color: var(--color-text-inverse);
   font-size: var(--font-size-lg);
   cursor: pointer;
   display: flex;
@@ -1366,7 +1382,7 @@ html, body {
   background: var(--color-accent);
   border: none;
   border-radius: var(--radius-md);
-  color: white;
+  color: var(--color-text-inverse);
   font-size: var(--font-size-md);
   cursor: pointer;
   display: flex;
@@ -1652,7 +1668,6 @@ html, body {
 }
 
 .synth-select-full:focus {
-  outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
 }
@@ -1663,7 +1678,7 @@ html, body {
   margin-top: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
@@ -1847,7 +1862,7 @@ html, body {
 .synth-type-tab.active {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .synth-type-tab .tab-icon {
@@ -1910,7 +1925,7 @@ html, body {
 
 .synth-section-typed.active .synth-section-badge {
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .synth-section-content {
@@ -1949,7 +1964,7 @@ html, body {
 .synth-preset-btn.active {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .synth-oscillators {
@@ -1980,7 +1995,7 @@ html, body {
 .synth-osc-btn.active {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .synth-osc-icon {
@@ -2012,7 +2027,6 @@ html, body {
   appearance: none;
   background: var(--color-border);
   border-radius: 3px;
-  outline: none;
 }
 
 .synth-slider-row input[type="range"]::-webkit-slider-thumb {
@@ -2096,7 +2110,7 @@ html, body {
 .synth-test-btn {
   padding: var(--space-sm) var(--space-lg);
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -2106,7 +2120,7 @@ html, body {
 
 .synth-test-btn:hover {
   transform: scale(1.05);
-  background: #7c3aed;
+  background: var(--color-accent-hover);
 }
 
 .synth-test-btn:active {

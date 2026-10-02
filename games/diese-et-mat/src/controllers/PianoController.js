@@ -239,9 +239,12 @@ export class PianoController extends EventEmitter {
     const notes = this._generateNotes();
 
     notes.forEach((n, index) => {
-      const key = document.createElement('div');
+      const key = document.createElement('button');
+      key.type = 'button';
       key.className = `piano-key piano-key-${n.isBlack ? 'black' : 'white'}`;
       key.dataset.note = n.note;
+      key.setAttribute('aria-label', `Jouer ${this._noteToFrench(n.note)}${n.label ? `, raccourci ${n.label}` : ''}`);
+      key.setAttribute('aria-pressed', 'false');
 
       // Position des touches noires
       if (n.isBlack) {
@@ -284,6 +287,25 @@ export class PianoController extends EventEmitter {
 
       key.addEventListener('touchend', () => {
         this.stopNote(n.note, key);
+      });
+
+      key.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {return;}
+        event.preventDefault();
+        event.stopPropagation();
+        if (!event.repeat) {this.playNote(n.note, key);}
+      });
+      key.addEventListener('keyup', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {return;}
+        event.preventDefault();
+        event.stopPropagation();
+        this.stopNote(n.note, key);
+      });
+      key.addEventListener('blur', () => this.stopNote(n.note, key));
+      key.addEventListener('click', (event) => {
+        if (event.detail === 0) {
+          this.playNote(n.note, key).then(() => this.stopNote(n.note, key));
+        }
       });
 
       container.appendChild(key);
@@ -498,6 +520,7 @@ export class PianoController extends EventEmitter {
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.add('active');
+      keyElement.setAttribute('aria-pressed', 'true');
     }
 
     // Afficher la note
@@ -520,6 +543,7 @@ export class PianoController extends EventEmitter {
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.remove('active');
+      keyElement.setAttribute('aria-pressed', 'false');
     }
 
     // Arrêter via SynthManager
@@ -536,6 +560,7 @@ export class PianoController extends EventEmitter {
     // Reset visuellement
     this.elements.keyboard?.querySelectorAll('.piano-key.active').forEach((key) => {
       key.classList.remove('active');
+      key.setAttribute('aria-pressed', 'false');
     });
   }
 

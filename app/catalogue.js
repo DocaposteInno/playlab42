@@ -61,6 +61,7 @@ function createFilterElement(tag, isActive) {
   const btn = fragment.querySelector('.filter');
   btn.textContent = tag || 'Tous';
   btn.dataset.tag = tag;
+  btn.setAttribute('aria-pressed', String(isActive));
   if (isActive) { btn.classList.add('active'); }
   return fragment;
 }

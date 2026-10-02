@@ -81,7 +81,7 @@ export class DopplerGraph {
     this.container.innerHTML = `
       <div class="doppler-graph-header" data-drag-handle>
         <div class="doppler-graph-title">Réceptions Doppler</div>
-        <select class="doppler-graph-timewindow" id="doppler-timewindow">
+        <select class="doppler-graph-timewindow" id="doppler-timewindow" aria-label="Fenêtre temporelle des réceptions Doppler">
           <option value="auto">Auto</option>
           <option value="10">10s</option>
           <option value="60">1min</option>
@@ -95,7 +95,7 @@ export class DopplerGraph {
         <span class="doppler-legend-item doppler-legend--blue">Blueshift</span>
       </div>
       <div class="doppler-graph-canvas-wrapper">
-        <canvas class="doppler-graph-canvas"></canvas>
+        <canvas class="doppler-graph-canvas" role="img" aria-label="Réceptions des signaux par source au cours du temps propre : rouge pour l’éloignement, bleu pour le rapprochement."></canvas>
       </div>
     `;
 

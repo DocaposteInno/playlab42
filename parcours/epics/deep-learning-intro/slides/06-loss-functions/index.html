@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script type="module">
@@ -82,9 +81,9 @@
 
                     <!-- Canvas de visualisation -->
                     <div class="flex flex-col items-center">
-                        <canvas id="lossCanvas" width="500" height="280" class="rounded-lg" style="max-width: 500px; width: 100%;"></canvas>
+                        <canvas id="lossCanvas" width="500" height="280" class="rounded-lg" role="img" aria-label="Courbe de la fonction de perte sélectionnée selon la cible y" style="max-width: 500px; width: 100%;"></canvas>
                         <div class="flex items-center gap-3 mt-3">
-                            <label class="text-sm dl-text-secondary">Cible y =</label>
+                            <label for="targetY" class="text-sm dl-text-secondary">Cible y =</label>
                             <input type="range" id="targetY" min="-1" max="1" step="0.1" value="0" class="w-32">
                             <span id="targetYValue" class="font-mono dl-accent-cyan w-12">0.0</span>
                         </div>

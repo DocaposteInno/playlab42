@@ -257,6 +257,7 @@ export class SynthController extends EventEmitter {
     buttons.forEach((btn) => {
       const oscType = btn.dataset.osc;
       btn.classList.toggle('active', oscType === currentOsc);
+      btn.setAttribute('aria-pressed', String(oscType === currentOsc));
 
       btn.addEventListener('click', () => {
         this.synthManager.setOscillator(oscType);
@@ -278,6 +279,7 @@ export class SynthController extends EventEmitter {
 
     container.querySelectorAll('.synth-osc-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.osc === activeOsc);
+      btn.setAttribute('aria-pressed', String(btn.dataset.osc === activeOsc));
     });
   }
 

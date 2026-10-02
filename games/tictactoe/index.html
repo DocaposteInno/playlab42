@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic-Tac-Toe - Playlab42</title>
   <link rel="stylesheet" href="../../lib/theme.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
   <style>
     * {
       margin: 0;
@@ -69,7 +70,6 @@
     }
 
     .config-group select:focus {
-      outline: none;
       border-color: var(--color-accent);
     }
 
@@ -79,7 +79,7 @@
       background: var(--color-accent);
       border: none;
       border-radius: var(--radius-md);
-      color: white;
+      color: var(--color-text-inverse);
       font-size: var(--font-size-md);
       font-weight: 600;
       cursor: pointer;
@@ -191,7 +191,7 @@
 
     .btn-secondary:hover {
       background: var(--color-accent);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     /* Scores */
@@ -255,9 +255,9 @@
 
   <!-- Écran de jeu -->
   <div class="game-screen" id="game-screen">
-    <div class="status" id="status">À vous de jouer</div>
+    <div class="status" id="status" role="status" aria-live="polite">À vous de jouer</div>
 
-    <div class="board" id="board">
+    <div class="board" id="board" role="group" aria-label="Morpion, trois lignes et trois colonnes">
       <button class="cell" data-index="0"></button>
       <button class="cell" data-index="1"></button>
       <button class="cell" data-index="2"></button>
@@ -298,6 +298,7 @@
     import { BlockerBot } from './bots/blocker.js';
     import { PerfectBot } from './bots/perfect.js';
     import GameKit from '../../lib/gamekit.js';
+    import { createBoardNavigation } from '../board-navigation.js';
 
     // Initialiser GameKit pour la communication avec le portail
     GameKit.init('tictactoe');
@@ -316,6 +317,8 @@
     const configScreen = $('#config-screen');
     const gameScreen = $('#game-screen');
     const boardEl = $('#board');
+    const navigation = createBoardNavigation(boardEl, 3);
+    navigation.afterRender();
     const statusEl = $('#status');
     const cells = $$('.cell');
     const opponentSelect = $('#opponent');
@@ -369,6 +372,7 @@
       gameScreen.classList.add('active');
 
       render();
+      cells[0].focus();
 
       // Si le bot commence, le faire jouer
       if (state.currentPlayerId === opponentId && isVsBot) {
@@ -381,6 +385,8 @@
       cells.forEach((cell, i) => {
         const value = state.board[i];
         cell.textContent = value || '';
+        cell.setAttribute('aria-label', `Ligne ${Math.floor(i / 3) + 1}, colonne ${i % 3 + 1}, ${value || 'vide'}`);
+        cell.setAttribute('aria-disabled', String(Boolean(value) || state.gameOver || (isVsBot && state.currentPlayerId !== humanId)));
         cell.className = 'cell';
 
         if (value) {
@@ -398,6 +404,7 @@
         if (winLine) {
           winLine.forEach((i) => {
             cells[i].classList.add('winning');
+            cells[i].setAttribute('aria-label', `${cells[i].getAttribute('aria-label')}, ligne gagnante`);
           });
         }
       }

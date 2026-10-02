@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script type="module">
@@ -37,22 +36,22 @@
                 <div class="concept-box mb-8">
                     <h4 class="font-bold dl-accent-blue mb-3">Explorez un Réseau de Neurones</h4>
                     <div class="my-4">
-                        <canvas id="networkCanvas" width="700" height="350" class="w-full rounded-lg" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
+                        <canvas id="networkCanvas" width="700" height="350" class="w-full rounded-lg" role="img" aria-label="Réseau de neurones : propagation des trois entrées dans les couches" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
                         <p class="text-center text-xs dl-text-muted mt-2">Survolez les neurones pour voir leurs valeurs • Cliquez sur une entrée pour la modifier</p>
                     </div>
                     <div class="flex flex-wrap justify-center gap-4 mt-4">
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">Entrée x₁</label>
+                            <label for="input1" class="text-xs dl-text-muted block mb-1">Entrée x₁</label>
                             <input type="range" id="input1" min="-1" max="1" step="0.1" value="0.5" class="w-24">
                             <span id="input1Val" class="dl-accent-cyan text-xs font-mono block">0.5</span>
                         </div>
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">Entrée x₂</label>
+                            <label for="input2" class="text-xs dl-text-muted block mb-1">Entrée x₂</label>
                             <input type="range" id="input2" min="-1" max="1" step="0.1" value="-0.3" class="w-24">
                             <span id="input2Val" class="dl-accent-cyan text-xs font-mono block">-0.3</span>
                         </div>
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">Entrée x₃</label>
+                            <label for="input3" class="text-xs dl-text-muted block mb-1">Entrée x₃</label>
                             <input type="range" id="input3" min="-1" max="1" step="0.1" value="0.8" class="w-24">
                             <span id="input3Val" class="dl-accent-cyan text-xs font-mono block">0.8</span>
                         </div>

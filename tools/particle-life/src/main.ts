@@ -121,6 +121,7 @@ function setupControls(): void {
   if (randomBtn) {
     randomBtn.addEventListener('click', () => {
       simulation.randomizeAttractions();
+      updateAttractionMatrix();
     });
   }
 
@@ -188,7 +189,9 @@ function togglePlay(): void {
   isRunning = !isRunning;
   const playBtn = document.getElementById('playBtn');
   if (playBtn) {
-    playBtn.textContent = isRunning ? 'Pause' : 'Play';
+    playBtn.textContent = isRunning ? 'Pause' : 'Reprendre';
+    playBtn.setAttribute('aria-pressed', String(!isRunning));
+    playBtn.setAttribute('aria-label', isRunning ? 'Mettre en pause la simulation' : 'Reprendre la simulation');
   }
 }
 
@@ -236,7 +239,7 @@ function updateAttractionMatrix(): void {
   const colors = renderer.getColors();
 
   // Créer le tableau
-  let html = '<table class="matrix">';
+  let html = '<table class="matrix" aria-label="Attractions entre groupes">';
   html += '<tr><th></th>';
 
   // En-têtes de colonnes
@@ -260,6 +263,7 @@ function updateAttractionMatrix(): void {
       html += `<td style="background: ${bgColor}">
         <input type="range" min="-1" max="1" step="0.1" value="${value}"
                data-from="${i}" data-to="${j}"
+               aria-label="Attraction du groupe ${i + 1} vers le groupe ${j + 1}"
                title="${value.toFixed(1)}">
       </td>`;
     }

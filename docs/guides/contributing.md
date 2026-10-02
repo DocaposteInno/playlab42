@@ -75,6 +75,8 @@ tools/
 - [ ] Fichier `tool.json` avec champs requis
 - [ ] Utilise `/lib/theme.css` pour les styles
 - [ ] Utilise `/lib/theme.js` pour le thème (dark/light)
+- [ ] Charge `/lib/ui.css` pour le focus visible et les préférences de mouvement
+- [ ] Contrôles utilisables au clavier, formulaires étiquetés et états annoncés
 - [ ] Fonctionne en mode sombre et clair
 - [ ] Responsive (mobile + desktop)
 - [ ] Commentaires en français
@@ -186,6 +188,7 @@ parcours/
 - [ ] Au moins 1 slide avec `slide.json` + `index.html`
 - [ ] Slides utilisent `/lib/theme.css` et `/parcours/_shared/slide-base.css`
 - [ ] Slides utilisent `/lib/theme.js` pour le thème
+- [ ] Contrôles natifs accessibles et styles de composants partagés (cartes, tableaux, formulaires)
 - [ ] Assets optimisés (images < 500KB)
 - [ ] `thumbnail.png` vignette (380x180px, 19:9, < 50KB) - optionnel
 
