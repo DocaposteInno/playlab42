@@ -29,8 +29,13 @@ exerces dans le navigateur ; les liens autonomes des slides ne court-circuitent
 pas la navigation du viewer. Deux demandes de skills ont ete comparees avec
 et sans skill, sans gain statistique revendique.
 Le navigateur a ete connecte via CDP : le telechargement local de l'image
-Playwright officielle etait bloque par le DNS du proxy Docker. La CI native
-reste a observer sur la PR ; aucun merge, deploiement ou archivage n'est affirme.
+Playwright officielle etait bloque par le DNS du proxy Docker.
+La premiere CI native a ensuite revele une course de focus : la recherche
+differee pouvait remplacer la carte d'ouverture pendant la lecture. Le
+retour de focus retrouve maintenant la carte par son identite, avec neuf
+tests d'accessibilite passes dans Docker. Chromium natif a reussi sur
+`db70562` dans la PR #124 (run GitHub Actions `37057205123`, deux workers,
+aucun retry). Aucun merge, deploiement ou archivage n'est affirme.
 
 ## 1. Skills de projet - agent skills
 
