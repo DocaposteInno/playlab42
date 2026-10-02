@@ -73,7 +73,7 @@ historique mais avertit : ce fallback n'est pas une confirmation de lecture.
 | `playlab42.theme` | chaîne brute ou clé absente | dark/light ; system supprime la clé |
 | `scores_<id>` | JSON tableau | `{score: nombre fini, date: nombre fini ≥ 0, player: chaîne}` |
 | `progress_<id>` | JSON propre au jeu | JSON sérialisable, pas de validation des règles du jeu |
-| `parcours-progress` | JSON table par epic | `{visited: chaîne[], current: chaîne|null}` |
+| `parcours-progress` | JSON table par epic | `{visited: chaîne[], current?: chaîne|null}` ; les anciennes valeurs sans `current` sont conservées |
 
 Les identifiants dynamiques ont une lettre minuscule initiale, puis lettres
 minuscules, chiffres, `_` et `-`, maximum 64 caractères ; ceux contenant
