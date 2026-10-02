@@ -13,7 +13,7 @@ const { state, setState } = await import('./state.js');
 const { el } = await import('./dom-cache.js');
 const { setupEventListeners } = await import('./events.js');
 const { updateTabUI } = await import('./tabs.js');
-const { createEpicCardElement } = await import('./parcours.js');
+const { createEpicCardElement, openEpic, closeParcours } = await import('./parcours.js');
 const { showSettings, hideSettings, setSoundPreference, setThemePreference } = await import('./settings.js');
 const { loadGame, updateSoundButton } = await import('./game-loader.js');
 const { ParcoursViewer } = await import('../lib/parcours-viewer.js');
@@ -47,6 +47,27 @@ describe('Accessibilité du portail', () => {
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
+  });
+
+  it('retrouve la carte apres un rendu differe de recherche pendant le parcours', () => {
+    const epic = {
+      id: 'exemple', title: 'Exemple', description: 'Description',
+      path: 'parcours/epics/exemple', slideCount: 4, tags: [],
+    };
+    const previousViewer = state.parcoursViewer;
+    setState({ parcoursViewer: { load: jest.fn() } });
+    try {
+      el.cardsParcours.replaceChildren(createEpicCardElement(epic));
+      const original = el.cardsParcours.querySelector('.epic-card');
+      original.focus();
+      openEpic(epic.id);
+      el.cardsParcours.replaceChildren(createEpicCardElement(epic));
+      expect(original.isConnected).toBe(false);
+      closeParcours();
+      expect(document.activeElement).toBe(el.cardsParcours.querySelector('.epic-card'));
+    } finally {
+      setState({ parcoursViewer: previousViewer });
+    }
   });
 
   it('navigue dans les quatre onglets aux flèches et avec Home/End', () => {
