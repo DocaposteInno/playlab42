@@ -5,6 +5,7 @@
 # Permet aux fichiers créés dans le container d'avoir les bons droits
 export LOCAL_UID := $(shell id -u)
 export LOCAL_GID := $(shell id -g)
+export TYPE ID TITLE
 
 # Support multi-worktree : Nom de projet basé sur le dossier courant
 # Permet d'avoir plusieurs instances Docker en parallèle (une par worktree)
@@ -18,7 +19,7 @@ PORT_HASH := $(shell echo "$(COMPOSE_PROJECT_NAME)" | cksum | cut -d' ' -f1)
 PORT_OFFSET := $(shell echo $$(( $(PORT_HASH) % 100 )))
 export PLAYLAB_PORT ?= $(shell echo $$(( 5200 + $(PORT_OFFSET) )))
 
-.PHONY: help up down build shell logs status info claude install test lint typecheck build-ts
+.PHONY: help up down build shell logs status info claude install test lint typecheck build-ts test-e2e test-e2e-ui scaffold openspec-list openspec-validate
 
 # Affiche l'aide par défaut
 help:
@@ -46,6 +47,9 @@ help:
 	@echo "  make build-parcours  - Générer data/parcours.json"
 	@echo "  make build-bookmarks - Générer data/bookmarks.json"
 	@echo "  make test            - Lancer les tests"
+	@echo "  make test-e2e        - Lancer les parcours navigateur dans une image dédiée"
+	@echo "  make test-e2e-ui     - Interface Playwright sur localhost:8080"
+	@echo "  make scaffold TYPE=... ID=... TITLE=... - Créer un module depuis les gabarits"
 	@echo "  make lint            - Vérifier le code"
 	@echo "  make typecheck       - Vérifier les types TypeScript"
 	@echo "  make build-ts        - Transpiler TypeScript vers JavaScript"
@@ -113,6 +117,17 @@ test:
 test-watch:
 	docker compose exec dev npm run test:watch
 
+test-e2e:
+	docker build -f docker/e2e.Dockerfile -t $(COMPOSE_PROJECT_NAME)-e2e .
+	docker run --rm --shm-size=1g --user "$$LOCAL_UID:$$LOCAL_GID" --mount "type=bind,src=$(CURDIR),dst=/workspace" --volume /workspace/node_modules $(COMPOSE_PROJECT_NAME)-e2e
+
+test-e2e-ui:
+	docker build -f docker/e2e.Dockerfile -t $(COMPOSE_PROJECT_NAME)-e2e .
+	docker run --rm --shm-size=1g -p 127.0.0.1:8080:8080 --user "$$LOCAL_UID:$$LOCAL_GID" --mount "type=bind,src=$(CURDIR),dst=/workspace" --volume /workspace/node_modules $(COMPOSE_PROJECT_NAME)-e2e npm run test:e2e:ui -- --ui-host=0.0.0.0 --ui-port=8080
+
+scaffold:
+	docker compose exec -e PLAYLAB_SCAFFOLD_TYPE="$$TYPE" -e PLAYLAB_SCAFFOLD_ID="$$ID" -e PLAYLAB_SCAFFOLD_TITLE="$$TITLE" dev sh -c 'npm run scaffold -- "$$PLAYLAB_SCAFFOLD_TYPE" "$$PLAYLAB_SCAFFOLD_ID" --title "$$PLAYLAB_SCAFFOLD_TITLE"'
+
 lint:
 	docker compose exec dev npm run lint
 
@@ -163,15 +178,10 @@ claude:
 # === OpenSpec ===
 
 openspec-list:
-	@echo "Changes actifs:"
-	@ls -la openspec/changes/ 2>/dev/null | grep -v "archive" | grep -v "total" || echo "  (aucun)"
-	@echo ""
-	@echo "Specs:"
-	@ls -la openspec/specs/ 2>/dev/null | grep -v "total" || echo "  (aucune)"
+	docker compose exec dev npm run openspec:list
 
 openspec-validate:
-	@echo "Validation des specs..."
-	@echo "(À implémenter avec openspec CLI)"
+	docker compose exec dev npm run openspec:validate
 
 # === Raccourcis ===
 

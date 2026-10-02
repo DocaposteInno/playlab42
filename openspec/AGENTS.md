@@ -1,91 +1,42 @@
-# OpenSpec - Instructions pour Agents IA
+# OpenSpec - Compatibilité des instructions historiques
 
-Ce document définit le workflow spec-driven development pour playlab42.
+Les règles communes vivent dans [AGENTS.md](../AGENTS.md) à la racine.
+Le workflow actuel est documenté dans
+[docs/guides/openspec-workflow.md](../docs/guides/openspec-workflow.md).
+La configuration officielle OPSX est [config.yaml](config.yaml).
 
-## Quand créer une proposal OpenSpec ?
+Ce fichier reste un point d'entrée pour les anciens liens et les trois alias
+locaux `.claude/commands/openspec/`. Il n'est pas un fichier généré par le CLI
+actuel. Ne pas le supprimer via une migration automatique non revue.
 
-**Créer une proposal pour :**
-- Nouvelles fonctionnalités (nouveau jeu, nouvelle IHM, nouvel agent...)
-- Breaking changes sur les APIs existantes
-- Changements d'architecture
-- Travaux significatifs de performance ou sécurité
+Avant une nouvelle fonctionnalité, lire les specs concernées et les changes
+actifs. Utiliser un identifiant kebab-case avec un verbe, par exemple
+`update-project-skills-kit-e2e`. Conserver les changes étrangers à la demande
+et tout l'historique d'archive.
 
-**Ne pas créer de proposal pour :**
-- Bug fixes simples
-- Corrections de typos
-- Mises à jour de dépendances
-- Ajout de tests sur code existant
+Un change `spec-driven` contient `proposal.md`, `design.md`, `tasks.md` et les
+deltas dans `specs/<capability>/spec.md`. Une demande utilisateur explicite peut
+autoriser son implémentation ; consigner cette autorisation, sans prétendre
+qu'une revue ou une livraison a eu lieu. Les tâches sont ordonnées uniquement
+par leurs dépendances réelles et sont cochées après vérification.
 
-## Structure des dossiers
-
-```
-openspec/
-├── AGENTS.md           # Ce fichier
-├── project.md          # Conventions du projet
-├── specs/              # Spécifications des capabilities
-│   └── [capability]/
-│       └── spec.md
-└── changes/            # Propositions de changement
-    ├── [change-id]/
-    │   ├── proposal.md # Pourquoi, Quoi, Impact
-    │   ├── tasks.md    # Checklist d'implémentation
-    │   ├── design.md   # Décisions techniques (optionnel)
-    │   └── specs/      # Deltas des specs
-    └── archive/        # Changes déployés
-```
-
-## Workflow en 3 étapes
-
-### 1. Créer un changement
-```bash
-/openspec:proposal
-```
-- Décrire le **pourquoi** et le **quoi**
-- Identifier l'impact sur les specs existantes
-- Obtenir validation avant implémentation
-
-### 2. Implémenter
-```bash
-/openspec:apply
-```
-- Suivre `tasks.md` séquentiellement
-- Cocher chaque tâche terminée
-- Mettre à jour `design.md` si décisions techniques
-
-### 3. Archiver après déploiement
-```bash
-/openspec:archive
-```
-- Déplacer vers `changes/archive/YYYY-MM-DD-[name]/`
-- Fusionner les deltas dans `specs/`
-
-## Format des Change IDs
-
-Utiliser kebab-case avec verbe d'action :
-- `add-poker-game` - Ajout de fonctionnalité
-- `update-game-engine` - Modification
-- `remove-legacy-api` - Suppression
-- `refactor-ui-components` - Refactoring
-
-## Format des Requirements
+Pour les nouvelles exigences, employer les en-têtes OpenSpec exacts :
 
 ```markdown
 ## ADDED Requirements
 
-### Requirement: [Nom]
-The system SHALL [comportement attendu].
+### Requirement: Example behavior
+The system SHALL expose the requested behavior.
 
-#### Scenario: [Nom du scénario]
-- **WHEN** [condition]
-- **THEN** [résultat attendu]
+#### Scenario: Observable result
+- **WHEN** the user performs the relevant action
+- **THEN** the observable result matches the requirement
 ```
 
-## Commandes disponibles
+Un bloc `MODIFIED` remplace une exigence entière : conserver ses scénarios
+existants, sauf retrait explicitement justifié. Les specs principales ont une
+section `## Purpose` et une section `## Requirements`.
 
-| Commande | Description |
-|----------|-------------|
-| `openspec list` | Changes actifs |
-| `openspec list --specs` | Toutes les capabilities |
-| `openspec show [item]` | Détails d'un item |
-| `openspec validate [item]` | Validation stricte |
-| `openspec archive <id>` | Archiver après déploiement |
+La validation réelle utilise le CLI épinglé dans Docker :
+`make openspec-validate`. Un examen manuel ne la remplace pas. Ne pas archiver
+un change avant sa livraison et une décision explicite.

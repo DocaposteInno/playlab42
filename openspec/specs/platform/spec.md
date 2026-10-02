@@ -1,6 +1,6 @@
 # Platform Specification
 
-## Overview
+## Purpose
 
 Playlab42 est une plateforme pédagogique de mini-jeux et outils collaboratifs. Cette spec définit l'architecture technique de la **version standalone** : tools et games autonomes, sans backend.
 

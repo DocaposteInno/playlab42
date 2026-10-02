@@ -529,7 +529,16 @@ export class PianoController extends EventEmitter {
     }
 
     // Jouer via SynthManager
-    await this.synthManager?.noteOn(note);
+    try {
+      await this.synthManager?.noteOn(note);
+    } catch (error) {
+      console.error('Erreur lecture audio du piano:', error);
+      if (this.elements.noteDisplay) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.elements.noteDisplay.textContent = `Audio indisponible : ${message}`;
+      }
+      return;
+    }
     this.emit('note-on', { note });
   }
 

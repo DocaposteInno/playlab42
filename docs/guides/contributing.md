@@ -22,12 +22,18 @@ Avant de contribuer, assurez-vous d'avoir :
 
 ## Workflow général
 
+Le [kit de contribution](./contribution-kit.md) fournit les gabarits et la
+[galerie UI](../../tools/ui-kit/index.html). Les [skills de projet](./project-skills.md)
+guident les agents sans remplacer les conventions de `AGENTS.md`.
+Pour un nouveau module, suivre aussi le [workflow OpenSpec](./openspec-workflow.md).
+
 ```
 1. FORK
    └── Fork playlab42 sur votre compte GitHub
 
-2. CLONE
+2. CLONE ET BRANCHE
    └── git clone https://github.com/VOUS/playlab42.git
+   └── git switch -c feat/mon-contenu
 
 3. CRÉATION
    └── Ajouter votre contenu selon le type :
@@ -35,15 +41,17 @@ Avant de contribuer, assurez-vous d'avoir :
        - games/mon-jeu/ (game.json, index.html, engine.js...)
        - parcours/epics/mon-epic/ (epic.json, slides/...)
 
-4. TEST LOCAL
+4. PRÉPARATION ET PARCOURS LOCAL
+   └── make npm CMD="run build:local"
    └── make serve
-   └── Vérifier http://localhost:5242
+   └── make info pour connaître le port de ce worktree
+   └── make test-e2e pour les interactions navigateur
 
 5. COMMIT
    └── git add . && git commit -m "feat: ajout [type] [nom]"
 
 6. PUSH
-   └── git push origin main
+   └── git push -u origin feat/mon-contenu
 
 7. PULL REQUEST
    └── Ouvrir PR vers playlab42/main

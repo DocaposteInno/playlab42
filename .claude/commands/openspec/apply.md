@@ -1,20 +1,18 @@
-Implémente un changement OpenSpec approuvé.
+Alias local de compatibilité pour implémenter un change autorisé.
+Le workflow officiel actuel est OPSX (`/opsx:apply` avec l'intégration Claude).
 
-## Instructions
+1. Lire `AGENTS.md` et `docs/guides/openspec-workflow.md`.
+2. Identifier le change depuis la demande ou `openspec list` dans Docker,
+   puis lire sa proposal, son design, ses deltas et ses tâches.
+3. Consulter `openspec instructions apply --change <change-id> --json`
+   avec le CLI local épinglé, dans Docker.
+4. Vérifier la base d'autorisation consignée ; implémenter dans ce périmètre.
+   Respecter les dépendances réelles et la propriété des fichiers.
+5. Adapter les artefacts aux décisions prises, sans modifier les changes
+   étrangers. Cocher seulement les tâches réalisées et vérifiées.
+6. Exécuter les validations pertinentes dans Docker et la validation stricte
+   OpenSpec. Rapporter explicitement les tâches et blocages restants.
 
-1. Liste les changes actifs avec `openspec list` ou explore `@/openspec/changes/`
-2. Demande à l'utilisateur quel change implémenter
-3. Lis dans l'ordre :
-   - `proposal.md` - Comprendre le contexte
-   - `design.md` - Décisions techniques (si existe)
-   - `tasks.md` - Liste des tâches
-4. Implémente chaque tâche séquentiellement
-5. Coche chaque tâche terminée dans `tasks.md`
-6. Mets à jour `design.md` si nouvelles décisions techniques
-
-## Règles
-
-- Une tâche à la fois
-- Commit après chaque tâche significative
-- Ne pas modifier les specs tant que toutes les tâches ne sont pas terminées
-- Signaler tout blocage ou question
+Ne pas imposer un commit par tâche, une exécution séquentielle artificielle,
+un archivage ou un déploiement. Les actions Git suivent la demande et les
+règles du projet.

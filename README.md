@@ -7,7 +7,7 @@
 [![Security Audit](https://github.com/z4ppy/playlab42/actions/workflows/security-audit.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/security-audit.yml)
 [![codecov](https://codecov.io/gh/z4ppy/playlab42/graph/badge.svg)](https://codecov.io/gh/z4ppy/playlab42)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](LICENSE)
-[![Node.js 20+](https://img.shields.io/badge/node-20%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node.js 24+](https://img.shields.io/badge/node-24%2B-brightgreen.svg)](https://nodejs.org/)
 
 Plateforme pédagogique complète pour la formation au développement assisté par IA : supports de cours, base de connaissance, outils et jeux collaboratifs.
 
@@ -65,7 +65,8 @@ Chaque session de formation se conclut par une **contribution réelle** via Pull
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Le backend est **virtualisable** : mode localStorage pour fonctionner sans serveur.
+La version actuelle est **100% frontend**, avec stockage local dans le navigateur.
+Le bloc backend du schéma représente une évolution possible, pas un service existant.
 
 ## Structure du projet
 
@@ -94,7 +95,10 @@ playlab42/
 ├── lib/                    # Bibliothèques partagées (thème, gamekit, utils)
 ├── data/                   # Données générées (catalogue.json, parcours.json)
 ├── docs/                   # Documentation
+├── templates/              # Gabarits de jeux, outils et parcours
+├── e2e/                    # Parcours navigateur Playwright
 ├── openspec/               # Spécifications et changes
+├── .github/skills/         # Skills de projet versionnés
 └── .claude/                # Configuration Claude Code (commandes slash)
 ```
 
@@ -119,9 +123,12 @@ make claude
 ```bash
 make shell              # Shell dans le container
 make npm CMD="..."      # Commandes npm (ex: "install lodash")
-make dev                # Serveur TypeScript
+make build-ts           # Transpiler les sources TypeScript optionnelles
 make lint               # Vérification qualité
 make test               # Tests Jest
+make test-e2e           # Parcours navigateur dans une image Docker dédiée
+make npm CMD="run build:local" # Catalogues et sources TS sans enrichissement réseau
+make openspec-validate  # Validation stricte avec la CLI épinglée
 make info               # Infos de l'instance (port, container)
 ```
 
@@ -146,6 +153,10 @@ make info
 | [Créer un outil](./docs/guides/create-tool.md) | Guide pas à pas |
 | [Créer un jeu](./docs/guides/create-game.md) | Guide pas à pas |
 | [Contribuer](./docs/guides/contributing.md) | Workflow de contribution |
+| [Kit de contribution](./docs/guides/contribution-kit.md) | Gabarits et galerie des composants partagés |
+| [Skills de projet](./docs/guides/project-skills.md) | Utilisation et scénarios des skills Playlab42 |
+| [Workflow OpenSpec](./docs/guides/openspec-workflow.md) | Commandes et validation des spécifications |
+| [Parcours navigateur](./docs/TESTING_STRATEGY.md) | Stratégie de qualité et suite E2E |
 
 ## Le "42"
 

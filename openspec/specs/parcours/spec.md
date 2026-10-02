@@ -3,6 +3,48 @@
 > Système de contenus pédagogiques pour PlayLab42.
 > 100% statique, compatible GitHub Pages.
 
+## Purpose
+
+Le système de parcours publie des contenus pédagogiques sous forme d'epics
+et de slides dans un catalogue statique. Le viewer permet leur consultation,
+la navigation entre slides et le suivi local de progression sans backend.
+Les sections détaillées ci-dessous restent la référence du contrat existant.
+
+## Requirements
+
+### Requirement: Static Epic Publication
+
+The system SHALL publish epics and their ordered slides from manifests through
+the existing static parcours build.
+
+#### Scenario: Parcours build
+- **WHEN** the parcours build reads epic and slide manifests
+- **THEN** it generates the parcours catalogue for the frontend
+- **AND** the referenced slides remain static content
+
+### Requirement: Slide Navigation
+
+The system SHALL allow users to open an epic and navigate its slides through
+the parcours viewer without an application backend.
+
+#### Scenario: Sequential navigation
+- **WHEN** a user selects the next or previous slide in an open epic
+- **THEN** the viewer displays the corresponding slide and updates navigation state
+
+#### Scenario: Direct slide navigation
+- **WHEN** a user selects an available slide in the table of contents
+- **THEN** the viewer opens that slide and identifies it as active
+
+### Requirement: Local Parcours Progress
+
+The system SHALL track parcours progress locally in the browser as described
+in the progression contract below.
+
+#### Scenario: Visited slide
+- **WHEN** a user visits a slide
+- **THEN** the local progression records the visit
+- **AND** the viewer can show the epic's updated progression
+
 ---
 
 ## Table des matières

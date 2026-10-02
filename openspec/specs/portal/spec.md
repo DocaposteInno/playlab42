@@ -1,6 +1,6 @@
 # Portal Specification
 
-## Overview
+## Purpose
 
 Le portail est l'interface principale de Playlab42. C'est une application 100% frontend (pas de backend) qui permet de :
 
