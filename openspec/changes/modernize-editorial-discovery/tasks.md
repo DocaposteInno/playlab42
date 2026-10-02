@@ -26,8 +26,15 @@ Markdown et aux scripts sont identifiees ; les liens vers les cinq anciens
 dossiers non servis ont ete remplaces par des fichiers utiles.
 
 Le diff final sous `games/` et `tools/` est vide. Aucun merge, deploiement ou
-archivage n'est affirme. La CI native et la publication sont consignees apres
-leurs resultats reels.
+archivage n'est affirme.
+
+## Publication
+
+Le commit d'implementation `d7c69fb` a ete pousse sur `feat/editorial-ux`.
+La PR #127 cible `main`, base `868da9e`. Les preuves locales ci-dessus ne
+pretendent pas remplacer la suite CI native, encore en attente lors de cette
+consignation. La suite complete est declenchee par la PR ; aucun resultat CI
+non observe n'est affirme.
 
 ## 1. Portail et mutualisation
 
@@ -63,7 +70,7 @@ leurs resultats reels.
 - [x] 5.3 Examiner le rendu clair/sombre et mobile, ainsi que les liens generes.
 - [x] 5.4 Confirmer les jeux, outils internes et simulateurs exclus inchanges.
 - [x] 5.5 Valider strictement ce change et les autres contrats OpenSpec.
-- [ ] 5.6 Livrer la branche et la PR sans merge ni deploiement.
+- [x] 5.6 Livrer la branche et la PR sans merge ni deploiement.
 
 ## 6. Livraison ulterieure
 
