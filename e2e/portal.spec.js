@@ -31,6 +31,48 @@ test('portail: onglets natifs, fleches, Home/End et saisie de /', async ({ page 
   await expect(page.locator('.bookmark-item a[href="https://cursor.com"]')).toBeVisible();
 });
 
+test('portail: filtres secondaires a la demande, resume visible et remise a zero', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.epic-card').first()).toBeVisible();
+  const options = page.locator('#discovery-options');
+  await expect(options).not.toHaveAttribute('open', '');
+  await expect(page.locator('#parcours-category-filters')).toBeHidden();
+  await activate(page.locator('#tab-games'));
+  await expect(page.locator('#cards-games .card').first()).toBeVisible();
+  const initialCount = await page.locator('#cards-games .card').count();
+  await expect(page.locator('#filters')).toBeHidden();
+  await activate(options.locator('summary'));
+  await expect(page.locator('#filters')).toBeVisible();
+  await expect(page.locator('#parcours-category-filters')).toBeHidden();
+  await expect(page.locator('#bookmark-filters')).toBeHidden();
+  const filter = page.locator('#filters .filter').nth(1);
+  await activate(filter);
+  await expect(filter).toBeFocused();
+  await expect(filter).toHaveAttribute('aria-pressed', 'true');
+  const label = await filter.textContent();
+  await activate(options.locator('summary'));
+  await expect(filter).toBeHidden();
+  await expect(options.locator('summary')).toContainText(label);
+  await page.locator('#search').fill('aucun-resultat-impossible');
+  await expect(page.locator('#catalogue-status')).toHaveText('0 jeux');
+  await expect(page.locator('#empty-games')).toBeVisible();
+  await activate(page.locator('#btn-reset-discovery'));
+  await expect(page.locator('#search')).toBeFocused();
+  await expect(page.locator('#cards-games .card')).toHaveCount(initialCount);
+  await expect(page.locator('#btn-reset-discovery')).toBeHidden();
+  await expect(options).not.toHaveAttribute('open', '');
+  await activate(options.locator('summary'));
+  await activate(filter);
+  await page.locator('#search').fill('JSON');
+  await activate(page.locator('#tab-tools'));
+  await expect(page.locator('#search')).toHaveValue('JSON');
+  await expect(page.locator('#search')).toHaveAttribute('placeholder', 'Rechercher un outil…');
+  await expect(page.locator('#filters .filter.active')).toHaveAttribute('data-tag', '');
+  await expect(page.locator('#cards-tools .card').filter({ hasText: 'JSON' })).toHaveCount(1);
+  await expect(page.locator('#discovery-filter-label')).toHaveText('Affiner la sélection');
+  await expectNoOverflow(page);
+});
+
 test('parcours: Enter charge une vraie slide, Escape ferme le plan avant le viewer', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('parcours-menu-width', '350'));
   await page.goto('/');

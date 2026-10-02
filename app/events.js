@@ -9,11 +9,12 @@ import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
 import { on, delegate, debounce, isEditableTarget } from '../lib/dom.js';
 import { THEMES } from '../lib/theme.js';
+import { updateDiscoveryControls } from '../lib/catalogue-ui.js';
 
 import { switchTab, registerRenderCallbacks, handleTabKeydown } from './tabs.js';
 import { renderCatalogue } from './catalogue.js';
 import { renderParcours, selectParcoursCategory } from './parcours.js';
-import { renderBookmarks, selectBookmarkTag, showBookmarkPreview, hideBookmarkPreview } from './bookmarks.js';
+import { renderBookmarks, selectBookmarkTag } from './bookmarks.js';
 import { unloadGame, toggleFullscreen, toggleSound } from './game-loader.js';
 import { showSettings, hideSettings, setSoundPreference, setThemePreference, clearAllData } from './settings.js';
 
@@ -65,37 +66,8 @@ export function setupEventListeners() {
     selectBookmarkTag(btn.dataset.tag || null);
   });
 
-  // === Bookmarks - preview au survol (délégation) ===
-  if (el.bookmarkTree) {
-    el.bookmarkTree.addEventListener('mouseenter', (e) => {
-      const link = e.target.closest('.bookmark-item a[data-bookmark]');
-      if (link && link.dataset.bookmark) {
-        try {
-          const bookmarkData = JSON.parse(link.dataset.bookmark);
-          showBookmarkPreview(bookmarkData, link);
-        } catch {
-          // Ignorer les erreurs de parsing
-        }
-      }
-    }, true);
-
-    el.bookmarkTree.addEventListener('mouseleave', (e) => {
-      const link = e.target.closest('.bookmark-item a[data-bookmark]');
-      if (link) {
-        hideBookmarkPreview();
-      }
-    }, true);
-    el.bookmarkTree.addEventListener('focusin', (e) => {
-      const link = e.target.closest('a[data-bookmark]');
-      if (link) {
-        showBookmarkPreview(JSON.parse(link.dataset.bookmark), link);
-      }
-    });
-    el.bookmarkTree.addEventListener('focusout', hideBookmarkPreview);
-  }
-
   // === Catalogue - recherche ===
-  on(el.search, 'input', debounce(() => {
+  const renderActiveCatalogue = () => {
     if (state.activeTab === 'parcours') {
       renderParcours();
     } else if (state.activeTab === 'bookmarks') {
@@ -103,7 +75,15 @@ export function setupEventListeners() {
     } else {
       renderCatalogue();
     }
-  }, 200));
+    updateDiscoveryControls();
+  };
+  on(el.search, 'input', debounce(renderActiveCatalogue, 200));
+  on(el.resetDiscovery, 'click', () => {
+    el.search.value = '';
+    setState({ activeFilter: '', parcoursCategory: null, bookmarkTagFilter: null });
+    renderActiveCatalogue();
+    el.search.focus();
+  });
 
   // === Game - contrôles ===
   on(el.btnBack, 'click', unloadGame);
@@ -158,7 +138,6 @@ export function setupEventListeners() {
 export function handlePortalKeydown(e) {
   if (e.defaultPrevented) { return; }
   if (e.key === 'Escape') {
-    hideBookmarkPreview();
     if (state.currentView === 'game') {
       unloadGame();
     } else if (state.currentView === 'settings') {

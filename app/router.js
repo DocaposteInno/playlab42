@@ -8,6 +8,7 @@
 import { state } from './state.js';
 import { openEpic, closeParcours } from './parcours.js';
 import { openGame, openTool, unloadGame } from './game-loader.js';
+import { switchTab } from './tabs.js';
 
 /**
  * Gère le routage basé sur le hash URL
@@ -52,6 +53,9 @@ export function handleHashRoute() {
   }
   if (state.currentView === 'game') {
     unloadGame();
+  }
+  if (hash === '#/parcours') {
+    switchTab('parcours');
   }
 }
 

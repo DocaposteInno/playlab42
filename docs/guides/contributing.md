@@ -346,7 +346,7 @@ En attendant, respecter la limite de 50 Ko impose de quantiser la palette
 ## Besoin d'aide ?
 
 - Consultez les [guides existants](./README.md)
-- Regardez les [exemples dans le code](../../tools/)
+- Regardez les [composants en action dans la galerie UI](../../tools/ui-kit/index.html)
 - Ouvrez une issue sur GitHub
 
 Merci de contribuer à PlayLab42 ! 🎉

@@ -4,6 +4,7 @@
  */
 
 @import url("../../lib/ui.css");
+@import url("./slide.css");
 
 *,
 *::before,

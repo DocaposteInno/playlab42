@@ -99,7 +99,9 @@ Les tests vivent dans `e2e/`, séparés de la découverte Jest.
 
 | Contrat | Couverture navigateur |
 |---------|------------------------|
-| Portail | Chargement des catalogues, quatre onglets aux flèches/Home/End, `/` dans la recherche et le pseudo, liens bookmarks versionnés, outil JSON en iframe |
+| Portail | Chargement des catalogues, quatre onglets aux flèches/Home/End, `/` dans la recherche et le pseudo, filtres secondaires fermés initialement, résumé du filtre replié, compteur et remise à zéro, outil JSON en iframe |
+| Liens | Ressources versionnées, descriptions et domaines lisibles sans survol, recherche normalisée, filtres à la demande, états sans résultat/erreur et lecture mobile |
+| Guides | Index HTML statique depuis les Markdown canoniques, navigation interne et ancres, références source identifiées, thèmes locaux et code/tableaux sans débordement |
 | Parcours | Activation d'une carte par Entrée, vraie slide chargée, navigation Précédent/Suivant, Échap ferme le plan avant le viewer, retour du focus, largeur du plan conservée |
 | Thèmes | Choix clavier, état accessible, persistance, préférence système, thème transmis à l'iframe outil, tokens calculés clair/sombre au seuil AA 4,5:1 |
 | Jeux | Dames : déplacement légal ; Go hot-seat : deux pierres et fin par passes ; Triomino seed 42 : sélection, rotation et placement exacts, dialogue piégé et retour du focus |

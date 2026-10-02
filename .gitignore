@@ -5,6 +5,7 @@ node_modules/
 dist/
 build/
 assets/vendor/
+docs/site/
 
 # IDE
 .idea/

@@ -21,6 +21,10 @@ export const el = {
 
   // === Catalogue ===
   search: $('#search'),
+  searchLabel: $('#search-label'),
+  discoveryOptions: $('#discovery-options'),
+  catalogueStatus: $('#catalogue-status'),
+  resetDiscovery: $('#btn-reset-discovery'),
   filters: $('#filters'),
   cardsGames: $('#cards-games'),
   cardsTools: $('#cards-tools'),
