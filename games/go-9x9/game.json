@@ -24,7 +24,7 @@
         "komi": 6.5
     },
     "bots": {
-        "default": "Random",
+        "default": "Greedy",
         "available": [
             {
                 "name": "Random",
