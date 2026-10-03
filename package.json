@@ -46,6 +46,7 @@
     "@playwright/test": "1.63.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.3",
+    "braces": "file:vendor/braces",
     "esbuild": "^0.28.0",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
@@ -61,5 +62,8 @@
     "typescript": "^7.0.2",
     "vexflow": "5.0.0",
     "yaml": "2.9.1"
+  },
+  "overrides": {
+    "braces": "$braces"
   }
 }
