@@ -76,9 +76,23 @@ export function updateTabUI() {
   el.panelGames.classList.toggle('active', state.activeTab === 'games');
   el.panelBookmarks.classList.toggle('active', state.activeTab === 'bookmarks');
 
-  // Masquer les filtres globaux sur Parcours et Bookmarks (ils ont leurs propres filtres)
+  // Une seule famille de filtres est proposée pour la section active.
   const hideFilters = state.activeTab === 'parcours' || state.activeTab === 'bookmarks';
-  el.filters.style.display = hideFilters ? 'none' : 'flex';
+  el.filters.hidden = hideFilters;
+  el.parcoursCategoryFilters.hidden = state.activeTab !== 'parcours';
+  el.bookmarkFilters.hidden = state.activeTab !== 'bookmarks';
+  const labels = {
+    parcours: ['les parcours', 'un parcours'],
+    tools: ['les outils', 'un outil'],
+    games: ['les jeux', 'un jeu'],
+    bookmarks: ['les liens', 'un lien'],
+  };
+  const [section, item] = labels[state.activeTab];
+  el.search.placeholder = `Rechercher ${item}…`;
+  el.searchLabel.textContent = `Rechercher dans ${section}`;
+  el.catalogueStatus.textContent = 'Chargement…';
+  document.getElementById('discovery-filter-label').textContent = 'Affiner la sélection';
+  el.resetDiscovery.hidden = !el.search.value.trim();
 }
 
 /**

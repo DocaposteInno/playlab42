@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="lib/ui.css">
   <link rel="stylesheet" href="lib/parcours-viewer.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="app/parcours.css">
+  <link rel="stylesheet" href="app/bookmarks.css">
   <script type="module">
     // Initialiser le thème le plus tôt possible pour éviter le flash
     import { initTheme } from './lib/theme.js';
@@ -19,7 +21,8 @@
   <a class="skip-link" href="#main">Aller au contenu</a>
   <header>
     <div class="brand"><span class="brand-mark" aria-hidden="true">42</span><h1>Playlab42</h1></div>
-    <nav aria-label="Préférences">
+    <nav class="portal-actions" aria-label="Guides et préférences">
+      <a class="guides-link" href="docs/site/index.html">Guides</a>
       <button class="btn-settings" id="btn-settings" aria-label="Paramètres">⚙</button>
     </nav>
   </header>
@@ -30,38 +33,48 @@
       <div class="catalogue-intro">
         <p class="eyebrow">Le laboratoire des développeurs</p>
         <h2>Apprendre, expérimenter, jouer.</h2>
-        <p>Des parcours pour progresser, des outils pour explorer et des jeux pour pratiquer.</p>
+        <p>Choisissez un sujet, ouvrez un outil, essayez une idée. Tout est ici pour apprendre en faisant.</p>
       </div>
       <!-- Onglets -->
       <div class="tabs" role="tablist" aria-label="Sections du catalogue">
         <button class="tab active" role="tab" aria-selected="true" aria-controls="panel-parcours" id="tab-parcours" data-tab="parcours">
-          📚 Parcours
+          Parcours
         </button>
         <button class="tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-tools" id="tab-tools" data-tab="tools">
-          🔧 Outils
+          Outils
         </button>
         <button class="tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-games" id="tab-games" data-tab="games">
-          🎮 Jeux
+          Jeux
         </button>
         <button class="tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-bookmarks" id="tab-bookmarks" data-tab="bookmarks">
-          🔗 Liens
+          Liens
         </button>
       </div>
 
-      <div class="search-bar">
-        <label for="search" class="sr-only">Rechercher dans la section active</label>
-        <input type="search" id="search" placeholder="Rechercher un parcours, un outil, un jeu…" aria-describedby="search-help">
-        <span id="search-help" class="search-help">Recherche dans la section active · Raccourci /</span>
+      <div class="discovery-toolbar">
+        <div class="search-bar">
+          <label for="search" class="sr-only" id="search-label">Rechercher dans les parcours</label>
+          <input type="search" id="search" placeholder="Rechercher un parcours…" aria-describedby="search-help">
+          <span id="search-help" class="search-help">Dans cette section · Raccourci /</span>
+        </div>
+        <details id="discovery-options" class="discovery-options">
+          <summary><span id="discovery-filter-label">Affiner la sélection</span></summary>
+          <div class="discovery-filter-groups">
+            <div class="filters" id="filters" hidden>
+              <button type="button" class="filter active" data-tag="" aria-pressed="true">Tous</button>
+            </div>
+            <div class="parcours-category-filters" id="parcours-category-filters"></div>
+            <div class="bookmark-filters" id="bookmark-filters" hidden></div>
+          </div>
+        </details>
       </div>
-
-      <div class="filters" id="filters">
-        <button class="filter active" data-tag="" aria-pressed="true">Tous</button>
+      <div class="discovery-result-row">
+        <p id="catalogue-status" role="status" aria-live="polite" aria-atomic="true">Chargement des parcours…</p>
+        <button type="button" id="btn-reset-discovery" class="reset-discovery" hidden>Tout afficher</button>
       </div>
 
       <!-- Panel Parcours -->
       <div id="panel-parcours" class="tab-panel active" role="tabpanel" aria-labelledby="tab-parcours">
-        <!-- Filtres par catégorie -->
-        <div class="parcours-category-filters" id="parcours-category-filters"></div>
         <!-- Catégories dépliées (PlayLab42, Récents, Autres) -->
         <div class="parcours-categories-expanded" id="parcours-categories-expanded"></div>
         <!-- Liste d'épics (filtrée par recherche) -->
@@ -85,7 +98,6 @@
 
       <!-- Panel Bookmarks -->
       <div id="panel-bookmarks" class="tab-panel" role="tabpanel" aria-labelledby="tab-bookmarks">
-        <div class="bookmark-filters" id="bookmark-filters"></div>
         <div class="bookmark-tree" id="bookmark-tree"></div>
         <p class="empty-message" id="empty-bookmarks">Aucun lien disponible</p>
       </div>
@@ -147,7 +159,7 @@
 
   <footer>
     <span>Playlab42</span>
-    <span class="version">v0.2.0</span>
+    <span class="footer-note">Apprendre en faisant.</span>
   </footer>
 
   <!-- Templates -->
@@ -221,16 +233,6 @@
       </a>
     </li>
   </template>
-
-  <!-- Preview Bookmark (singleton) -->
-  <div id="bookmark-preview" class="bookmark-preview" role="tooltip" aria-hidden="true">
-    <div class="bookmark-preview-image"></div>
-    <div class="bookmark-preview-content">
-      <h4 class="bookmark-preview-title"></h4>
-      <p class="bookmark-preview-description"></p>
-      <span class="bookmark-preview-domain"></span>
-    </div>
-  </div>
 
   <script type="module" src="app.js"></script>
 </body>
