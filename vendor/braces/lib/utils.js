@@ -1,5 +1,7 @@
 'use strict';
 
+const { MAX_DEPTH, depthError } = require('./depth');
+
 exports.isInteger = num => {
   if (typeof num === 'number') {
     return Number.isInteger(num);
@@ -101,12 +103,15 @@ exports.reduce = nodes => nodes.reduce((acc, node) => {
 exports.flatten = (...args) => {
   const result = [];
 
-  const flat = arr => {
+  const flat = (arr, depth = 0) => {
+    if (depth > MAX_DEPTH) {
+      throw depthError();
+    }
     for (let i = 0; i < arr.length; i++) {
       const ele = arr[i];
 
       if (Array.isArray(ele)) {
-        flat(ele);
+        flat(ele, depth + 1);
         continue;
       }
 

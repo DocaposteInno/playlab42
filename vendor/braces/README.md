@@ -22,6 +22,7 @@ All published upstream versions through 3.0.3 are affected. This fork:
   direct AST arguments and cycles;
 - bounds AST node visits, including repeated shared subtrees;
 - bounds expand's parent-chain traversal for malformed direct ASTs.
+- rejects non-string AST values and bounds recursive expansion-array helpers.
 
 The hard ceiling is 128 AST edges, including terminal nodes. Excessive nesting
 raises `RangeError` with `code: ERR_BRACES_DEPTH`; excessive AST size raises

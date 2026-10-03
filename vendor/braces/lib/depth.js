@@ -22,6 +22,9 @@ const assertAst = ast => {
     if (!node || typeof node !== 'object') {
       throw new TypeError('Expected a brace AST node');
     }
+    if (node.value !== undefined && typeof node.value !== 'string') {
+      throw new TypeError('Expected a string brace AST value');
+    }
     if (node.nodes !== undefined) {
       if (!Array.isArray(node.nodes)) {
         throw new TypeError('Expected an array of brace AST nodes');

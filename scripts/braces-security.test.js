@@ -60,6 +60,26 @@ describe('bounded braces dependency', () => {
     expectDepthError(() => braces.expand({ type: 'root', nodes: [node] }));
   });
 
+  it.each(['stringify', 'compile', 'expand'])('rejects non-string AST values in %s', (method) => {
+    const node = { type: 'root', nodes: [{ type: 'text', value: deepAst(20000) }] };
+    expect(() => braces[method](node)).toThrow(TypeError);
+  });
+
+  it('bounds malformed cached expansion arrays and the flatten helper', () => {
+    const cycle = [];
+    cycle.push(cycle, cycle);
+    const node = {
+      type: 'paren',
+      parent: { type: 'brace', queue: cycle },
+      nodes: [{ type: 'text', value: 'a' }],
+    };
+    expectDepthError(() => braces.expand({ type: 'root', nodes: [node] }));
+    const utils = require('../vendor/braces/lib/utils');
+    const flatCycle = [];
+    flatCycle.push(flatCycle);
+    expectDepthError(() => utils.flatten(flatCycle));
+  });
+
   it('bounds repeated shared subtrees without exponentially traversing them', () => {
     let node = { type: 'text', value: 'a' };
     for (let i = 0; i < 20; i++) {

@@ -5,7 +5,10 @@ const stringify = require('./stringify');
 const utils = require('./utils');
 const { MAX_DEPTH, depthError, assertAst } = require('./depth');
 
-const append = (queue = '', stash = '', enclose = false) => {
+const append = (queue = '', stash = '', enclose = false, depth = 0) => {
+  if (depth > MAX_DEPTH) {
+    throw depthError();
+  }
   const result = [];
 
   queue = [].concat(queue);
@@ -19,12 +22,12 @@ const append = (queue = '', stash = '', enclose = false) => {
   for (const item of queue) {
     if (Array.isArray(item)) {
       for (const value of item) {
-        result.push(append(value, stash, enclose));
+        result.push(append(value, stash, enclose, depth + 1));
       }
     } else {
       for (let ele of stash) {
         if (enclose === true && typeof ele === 'string') ele = `{${ele}}`;
-        result.push(Array.isArray(ele) ? append(item, ele, enclose) : item + ele);
+        result.push(Array.isArray(ele) ? append(item, ele, enclose, depth + 1) : item + ele);
       }
     }
   }
