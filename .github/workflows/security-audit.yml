@@ -38,6 +38,16 @@ jobs:
           node-version: '26'
           cache: 'npm'
 
+      - name: Regenerer le lockfile du fork local
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Exporter le lockfile genere
+        uses: actions/upload-artifact@v7
+        with:
+          name: generated-package-lock
+          path: package-lock.json
+          retention-days: 1
+
       - name: Installation des dépendances
         run: npm ci
 
