@@ -3,7 +3,8 @@ name: playlab-create-game
 description: >-
   Créer un mini-jeu Playlab42 ou modifier réellement ses règles : moteur
   isomorphe déterministe, actions, vues joueur, bots, manifeste game.json,
-  client autonome et tests. Utiliser aussi pour un replay, une fuite
+  client autonome et tests, y compris les jeux solo en temps réel avec gravité,
+  chronomètre ou commandes maintenues. Utiliser aussi pour un replay, une fuite
   d'information cachée ou une action invalide. Pour un défaut uniquement
   visuel, de thème ou de focus, utiliser playlab-ui sans changer le moteur.
 ---
@@ -42,6 +43,9 @@ un moteur existant pour faire fonctionner un nouveau client.
    Faire décider les bots à partir de cette vue, pas de l'état secret.
 7. Tester initialisation, transitions, actions invalides, mauvais joueur,
    victoire/nul, immutabilité, replay et reprise après sérialisation.
+8. Pour un jeu temps réel, lire la section dédiée de `references/game.md`.
+   Transmettre le temps au moteur par des actions explicites et sérialiser ses
+   délais : une horloge cachée rendrait les replays et reprises non vérifiables.
 
 ## Relier les surfaces
 
@@ -70,6 +74,9 @@ make build-catalogue
 Pour TypeScript : `make typecheck` puis `make build-ts`.
 Vérifier le jeu autonome et dans le portail via `make serve` / `make info`,
 puis les parcours navigateur pertinents via `make test-e2e`.
+Pour un jeu temps réel, couvrir aussi les commandes maintenues, la perte de focus,
+le temps figé en pause et le nettoyage à `unload`. Ajouter ces parcours dans la
+suite `e2e/` existante, pas seulement dans un script temporaire de session.
 Ne pas versionner `data/*.json` ni les sorties `dist/`.
 
 ## Livrer
