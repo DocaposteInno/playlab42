@@ -68,7 +68,7 @@ The Go 9x9 manifest SHALL expose default and available bots (Random, Greedy) for
 
 #### Scenario: Default bot
 - **WHEN** the game is launched with a missing second human player
-- **THEN** the default Random bot fills the slot.
+- **THEN** the default Greedy bot fills the slot.
 
 #### Scenario: Bot registry
 - **WHEN** the manifest is read
@@ -134,8 +134,8 @@ games/go-9x9/
 ├── index.html          # UI standalone
 ├── game.json           # Manifest
 └── bots/
-    ├── random.js       # Bot aléatoire (défaut)
-    └── greedy.js       # Bot heuristique (captures)
+    ├── random.js       # Bot aléatoire (facile)
+    └── greedy.js       # Bot tactique (défaut, libertés et recherche)
 ```
 
 ## Testing

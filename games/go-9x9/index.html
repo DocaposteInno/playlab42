@@ -254,8 +254,8 @@
             <div class="controls">
                 <label for="bot-select">Adversaire</label>
                 <select id="bot-select">
-                    <option value="random">🤖 Random (défaut)</option>
-                    <option value="greedy">🤖 Greedy</option>
+                    <option value="greedy">🤖 Tactique (défaut)</option>
+                    <option value="random">🤖 Aléatoire (facile)</option>
                     <option value="human">👤 Hot-seat</option>
                 </select>
                 <button class="btn-primary" id="btn-start">Démarrer</button>
@@ -354,10 +354,11 @@
 
         function handleHumanMove(x, y) {
             if (!state || state.gameOver) return;
-            if (state.currentPlayerId !== humanId) return;
+            if (bot && state.currentPlayerId !== humanId) return;
             const action = { type: 'place', x, y };
-            if (!engine.isValidAction(state, action, humanId)) return;
-            state = engine.applyAction(state, action, humanId);
+            const player = state.currentPlayerId;
+            if (!engine.isValidAction(state, action, player)) return;
+            state = engine.applyAction(state, action, player);
             render();
             maybeBotTurn();
         }
@@ -378,6 +379,7 @@
 
         function pass() {
             if (!state || state.gameOver) return;
+            if (bot && state.currentPlayerId !== humanId) return;
             const player = state.currentPlayerId;
             state = engine.applyAction(state, { type: 'pass' }, player);
             render();
@@ -386,6 +388,7 @@
 
         function resign() {
             if (!state || state.gameOver) return;
+            if (bot && state.currentPlayerId !== humanId) return;
             const player = state.currentPlayerId;
             state = engine.applyAction(state, { type: 'resign' }, player);
             render();
