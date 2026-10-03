@@ -8,6 +8,7 @@
 import { state } from './state.js';
 import { openEpic, closeParcours } from './parcours.js';
 import { openGame, openTool, unloadGame } from './game-loader.js';
+import { switchTab } from './tabs.js';
 
 /**
  * Gère le routage basé sur le hash URL
@@ -16,7 +17,10 @@ export function handleHashRoute() {
   const hash = window.location.hash;
 
   // Route jeux: #/games/:id
-  const gameMatch = hash.match(/#\/games\/([a-z0-9-]+)/);
+  // Motifs ancrés (^…$) : un identifiant invalide (majuscule, underscore,
+  // espace, caractère spécial) ne doit pas être tronqué en un id valide —
+  // « #/games/with_underscore » ne doit pas ouvrir le jeu « with ».
+  const gameMatch = hash.match(/^#\/games\/([a-z0-9-]+)$/);
   if (gameMatch) {
     const gameId = gameMatch[1];
     openGame(gameId);
@@ -24,7 +28,7 @@ export function handleHashRoute() {
   }
 
   // Route outils: #/tools/:id
-  const toolMatch = hash.match(/#\/tools\/([a-z0-9-]+)/);
+  const toolMatch = hash.match(/^#\/tools\/([a-z0-9-]+)$/);
   if (toolMatch) {
     const toolId = toolMatch[1];
     openTool(toolId);
@@ -32,7 +36,7 @@ export function handleHashRoute() {
   }
 
   // Route parcours: #/parcours/{epicId}/{slideId}
-  const parcoursMatch = hash.match(/#\/parcours\/([^/]+)(?:\/(.+))?/);
+  const parcoursMatch = hash.match(/^#\/parcours\/([^/]+)(?:\/(.+))?$/);
   if (parcoursMatch) {
     const [, epicId, slideId] = parcoursMatch;
     openEpic(epicId, slideId);
@@ -41,10 +45,17 @@ export function handleHashRoute() {
 
   // Pas de route spéciale, afficher le catalogue
   if (state.currentView === 'parcours') {
-    closeParcours();
+    if (state.parcoursViewer) {
+      state.parcoursViewer.close();
+    } else {
+      closeParcours();
+    }
   }
   if (state.currentView === 'game') {
     unloadGame();
+  }
+  if (hash === '#/parcours') {
+    switchTab('parcours');
   }
 }
 

@@ -10,11 +10,19 @@
 
   <!-- Styles spécifiques au jeu -->
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
 
   <!-- Initialisation du thème (le plus tôt possible) -->
   <script type="module">
     import { initTheme } from '../../lib/theme.js';
+    import { observeDialog } from '../dialog-accessibility.js';
     initTheme();
+    for (const name of ['memo', 'piano', 'synth', 'metronome', 'tuner']) {
+      observeDialog(document.getElementById(`${name}-overlay`), {
+        openClass: 'visible',
+        onClose: () => document.getElementById(`${name}-close`).click(),
+      });
+    }
   </script>
 </head>
 <body>
@@ -38,10 +46,10 @@
     </header>
 
     <!-- Audio activation banner (caché par défaut, affiché si erreur) -->
-    <div class="audio-banner hidden" id="audio-banner" role="button" tabindex="0" aria-label="Activer le son">
+    <button type="button" class="audio-banner hidden" id="audio-banner" aria-label="Activer le son">
       <span aria-hidden="true">🔊</span>
       <span>Cliquez pour activer le son</span>
-    </div>
+    </button>
 
     <!-- Main content -->
     <main class="app-main" id="app-main" role="main">
@@ -312,7 +320,7 @@
           </div>
         </div>
 
-        <div class="piano-note-display" id="piano-note-display">-</div>
+        <div class="piano-note-display" id="piano-note-display" role="status" aria-live="polite" aria-atomic="true">-</div>
         <div class="piano-keyboard" id="piano-keyboard">
           <!-- Les touches sont générées par JavaScript -->
         </div>
@@ -583,7 +591,7 @@
           <div class="synth-section">
             <div class="synth-section-title">Volume</div>
             <div class="synth-slider-row">
-              <label for="synth-volume">🔊</label>
+              <label for="synth-volume">Volume du synthétiseur</label>
               <input type="range" id="synth-volume" min="-60" max="0" value="-10">
               <span class="synth-slider-value" id="synth-volume-value">-10 dB</span>
             </div>
@@ -618,14 +626,14 @@
           <div class="metronome-tempo-control">
             <button class="metronome-tempo-btn" id="metronome-minus-10">-10</button>
             <button class="metronome-tempo-btn" id="metronome-minus-1">-1</button>
-            <input type="range" id="metronome-tempo-slider" min="30" max="300" value="120">
+            <input type="range" id="metronome-tempo-slider" min="30" max="300" value="120" aria-label="Tempo du métronome en battements par minute">
             <button class="metronome-tempo-btn" id="metronome-plus-1">+1</button>
             <button class="metronome-tempo-btn" id="metronome-plus-10">+10</button>
           </div>
 
           <!-- Signature rythmique -->
           <div class="metronome-time-signature">
-            <label>Signature</label>
+            <label for="metronome-time-signature">Signature</label>
             <select id="metronome-time-signature">
               <option value="4/4" selected>4/4</option>
               <option value="3/4">3/4</option>
@@ -636,7 +644,7 @@
 
           <!-- Boutons de contrôle -->
           <div class="metronome-controls">
-            <button class="metronome-play-btn" id="metronome-play">
+            <button class="metronome-play-btn" id="metronome-play" aria-pressed="false">
               <span class="metronome-play-icon">▶</span>
               <span class="metronome-play-text">Démarrer</span>
             </button>
@@ -723,8 +731,8 @@
   <script type="importmap">
     {
       "imports": {
-        "tone": "https://cdn.skypack.dev/tone@14.7.77",
-        "vexflow": "https://cdn.skypack.dev/vexflow@4.2.3"
+        "tone": "../../assets/vendor/tone/tone.js",
+        "vexflow": "../../assets/vendor/vexflow/vexflow.js"
       }
     }
   </script>

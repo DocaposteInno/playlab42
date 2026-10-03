@@ -27,11 +27,36 @@ export async function initSlide() {
   const { initTheme } = await import('../../lib/theme.js');
   initTheme();
 
+  prepareSlideTables();
+
   // Initialiser la numérotation du footer
   await initSlideFooter();
 
   // Configurer le handler pour les clics TOC du viewer
   setupScrollHandler();
+}
+
+/**
+ * Rend les tableaux larges défilables au clavier, sans modifier leur sémantique.
+ * Les conteneurs existants sont conservés pour préserver les démos interactives.
+ */
+export function prepareSlideTables() {
+  document.querySelectorAll('table').forEach((table) => {
+    let container = table.parentElement;
+    if (!container) {return;}
+    if (!container.classList.contains('slide-table-scroll')
+      && !container.classList.contains('overflow-x-auto')
+      && !container.classList.contains('overflow-hidden')) {
+      container = document.createElement('div');
+      table.before(container);
+      container.append(table);
+    }
+    container.classList.add('slide-table-scroll');
+    container.setAttribute('tabindex', '0');
+    container.setAttribute('role', 'region');
+    const caption = table.querySelector('caption');
+    container.setAttribute('aria-label', caption?.textContent.trim() || 'Tableau défilable horizontalement');
+  });
 }
 
 /**

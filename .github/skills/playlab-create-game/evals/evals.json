@@ -1,0 +1,34 @@
+{
+  "skill_name": "playlab-create-game",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Ajoute games/course-dix depuis le kit : deux joueurs alternent un lancer de dé à six faces, le premier à atteindre dix gagne. Seed obligatoire, état rejouable et reprenable après sauvegarde JSON, un bot simple et une UI autonome. L'implémentation de cette fonctionnalité est autorisée ; suis le contrat Playlab42.",
+      "expected_output": "Jeu complet avec moteur pur déterministe, tests, manifeste et bot cohérents, client et catalogue vérifiable.",
+      "files": ["templates/game/", "lib/seeded-random.js", "lib/types/game-engine.ts", "openspec/specs/bot/spec.md"],
+      "assertions": [
+        "Le moteur expose les huit méthodes du contrat GameEngine avec les signatures attendues.",
+        "Le moteur n'utilise ni Math.random, ni Date.now, ni DOM, ni stockage navigateur.",
+        "Le RNG est restauré depuis l'état et son état suivant est sauvegardé.",
+        "Les tests couvrent replay, reprise JSON, absence de mutation et rejet d'une action hors tour.",
+        "game.json déclare deux joueurs et les fichiers du bot déclaré existent."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Sur games/tictactoe, ajoute des tests de contrat qui comparent deux replays complets, reprennent une partie après JSON.stringify/parse et vérifient qu'une action sur une case occupée ou hors tour ne modifie pas l'état initial. Ne change pas les règles ou l'UI.",
+      "expected_output": "Tests ciblés du moteur réel, sans nouvelle architecture ni changement de client.",
+      "files": ["games/tictactoe/engine.js", "games/tictactoe/engine.test.js"],
+      "assertions": [
+        "Les tests comparent les états intermédiaires de deux séquences identiques.",
+        "Un test sérialise et restaure un état puis poursuit les actions.",
+        "Les actions invalides sont rejetées et l'état entrant est comparé à une copie préalable.",
+        "Le diff ne modifie ni le client index.html ni les règles du moteur."
+      ]
+    }
+  ],
+  "trigger_cases": [
+    {"query": "Le replay de mon jeu diverge après restauration JSON ; corrige la gestion du RNG.", "should_trigger": true},
+    {"query": "Le bouton rejouer du morpion manque de contraste ; touche seulement au CSS.", "should_trigger": false}
+  ]
+}

@@ -1,25 +1,52 @@
 /**
+ * @jest-environment jsdom
+ *
  * Tests: app/router.js
- * @see openspec/changes/extend-hash-routing-games-tools/specs/router-games-tools/spec.md
+ * @see openspec/changes/archive/extend-hash-routing-games-tools/specs/router-games-tools/spec.md
  */
 
-import { handleHashRoute } from './router.js';
-import { state, setState } from './state.js';
-import { openEpic, closeParcours } from './parcours.js';
-import { openGame, openTool, unloadGame } from './game-loader.js';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
-// Mocks
-jest.mock('./state.js');
-jest.mock('./parcours.js');
-jest.mock('./game-loader.js');
+// Mocks ESM : unstable_mockModule + import dynamique (cf. jest.config.js)
+const state = { currentView: 'catalogue' };
+const openEpic = jest.fn();
+const closeParcours = jest.fn();
+const openGame = jest.fn();
+const openTool = jest.fn();
+const unloadGame = jest.fn();
+const switchTab = jest.fn();
+
+jest.unstable_mockModule('./state.js', () => ({ state, setState: jest.fn() }));
+jest.unstable_mockModule('./parcours.js', () => ({ openEpic, closeParcours }));
+jest.unstable_mockModule('./game-loader.js', () => ({ openGame, openTool, unloadGame }));
+jest.unstable_mockModule('./tabs.js', () => ({ switchTab }));
+
+// Import dynamique après les mocks
+const { handleHashRoute } = await import('./router.js');
 
 describe('router: Hash routing for games and tools', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     state.currentView = 'catalogue';
+    state.parcoursViewer = null;
   });
 
   // ===== GAME ROUTES =====
+  it('ouvre le catalogue parcours explicitement depuis un guide', () => {
+    window.location.hash = '#/parcours';
+    handleHashRoute();
+    expect(switchTab).toHaveBeenCalledWith('parcours');
+    expect(openEpic).not.toHaveBeenCalled();
+  });
+
+  it('nettoie le viewer et ses raccourcis lors du retour navigateur au catalogue', () => {
+    state.currentView = 'parcours';
+    state.parcoursViewer = { close: jest.fn() };
+    window.location.hash = '#/';
+    handleHashRoute();
+    expect(state.parcoursViewer.close).toHaveBeenCalledTimes(1);
+    expect(closeParcours).not.toHaveBeenCalled();
+  });
 
   describe('Route: #/games/:id', () => {
     it('parses #/games/tictactoe and calls openGame', () => {

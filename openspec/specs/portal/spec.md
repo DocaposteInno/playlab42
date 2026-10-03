@@ -1,6 +1,6 @@
 # Portal Specification
 
-## Overview
+## Purpose
 
 Le portail est l'interface principale de Playlab42. C'est une application 100% frontend (pas de backend) qui permet de :
 
@@ -65,7 +65,7 @@ The system SHALL track recently played games in localStorage for future use, but
 
 ### Requirement: Tab Navigation
 
-The system SHALL provide tab-based navigation with three tabs: Parcours, Outils, Jeux.
+The system SHALL provide tab-based navigation with four tabs: Parcours, Outils, Jeux, Liens.
 
 #### Scenario: Default tab
 - **WHEN** the portal loads for the first time
@@ -83,6 +83,17 @@ The system SHALL provide tab-based navigation with three tabs: Parcours, Outils,
 #### Scenario: Tab-specific filters
 - **WHEN** a user applies tag filters
 - **THEN** filters apply only to the active tab content
+
+#### Scenario: Keyboard tab navigation
+- **WHEN** focus is on a catalogue tab
+- **THEN** Left/Right arrows activate and focus the adjacent tab, wrapping at the ends
+- **AND** Home/End activate and focus the first/last tab
+- **AND** only the selected tab is in the sequential tab order
+
+#### Scenario: Shortcuts while editing
+- **WHEN** the user types in an input, textarea, select or editable region
+- **THEN** catalogue shortcuts do not consume the input
+- **AND** shortcuts using Ctrl, Alt or Meta are left to the browser
 
 ### Requirement: Parcours Display
 
@@ -102,6 +113,27 @@ The system SHALL display pedagogical content (Epics) in the Parcours tab.
 - **WHEN** a user clicks on an epic card
 - **THEN** the parcours viewer opens with the first slide
 - **AND** the header and footer are hidden for immersive experience
+
+#### Scenario: Keyboard epic opening
+- **WHEN** the user focuses a parcours card and presses Enter
+- **THEN** its native hash link opens the viewer
+- **AND** focus moves to the viewer close control and returns to the card on close
+
+#### Scenario: Readable progression
+- **WHEN** a parcours card is displayed
+- **THEN** its progress is exposed as text, not only a colored bar
+
+### Requirement: Accessible Controls
+
+The system SHALL expose the purpose and current state of interface controls.
+
+#### Scenario: Preferences
+- **WHEN** sound or theme preferences change
+- **THEN** their controls update `aria-pressed` together with their visual state
+
+#### Scenario: Embedded content
+- **WHEN** a game or tool opens
+- **THEN** the iframe title identifies that game or tool
 
 #### Scenario: Parcours navigation
 - **WHEN** viewing a slide

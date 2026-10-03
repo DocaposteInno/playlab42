@@ -32,10 +32,10 @@
 <body class="mode-literary">
 
     <!-- Mode Selector -->
-    <nav class="mode-selector">
-        <button class="mode-btn active" data-mode="literary">Littéraire</button>
-        <button class="mode-btn" data-mode="scientific">Scientifique</button>
-        <button class="mode-btn" data-mode="practical">Pratique</button>
+    <nav class="mode-selector" aria-label="Mode de lecture">
+        <button type="button" class="mode-btn active" data-mode="literary" aria-pressed="true">Littéraire</button>
+        <button type="button" class="mode-btn" data-mode="scientific" aria-pressed="false">Scientifique</button>
+        <button type="button" class="mode-btn" data-mode="practical" aria-pressed="false">Pratique</button>
     </nav>
 
     <!-- Hero Section -->
@@ -690,11 +690,15 @@
                 body.className = `mode-${mode}`;
 
                 // Mettre à jour le bouton actif
-                modeButtons.forEach(b => b.classList.remove('active'));
+                modeButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-pressed', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
 
                 // Scroll en haut
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
             });
         });
     </script>

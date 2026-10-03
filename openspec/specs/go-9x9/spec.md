@@ -1,6 +1,6 @@
 # Go 9x9 Specification
 
-## Overview
+## Purpose
 
 Go 9x9 est une implémentation du jeu de Go sur un plateau 9x9, conçue pour Playlab42 avec :
 

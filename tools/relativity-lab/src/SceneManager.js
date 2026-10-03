@@ -96,6 +96,9 @@ export class SceneManager {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.container.appendChild(this.renderer.domElement);
+    this.renderer.domElement.setAttribute('role', 'img');
+    this.renderer.domElement.setAttribute('aria-label', 'Vue 3D de la simulation relativiste');
+    this.renderer.domElement.setAttribute('aria-describedby', 'canvas-help');
   }
 
   /**

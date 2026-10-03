@@ -1,0 +1,8 @@
+{
+  "id": "ui-kit",
+  "name": "Galerie UI Playlab42",
+  "description": "Atelier interactif de composants accessibles : thèmes, boutons, formulaires, cartes, statuts et dialogues natifs.",
+  "tags": ["developpement", "accessibilite", "design"],
+  "version": "1.0.0",
+  "author": "Playlab42"
+}

@@ -1,6 +1,6 @@
 # GameKit Specification
 
-## Overview
+## Purpose
 
 GameKit est le SDK standardisé pour les jeux Playlab42. Il fournit :
 

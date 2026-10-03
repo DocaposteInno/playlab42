@@ -12,7 +12,7 @@ Ce fichier contient les instructions pour les assistants IA (Claude Code, GitHub
 
 | Composant | Description |
 |-----------|-------------|
-| **Tools** | Outils HTML standalone (un fichier, pas de backend) |
+| **Tools** | Outils HTML standalone (un fichier ou modules locaux, pas de backend) |
 | **Games** | Jeux autonomes avec moteur isomorphe et bots |
 | **Parcours** | Contenus pédagogiques en slides HTML (Epics) |
 | **Portal** | Catalogue unifié, charge tools/games/parcours |
@@ -21,9 +21,9 @@ Ce fichier contient les instructions pour les assistants IA (Claude Code, GitHub
 
 ### Concepts clés
 
-- **Tool** : Outil HTML standalone (un fichier, ouvrable directement)
+- **Tool** : Outil HTML standalone, servi statiquement ; les versions sans imports ni chargement de ressources peuvent aussi s'ouvrir directement
 - **Game** : Mini-app standalone avec moteur de règles et bots
-- **GameEngine** : Moteur isomorphe, JavaScript pur, déterministe
+- **GameEngine** : Moteur isomorphe, JavaScript pur ou TypeScript optionnel, déterministe ; la compatibilité Node prépare une évolution future, pas un backend actuel
 - **Bot** : IA pluggable pour remplacer les joueurs humains
 - **Epic** : Parcours pédagogique composé de slides HTML
 - **GameKit** : SDK pour communication portail ↔ jeu
@@ -67,8 +67,8 @@ make test               # Lance les tests Jest
 make test-watch         # Mode watch
 
 # Sécurité
-make audit              # Audit npm des dépendances
-make security           # Audit complet (npm + Docker)
+make security-npm       # Audit npm des dépendances
+make security-audit     # Audit complet de sécurité
 ```
 
 **Ne jamais exécuter npm, node, ou autres outils directement sur le host.**
@@ -77,25 +77,40 @@ make security           # Audit complet (npm + Docker)
 
 Le projet supporte le développement parallèle via git worktrees. Chaque worktree obtient automatiquement un nom de projet Docker et un port uniques. Utiliser `make info` pour voir l'instance courante.
 
-## Workflow OpenSpec
+## Workflow OpenSpec et skills de projet
 
-<!-- OPENSPEC:START -->
-Toujours ouvrir `@/openspec/AGENTS.md` quand la requête :
-- Mentionne planning ou proposals (mots comme proposal, spec, change, plan)
-- Introduit nouvelles capabilities, breaking changes, changements d'architecture
-- Semble ambiguë et nécessite la spec officielle avant de coder
+Ce fichier est la **source commune des conventions** pour tous les agents et skills.
+Les skills spécialisés les référencent ; ils ne définissent pas une autre stack ou
+un workflow concurrent. Voir [les skills de projet](docs/guides/project-skills.md)
+et [le kit de contribution](docs/guides/contribution-kit.md).
 
-Utiliser `@/openspec/AGENTS.md` pour apprendre :
-- Comment créer et appliquer des propositions de changement
-- Format et conventions des specs
-- Structure et guidelines du projet
-<!-- OPENSPEC:END -->
+Les corps des skills sont versionnés uniquement dans **`.github/skills/`**.
+Le lien `.claude/skills -> ../.github/skills` expose cette même source à
+Claude sans seconde copie. Les skills OpenSpec générés se placent donc dans
+`.github/skills/openspec-*`, à côté des quatre skills métier `playlab-*`.
+Ce lien ne crée pas de commandes `/opsx:*` ; leur disponibilité dépend de
+l'intégration de commandes du client.
 
-## Commandes slash disponibles
+Pour une nouvelle capability, une rupture de contrat ou un changement d'architecture,
+lire [le guide OpenSpec](docs/guides/openspec-workflow.md), les specs concernées et
+les changes actifs avant de coder. Un correctif simple, une typo ou un test de
+comportement existant ne nécessite pas automatiquement une proposal.
 
-- `/openspec:proposal` - Créer une nouvelle proposition de changement
-- `/openspec:apply` - Implémenter un changement approuvé
-- `/openspec:archive` - Archiver après déploiement
+Le workflow officiel actuel est **OPSX**, avec le schéma `spec-driven` dans
+`openspec/config.yaml`. Les skills officiels `openspec-*` sont distincts des
+skills métier `playlab-*`. Le CLI est une dépendance de développement épinglée,
+exécutée dans Docker : `make openspec-list` et `make openspec-validate`.
+Les trois commandes Claude `/openspec:proposal`, `/openspec:apply` et
+`/openspec:archive` sont des **alias locaux de compatibilité**, pas le workflow
+officiel actuel.
+
+Une demande explicite d'implémentation vaut autorisation dans son périmètre :
+consigner cette base dans la proposal sans inventer une revue, un merge ou un
+déploiement. Les artefacts peuvent évoluer pendant l'implémentation. Respecter
+les dépendances réelles ; des tâches indépendantes peuvent être menées en
+parallèle sur des fichiers distincts. Cocher uniquement le travail effectivement
+réalisé et vérifié. L'archivage attend la livraison (merge et déploiement, si
+applicable) et une décision explicite ; ne jamais archiver pour simuler l'achèvement.
 
 ## Conventions
 
@@ -103,22 +118,28 @@ Utiliser `@/openspec/AGENTS.md` pour apprendre :
 - **Code** : JavaScript (ES modules), fonctions pures quand possible
 - **Nommage** : camelCase (variables), PascalCase (types), kebab-case (fichiers)
 - **Simplicité** : Préférer solutions simples, éviter over-engineering
-- **Isomorphisme** : Les moteurs de jeux doivent tourner client ET serveur
+- **Isomorphisme** : Les moteurs de jeux sont compatibles navigateur et Node, sans DOM, réseau ou système de fichiers ; aucun serveur de jeu n'est déployé aujourd'hui
 - **Docker-first** : Tout dans le container, rien sur le host
 
 ## Stack technique
 
 | Aspect | Choix |
 |--------|-------|
-| Langage | JavaScript (ES2024+) + TypeScript (optionnel) |
-| Runtime | Node.js 25+ (Alpine) |
+| Frontend | HTML/CSS et JavaScript natifs, sans framework imposé |
+| Langage | JavaScript (ES modules) + TypeScript strict (optionnel) |
+| Runtime de développement | Node.js 26 (Alpine) ; application exécutée dans le navigateur |
 | Build TS | esbuild (transpilation rapide) |
-| Tests | Jest + ts-jest |
+| Tests unitaires | Jest + esbuild |
+| Tests navigateur | Playwright |
 | Linting | ESLint |
 | Infra | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
 | Hébergement | GitHub Pages |
-| Workflow | OpenSpec |
+| Workflow | OpenSpec / OPSX, CLI local épinglé |
+
+Il n'existe aujourd'hui **ni backend applicatif ni runtime WebSocket**. Le
+serveur local ne fait que servir des fichiers statiques. L'isomorphisme des
+moteurs n'implique ni migration de framework ni ajout d'un service réseau.
 
 ## TypeScript (optionnel)
 
@@ -177,7 +198,7 @@ tools/my-tool/
 
 ```bash
 # 1. Développer avec watch
-make build-ts:watch     # Transpile automatiquement à chaque modification
+make npm CMD="run build:ts:watch" # Transpile automatiquement à chaque modification
 
 # 2. Tester
 make test               # Exécute tous les tests (JS + TS)
@@ -299,8 +320,9 @@ playlab42/
 ├── docs/                     # Documentation
 └── openspec/                 # Spécifications et proposals
     ├── specs/                # Specs techniques
-    ├── changes/              # Proposals en cours
-    └── archive/              # Changes archivés
+    ├── config.yaml           # Schéma et règles OPSX
+    └── changes/              # Proposals en cours
+        └── archive/          # Changes archivés (historique conservé)
 ```
 
 ## Spécifications techniques
@@ -325,7 +347,11 @@ Les specs détaillées sont dans `openspec/specs/` :
 - `docs/FEATURES.md` - Liste des features MVP par phase
 - `docs/CONCEPTS.md` - Définitions et glossaire
 - `docs/CATALOGUE-BUILD.md` - Workflow de build des catalogues
-- `openspec/project.md` - Conventions du projet
+- `openspec/project.md` - Point d'entrée historique vers les conventions communes
+- `docs/guides/openspec-workflow.md` - OPSX, CLI Docker et compatibilité des anciens alias
+- `docs/guides/project-skills.md` - Skills métier et source commune des conventions
+- `docs/guides/contribution-kit.md` - Gabarits game/tool/epic et galerie UI
+- `openspec/legacy/README.md` - Brouillons historiques conservés sans déclaration de livraison
 
 ## Guidelines pour agents IA
 
@@ -352,7 +378,7 @@ docker compose exec dev npm run ...
 # 3. Vérifier la qualité
 make lint
 make test
-make audit
+make security-npm
 
 # 4. Commiter
 git add .
@@ -365,7 +391,7 @@ git push -u origin feature/ma-feature
 ### Points d'attention
 
 - Les fichiers `data/*.json` sont générés au build et **non versionnés** (dans `.gitignore`)
-- Toujours lancer `npm run build` ou `make build` pour régénérer les catalogues
+- Régénérer les catalogues dans Docker avec `make npm CMD="run build:local"` ; `make build` construit l'image Docker
 - Les parcours utilisent un système de taxonomie avec threshold (min 3 epics par catégorie)
 - Les moteurs de jeux doivent être déterministes (utiliser SeededRandom)
 - Le projet est 100% statique, pas de backend requis

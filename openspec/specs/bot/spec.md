@@ -1,6 +1,6 @@
 # Bot Specification
 
-## Overview
+## Purpose
 
 Les Bots sont des IA qui jouent à la place des joueurs humains. C'est un aspect central de Playlab42 :
 

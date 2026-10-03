@@ -635,7 +635,7 @@ export class App {
         "></div>
 
         <!-- Feedback -->
-        <div id="feedback-container" style="
+        <div id="feedback-container" role="status" aria-live="polite" style="
           min-height: 50px;
           display: flex;
           align-items: center;
@@ -660,7 +660,7 @@ export class App {
           <button id="btn-play-sound" style="
             padding: var(--space-sm) var(--space-md);
             background: var(--color-accent);
-            color: white;
+            color: var(--color-text-inverse);
             border: none;
             border-radius: var(--radius-md);
             cursor: pointer;
@@ -766,7 +766,7 @@ export class App {
 
       container.style.gridTemplateColumns = 'repeat(7, 1fr)';
       container.innerHTML = intervals.map(int => `
-        <button class="note-btn" data-semitones="${int.value}" title="${int.name}" style="
+        <button class="note-btn" data-semitones="${int.value}" title="${int.name}" aria-label="${int.name}" style="
           padding: var(--space-sm) var(--space-xs);
           background: var(--color-bg-secondary);
           border: 2px solid var(--color-border);
@@ -1096,7 +1096,7 @@ export class App {
           <button id="btn-replay" style="
             padding: var(--space-sm) var(--space-lg);
             background: var(--color-accent);
-            color: white;
+            color: var(--color-text-inverse);
             border: none;
             border-radius: var(--radius-md);
             cursor: pointer;
@@ -1440,12 +1440,14 @@ export class App {
    * @param {KeyboardEvent} event
    */
   handleKeydown(event) {
+    if (event.defaultPrevented) {return;}
     // Échap pour fermer les overlays ou revenir au menu
     if (event.key === 'Escape') {
       if (this.metronomeController?.isVisible()) {
         this.metronomeController.hide();
         return;
       }
+
       if (this.tunerController?.isVisible()) {
         this.tunerController.hide();
         return;
@@ -1468,6 +1470,8 @@ export class App {
       return;
     }
 
+    if (event.target.closest?.('input, select, textarea, [contenteditable="true"]')) {return;}
+
     // Piano virtuel - jouer les notes avec le clavier (sustain prolongé)
     if (this.pianoController?.isVisible()) {
       const keyLower = event.key.toLowerCase();
@@ -1480,7 +1484,7 @@ export class App {
     }
 
     // Barre d'espace pour le tap en mode rythme
-    if (event.key === ' ' && this.rhythmController?.state) {
+    if (event.key === ' ' && this.rhythmController?.state && !event.target.closest?.('button, a[href]')) {
       event.preventDefault();
       this.rhythmController.handleKeydown(event);
     }

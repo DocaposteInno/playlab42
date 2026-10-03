@@ -1,0 +1,33 @@
+{
+  "skill_name": "playlab-release",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Prépare le handoff de la branche courante vers une PR : inspecte le diff, choisis les validations pour les fichiers modifiés et rédige la description. Tu es en lecture seule pour le runtime et GitHub : aucun Docker, npm/node sur le host, commit, push ou merge. Indique précisément les commandes à transmettre à l'opérateur.",
+      "expected_output": "Handoff fidèle au diff réel, validations Docker ciblées proposées sans exécution, description de PR et limitations explicites.",
+      "files": ["AGENTS.md", "Makefile", "package.json", ".github/PULL_REQUEST_TEMPLATE.md"],
+      "assertions": [
+        "Le résultat nomme la branche courante et les fichiers ou périmètres réellement modifiés.",
+        "Les commandes de tests/build proposées passent par Make ou le conteneur et ciblent des scripts existants.",
+        "Aucun runtime, commit, push, merge ou opération GitHub n'est exécuté.",
+        "Les validations non exécutées sont explicitement distinguées des inspections effectuées."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "J'ai seulement corrigé docs/guides/create-epic.md. Prépare la checklist de contribution sans commit ni publication. Dois-je refaire tous les builds et fusionner automatiquement si la CI est verte ?",
+      "expected_output": "Checklist proportionnée à un changement documentaire, aucune exécution applicative inutile et refus du merge automatique implicite.",
+      "files": ["docs/guides/create-epic.md", ".github/workflows/deploy.yml"],
+      "assertions": [
+        "La réponse distingue relecture documentaire et validation applicative inutile pour ce changement.",
+        "Aucun test, build, commit ou déploiement n'est lancé.",
+        "La réponse indique explicitement qu'une CI verte n'autorise pas une fusion automatique.",
+        "La publication GitHub Pages est décrite conformément aux déclencheurs de deploy.yml."
+      ]
+    }
+  ],
+  "trigger_cases": [
+    {"query": "Prépare cette branche pour une PR et donne les contrôles Docker adaptés au diff.", "should_trigger": true},
+    {"query": "Implémente maintenant un nouveau bot pour le morpion, sans t'occuper de la PR.", "should_trigger": false}
+  ]
+}

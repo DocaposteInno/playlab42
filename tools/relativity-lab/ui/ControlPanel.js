@@ -20,7 +20,7 @@ import * as THREE from 'three';
  * @returns {GUI}
  */
 export function createControlPanel(simulation, sceneManager, onPlayToggle = () => {}) {
-  const gui = new GUI({ title: '⚙️ Contrôles' });
+  const gui = new GUI({ title: '⚙️ Contrôles', container: document.getElementById('panels') });
 
   // Objet pour stocker les valeurs des contrôles
   const params = {

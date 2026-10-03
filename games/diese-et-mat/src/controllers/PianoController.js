@@ -119,6 +119,7 @@ export class PianoController extends EventEmitter {
 
     /** @type {Function[]} Cleanup handlers pour les event listeners */
     this._cleanupHandlers = [];
+    this._noteRequests = new Map();
   }
 
   // --------------------------------------------------------------------------
@@ -239,9 +240,12 @@ export class PianoController extends EventEmitter {
     const notes = this._generateNotes();
 
     notes.forEach((n, index) => {
-      const key = document.createElement('div');
+      const key = document.createElement('button');
+      key.type = 'button';
       key.className = `piano-key piano-key-${n.isBlack ? 'black' : 'white'}`;
       key.dataset.note = n.note;
+      key.setAttribute('aria-label', `Jouer ${this._noteToFrench(n.note)}${n.label ? `, raccourci ${n.label}` : ''}`);
+      key.setAttribute('aria-pressed', 'false');
 
       // Position des touches noires
       if (n.isBlack) {
@@ -284,6 +288,26 @@ export class PianoController extends EventEmitter {
 
       key.addEventListener('touchend', () => {
         this.stopNote(n.note, key);
+      });
+      key.addEventListener('touchcancel', () => this.stopNote(n.note, key));
+
+      key.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {return;}
+        event.preventDefault();
+        event.stopPropagation();
+        if (!event.repeat) {this.playNote(n.note, key);}
+      });
+      key.addEventListener('keyup', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {return;}
+        event.preventDefault();
+        event.stopPropagation();
+        this.stopNote(n.note, key);
+      });
+      key.addEventListener('blur', () => this.stopNote(n.note, key));
+      key.addEventListener('click', (event) => {
+        if (event.detail === 0) {
+          this.playNote(n.note, key).then(() => this.stopNote(n.note, key));
+        }
       });
 
       container.appendChild(key);
@@ -495,9 +519,13 @@ export class PianoController extends EventEmitter {
    * @param {HTMLElement} [keyElement] - Élément de la touche
    */
   async playNote(note, keyElement) {
+    if (this._noteRequests.has(note)) {return;}
+    const request = {};
+    this._noteRequests.set(note, request);
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.add('active');
+      keyElement.setAttribute('aria-pressed', 'true');
     }
 
     // Afficher la note
@@ -506,7 +534,18 @@ export class PianoController extends EventEmitter {
     }
 
     // Jouer via SynthManager
-    await this.synthManager?.noteOn(note);
+    try {
+      await this.synthManager?.noteOn(note);
+      if (this._noteRequests.get(note) !== request) {return;}
+    } catch (error) {
+      if (this._noteRequests.get(note) !== request) {return;}
+      console.error('Erreur lecture audio du piano:', error);
+      if (this.elements.noteDisplay) {
+        const message = error instanceof Error ? error.message : String(error);
+        this.elements.noteDisplay.textContent = `Audio indisponible : ${message}`;
+      }
+      return;
+    }
     this.emit('note-on', { note });
   }
 
@@ -517,9 +556,11 @@ export class PianoController extends EventEmitter {
    * @param {HTMLElement} [keyElement] - Élément de la touche
    */
   stopNote(note, keyElement) {
+    this._noteRequests.delete(note);
     // Feedback visuel
     if (keyElement) {
       keyElement.classList.remove('active');
+      keyElement.setAttribute('aria-pressed', 'false');
     }
 
     // Arrêter via SynthManager
@@ -531,11 +572,13 @@ export class PianoController extends EventEmitter {
    * Arrête toutes les notes actives.
    */
   stopAllNotes() {
+    this._noteRequests.clear();
     this.synthManager?.stopAllNotes();
 
     // Reset visuellement
     this.elements.keyboard?.querySelectorAll('.piano-key.active').forEach((key) => {
       key.classList.remove('active');
+      key.setAttribute('aria-pressed', 'false');
     });
   }
 

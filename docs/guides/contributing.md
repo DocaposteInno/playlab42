@@ -22,12 +22,18 @@ Avant de contribuer, assurez-vous d'avoir :
 
 ## Workflow général
 
+Le [kit de contribution](./contribution-kit.md) fournit les gabarits et la
+[galerie UI](../../tools/ui-kit/index.html). Les [skills de projet](./project-skills.md)
+guident les agents sans remplacer les conventions de `AGENTS.md`.
+Pour un nouveau module, suivre aussi le [workflow OpenSpec](./openspec-workflow.md).
+
 ```
 1. FORK
    └── Fork playlab42 sur votre compte GitHub
 
-2. CLONE
+2. CLONE ET BRANCHE
    └── git clone https://github.com/VOUS/playlab42.git
+   └── git switch -c feat/mon-contenu
 
 3. CRÉATION
    └── Ajouter votre contenu selon le type :
@@ -35,15 +41,17 @@ Avant de contribuer, assurez-vous d'avoir :
        - games/mon-jeu/ (game.json, index.html, engine.js...)
        - parcours/epics/mon-epic/ (epic.json, slides/...)
 
-4. TEST LOCAL
+4. PRÉPARATION ET PARCOURS LOCAL
+   └── make npm CMD="run build:local"
    └── make serve
-   └── Vérifier http://localhost:5242
+   └── make info pour connaître le port de ce worktree
+   └── make test-e2e pour les interactions navigateur
 
 5. COMMIT
    └── git add . && git commit -m "feat: ajout [type] [nom]"
 
 6. PUSH
-   └── git push origin main
+   └── git push -u origin feat/mon-contenu
 
 7. PULL REQUEST
    └── Ouvrir PR vers playlab42/main
@@ -75,6 +83,8 @@ tools/
 - [ ] Fichier `tool.json` avec champs requis
 - [ ] Utilise `/lib/theme.css` pour les styles
 - [ ] Utilise `/lib/theme.js` pour le thème (dark/light)
+- [ ] Charge `/lib/ui.css` pour le focus visible et les préférences de mouvement
+- [ ] Contrôles utilisables au clavier, formulaires étiquetés et états annoncés
 - [ ] Fonctionne en mode sombre et clair
 - [ ] Responsive (mobile + desktop)
 - [ ] Commentaires en français
@@ -186,6 +196,7 @@ parcours/
 - [ ] Au moins 1 slide avec `slide.json` + `index.html`
 - [ ] Slides utilisent `/lib/theme.css` et `/parcours/_shared/slide-base.css`
 - [ ] Slides utilisent `/lib/theme.js` pour le thème
+- [ ] Contrôles natifs accessibles et styles de composants partagés (cartes, tableaux, formulaires)
 - [ ] Assets optimisés (images < 500KB)
 - [ ] `thumbnail.png` vignette (380x180px, 19:9, < 50KB) - optionnel
 
@@ -315,12 +326,27 @@ Vérifiez :
 | Audio | < 5MB |
 | Vignette | 380x180px (19:9), < 50KB |
 
+### Pourquoi les vignettes de jeux et d'outils sont en PNG
+
+Les vignettes de jeux et d'outils sont des images photographiques : en JPEG ou
+en WebP, elles pèseraient 15 à 25 Ko au lieu de 38 à 50 Ko (c'est le cas des
+vignettes d'epics, déjà en `.jpg`). Elles restent pourtant en `.png`, parce que
+leur chemin n'est pas déclaré : il est **dérivé du chemin du jeu ou de l'outil**
+dans `app/catalogue.js` (`path.replace('index.html', 'thumb.png')` pour un jeu,
+`path.replace('.html', '-thumb.png')` pour un outil). Changer d'extension
+supposerait donc de rendre le chemin de vignette explicite — champ dédié dans
+`game.json` / `tool.json`, propagé par `scripts/build-catalogue.js` jusqu'au
+catalogue — ce qui dépasse le cadre d'une optimisation d'images.
+
+En attendant, respecter la limite de 50 Ko impose de quantiser la palette
+(`pngquant 128`, par exemple) plutôt que de flouter l'image.
+
 ---
 
 ## Besoin d'aide ?
 
 - Consultez les [guides existants](./README.md)
-- Regardez les [exemples dans le code](../../tools/)
+- Regardez les [composants en action dans la galerie UI](../../tools/ui-kit/index.html)
 - Ouvrez une issue sur GitHub
 
 Merci de contribuer à PlayLab42 ! 🎉

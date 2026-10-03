@@ -2,10 +2,13 @@
  * Configuration Jest pour Playlab42
  *
  * Conventions de tests :
+ * - app/module.test.js : Tests pour app/module.js (nécessitent jsdom, déclaré
+ *   par un docblock `@jest-environment jsdom` en tête de fichier)
  * - lib/module.test.js : Tests pour lib/module.js (pattern plat)
  * - lib/module/__tests__/*.test.js : Tests pour modules complexes
  * - games/[id]/engine.test.js : Tests pour les moteurs de jeux
  * - tools/[id]/__tests__/*.test.js : Tests pour les tools complexes
+ * - parcours/.../module.test.js : Tests des interactions et styles pédagogiques
  * - scripts/*.test.js : Tests pour les scripts de build
  *
  * Supporte JavaScript (.js) et TypeScript (.ts)
@@ -22,9 +25,11 @@ export default {
 
   // Pattern de découverte des fichiers de test (JS et TS)
   testMatch: [
+    '**/app/**/*.test.{js,ts}',
     '**/lib/**/*.test.{js,ts}',
     '**/games/**/*.test.{js,ts}',
     '**/tools/**/*.test.{js,ts}',
+    '**/parcours/**/*.test.{js,ts}',
     '**/scripts/**/*.test.{js,ts}',
   ],
 
@@ -33,25 +38,21 @@ export default {
     '/node_modules/',
     '/data/',
     '/dist/',
+    '/assets/vendor/',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/assets/vendor/'],
 
-  // Transformation : ts-jest pour TypeScript (gère les imports .js -> .ts)
+  // Transformation : esbuild pour TypeScript (transpilation seule, sans
+  // vérification de types ; celle-ci est assurée par `npm run typecheck`)
   transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      {
-        useESM: true,
-        tsconfig: {
-          // Permettre les imports sans vérification de fichier
-          moduleResolution: 'bundler',
-          module: 'ESNext',
-          target: 'ES2022',
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-        },
-      },
-    ],
+    '^.+\\.ts$': './jest.transform.cjs',
   },
+
+  // Traiter les .ts comme des modules ES natifs
+  // Le "type": "module" du package.json ne couvre que les .js ; sans cette
+  // ligne Jest chargerait les .ts transpilés comme du CommonJS et échouerait
+  // sur « Cannot use import statement outside a module ».
+  extensionsToTreatAsEsm: ['.ts'],
 
   // Ne pas ignorer les fichiers ESM locaux (lib/*.js, games/*.js)
   // Par défaut Jest ignore node_modules ; on garde ce comportement
@@ -69,6 +70,7 @@ export default {
 
   // Collecter la couverture depuis ces dossiers
   collectCoverageFrom: [
+    'app/**/*.{js,ts}',
     'lib/**/*.{js,ts}',
     'games/**/engine.{js,ts}',
     'tools/**/src/**/*.{js,ts}',
