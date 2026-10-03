@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet et autonomie maîtrisée — GitHub Copilot</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+</head>
+<body>
+  <article class="slide">
+    <h1>Fleet : travailler en parallèle, pas à l'aveugle</h1>
+    <p><code>/fleet</code> active la coordination de <strong>sous-agents en parallèle</strong> dans Copilot CLI. L'agent principal répartit le travail, collecte les résultats et les intègre. Ce n'est ni un raccourci pour déployer dans le cloud, ni une promesse de gain sur toutes les tâches.</p>
+    <p><strong>Repère :</strong> Fleet et Autopilot sont disponibles à tous depuis la version 0.0.411 du 17 février 2026. Fleet est présent dans l'aide CLI 1.0.82 consultée le 3 octobre 2026 ; la documentation actuelle décrit aussi le flag <code>--fleet</code>.</p>
+
+    <h2>Choisir entre les modes</h2>
+    <table>
+      <thead><tr><th>Mécanisme</th><th>Son rôle</th><th>Quand l'utiliser</th></tr></thead>
+      <tbody>
+        <tr><td>Agent seul</td><td>Traiter une tâche dans un fil principal.</td><td>Petite correction ou chaîne de décisions fortement dépendantes.</td></tr>
+        <tr><td>Plan</td><td>Préparer les étapes et les arbitrages avant de coder.</td><td>Besoin ambigu, risque architectural ou modification importante.</td></tr>
+        <tr><td>Fleet</td><td>Distribuer plusieurs tâches indépendantes à des sous-agents.</td><td>Exploration de modules distincts ou travaux sur des fichiers séparés.</td></tr>
+        <tr><td>Autopilot</td><td>Poursuivre un objectif avec moins d'interruptions.</td><td>Objectif clair, environnement maîtrisé et surveillance adaptée.</td></tr>
+        <tr><td>Delegate</td><td>Transmettre le travail à l'agent sur GitHub.</td><td>Exécution distante et proposition de PR.</td></tr>
+      </tbody>
+    </table>
+    <p>Fleet et Autopilot répondent à deux questions différentes : <strong>combien de tâches en parallèle ?</strong> et <strong>quel degré d'autonomie ?</strong> Ni l'un ni l'autre ne remplace les permissions et la revue.</p>
+
+    <h2>Un premier essai en lecture seule</h2>
+    <pre><code>/fleet
+Analyse ce dépôt sans modifier de fichier.
+Répartis deux tâches indépendantes :
+- relever les points d'entrée et les contrats du module panier ;
+- repérer les tests existants et les cas limites non couverts.
+Chaque résultat doit citer les fichiers concernés et ses incertitudes.
+Attends les deux résultats puis propose une synthèse.
+Ne lance ni publication ni installation de dépendance.</code></pre>
+    <p>Configurez aussi les outils et permissions pour ce périmètre. La mention « sans modifier » dans le prompt est une consigne, pas une restriction technique.</p>
+
+    <h2>Avant de distribuer des modifications</h2>
+    <ol>
+      <li>Définissez les contrats communs et les dépendances ; ce qui dépend d'une décision doit attendre cette décision.</li>
+      <li>Attribuez un propriétaire à chaque fichier ou zone. Deux sous-agents ne doivent pas réécrire la même fonction en parallèle.</li>
+      <li>Demandez à chacun une sortie précise : diff, commandes exécutées, limites et questions non résolues.</li>
+      <li>Faites intégrer les résultats par l'agent principal, puis exécutez les validations transversales.</li>
+    </ol>
+    <p>Pour des sessions ou contributeurs réellement séparés, utilisez des branches et worktrees dédiés. Ne supposez pas qu'une invocation Fleet crée automatiquement l'isolation Git ou un bac à sable dont vous avez besoin.</p>
+
+    <h2>Piloter l'exécution</h2>
+    <table>
+      <thead><tr><th>Commande CLI</th><th>Utilité</th></tr></thead>
+      <tbody>
+        <tr><td><code>/tasks</code></td><td>Consulter et gérer les tâches de sous-agents et commandes shell.</td></tr>
+        <tr><td><code>/subagents</code></td><td>Configurer les modèles par défaut ou par type de sous-agent.</td></tr>
+        <tr><td><code>/usage</code></td><td>Observer la consommation de la session.</td></tr>
+        <tr><td><code>/limits</code></td><td>Consulter ou modifier la limite souple AI credits ; vérifier sa portée selon la version.</td></tr>
+        <tr><td><code>/diff</code> et <code>/review</code></td><td>Contrôler l'intégration finale, pas seulement chaque résultat séparé.</td></tr>
+      </tbody>
+    </table>
+    <p>Arrêtez une exécution qui dérive plutôt que de la laisser « essayer encore ». Les annulations ne révoquent pas les effets déjà produits dans un service externe.</p>
+
+    <h2>Le coût du parallélisme</h2>
+    <p>Chaque sous-agent traite du contexte et peut appeler des outils et modèles. Le parallélisme peut réduire le temps mural tout en <strong>augmentant la consommation totale</strong>. Choisissez Fleet pour des tâches suffisamment substantielles ; un unique agent reste préférable pour lire deux petits fichiers.</p>
+    <p>Définissez une limite de travail et un budget, puis vérifiez la consommation réelle. Une limite locale souple ne garantit pas l'arrêt exact à un montant donné ; le chapitre Facturation détaille les contrôles côté GitHub.</p>
+
+    <h2>Signaux d'alerte</h2>
+    <ul>
+      <li>Plusieurs agents modifient le même fichier ou font des hypothèses incompatibles.</li>
+      <li>La synthèse affirme qu'un test a réussi alors qu'aucun résultat d'exécution ne le montre.</li>
+      <li>La tâche était séquentielle mais a été répartie avant d'établir le contrat partagé.</li>
+      <li>Le nombre d'agents augmente sans améliorer le résultat ni clarifier le blocage.</li>
+    </ul>
+    <p><strong>Sources :</strong> <a href="https://docs.github.com/en/copilot/concepts/agents/copilot-cli/fleet" target="_blank" rel="noopener noreferrer">Fonctionnement de Fleet</a> et <a href="https://github.com/github/copilot-cli/blob/main/changelog.md" target="_blank" rel="noopener noreferrer">changelog CLI</a>, ainsi que <code>/help</code> de la version installée.</p>
+  </article>
+</body>
+</html>

@@ -3,208 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quick Start et concepts clés — GitHub Copilot Guide</title>
+  <title>Démarrer et choisir son parcours — GitHub Copilot</title>
   <link rel="stylesheet" href="../../../../../lib/theme.css">
   <link rel="stylesheet" href="../../../../_shared/slide-base.css">
   <script type="module">
     import { initTheme } from '../../../../../lib/theme.js';
     initTheme();
   </script>
-  <style>
-    .version-info {
-      font-size: var(--font-size-sm);
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-lg);
-    }
-    .checklist {
-      list-style: none;
-      padding-left: var(--space-md);
-    }
-    .checklist li::before {
-      content: "☐ ";
-    }
-    .step-number {
-      display: inline-block;
-      width: 2rem;
-      height: 2rem;
-      background: var(--color-accent);
-      color: white;
-      border-radius: 50%;
-      text-align: center;
-      line-height: 2rem;
-      font-weight: bold;
-      margin-right: var(--space-sm);
-    }
-    .config-levels {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      background: var(--color-bg-secondary);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border);
-      white-space: pre;
-      overflow-x: auto;
-    }
-  </style>
 </head>
 <body>
   <article class="slide">
-    <p class="version-info"><strong>Version</strong> : 1.0 | <strong>Dernière mise à jour</strong> : Décembre 2025<br>
-    <strong>Public cible</strong> : Développeurs de tous niveaux<br>
-    <strong>IDE couverts</strong> : VS Code, JetBrains (IntelliJ, Rider, PhpStorm...), Visual Studio</p>
+    <h1>Démarrer et choisir son parcours</h1>
+    <p><strong>Mise à jour : 3 octobre 2026.</strong> Ce guide couvre les bases, les agents dans VS Code et Copilot CLI. Les modèles, quotas et fonctionnalités évoluent vite : les sources de chaque chapitre et l'aide de votre version priment sur un exemple figé.</p>
 
-    <h1>Quick Start — Copilot en 5 minutes</h1>
-
-    <h2><span class="step-number">1</span> Créer le fichier projet (2 min)</h2>
-
-    <p>Créez <code>.github/copilot-instructions.md</code> à la racine de votre repo :</p>
-
-    <pre><code># [Nom du projet] — Instructions Copilot
-
-## Stack technique
-- C# 12 / .NET 8 avec ASP.NET Core
-- PostgreSQL avec Entity Framework Core
-- React 18 avec TypeScript
-
-## Conventions
-- Nommage : PascalCase (C#), camelCase (JS/TS)
-- Commits : format Conventional Commits
-- Tests : xUnit (C#), Vitest (React)
-
-## Structure
-- src/Api/ : Controllers et endpoints
-- src/Domain/ : Logique métier
-- src/Web/ : Frontend React
-- tests/ : Tests unitaires et intégration</code></pre>
-
-    <h2><span class="step-number">2</span> Activer dans votre IDE (1 min)</h2>
-
-    <h3>VS Code</h3>
-    <ul class="checklist">
-      <li>Extension "GitHub Copilot" installée</li>
-      <li>Extension "GitHub Copilot Chat" installée</li>
-      <li><code>Ctrl+Shift+P</code> → "GitHub Copilot: Sign In"</li>
-    </ul>
-
-    <h3>JetBrains (Rider, PhpStorm...)</h3>
-    <ul class="checklist">
-      <li>Plugin "GitHub Copilot" installé (Settings → Plugins)</li>
-      <li>Settings → Languages &amp; Frameworks → GitHub Copilot → Login</li>
-    </ul>
-
-    <h3>Visual Studio</h3>
-    <ul class="checklist">
-      <li>Extension installée (incluse par défaut v17.10+)</li>
-      <li>Tools → Options → GitHub → Copilot → Sign In</li>
-    </ul>
-
-    <h2><span class="step-number">3</span> Premier prompt efficace (2 min)</h2>
-
-    <p>Ouvrez Copilot Chat (<code>Ctrl+Alt+I</code> VS Code / <code>Alt+C</code> JetBrains) et testez :</p>
-
-    <pre><code>Crée un endpoint API qui retourne la liste des utilisateurs actifs.
-- Controller ASP.NET Core
-- Route GET /api/users/active
-- Filtrer par IsActive == true
-- Retourner un DTO avec Id, Email, FullName</code></pre>
-
-    <h2>Commandes essentielles à retenir</h2>
-
+    <h2>Deux chemins de lecture</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Commande</th>
-          <th>Usage</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Votre objectif</th><th>Chemin conseillé</th><th>Temps indicatif</th></tr></thead>
       <tbody>
-        <tr><td><code>/explain</code></td><td>Comprendre du code existant</td></tr>
-        <tr><td><code>/fix</code></td><td>Corriger une erreur</td></tr>
-        <tr><td><code>/tests</code></td><td>Générer des tests unitaires</td></tr>
-        <tr><td><code>/doc</code></td><td>Ajouter de la documentation</td></tr>
+        <tr><td>Débuter sans se perdre</td><td>Présentation → ce démarrage → Autocomplétion → VS Code → Bonnes pratiques → Facturation → atelier débutant</td><td>30 à 45 min</td></tr>
+        <tr><td>Industrialiser son usage</td><td>Configuration projet → Agents → Skills → Prompting → MCP → CLI → Fleet → Facturation → ateliers avancés</td><td>60 à 90 min</td></tr>
+      </tbody>
+    </table>
+    <p>Le menu du parcours permet de rejoindre directement un chapitre. Il n'est pas nécessaire d'activer MCP, Fleet ou Autopilot pour profiter de Copilot.</p>
+
+    <h2>1. Activer Copilot dans VS Code</h2>
+    <ol>
+      <li>Mettez VS Code à jour, ouvrez un petit dépôt de confiance puis ouvrez Chat et la configuration Copilot.</li>
+      <li>Connectez votre compte GitHub. Vérifiez l'offre active et, en entreprise, les politiques appliquées par votre administrateur.</li>
+      <li>Suivez l'assistant d'installation de votre version ; vérifiez ensuite que les suggestions et le Chat sont disponibles.</li>
+    </ol>
+    <p>Dans JetBrains, installez le plugin GitHub Copilot depuis les paramètres. Dans Visual Studio, utilisez l'intégration Copilot proposée par votre version. Les commandes et réglages ne sont pas interchangeables entre IDE.</p>
+
+    <h2>2. Comprendre avant de modifier</h2>
+    <p>Ouvrez un fichier, sélectionnez une petite fonction et choisissez <strong>Ask</strong> dans Chat si votre harness le propose (notamment Local). Sinon, demandez explicitement une explication dans une session aux permissions limitées :</p>
+    <pre><code>Explique cette fonction à un développeur qui découvre le projet.
+Décris les entrées, la sortie et les cas limites.
+N'effectue aucune modification.
+Si une hypothèse manque, indique-la au lieu de l'inventer.</code></pre>
+    <p>Le Chat inline s'ouvre avec <code>Ctrl+I</code> sous Windows/Linux ou <code>Cmd+I</code> sous macOS. Vérifiez les raccourcis de votre installation si votre keymap diffère.</p>
+
+    <h2>3. Réaliser une première modification limitée</h2>
+    <p>Sur une branche dédiée, choisissez <strong>Agent</strong> dans une session Local ou Copilot <strong>Folder</strong> avec permissions manuelles. Évitez de démarrer par une session Worktree Copilot, qui utilise actuellement Allow all. Donnez un résultat mesurable :</p>
+    <pre><code>Ajoute un test pour le cas vide de cette fonction.
+Réutilise le framework et les conventions existants.
+Ne modifie pas l'API publique et n'ajoute pas de dépendance.
+Annonce les fichiers visés, puis demande les permissions nécessaires.
+Lance les tests ciblés et explique le diff obtenu.</code></pre>
+    <p>Relisez le diff et les résultats avant d'accepter. Une exécution réussie n'implique pas que le besoin métier est correctement couvert.</p>
+
+    <h2>4. Donner les repères du dépôt</h2>
+    <p>Créez un court <code>.github/copilot-instructions.md</code>, adapté au projet réel :</p>
+    <pre><code># Instructions du projet
+- Lis les conventions existantes avant de modifier un fichier.
+- Réutilise les commandes de test et de build documentées.
+- Préserve les API publiques sauf demande explicite.
+- Demande l'accord avant toute dépendance ou publication.
+- Ne place jamais de secret dans le code ou les journaux.</code></pre>
+    <p>Dans le CLI, <code>/init</code> peut proposer ces instructions. Relisez-les, versionnez seulement ce qui est juste, puis contrôlez leur chargement avec <code>/instructions</code>.</p>
+
+    <h2>Le vocabulaire à connaître</h2>
+    <table>
+      <thead><tr><th>Terme</th><th>Ce qu'il désigne</th></tr></thead>
+      <tbody>
+        <tr><td>Complétion / NES</td><td>Suggestion pendant la frappe / suggestion de la prochaine modification.</td></tr>
+        <tr><td>Ask / Plan / Agent</td><td>Comprendre / préparer / exécuter. Ce sont des modes ou agents, pas des garanties de permissions.</td></tr>
+        <tr><td>Instructions</td><td>Conventions durables du dépôt ou de l'utilisateur.</td></tr>
+        <tr><td>Prompt réutilisable</td><td>Une demande Local existante ; les .prompt.md ne sont plus chargés par Agent Host.</td></tr>
+        <tr><td>Agent personnalisé</td><td>Un rôle spécialisé, avec des instructions et des outils.</td></tr>
+        <tr><td>Skill</td><td>Une procédure réutilisable, avec éventuellement scripts et ressources.</td></tr>
+        <tr><td>MCP</td><td>Un protocole donnant accès à des outils ou données externes.</td></tr>
+        <tr><td>Fleet</td><td>La coordination de sous-agents en parallèle dans Copilot CLI.</td></tr>
+        <tr><td>AI credits</td><td>L'unité de consommation de la nouvelle facturation Copilot ; pas un nombre de prompts.</td></tr>
       </tbody>
     </table>
 
-    <p><strong>Raccourci magique :</strong> Sélectionnez du code + <code>Ctrl+I</code> (VS Code) pour un prompt contextuel.</p>
-
-    <hr>
-
-    <h1>Introduction et concepts clés</h1>
-
-    <h2>Qu'est-ce que GitHub Copilot ?</h2>
-
-    <p>GitHub Copilot est une <strong>suite d'outils d'assistance au développement</strong> basée sur l'IA, proposée par GitHub. Elle comprend plusieurs produits :</p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Produit</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>Copilot dans l'IDE</strong></td><td>Assistant intégré (VS Code, JetBrains, Visual Studio)</td></tr>
-        <tr><td><strong>Copilot CLI</strong></td><td>Assistant en ligne de commande</td></tr>
-        <tr><td><strong>Copilot sur github.com</strong></td><td>Chat web, revue de PR automatique</td></tr>
-        <tr><td><strong>Copilot API</strong></td><td>Pour intégrations custom</td></tr>
-        <tr><td><strong>Copilot Extensions</strong></td><td>Connexion à des outils tiers (MCP)</td></tr>
-      </tbody>
-    </table>
-
-    <blockquote>
-      Ce guide se concentre sur l'usage dans les IDE, qui représente le cœur de l'expérience développeur au quotidien. Une section couvre également Copilot CLI pour les usages terminal.
-    </blockquote>
-
-    <h2>Modes d'interaction dans l'IDE</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Mode</th>
-          <th>Description</th>
-          <th>Cas d'usage</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>Complétion inline</strong></td><td>Suggestions automatiques pendant la frappe</td><td>Code répétitif, patterns connus</td></tr>
-        <tr><td><strong>Copilot Chat</strong></td><td>Interface conversationnelle</td><td>Questions, refactoring, explications</td></tr>
-        <tr><td><strong>Mode Agent</strong></td><td>Exécution autonome multi-fichiers</td><td>Tâches complexes, génération de code</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Les 3 niveaux de configuration</h2>
-
-    <div class="config-levels">┌─────────────────────────────────────────────────────────┐
-│  Niveau 1 : Instructions projet                         │
-│  └── .github/copilot-instructions.md                    │
-│  └── .github/instructions/*.instructions.md             │
-│  └── .github/agents/*.md                                │
-├─────────────────────────────────────────────────────────┤
-│  Niveau 2 : Instructions personnelles                   │
-│  └── Paramètres IDE (settings.json, etc.)               │
-│  └── Fichiers globaux utilisateur                       │
-├─────────────────────────────────────────────────────────┤
-│  Niveau 3 : Prompts réutilisables                       │
-│  └── .github/prompts/*.prompt.md                        │
-└─────────────────────────────────────────────────────────┘</div>
-
-    <h2>Vocabulaire essentiel</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Terme</th>
-          <th>Définition</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>Custom Instructions</strong></td><td>Règles permanentes qui guident Copilot pour un projet ou utilisateur</td></tr>
-        <tr><td><strong>Agent</strong></td><td>Persona spécialisée avec un rôle précis (@test-agent, @docs-agent)</td></tr>
-        <tr><td><strong>Participant</strong></td><td>Contexte spécifique invoqué avec @ (@workspace, @terminal)</td></tr>
-        <tr><td><strong>Slash command</strong></td><td>Commande rapide préfixée par / (/explain, /fix, /tests)</td></tr>
-        <tr><td><strong>Prompt file</strong></td><td>Template de prompt réutilisable (.prompt.md)</td></tr>
-      </tbody>
-    </table>
+    <blockquote><strong>Les commandes ont un contexte.</strong> Tapez <code>/</code> dans VS Code pour ses actions et prompts disponibles. Tapez <code>/help</code> dans le CLI pour son propre catalogue. Ne copiez pas une commande de l'un en supposant qu'elle fonctionne dans l'autre.</blockquote>
+    <p><strong>Source :</strong> <a href="https://code.visualstudio.com/docs/copilot/setup" target="_blank" rel="noopener noreferrer">Configurer Copilot dans VS Code</a>.</p>
   </article>
 </body>
 </html>
