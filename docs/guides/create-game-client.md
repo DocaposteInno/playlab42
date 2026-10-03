@@ -106,6 +106,85 @@ import { SeededRandom } from '../../lib/seeded-random.js';
 import { RandomBot } from './bots/random.js';
 ```
 
+#### Cycle de vie du SDK
+
+Pour les clients qui utilisent GameKit, appeler `GameKit.init('mon-jeu')`
+une fois par session. `dispose()` retire les écouteurs internes, libère les
+assets et autorise une nouvelle initialisation. Le hook `onGameDispose`
+peut encore sauvegarder la progression avant cette libération.
+
+```javascript
+import GameKit from '../../lib/gamekit.js';
+import { initTheme, onThemeChange } from '../../lib/theme.js';
+
+const stopTheme = initTheme();
+const unsubscribe = onThemeChange(() => render());
+GameKit.init('mon-jeu');
+
+window.onGameDispose = () => {
+  if (!GameKit.saveProgress(state)) {
+    console.error('La progression n’a pas pu être sauvegardée.');
+  }
+  unsubscribe();
+  stopTheme();
+};
+```
+
+L'initialisation du thème est idempotente ; son nettoyage ne retire pas les
+abonnements créés séparément avec `onThemeChange`. `syncTheme()` applique une
+préférence déjà importée sans écrire dans le stockage.
+
+Les chemins relatifs d'assets sont résolus depuis le dossier du jeu, en
+conservant le préfixe de déploiement du site. Les URLs absolues, `data:` et
+`blob:` restent explicites. Une promesse de chargement encore en cours
+rejette lors du nettoyage : le client doit traiter cette annulation.
+
+Les types du protocole portail/jeu sont disponibles dans `lib/types/` pour
+les consommateurs TypeScript, sans imposer TypeScript aux clients HTML.
+Les helpers de scores et progression conservent leur API publique ; une
+erreur de lecture est signalée et ne supprime plus les données corrompues.
+Voir [Données locales](local-data.md) pour la sauvegarde et la restauration.
+
+#### Jeux temps réel : horloge, pause et entrées
+
+La boucle d'animation appartient au client ; le moteur ne lit ni `Date.now()`,
+ni `performance.now()`, ni un timer du navigateur. Transmettre la durée simulée
+par une action propre au jeu, par exemple `{ type: 'tick', delta: 100 }`, et
+conserver dans l'état JSON les délais qui influencent les règles. Cela permet
+de rejouer exactement une partie et de reprendre après sérialisation.
+
+Définir l'unité et les bornes du delta, le comportement d'un tick qui traverse
+plusieurs événements et leur priorité en cas de simultanéité. Tester les limites
+exactes d'un chronomètre ou d'un délai de verrouillage ; ne pas compter les frames
+comme si tous les écrans avaient la même fréquence.
+
+En pause, arrêter la consommation de temps simulé et vider les commandes maintenues.
+À la reprise, réinitialiser la référence temporelle de la boucle pour ne pas
+appliquer la durée passée dans un autre onglet. GameKit appelle `onGameResume`
+au retour de visibilité : le client doit choisir délibérément entre reprise
+automatique et reprise manuelle, notamment pour un jeu où une pièce peut tomber.
+Une interruption longue de rendu mérite elle aussi une politique explicite :
+pause, rattrapage borné ou simulation complète, selon les règles du jeu.
+
+Libérer les touches et pointeurs lors de `blur`, `pointercancel`, perte de capture,
+pause et démontage. Ne pas dépendre de la répétition clavier du système pour
+cadencer une commande de jeu. À `onGameDispose`, annuler la frame planifiée,
+retirer les écouteurs du client et libérer les ressources audio : le nettoyage
+interne du SDK ne nettoie pas automatiquement la boucle propre au jeu.
+
+Séparer les records par objectif. Un score maximal et un meilleur temps minimal
+ne peuvent pas utiliser le même tri décroissant. Garder un petit format versionné
+propre au jeu via `saveProgress`, traiter sa valeur de retour et rendre visibles
+les échecs de sauvegarde. Ne pas effacer un stockage corrompu ou futur pour forcer
+une nouvelle écriture ; consulter le guide [Données locales](local-data.md).
+
+Ajouter les scénarios navigateur dans `e2e/` avec les fixtures existantes :
+action réelle, maintien puis relâchement, perte de focus, temps figé en pause,
+reprise volontaire si choisie, fin de partie, utilisation à petite largeur et
+arrêt lors du message `unload`. Les tests d'un moteur pur ne prouvent pas ces
+contrats du client, et une vérification temporaire non versionnée ne les protège
+pas dans la CI.
+
 ### 4. Gérer l'état du client
 
 ```javascript

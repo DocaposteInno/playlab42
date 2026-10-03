@@ -46,6 +46,8 @@ export class ScoreRenderer {
 
     /** @type {boolean} Prêt pour le rendu */
     this.ready = false;
+    this._disposed = false;
+    this._initPromise = null;
 
     /** @type {Object|null} Couleurs de highlight */
     this.highlightColor = null;
@@ -60,13 +62,34 @@ export class ScoreRenderer {
    *
    * @returns {Promise<void>}
    */
-  async init() {
-    if (this.ready) {return;}
+  init() {
+    if (this._disposed) {
+      return Promise.reject(new Error('Renderer détruit'));
+    }
+    if (this.ready) {return Promise.resolve();}
+    if (!this._initPromise) {
+      this._initPromise = this._initialize().finally(() => {
+        this._initPromise = null;
+      });
+    }
+    return this._initPromise;
+  }
 
+  async _initialize() {
     try {
       // Charger VexFlow dynamiquement
       const vexflow = await import('vexflow');
-      this.VF = vexflow.Vex?.Flow || vexflow.Flow || vexflow;
+      this.VF = vexflow;
+      // L'entrée complète embarque les fontes ; loadFonts() utiliserait un CDN.
+      const fonts = await Promise.all([
+        document.fonts.load('16px Bravura'),
+        document.fonts.load('16px Academico'),
+      ]);
+      if (fonts.some((faces) => faces.length === 0)) {
+        throw new Error('Fontes musicales locales indisponibles');
+      }
+      if (this._disposed) {throw new Error('Renderer détruit');}
+      vexflow.VexFlow.setFonts('Bravura', 'Academico');
 
       // Créer le renderer
       this._createRenderer();
@@ -274,7 +297,7 @@ export class ScoreRenderer {
    * @private
    */
   _formatAndDraw(staveNotes) {
-    const voice = new this.VF.Voice({ num_beats: 4, beat_value: 4 });
+    const voice = new this.VF.Voice({ numBeats: 4, beatValue: 4 });
     voice.setMode(this.VF.Voice.Mode.SOFT);
     voice.addTickables(staveNotes);
 
@@ -377,6 +400,7 @@ export class ScoreRenderer {
    * Nettoie et libère les ressources
    */
   dispose() {
+    this._disposed = true;
     this.container.innerHTML = '';
     this.renderer = null;
     this.context = null;

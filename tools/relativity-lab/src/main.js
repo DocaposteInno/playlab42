@@ -280,6 +280,8 @@ class App {
 
     const icon = playBtn.querySelector('.play-button-icon');
     const text = playBtn.querySelector('.play-button-text');
+    playBtn.setAttribute('aria-pressed', String(playing));
+    playBtn.setAttribute('aria-label', playing ? 'Mettre en pause la simulation' : 'Lire la simulation');
 
     if (playing) {
       playBtn.classList.add('play-button--running');
@@ -298,7 +300,7 @@ class App {
   #setupKeyboard() {
     document.addEventListener('keydown', (e) => {
       // Ignorer si on est dans un champ de saisie
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if ((e.target instanceof Element && e.target.closest('input, textarea, select, button, [contenteditable="true"]')) || e.altKey || e.ctrlKey || e.metaKey) {
         return;
       }
 
@@ -441,7 +443,7 @@ function initApp() {
       const container = document.getElementById('canvas-container');
       if (container) {
         container.innerHTML = `
-          <div style="
+          <div role="alert" style="
             display: flex;
             flex-direction: column;
             align-items: center;

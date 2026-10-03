@@ -1,14 +1,15 @@
 {
   "id": "github-copilot-guide",
   "title": "GitHub Copilot — Guide du développeur",
-  "description": "Guide complet pour maîtriser GitHub Copilot : présentation du service, autocomplétion, configuration projet, agents spécialisés, techniques de prompting, MCP et bonnes pratiques.",
+  "description": "De la première suggestion aux workflows avancés : VS Code, Copilot CLI, instructions, skills, agents, Fleet, MCP, AI credits et ateliers pour débutants et développeurs confirmés.",
   "hierarchy": ["playlab42"],
   "order": 2,
-  "tags": ["copilot", "ia", "productivité", "ide", "guide", "mcp"],
+  "tags": ["copilot", "ia", "productivité", "ide", "guide", "mcp", "cli", "skills", "agents"],
   "metadata": {
     "author": "Playlab42",
     "created": "2025-12-15",
-    "duration": "60 min",
+    "updated": "2026-10-03",
+    "duration": "90 min",
     "difficulty": "intermediate"
   },
   "icon": "🤖",
@@ -19,11 +20,15 @@
     { "id": "02-autocompletion" },
     { "id": "02-configuration-projet" },
     { "id": "03-agents-specialises" },
+    { "id": "09-skills" },
     { "id": "04-configuration-ide" },
     { "id": "05-prompting" },
     { "id": "06-bonnes-pratiques" },
     { "id": "08-mcp" },
-    { "id": "07-cli-annexes" }
+    { "id": "07-cli-annexes" },
+    { "id": "10-fleet" },
+    { "id": "11-facturation" },
+    { "id": "12-ateliers" }
   ],
   "bookmarks": [
     {
@@ -48,11 +53,32 @@
       "tags": ["copilot", "cli", "terminal"]
     },
     {
-      "url": "https://opencode.ai",
-      "title": "OpenCode",
-      "description": "Agent IA terminal open-source",
-      "icon": "🔓",
-      "tags": ["opencode", "cli", "open-source"]
+      "url": "https://code.visualstudio.com/docs/copilot/overview",
+      "title": "Copilot dans VS Code",
+      "description": "Documentation officielle des agents et de leur personnalisation dans VS Code",
+      "icon": "💻",
+      "tags": ["copilot", "vscode", "agents"]
+    },
+    {
+      "url": "https://code.visualstudio.com/docs/agent-customization/agent-skills",
+      "title": "Agent Skills dans VS Code",
+      "description": "Format SKILL.md, découverte et usage des procédures réutilisables",
+      "icon": "🧩",
+      "tags": ["copilot", "skills", "vscode"]
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/concepts/billing-and-usage/individuals/billing",
+      "title": "Copilot : AI credits et facturation",
+      "description": "Offres individuelles, allocations de crédits et consommation supplémentaire",
+      "icon": "💳",
+      "tags": ["copilot", "facturation"]
+    },
+    {
+      "url": "https://code.visualstudio.com/updates/v1_140",
+      "title": "VS Code 1.140 — septembre 2026",
+      "description": "Nouveautés du harness Copilot, sessions Agent Host et configuration portable",
+      "icon": "🆕",
+      "tags": ["copilot", "vscode", "agents"]
     },
     {
       "url": "https://modelcontextprotocol.io",

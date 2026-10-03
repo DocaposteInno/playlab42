@@ -7,8 +7,8 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../../parcours/_shared/mathjax-config.js"></script>
+    <script id="MathJax-script" async src="../../../../../assets/vendor/mathjax/tex-mml-chtml.js"></script>
 
     <script type="module">
         import { initSlide, initGlossary, sendTOC, setupScrollHandler } from '../../../../../parcours/_shared/slide-utils.js';
@@ -230,7 +230,7 @@
                 <div class="my-6 p-4 dl-card rounded-xl border">
                     <h4 class="font-bold dl-accent-blue mb-3 text-center">Courbes d'Apprentissage</h4>
                     <div class="flex flex-col items-center">
-                        <canvas id="learningCurvesCanvas" width="600" height="220" class="rounded-lg" style="max-width: 600px;"></canvas>
+                        <canvas id="learningCurvesCanvas" width="600" height="220" class="rounded-lg" role="img" aria-label="Courbes d'apprentissage : sous-apprentissage, équilibre et sur-apprentissage" style="max-width: 600px;"></canvas>
                         <div class="flex gap-6 mt-3">
                             <div class="flex items-center gap-2">
                                 <span class="inline-block w-4 h-1 rounded" style="background: #22d3ee;"></span>

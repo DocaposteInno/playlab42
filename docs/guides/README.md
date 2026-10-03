@@ -1,16 +1,53 @@
 # Guides Playlab42
 
-Bienvenue dans les guides de développement Playlab42. Ces guides vous accompagnent pas à pas pour créer vos propres outils et jeux.
+Une idée, un premier outil, un jeu à construire : choisissez le guide qui
+correspond à votre prochaine étape. Les exemples et contrats techniques restent
+dans leurs guides de référence, sans copie à maintenir.
 
-## Guides disponibles
+## Lire dans le laboratoire
+
+Depuis le portail, ouvrez **Les guides** : les documents sont présentés dans un
+lecteur HTML avec un plan, des liens de section et les thèmes du laboratoire.
+Les liens entre documents restent dans ce lecteur. Le lien **Lire la source
+Markdown** permet de retrouver chaque fichier canonique.
+
+Le site est généré dans `docs/site/`, sans backend, CDN ou iframe :
+
+```bash
+# Dans le worktree, via le conteneur de développement
+make build-guides
+make serve
+```
+
+`make build-guides` exécute `node scripts/build-guides.js` dans Docker.
+Ne modifiez pas les pages générées : éditez les Markdown sous `docs/`, puis
+régénérez. Un fichier Markdown hors de `docs/` est signalé comme **source
+Markdown**, et non présenté comme une page du lecteur.
+
+## Prendre ses repères
+
+- [Architecture](architecture.md) : comprendre les composants et leurs limites.
+- [Premiers pas](../GETTING_STARTED.md) : préparer l'environnement Docker.
+- [Contribuer](contributing.md) : connaître le workflow et les vérifications.
+
+## Créer une contribution
 
 | Guide | Description | Niveau |
 |-------|-------------|--------|
-| [Architecture](architecture.md) | Vue d'ensemble de la plateforme | Tous |
+| [Kit de contribution](contribution-kit.md) | Gabarits, composants partagés et galerie UI | Tous |
 | [Créer un outil](create-tool.md) | Créer un outil HTML standalone | Débutant |
+| [Créer un parcours](create-epic.md) | Organiser des slides pédagogiques en Epic | Débutant |
 | [Créer un moteur de jeu](create-game-engine.md) | Créer un moteur isomorphe | Intermédiaire |
 | [Créer un client de jeu](create-game-client.md) | Créer une interface de jeu | Intermédiaire |
 | [Créer un bot](create-bot.md) | Créer une IA pour un jeu | Avancé |
+
+## Vérifier et travailler avec l'IA
+
+- [Stratégie de tests](../TESTING_STRATEGY.md) : choisir les preuves adaptées.
+- [Skills du projet](project-skills.md) : utiliser les assistants avec les mêmes conventions.
+- [Workflow OpenSpec](openspec-workflow.md) : clarifier et suivre un changement.
+- [Données locales](local-data.md) : comprendre la persistance navigateur.
+- [Bibliothèques runtime](runtime-libraries.md) : utiliser les distributions locales.
 
 ## Par où commencer ?
 
@@ -50,6 +87,6 @@ make shell
 
 ## Ressources
 
-- [Spécifications techniques](../../openspec/specs/)
+- [Spécification du portail](../../openspec/specs/portal/spec.md)
 - [Conventions du projet](../../openspec/project.md)
-- [Exemples existants](../../tools/) et [jeux](../../games/)
+- [Exemples d'interface](../../tools/ui-kit/index.html) et [de jeu](../../games/tictactoe/index.html)

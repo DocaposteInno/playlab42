@@ -1,134 +1,239 @@
 /**
  * @jest-environment jsdom
  *
- * Tests: app/bookmarks.js - showBookmarkPreview (vignette de la preview)
- *
- * La preview est un élément unique (#bookmark-preview, cf. index.html) réutilisé
- * d'un survol à l'autre : ces tests couvrent le repli emoji et la course entre
- * deux survols successifs.
+ * Bibliothèque de liens : cartes, navigation, recherche et états de chargement.
  */
 
-import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import { readFileSync } from 'node:fs';
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 
-// Mocks ESM : unstable_mockModule + import dynamique (cf. jest.config.js)
-const preview = document.createElement('div');
-preview.innerHTML = `
-  <div class="bookmark-preview-image"></div>
-  <div class="bookmark-preview-content">
-    <h4 class="bookmark-preview-title"></h4>
-    <p class="bookmark-preview-description"></p>
-    <span class="bookmark-preview-domain"></span>
-  </div>
-`;
-
-const el = { bookmarkPreview: preview };
-const state = { bookmarksCatalogue: null, bookmarkTag: null, searchQuery: '' };
-
-jest.unstable_mockModule('./state.js', () => ({ state, setState: jest.fn() }));
+const state = { bookmarksCatalogue: null, bookmarkTagFilter: null, activeTab: 'bookmarks' };
+const el = {};
+const originalFetch = globalThis.fetch;
+jest.unstable_mockModule('./state.js', () => ({
+  state,
+  setState: updates => Object.assign(state, updates),
+}));
 jest.unstable_mockModule('./dom-cache.js', () => ({ el }));
 
-const actualDom = await import('../lib/dom.js');
-jest.unstable_mockModule('../lib/dom.js', () => ({
-  ...actualDom,
-  cloneTemplate: () => document.createDocumentFragment(),
-}));
+const {
+  renderBookmarks, selectBookmarkTag, loadBookmarksCatalogue, showBookmarkPreview, hideBookmarkPreview,
+} = await import('./bookmarks.js');
 
-const { showBookmarkPreview } = await import('./bookmarks.js');
+const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const templates = ['bookmark-category-template', 'bookmark-item-template']
+  .map(id => index.match(new RegExp(`<template id="${id}">[\\s\\S]*?</template>`))[0]).join('');
 
-const imageEl = () => preview.querySelector('.bookmark-preview-image');
-
-/** Ancre minimale : showBookmarkPreview appelle getBoundingClientRect() */
-function anchor() {
-  const a = document.createElement('a');
-  a.getBoundingClientRect = () => ({ top: 0, left: 0, right: 100, bottom: 20, width: 100, height: 20 });
-  return a;
+/**
+ * Petit catalogue couvrant les métadonnées éditoriales et enrichies.
+ * @returns {Object} Catalogue indépendant pour chaque test
+ */
+function catalogue() {
+  return {
+    tags: [{ id: 'ide', count: 1 }, { id: 'cli', count: 1 }],
+    categories: [
+      {
+        id: 'coding-tools', label: 'Outils de Coding IA',
+        bookmarks: [{
+          title: 'Cursor', displayTitle: 'Cursor — présentation enrichie',
+          description: 'Éditeur de code IA-native basé sur VS Code',
+          displayDescription: 'Une présentation enrichie pour développer',
+          url: 'https://cursor.com', domain: 'cursor.com', tags: ['ide', 'ia-native'],
+        }],
+      },
+      {
+        id: 'resources', label: 'Ressources & Formation',
+        bookmarks: [{
+          title: 'Aider', description: 'Programmation en terminal',
+          url: 'https://aider.chat', domain: 'aider.chat', tags: ['cli'],
+        }],
+      },
+    ],
+  };
 }
 
-const bookmarkA = {
-  title: 'Bookmark A',
-  domain: 'a.example',
-  icon: '🅰️',
-  meta: { ogImage: 'data/bookmarks-images/a.png' },
-};
+beforeEach(() => {
+  document.body.innerHTML = `${templates}
+    <input id="search"><div id="bookmark-filters"></div>
+    <div id="bookmark-tree"></div><p id="empty-bookmarks"></p>
+    <p id="catalogue-status"></p><div id="bookmark-preview" class="visible"></div>`;
+  Object.assign(el, {
+    search: document.getElementById('search'),
+    bookmarkFilters: document.getElementById('bookmark-filters'),
+    bookmarkTree: document.getElementById('bookmark-tree'),
+    emptyBookmarks: document.getElementById('empty-bookmarks'),
+    bookmarkPreview: document.getElementById('bookmark-preview'),
+  });
+  Object.assign(state, { bookmarksCatalogue: catalogue(), bookmarkTagFilter: null, activeTab: 'bookmarks' });
+});
 
-const bookmarkB = {
-  title: 'Bookmark B',
-  domain: 'b.example',
-  icon: '🅱️',
-  meta: { ogImage: 'data/bookmarks-images/b.png' },
-};
+afterEach(() => {
+  jest.restoreAllMocks();
+  globalThis.fetch = originalFetch;
+});
 
-describe('bookmarks: showBookmarkPreview', () => {
-  beforeEach(() => {
-    imageEl().textContent = '';
+describe('bibliothèque de liens', () => {
+  it('rend chaque ressource avec son texte utile et un lien externe natif', () => {
+    renderBookmarks();
+    const links = el.bookmarkTree.querySelectorAll('.bookmark-item a');
+    expect(links).toHaveLength(2);
+    expect(links[0].href).toBe('https://cursor.com/');
+    expect(links[0].target).toBe('_blank');
+    expect(links[0].rel).toContain('noopener');
+    expect(links[0].querySelector('.bookmark-title').textContent).toBe('Cursor');
+    expect(links[0].textContent).toContain('Éditeur de code');
+    expect(links[0].textContent).toContain('cursor.com');
+    expect(links[0].textContent).toContain('Nouvelle fenêtre');
+    expect(links[0].hasAttribute('data-bookmark')).toBe(false);
+    expect(el.bookmarkTree.querySelector('.bookmark-icon, .bookmark-category-icon, img')).toBeNull();
+    expect(document.getElementById('catalogue-status').textContent).toBe('2 liens');
   });
 
-  it('affiche une <img> pour un bookmark avec image OG', () => {
-    showBookmarkPreview(bookmarkA, anchor());
-    const img = imageEl().querySelector('img');
-
-    expect(img).not.toBeNull();
-    expect(img.getAttribute('src')).toBe('data/bookmarks-images/a.png');
-    expect(img.alt).toBe('Aperçu de Bookmark A');
-    expect(img.loading).toBe('lazy');
-    expect(img.decoding).toBe('async');
+  it('utilise les métadonnées enrichies et le domaine URL en repli', () => {
+    const bookmark = state.bookmarksCatalogue.categories[0].bookmarks[0];
+    delete bookmark.title;
+    delete bookmark.description;
+    delete bookmark.domain;
+    renderBookmarks();
+    expect(el.bookmarkTree.querySelector('.bookmark-title').textContent).toBe('Cursor — présentation enrichie');
+    expect(el.bookmarkTree.querySelector('.bookmark-description').textContent).toContain('présentation enrichie');
+    expect(el.bookmarkTree.querySelector('.bookmark-domain').textContent).toBe('cursor.com');
   });
 
-  it("ne déclare pas de dimensions intrinsèques (l'image OG est distante)", () => {
-    showBookmarkPreview(bookmarkA, anchor());
-    const img = imageEl().querySelector('img');
-
-    expect(img.getAttribute('width')).toBeNull();
-    expect(img.getAttribute('height')).toBeNull();
+  it('propose des ancres de catégories dont les titres reçoivent le focus', () => {
+    renderBookmarks();
+    const nav = el.bookmarkTree.querySelector('nav');
+    const options = el.bookmarkTree.querySelector('.bookmark-navigation-disclosure');
+    expect(options.open).toBe(false);
+    options.open = true;
+    expect(nav.getAttribute('aria-label')).toBe('Catégories de liens');
+    expect(nav.querySelectorAll('a')).toHaveLength(2);
+    const link = nav.querySelector('a');
+    expect(link.getAttribute('href')).toBe('#bookmark-category-coding-tools-title');
+    link.click();
+    expect(options.open).toBe(false);
+    const heading = document.getElementById('bookmark-category-coding-tools-title');
+    expect(document.activeElement).toBe(heading);
+    expect(heading.textContent).toContain('1 lien');
+    expect(document.getElementById('bookmark-category-coding-tools').getAttribute('aria-labelledby')).toBe(heading.id);
   });
 
-  it("affiche l'emoji du bookmark quand il n'y a pas d'image OG", () => {
-    showBookmarkPreview({ title: 'Sans image', domain: 'c.example', icon: '📘' }, anchor());
-
-    expect(imageEl().querySelector('img')).toBeNull();
-    expect(imageEl().textContent).toBe('📘');
+  it('cherche tous les mots sans accents, indépendamment de leur ordre', () => {
+    el.search.value = '  CODE editeur  ';
+    renderBookmarks();
+    expect(el.bookmarkTree.querySelectorAll('.bookmark-item')).toHaveLength(1);
+    expect(el.bookmarkTree.textContent).toContain('Cursor');
+    el.search.value = 'éditeur absent';
+    renderBookmarks();
+    expect(el.bookmarkTree.querySelectorAll('.bookmark-item')).toHaveLength(0);
   });
 
-  it("utilise l'emoji par défaut quand le bookmark n'a pas d'icône", () => {
-    showBookmarkPreview({ title: 'Sans icône', domain: 'd.example' }, anchor());
-
-    expect(imageEl().textContent).toBe('🔖');
+  it('recherche aussi dans domaines, tags, catégories et métadonnées enrichies', () => {
+    for (const query of ['CURSOR.COM', 'ia-native', 'coding', 'presentation developper']) {
+      el.search.value = query;
+      renderBookmarks();
+      expect(el.bookmarkTree.querySelectorAll('.bookmark-item')).toHaveLength(1);
+      expect(el.bookmarkTree.textContent).toContain('Cursor');
+    }
   });
 
-  it("remplace l'image en erreur par l'emoji tant qu'elle est affichée", () => {
-    showBookmarkPreview(bookmarkA, anchor());
-    const imgA = imageEl().querySelector('img');
-
-    imgA.onerror();
-
-    expect(imageEl().textContent).toBe('🅰️');
+  it('combine le tag et la recherche puis remet le tag à zéro', () => {
+    selectBookmarkTag('cli');
+    expect(el.bookmarkTree.querySelectorAll('.bookmark-item')).toHaveLength(1);
+    expect(el.bookmarkFilters.querySelector('[data-tag="cli"]').getAttribute('aria-pressed')).toBe('true');
+    el.search.value = 'cursor';
+    renderBookmarks();
+    expect(el.emptyBookmarks.classList.contains('visible')).toBe(true);
+    selectBookmarkTag(null);
+    expect(el.bookmarkTree.querySelectorAll('.bookmark-item')).toHaveLength(1);
+    expect(el.emptyBookmarks.classList.contains('visible')).toBe(false);
   });
 
-  it("neutralise le handler de l'image précédente au survol suivant", () => {
-    showBookmarkPreview(bookmarkA, anchor());
-    const imgA = imageEl().querySelector('img');
-
-    showBookmarkPreview(bookmarkB, anchor());
-
-    expect(imgA.onerror).toBeNull();
+  it('conserve le bouton et le focus pendant le filtre et la recherche', () => {
+    renderBookmarks();
+    const button = el.bookmarkFilters.querySelector('[data-tag="ide"]');
+    button.focus();
+    selectBookmarkTag('ide');
+    el.search.value = 'code';
+    renderBookmarks();
+    expect(document.activeElement).toBe(button);
+    expect(el.bookmarkFilters.querySelector('[data-tag="ide"]')).toBe(button);
+    el.search.focus();
+    renderBookmarks();
+    expect(document.activeElement).toBe(el.search);
   });
 
-  it("n'écrase pas la preview suivante quand l'erreur arrive après un autre survol", () => {
-    showBookmarkPreview(bookmarkA, anchor());
-    const imgA = imageEl().querySelector('img');
-    // Capturé avant le survol suivant : simule une requête déjà en vol dont le
-    // handler a été planifié, garde de parentNode comprise.
-    const onErrorA = imgA.onerror;
+  it('ne tronque pas les tags au dixième filtre', () => {
+    state.bookmarksCatalogue.tags = Array.from({ length: 12 }, (_, index) => ({ id: `tag-${index}`, count: 1 }));
+    renderBookmarks();
+    expect(el.bookmarkFilters.querySelectorAll('button')).toHaveLength(13);
+    expect(el.bookmarkFilters.querySelector('[data-tag="tag-11"]')).not.toBeNull();
+  });
 
-    // Survol de B avant l'expiration de la requête de A
-    showBookmarkPreview(bookmarkB, anchor());
-    const imgB = imageEl().querySelector('img');
+  it('distingue indisponibilité, catalogue vide et sélection sans résultat', () => {
+    state.bookmarksCatalogue = null;
+    renderBookmarks();
+    expect(el.emptyBookmarks.textContent).toContain('indisponibles');
+    expect(el.emptyBookmarks.classList.contains('visible')).toBe(true);
+    expect(el.emptyBookmarks.getAttribute('role')).toBe('alert');
+    expect(document.getElementById('catalogue-status').textContent).toBe('Liens indisponibles');
+    state.bookmarksCatalogue = { categories: [], tags: [] };
+    renderBookmarks();
+    expect(el.emptyBookmarks.hasAttribute('role')).toBe(false);
+    expect(el.emptyBookmarks.textContent).toBe('Aucun lien disponible pour le moment.');
+    state.bookmarksCatalogue = catalogue();
+    el.search.value = 'aucune-correspondance';
+    renderBookmarks();
+    expect(el.emptyBookmarks.textContent).toContain('ne correspond');
+    expect(el.bookmarkTree.children).toHaveLength(0);
+    expect(document.getElementById('catalogue-status').textContent).toBe('0 liens');
+  });
 
-    // L'erreur de A arrive ensuite, sur un nœud désormais détaché
-    onErrorA();
+  it('nettoie les cartes précédentes après une indisponibilité', () => {
+    renderBookmarks();
+    state.bookmarksCatalogue = null;
+    renderBookmarks();
+    expect(el.bookmarkTree.children).toHaveLength(0);
+    expect(el.bookmarkFilters.querySelectorAll('button')).toHaveLength(1);
+  });
 
-    expect(imageEl().querySelector('img')).toBe(imgB);
-    expect(imgB.getAttribute('src')).toBe('data/bookmarks-images/b.png');
-    expect(imageEl().textContent).not.toBe('🅰️');
+  it("n'écrase pas le compteur de l'onglet actif en arrière-plan", () => {
+    state.activeTab = 'games';
+    document.getElementById('catalogue-status').textContent = '8 jeux';
+    renderBookmarks();
+    expect(document.getElementById('catalogue-status').textContent).toBe('8 jeux');
+  });
+
+  it('désactive les appels historiques de preview', () => {
+    showBookmarkPreview({ title: 'Cursor' }, document.createElement('a'));
+    expect(el.bookmarkPreview.classList.contains('visible')).toBe(false);
+    expect(el.bookmarkPreview.getAttribute('aria-hidden')).toBe('true');
+    el.bookmarkPreview = null;
+    expect(() => hideBookmarkPreview()).not.toThrow();
+  });
+});
+
+describe('chargement du catalogue des liens', () => {
+  it('charge le catalogue disponible', async () => {
+    const data = catalogue();
+    globalThis.fetch = jest.fn().mockResolvedValue({ ok: true, json: jest.fn().mockResolvedValue(data) });
+    await loadBookmarksCatalogue();
+    expect(globalThis.fetch).toHaveBeenCalledWith('./data/bookmarks.json');
+    expect(state.bookmarksCatalogue).toBe(data);
+  });
+
+  it.each([
+    ['HTTP', () => Promise.resolve({ ok: false })],
+    ['réseau', () => Promise.reject(new Error('hors ligne'))],
+    ['JSON', () => Promise.resolve({ ok: true, json: jest.fn().mockRejectedValue(new Error('JSON invalide')) })],
+    ['format', () => Promise.resolve({ ok: true, json: jest.fn().mockResolvedValue({}) })],
+    ['catégorie invalide', () => Promise.resolve({ ok: true, json: jest.fn().mockResolvedValue({ categories: [{}] }) })],
+  ])('rend explicite une erreur %s', async (_name, response) => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    globalThis.fetch = jest.fn().mockImplementation(response);
+    await loadBookmarksCatalogue();
+    expect(state.bookmarksCatalogue).toBeNull();
+    renderBookmarks();
+    expect(el.emptyBookmarks.textContent).toContain('indisponibles');
   });
 });

@@ -1,0 +1,8 @@
+/* Mise en page de la galerie ; les composants viennent de lib/components.css. */
+.gallery-container { max-width: 72rem; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr)); gap: var(--space-lg); align-items: start; }
+h1, h2, h3 { line-height: 1.25; overflow-wrap: anywhere; }
+h2 { margin-top: 0; }
+a { color: var(--color-accent); }
+.preview-card { background: var(--color-bg-secondary); }
+.preview-card.compact { max-width: 22rem; }

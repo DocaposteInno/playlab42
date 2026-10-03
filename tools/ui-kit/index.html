@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galerie UI Playlab42</title>
+  <link rel="stylesheet" href="../../lib/theme.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
+  <link rel="stylesheet" href="../../lib/components.css">
+  <link rel="stylesheet" href="gallery.css">
+</head>
+<body class="ui-page">
+  <a class="ui-skip-link" href="#main">Aller aux composants</a>
+  <header class="ui-header ui-container gallery-container">
+    <div><h1>Galerie UI Playlab42</h1><p>Composer un outil, un jeu ou une slide avec les primitives existantes.</p></div>
+    <div><label class="ui-label" for="theme">Thème</label>
+      <select class="ui-field" id="theme">
+        <option value="system">Système</option><option value="light">Clair</option><option value="dark">Sombre</option>
+      </select>
+    </div>
+  </header>
+  <main class="ui-container gallery-container" id="main" tabindex="-1">
+    <p>Parcourez cette page avec Tab et Maj+Tab : le focus visible vient de <code>lib/ui.css</code>.
+      Entrée et Espace activent les boutons ; Échap ferme le dialogue. Les animations respectent les préférences de mouvement réduit.</p>
+    <div class="gallery-grid">
+      <section class="ui-card" aria-labelledby="buttons-title">
+        <h2 id="buttons-title">Boutons et états</h2>
+        <div class="ui-actions">
+          <button id="primary" class="ui-button ui-button-primary" type="button">Action principale</button>
+          <button class="ui-button" id="secondary" type="button">Action secondaire</button>
+          <button class="ui-button" type="button" disabled>Action indisponible</button>
+        </div>
+        <p id="button-status" class="ui-status" role="status" aria-live="polite">Prêt : choisissez une action.</p>
+        <p>Le bouton désactivé n'entre pas dans l'ordre de tabulation. Aucun état ne dépend seulement d'une couleur.</p>
+      </section>
+      <section class="ui-card" aria-labelledby="form-title">
+        <h2 id="form-title">Formulaire et carte de prévisualisation</h2>
+        <form class="ui-form" id="preview-form">
+          <label class="ui-label" for="card-title">Titre de la carte (obligatoire)</label>
+          <input class="ui-field" id="card-title" name="title" maxlength="80" required value="Ma contribution" aria-describedby="title-help">
+          <p id="title-help" class="ui-help">Un titre clair, de 1 à 80 caractères, sans HTML interprété.</p>
+          <label class="ui-label" for="kind">Type de contribution</label>
+          <select class="ui-field" id="kind" name="kind"><option>Outil</option><option>Jeu</option><option>Parcours</option></select>
+          <label class="ui-label" for="description">Description</label>
+          <textarea class="ui-field" id="description" name="description" rows="3" maxlength="240">Une expérience courte et utile.</textarea>
+          <label class="ui-label" for="spacing">Espacement de la carte : <output id="spacing-value" for="spacing">16</output> px</label>
+          <input class="ui-field" id="spacing" type="range" min="8" max="32" step="4" value="16">
+          <fieldset class="ui-fieldset"><legend>Statut de la contribution</legend>
+            <label class="ui-choice"><input type="radio" name="status" value="Brouillon" checked> Brouillon</label>
+            <label class="ui-choice"><input type="radio" name="status" value="Prête à relire"> Prête à relire</label>
+          </fieldset>
+          <label class="ui-choice"><input id="compact" type="checkbox"> Réduire la largeur de la carte</label>
+          <button class="ui-button ui-button-primary" type="submit">Appliquer à la carte</button>
+          <p class="ui-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="ui-card" aria-labelledby="preview-title">
+        <h2 id="preview-title">Résultat interactif</h2>
+        <article id="preview" class="ui-card preview-card">
+          <p id="preview-kind" class="ui-badge">Outil</p>
+          <h3 id="preview-name">Ma contribution</h3>
+          <p id="preview-description">Une expérience courte et utile.</p>
+          <p id="preview-state">Statut : Brouillon</p>
+          <button class="ui-button" id="open-dialog" type="button">Inspecter dans un dialogue</button>
+        </article>
+        <p>La carte utilise les couleurs, espacements et rayons de <code>lib/theme.css</code>, sans palette concurrente.</p>
+        <p class="ui-status ui-status-success">Succès : carte disponible.</p>
+        <p class="ui-status ui-status-warning">Attention : contenu d'exemple à personnaliser.</p>
+        <p class="ui-status ui-status-error">Erreur d'exemple : un champ obligatoire manque.</p>
+      </section>
+      <section class="ui-card" aria-labelledby="tokens-title">
+        <h2 id="tokens-title">Inspecteur de tokens</h2>
+        <label class="ui-label" for="token">Variable CSS partagée</label>
+        <select class="ui-field" id="token">
+          <option>--color-bg</option><option>--color-text</option><option>--color-accent</option>
+          <option>--color-border</option><option>--space-md</option><option>--radius-lg</option>
+        </select>
+        <p>Valeur effective : <output id="token-value" for="token"></output></p>
+        <pre class="ui-code"><code id="token-code"></code></pre>
+        <button class="ui-button" id="download" type="button">Télécharger cette règle CSS</button>
+        <p class="ui-status" id="download-status" role="status" aria-live="polite"></p>
+        <p>Les mêmes classes <code>ui-*</code> de <code>lib/components.css</code> équipent cette galerie et les gabarits jeu, outil et epic.</p>
+        <p><a href="../../lib/theme.css">Lire les tokens</a> · <a href="../../lib/ui.css">Lire les primitives</a> · <a href="../../lib/components.css">Lire les composants</a></p>
+      </section>
+    </div>
+  </main>
+  <dialog class="ui-dialog" id="inspector" aria-labelledby="dialog-title" aria-describedby="dialog-help">
+    <h2 id="dialog-title">Inspecter la carte</h2>
+    <p id="dialog-help">Dialogue natif : focus contenu, fermeture avec Échap et retour au bouton d'ouverture.</p>
+    <pre class="ui-code"><code id="card-code"></code></pre>
+    <form method="dialog"><button class="ui-button" autofocus>Fermer le dialogue</button></form>
+  </dialog>
+  <script type="module" src="gallery.js"></script>
+</body>
+</html>

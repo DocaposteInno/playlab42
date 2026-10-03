@@ -8,6 +8,9 @@
 import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
 import { cloneTemplate } from '../lib/dom.js';
+import { matchesQuery, renderTagFilters, setDiscoveryCount, setDiscoveryMessage } from '../lib/catalogue-ui.js';
+
+let catalogueError = null;
 
 // Dimensions intrinsèques des vignettes : standard de fait du dépôt 380x180
 // (ratio 19/9, cf. --thumb-ratio dans style.css). Posées en attributs width/
@@ -23,16 +26,23 @@ export async function loadCatalogue() {
   try {
     const response = await fetch('./data/catalogue.json');
     if (!response.ok) { throw new Error('Catalogue introuvable'); }
+    catalogueError = null;
     setState({ catalogue: await response.json() });
     renderCatalogue();
   } catch (e) {
     console.error('Erreur chargement catalogue:', e);
-    el.cardsGames.textContent = '';
-    el.cardsTools.textContent = '';
-    const errorEl = document.createElement('p');
-    errorEl.className = 'error';
-    errorEl.textContent = 'Erreur de chargement du catalogue';
-    el.cardsGames.appendChild(errorEl);
+    catalogueError = 'Impossible de charger le catalogue. Rechargez la page pour réessayer.';
+    setState({ catalogue: null });
+    for (const container of [el.cardsGames, el.cardsTools]) {
+      const errorEl = document.createElement('p');
+      errorEl.className = 'error';
+      errorEl.setAttribute('role', 'alert');
+      errorEl.textContent = catalogueError;
+      container.replaceChildren(errorEl);
+    }
+    el.emptyGames.classList.remove('visible');
+    el.emptyTools.classList.remove('visible');
+    renderCatalogue();
   }
 }
 
@@ -51,34 +61,14 @@ export function getTagsForCurrentTab() {
 }
 
 /**
- * Crée un élément filtre
- * @param {string} tag - Tag du filtre (vide pour "Tous")
- * @param {boolean} isActive - Si le filtre est actif
- * @returns {DocumentFragment} Fragment DOM
- */
-function createFilterElement(tag, isActive) {
-  const fragment = cloneTemplate('filter-template');
-  const btn = fragment.querySelector('.filter');
-  btn.textContent = tag || 'Tous';
-  btn.dataset.tag = tag;
-  if (isActive) { btn.classList.add('active'); }
-  return fragment;
-}
-
-/**
  * Rend les filtres de tags pour l'onglet actif
  */
 export function renderFilters() {
   const tags = getTagsForCurrentTab();
-  el.filters.textContent = '';
-
-  // Filtre "Tous"
-  el.filters.appendChild(createFilterElement('', state.activeFilter === ''));
-
-  // Filtres par tag
-  for (const tag of tags) {
-    el.filters.appendChild(createFilterElement(tag, state.activeFilter === tag));
-  }
+  const items = state.activeTab === 'games' ? state.catalogue.games : state.catalogue.tools;
+  renderTagFilters(el.filters, tags.map(tag => ({
+    id: tag, label: tag, count: items.filter(item => item.tags?.includes(tag)).length,
+  })), state.activeFilter);
 }
 
 /**
@@ -157,20 +147,14 @@ export function createCardElement(item, type) {
  * @returns {Object[]} Items filtrés
  */
 export function filterItems(items) {
-  const search = el.search.value.toLowerCase().trim();
+  const search = el.search.value;
   return items.filter(item => {
     // Filtre par tag
     if (state.activeFilter && !item.tags?.includes(state.activeFilter)) {
       return false;
     }
     // Filtre par recherche
-    if (search) {
-      const searchable = `${item.name} ${item.description}`.toLowerCase();
-      if (!searchable.includes(search)) {
-        return false;
-      }
-    }
-    return true;
+    return matchesQuery(search, item.name, item.description, ...(item.tags || []));
   });
 }
 
@@ -178,7 +162,11 @@ export function filterItems(items) {
  * Rend le catalogue (onglet actif uniquement)
  */
 export function renderCatalogue() {
-  if (!state.catalogue) { return; }
+  if (state.activeTab !== 'tools' && state.activeTab !== 'games') { return; }
+  if (!state.catalogue) {
+    setDiscoveryMessage(catalogueError || 'Chargement du catalogue…');
+    return;
+  }
 
   renderFilters();
 
@@ -188,7 +176,10 @@ export function renderCatalogue() {
     for (const tool of filteredTools) {
       el.cardsTools.appendChild(createCardElement(tool, 'tool'));
     }
-    el.emptyTools.classList.toggle('visible', filteredTools.length === 0 && state.catalogue.tools.length > 0);
+    el.emptyTools.textContent = state.catalogue.tools.length
+      ? 'Aucun outil ne correspond à cette sélection.' : 'Aucun outil disponible pour le moment.';
+    el.emptyTools.classList.toggle('visible', filteredTools.length === 0);
+    setDiscoveryCount(filteredTools.length, 'outils');
   }
 
   if (state.activeTab === 'games') {
@@ -197,6 +188,9 @@ export function renderCatalogue() {
     for (const game of filteredGames) {
       el.cardsGames.appendChild(createCardElement(game, 'game'));
     }
-    el.emptyGames.classList.toggle('visible', filteredGames.length === 0 && state.catalogue.games.length > 0);
+    el.emptyGames.textContent = state.catalogue.games.length
+      ? 'Aucun jeu ne correspond à cette sélection.' : 'Aucun jeu disponible pour le moment.';
+    el.emptyGames.classList.toggle('visible', filteredGames.length === 0);
+    setDiscoveryCount(filteredGames.length, 'jeux');
   }
 }

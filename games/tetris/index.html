@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1020">
+    <meta name="description" content="Neon Stack : blocs tombants, trois défis, rotations SRS et commandes tactiles.">
+    <title>Tetris — Neon Stack | Playlab42</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="main.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <a class="home" href="../../index.html" id="quit" aria-label="Retour à Playlab42">PLAYLAB<span>42</span> / ARCADE</a>
+        <div class="toolbar">
+          <button id="sound" class="quiet" aria-pressed="false">Son : non</button>
+          <button id="pause" class="quiet" disabled>Pause <kbd>P</kbd></button>
+          <button id="menu" class="quiet">Nouvelle partie</button>
+        </div>
+      </header>
+      <section class="intro" aria-labelledby="title">
+        <div><p class="eyebrow"><span class="signal"></span> FALLING BLOCKS / 01</p><h1 id="title">NEON<span>STACK</span><span class="title-dot">.</span></h1></div>
+        <p class="tagline">Trouve le rythme.<br><strong>Fais de la place.</strong></p>
+      </section>
+
+      <section class="arena" aria-label="Jeu de blocs tombants">
+        <aside class="left-rail">
+          <section class="panel hold-panel"><h2>Réserve <kbd>C</kbd></h2><canvas id="hold" width="160" height="88" aria-label="Réserve vide"></canvas><p id="hold-status">Une seconde chance.</p></section>
+          <section class="panel record-panel"><h2>Record personnel</h2><p class="record" id="record">—</p><p id="record-mode">Marathon</p></section>
+          <section class="notes"><span class="index">01 / LE PRINCIPE</span><p>Empile. Complète les lignes.<br>Garde un œil sur la suite.</p><div class="mini-blocks" aria-hidden="true"><i></i><i></i><i></i><i></i></div></section>
+        </aside>
+
+        <div class="board-column">
+          <div class="board-heading"><span id="mode-label">MARATHON</span><span id="play-state">PRÊT À JOUER</span></div>
+          <div class="board-frame" id="board-frame">
+            <canvas id="board" width="300" height="600" tabindex="0" aria-label="Grille de jeu de 10 colonnes et 20 lignes. Les commandes sont décrites sous la grille." aria-describedby="instructions"></canvas>
+            <div class="overlay" id="overlay">
+              <div class="overlay-card">
+                <p class="eyebrow" id="overlay-kicker">TON PROCHAIN DÉFI</p>
+                <h2 id="overlay-title">Entre dans<br>le flow.</h2>
+                <p id="overlay-description">Sept pièces. Des possibilités infinies.</p>
+                <fieldset id="modes"><legend>Choisis ton mode</legend>
+                  <label><input type="radio" name="mode" value="marathon" checked><span><strong>Marathon</strong><small>Le rythme monte. Jusqu'où iras-tu ?</small></span><b>∞</b></label>
+                  <label><input type="radio" name="mode" value="sprint"><span><strong>Sprint</strong><small>40 lignes. Le plus vite possible.</small></span><b>40</b></label>
+                  <label><input type="radio" name="mode" value="ultra"><span><strong>Ultra</strong><small>120 secondes pour tout donner.</small></span><b>2′</b></label>
+                </fieldset>
+                <button class="primary" id="start">C'est parti <span aria-hidden="true">↗</span></button>
+                <button class="resume" id="resume" hidden>Reprendre la partie</button>
+                <p class="overlay-footnote">Clavier ou tactile · Sans inscription</p>
+              </div>
+            </div>
+            <div id="clear-effect" class="clear-effect" aria-hidden="true"></div>
+          </div>
+          <div class="progress-track" role="progressbar" id="progress" aria-label="Progression du défi" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="progress-fill"></span></div>
+          <p class="board-caption" id="goal">10 lignes avant le niveau suivant</p>
+        </div>
+
+        <aside class="right-rail">
+          <section class="panel score-panel"><h2>Score</h2><p class="score" id="score">000000</p><div class="stat-grid"><div><h3>Niveau</h3><p id="level">01</p></div><div><h3>Lignes</h3><p id="lines">00</p></div></div><div class="time-row"><span>Temps</span><time id="time">00:00.00</time></div></section>
+          <section class="panel next-panel"><h2>À suivre <span>5 PIÈCES</span></h2><canvas id="next" width="160" height="300" aria-label="File des prochaines pièces"></canvas></section>
+          <p id="announcement" class="announcement" role="status" aria-live="polite" aria-atomic="true">À toi de jouer.</p>
+        </aside>
+      </section>
+
+      <nav class="touch-controls" aria-label="Commandes tactiles">
+        <button data-action="hold" aria-label="Mettre en réserve">C<span>Réserve</span></button>
+        <button data-action="rotateCCW" aria-label="Tourner à gauche">↶<span>Rotation</span></button>
+        <button data-action="rotateCW" aria-label="Tourner à droite">↷<span>Rotation</span></button>
+        <button data-action="hardDrop" class="drop" aria-label="Chute immédiate">⇓<span>Chute</span></button>
+        <button data-action="left" aria-label="Déplacer à gauche">←</button>
+        <button data-action="softDrop" aria-label="Descendre">↓</button>
+        <button data-action="right" aria-label="Déplacer à droite">→</button>
+      </nav>
+      <footer class="footer">
+        <p id="instructions"><kbd>←</kbd><kbd>→</kbd> déplacer <span>·</span> <kbd>↑</kbd> / <kbd>X</kbd> tourner <span>·</span> <kbd>Z</kbd> inverse <span>·</span> <kbd>↓</kbd> descendre <span>·</span> <kbd>Espace</kbd> chute <span>·</span> <kbd>C</kbd> réserve <span>·</span> <kbd>P</kbd> pause</p>
+        <details><summary>Les règles, en bref</summary><p>Complète une ligne horizontale pour l'effacer. Les sept pièces arrivent par sacs mélangés : chacune apparaît une fois par sac. La silhouette montre le point de chute. La réserve s'utilise une seule fois par pièce. Tu disposes de 0,5 seconde pour ajuster une pièce au sol ; les déplacements peuvent réinitialiser ce délai au maximum 15 fois.</p><p>Une, deux, trois ou quatre lignes valent 100, 300, 500 ou 800 points × niveau. Les T-spins, les combos et les suites de quatre lignes ou T-spins rapportent des bonus. La chute douce rapporte 1 point par case, la chute immédiate 2. Marathon accélère tous les 10 lignes, Sprint vise 40 lignes, Ultra dure deux minutes. Une pile qui empêche l'arrivée d'une pièce termine la partie.</p></details>
+        <p class="storage-notice" id="storage-notice" role="status" hidden></p>
+        <div class="footer-signature"><span>TETRIS — NEON STACK</span><span>UNE EXPÉRIENCE PLAYLAB42</span></div>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -3,192 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuration personnelle par IDE — GitHub Copilot Guide</title>
+  <title>VS Code — Agents, sessions et configuration</title>
   <link rel="stylesheet" href="../../../../../lib/theme.css">
   <link rel="stylesheet" href="../../../../_shared/slide-base.css">
   <script type="module">
     import { initTheme } from '../../../../../lib/theme.js';
     initTheme();
   </script>
-  <style>
-    .ide-section {
-      background: var(--color-bg-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-md);
-      margin: var(--space-lg) 0;
-    }
-    .ide-section h3 {
-      margin-top: 0;
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-    }
-    .ide-logo {
-      font-size: 1.5rem;
-    }
-    .shortcut-table td:first-child {
-      font-weight: 600;
-    }
-    .support-check { color: var(--color-success); }
-    .support-cross { color: var(--color-error); }
-  </style>
 </head>
 <body>
   <article class="slide">
-    <h1>Configuration personnelle par IDE</h1>
+    <h1>VS Code : agents, sessions et configuration</h1>
+    <p>Copilot ne se limite plus à un panneau de questions. VS Code propose un environnement pour préparer, exécuter et suivre des tâches agentiques. Le bon point de départ reste une session courte, un périmètre clair et des autorisations limitées.</p>
+    <p><strong>Référence stable : VS Code 1.140, publiée le 30 septembre 2026.</strong> La version 1.141 est encore Insiders à la date du guide. Ses fonctionnalités ne doivent pas être présentées comme disponibles dans toutes les installations stables.</p>
 
-    <div class="ide-section">
-      <h3><span class="ide-logo">💙</span> 4.1 VS Code</h3>
+    <h2>La nouveauté structurante : le harness Copilot</h2>
+    <p>Un <strong>harness</strong> est le runtime qui exécute l'agent et relie modèles, outils et permissions. La stable 1.140 met en avant le harness <strong>Copilot</strong>, fondé sur le Copilot SDK comme le CLI, et exécuté par un processus <strong>Agent Host</strong>. Il peut devenir le choix par défaut pour certains utilisateurs, pas nécessairement tous.</p>
+    <p>Distinguez cinq choix : <strong>cible/harness → agent → modèle → permissions → isolation du code</strong>. « Cloud » est un environnement d'exécution ; « Plan » un agent ; un worktree une isolation des modifications Git, pas du réseau ni des commandes.</p>
 
-      <h4>Paramètres recommandés (settings.json)</h4>
-
-      <pre><code>{
-  "github.copilot.enable": {
-    "*": true,
-    "plaintext": false,
-    "markdown": true,
-    "scminput": false
-  },
-  "github.copilot.nextEditSuggestions.enabled": true,
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
-  "chat.instructionsFilesLocations": {
-    ".github/instructions": true
-  },
-  "chat.promptFilesLocations": {
-    ".github/prompts": true
-  },
-  "chat.agent.enabled": true,
-  "chat.agent.maxRequests": 25
-}</code></pre>
-
-      <h4>Raccourcis essentiels</h4>
-
-      <table class="shortcut-table">
-        <thead>
-          <tr>
-            <th>Action</th>
-            <th>macOS</th>
-            <th>Windows/Linux</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Ouvrir Chat</td><td><code>Ctrl+Cmd+I</code></td><td><code>Ctrl+Alt+I</code></td></tr>
-          <tr><td>Chat inline</td><td><code>Cmd+I</code></td><td><code>Ctrl+I</code></td></tr>
-          <tr><td>Accepter suggestion</td><td><code>Tab</code></td><td><code>Tab</code></td></tr>
-          <tr><td>Suggestion suivante</td><td><code>Option+]</code></td><td><code>Alt+]</code></td></tr>
-          <tr><td>Déclencher suggestion</td><td><code>Option+\</code></td><td><code>Alt+\</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="ide-section">
-      <h3><span class="ide-logo">🧠</span> 4.2 JetBrains (Rider, PhpStorm, WebStorm...)</h3>
-
-      <h4>Accès aux paramètres</h4>
-
-      <p><strong>File &gt; Settings &gt; Languages &amp; Frameworks &gt; GitHub Copilot</strong></p>
-
-      <h4>Instructions globales personnelles</h4>
-
-      <p>Créer manuellement :</p>
-      <ul>
-        <li><strong>macOS/Linux :</strong> <code>~/.config/github-copilot/intellij/global-copilot-instructions.md</code></li>
-        <li><strong>Windows :</strong> <code>%APPDATA%\Local\github-copilot\intellij\global-copilot-instructions.md</code></li>
-      </ul>
-
-      <h4>Limitations actuelles</h4>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Fonctionnalité</th>
-            <th>Support</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>copilot-instructions.md</td><td><span class="support-check">✅</span></td></tr>
-          <tr><td>.instructions.md conditionnels</td><td><span class="support-cross">❌</span></td></tr>
-          <tr><td>Fichiers .prompt.md</td><td><span class="support-check">✅</span></td></tr>
-          <tr><td>Mode Agent</td><td><span class="support-check">✅</span> (Preview)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="ide-section">
-      <h3><span class="ide-logo">💜</span> 4.3 Visual Studio</h3>
-
-      <h4>Accès aux paramètres</h4>
-
-      <p><strong>Tools &gt; Options &gt; GitHub &gt; Copilot</strong></p>
-
-      <h4>Fonctionnalités spécifiques</h4>
-
-      <ul>
-        <li><strong>Contexte sémantique C#</strong> : inclut automatiquement les fichiers fermés pertinents</li>
-        <li><strong>Référence #solution</strong> : interroge l'ensemble de la solution</li>
-        <li><strong>Intégration IntelliSense</strong> : suggestions contextuelles avancées</li>
-      </ul>
-    </div>
-
-    <hr>
-
-    <h2>Matrice de compatibilité IDE</h2>
-
+    <h2>Choisir le bon interlocuteur</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Fonctionnalité</th>
-          <th>VS Code</th>
-          <th>JetBrains</th>
-          <th>Visual Studio</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Mode / agent</th><th>But</th><th>Exemple</th></tr></thead>
       <tbody>
-        <tr>
-          <td>copilot-instructions.md</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-        </tr>
-        <tr>
-          <td>.instructions.md conditionnels</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-cross">❌</span></td>
-          <td><span class="support-check">✅</span></td>
-        </tr>
-        <tr>
-          <td>Fichiers .prompt.md</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-        </tr>
-        <tr>
-          <td>agents.md</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-        </tr>
-        <tr>
-          <td>Mode Agent</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span> (Preview)</td>
-          <td><span class="support-check">✅</span></td>
-        </tr>
-        <tr>
-          <td>Next Edit Suggestions</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-cross">❌</span></td>
-          <td><span class="support-cross">❌</span></td>
-        </tr>
-        <tr>
-          <td>@workspace</td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span></td>
-          <td><span class="support-check">✅</span> (#solution)</td>
-        </tr>
+        <tr><td>Ask</td><td>Comprendre et obtenir une réponse.</td><td>« Explique le cycle de vie de cette requête. »</td></tr>
+        <tr><td>Plan</td><td>Étudier une tâche et produire un plan avant implémentation.</td><td>« Propose une migration sans modifier les fichiers. »</td></tr>
+        <tr><td>Agent</td><td>Explorer, modifier et lancer des outils pour atteindre un objectif.</td><td>« Corrige ce bug et ajoute un test de régression. »</td></tr>
+        <tr><td>Agent personnalisé</td><td>Appliquer un rôle et des outils adaptés.</td><td>Un profil de documentation ou de revue.</td></tr>
       </tbody>
     </table>
+    <p>Le sélecteur dépend de la version et des profils installés. Un agent Plan aide à cadrer le travail ; les permissions effectives restent un réglage distinct.</p>
+
+    <h2>Sessions locales, en arrière-plan et dans le cloud</h2>
+    <p>La gestion des sessions permet de lancer et retrouver plusieurs tâches. Choisissez l'environnement disponible dans votre version plutôt que de confondre toutes les sessions avec le Chat actif.</p>
+    <table>
+      <thead><tr><th>Environnement</th><th>Intérêt</th><th>Point de vigilance</th></tr></thead>
+      <tbody>
+        <tr><td>Harness Local</td><td>Runtime de l'extension host VS Code, avec outils intégrés et d'extensions.</td><td>Travaille dans le workspace courant ; « Local » désigne ici un harness.</td></tr>
+        <tr><td>Harness Copilot / Agent Host</td><td>Sessions interactives ou en arrière-plan, sur votre machine, un hôte distant ou un Dev Container.</td><td>Choisir Folder ou Worktree et vérifier les permissions ; l'arrière-plan n'est pas nécessairement le cloud.</td></tr>
+        <tr><td>Cloud</td><td>Travail distant avec une proposition de changements sur GitHub.</td><td>Accès au dépôt, politiques, coûts et revue de la PR.</td></tr>
+      </tbody>
+    </table>
+    <p>Le mode d'exécution peut changer les outils disponibles. Vérifiez le contexte transmis lors d'une reprise ou délégation ; ne supposez pas qu'une session distante voit vos fichiers locaux non publiés.</p>
+    <blockquote><strong>Attention aux sessions Worktree Copilot :</strong> la documentation actuelle indique qu'elles utilisent <strong>Allow all</strong>. Les sessions Folder permettent les permissions manuelles. Choisissez en connaissance de cause ; un worktree n'est pas un sandbox.</blockquote>
+    <p>Les sessions Agent Host peuvent contenir des <strong>peer chats</strong>, avec historiques et modèles séparés mais normalement le même workspace/worktree. Plusieurs chats peuvent donc entrer en conflit sur les fichiers. Les sessions multi-dossiers introduites en 1.140 sont <strong>Experimental</strong>, désactivées par défaut.</p>
+
+    <h2>Quel lien avec Copilot CLI ?</h2>
+    <p>Le CLI fonctionne seul dans un terminal, y compris le terminal intégré de VS Code. Il peut se connecter au workspace via <code>/ide</code>. VS Code peut également proposer des sessions CLI dans son environnement de sessions.</p>
+    <p>Utilisez le profil terminal GitHub Copilot CLI, <strong>Chat: New Copilot CLI Session</strong> ou <code>copilot</code> dans le terminal. <strong>Resume in Terminal</strong> permet de poursuivre une session Copilot dans le CLI. Le runtime commun favorise la réutilisation d'instructions, skills et hooks compatibles, pas la synchronisation de tous les réglages.</p>
+    <p>Deux interfaces ne signifient pas deux projets différents : vous pouvez partager les fichiers de personnalisation du dépôt. En revanche, le Chat VS Code et le CLI gardent leurs commandes, leurs paramètres et leurs autorisations propres.</p>
+
+    <h2>Les capacités à explorer après les bases</h2>
+    <table>
+      <thead><tr><th>Capacité</th><th>Intérêt</th><th>Repère dans le parcours</th></tr></thead>
+      <tbody>
+        <tr><td>Skills</td><td>Charger des procédures et ressources adaptées à la tâche.</td><td>Chapitre Skills et atelier dédié.</td></tr>
+        <tr><td>Agents personnalisés</td><td>Choisir un rôle et ses outils.</td><td>Chapitre Agents spécialisés.</td></tr>
+        <tr><td>MCP</td><td>Relier des outils externes, avec sélection et approbation.</td><td>Chapitre MCP.</td></tr>
+        <tr><td>Outils navigateur intégrés</td><td>Navigation, lecture, interactions, captures et actions Playwright, sans installer obligatoirement un MCP navigateur.</td><td>Activés par défaut selon la documentation actuelle ; une page partagée peut exposer cookies et authentification.</td></tr>
+        <tr><td>Hooks — Preview dans VS Code</td><td>Automatiser des points du cycle agent.</td><td>Schéma et runtime dépendent du harness ; inspecter les commandes exécutées.</td></tr>
+        <tr><td>Agent Plugins 1.0</td><td>Bundles de skills, MCP, agents, hooks et autres personnalisations.</td><td>Vérifier provenance et composants spécifiques au client.</td></tr>
+        <tr><td>Contexte et checkpoints</td><td>Inspecter les références, suivre les changements et reprendre une tâche.</td><td>Un retour arrière de fichiers ne révoque pas des actions externes.</td></tr>
+      </tbody>
+    </table>
+    <p>Certaines fonctions peuvent être expérimentales ou activées progressivement. Consultez les notes de version, notamment lorsque l'interface ou un réglage manque. N'activez pas tout uniquement parce qu'une fonctionnalité existe.</p>
+    <p><strong>À distinguer du socle stable :</strong> HydraFusion est une Research Preview ; la délégation à des agent hosts distants est Experimental ; les agents cloud tiers Claude/Codex sont Preview. Le suivi Background Shells et la comparaison Run and Compare Agents… figurent dans les notes Insiders 1.141.</p>
+
+    <h2>Configuration minimale, plutôt qu'un bloc obsolète</h2>
+    <pre><code>{
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false
+  },
+  "github.copilot.nextEditSuggestions.enabled": true
+}</code></pre>
+    <p>Ouvrez ensuite les paramètres de VS Code, recherchez les options Chat/Copilot et utilisez les réglages documentés par votre version. Ne recopiez pas aveuglément d'anciens flags de preview, des noms d'outils ou un compteur de requêtes comme s'il s'agissait d'un plafond de facture.</p>
+    <p>Stockez les réglages partageables au niveau du workspace, les préférences au niveau utilisateur et les secrets dans les mécanismes d'authentification appropriés. Les politiques d'entreprise peuvent primer sur un réglage local.</p>
+
+    <h2>Raccourcis VS Code</h2>
+    <table>
+      <thead><tr><th>Action</th><th>Windows / Linux</th><th>macOS</th></tr></thead>
+      <tbody>
+        <tr><td>Ouvrir Chat</td><td><code>Ctrl+Alt+I</code></td><td><code>Ctrl+Cmd+I</code></td></tr>
+        <tr><td>Chat inline</td><td><code>Ctrl+I</code></td><td><code>Cmd+I</code></td></tr>
+        <tr><td>Accepter une suggestion</td><td><code>Tab</code></td><td><code>Tab</code></td></tr>
+        <tr><td>Rejeter une suggestion</td><td><code>Esc</code></td><td><code>Esc</code></td></tr>
+        <tr><td>Palette de commandes</td><td><code>Ctrl+Shift+P</code></td><td><code>Cmd+Shift+P</code></td></tr>
+      </tbody>
+    </table>
+    <p>Ces raccourcis peuvent changer avec la keymap et les extensions. Tapez <code>/</code> dans Chat pour ses commandes ; <code>/fleet</code> est une commande du CLI, pas une commande universelle du Chat VS Code.</p>
+
+    <h2>JetBrains et Visual Studio</h2>
+    <p>JetBrains expose les réglages du plugin dans <strong>Settings → Languages &amp; Frameworks → GitHub Copilot</strong>. Visual Studio dispose de ses paramètres GitHub Copilot et d'un contexte de solution adapté à .NET.</p>
+    <p>Le support des instructions ciblées, prompts, skills, agents ou MCP évolue indépendamment selon chaque IDE. Vérifiez les capacités de votre version ; une ancienne matrice « oui/non » peut être trompeuse.</p>
+    <h2>Sources officielles</h2>
+    <ul>
+      <li><a href="https://code.visualstudio.com/docs/copilot/overview" target="_blank" rel="noopener noreferrer">Copilot dans VS Code</a></li>
+      <li><a href="https://code.visualstudio.com/docs/agents/run/agent-harnesses" target="_blank" rel="noopener noreferrer">Harnesses, CLI et limites des environnements</a></li>
+      <li><a href="https://code.visualstudio.com/docs/agents/run/sessions/manage-sessions" target="_blank" rel="noopener noreferrer">Sessions et peer chats</a></li>
+      <li><a href="https://code.visualstudio.com/docs/agents/run/browser-tools" target="_blank" rel="noopener noreferrer">Outils navigateur et confidentialité des sessions</a></li>
+      <li><a href="https://code.visualstudio.com/updates/v1_140" target="_blank" rel="noopener noreferrer">VS Code 1.140 : stable du 30 septembre 2026</a></li>
+      <li><a href="https://code.visualstudio.com/updates" target="_blank" rel="noopener noreferrer">Notes de version VS Code et statut des nouveautés</a></li>
+    </ul>
   </article>
 </body>
 </html>

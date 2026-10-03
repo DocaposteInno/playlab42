@@ -46,7 +46,7 @@ Le code fait lui aussi partie du cours. Moteurs de jeux déterministes, tests au
 flowchart TB
     subgraph preparation["À la construction"]
         sources["Contenus & manifests<br/>tools · games · parcours · bookmarks"]
-        build["Scripts de build<br/>catalogues JSON · transpilation TypeScript"]
+        build["Scripts de build<br/>catalogues · guides · TypeScript"]
         files["Site prêt à servir<br/>HTML · CSS · JavaScript · JSON"]
         sources --> build --> files
     end
@@ -71,7 +71,7 @@ flowchart TB
     class sources,build,files,storage neutral
 ```
 
-Les scripts préparent les catalogues et transpilent les contenus TypeScript **avant** la mise en ligne. À l’usage, le navigateur charge les fichiers statiques ; aucune API applicative, base de données serveur ou authentification n’est nécessaire.
+Les scripts préparent les catalogues, les guides et les dépendances destinées au navigateur, et transpilent les contenus TypeScript **avant** la mise en ligne. À l’usage, le navigateur charge les fichiers statiques ; aucune API applicative, base de données serveur ou authentification n’est nécessaire.
 
 Les outils et les jeux peuvent aussi être ouverts en dehors du portail. Les bibliothèques de `lib/` apportent les briques communes : thèmes, générateur aléatoire déterministe, viewer de parcours et **GameKit**, le SDK de communication entre les jeux et le portail. Les préférences, scores et progressions restent stockés localement dans le navigateur, sans synchronisation entre appareils.
 
@@ -80,11 +80,11 @@ Les outils et les jeux peuvent aussi être ouverts en dehors du portail. Les bib
 | Couche | Technologies |
 |--------|--------------|
 | Interface | HTML, CSS, JavaScript en modules ES ; TypeScript optionnel |
-| Construction | Node.js 26, esbuild, scripts de génération des catalogues |
-| Qualité | Jest, ESLint, vérification des types TypeScript |
+| Construction | Node.js 26 dans Docker et la CI (minimum 24), esbuild, scripts de génération |
+| Qualité | Jest, Playwright, ESLint, vérification des types TypeScript |
 | Environnement | Docker, Docker Compose, Make |
 | Livraison | GitHub Actions → GitHub Pages |
-| Travail assisté par IA | [Instructions pour agents](AGENTS.md), [spécifications OpenSpec](openspec/specs/) |
+| Travail assisté par IA | [Instructions pour agents](AGENTS.md), [skills de projet](docs/guides/project-skills.md), [spécifications OpenSpec](openspec/specs/) |
 
 ## Démarrage rapide
 
@@ -99,9 +99,8 @@ cd playlab42
 # Construire l’environnement, démarrer le conteneur et installer les dépendances
 make init
 
-# Préparer les contenus TypeScript et les trois catalogues
-make build-ts
-make npm CMD="run build"
+# Préparer les contenus, catalogues et guides sans enrichissement réseau
+make npm CMD="run build:local"
 
 # Afficher l’URL locale, puis lancer le serveur
 make info
@@ -115,12 +114,15 @@ Ouvrez l’URL affichée par `make info`. Le port externe est calculé à partir
 | Commande | Usage |
 |----------|-------|
 | `make shell` | Ouvrir un shell dans le conteneur |
-| `make npm CMD="run build"` | Régénérer les catalogues après un ajout ou une modification de contenu |
+| `make npm CMD="run build:local"` | Reconstruire les contenus et catalogues sans enrichissement réseau |
+| `make npm CMD="run build"` | Reconstruire avec enrichissement des métadonnées des bookmarks |
 | `make build-ts` | Transpiler les contenus TypeScript |
 | `make npm CMD="run build:ts:watch"` | Transpiler TypeScript en continu pendant le développement |
 | `make test` | Exécuter les tests Jest |
+| `make test-e2e` | Exécuter les parcours navigateur dans une image Docker dédiée |
 | `make lint` | Vérifier la qualité du code |
 | `make typecheck` | Vérifier les types |
+| `make openspec-validate` | Valider strictement les spécifications avec la CLI épinglée |
 | `make down` | Arrêter les conteneurs |
 
 <details>
@@ -154,6 +156,7 @@ make serve
 | Développer un jeu | [Moteur de règles](docs/guides/create-game-engine.md), [interface](docs/guides/create-game-client.md) et [bots](docs/guides/create-bot.md) |
 | Écrire un parcours | [Guide de création d’un epic](docs/guides/create-epic.md) |
 | Proposer une ressource | [Guide de contribution](docs/guides/contributing.md) |
+| Partir d’un gabarit | [Kit de contribution et galerie des composants](docs/guides/contribution-kit.md) |
 | Travailler avec un agent IA | [Instructions du projet](AGENTS.md) |
 
 ### Se repérer dans le dépôt
@@ -170,7 +173,10 @@ playlab42/
 ├── scripts/                      # Génération des catalogues et build TS
 ├── data/                         # Catalogues générés, non versionnés
 ├── docs/                         # Guides et documentation
+├── templates/                    # Gabarits de jeux, outils et parcours
+├── e2e/                          # Parcours navigateur Playwright
 ├── openspec/                     # Spécifications et propositions de changement
+├── .github/skills/               # Skills de projet versionnés
 └── .github/workflows/            # CI, audits et déploiement
 ```
 
@@ -181,6 +187,8 @@ playlab42/
 | Comprendre les notions du projet | [Concepts & glossaire](docs/CONCEPTS.md) |
 | Comprendre la génération des données | [Build des catalogues](docs/CATALOGUE-BUILD.md) |
 | Consulter les contrats techniques | [Spécifications OpenSpec](openspec/specs/) |
+| Appliquer le workflow de spécification | [Workflow OpenSpec](docs/guides/openspec-workflow.md) |
+| Utiliser les skills du projet | [Skills de projet](docs/guides/project-skills.md) |
 | Comprendre la stratégie de tests | [Stratégie de tests](docs/TESTING_STRATEGY.md) |
 | Déployer la plateforme | [Guide de déploiement](docs/DEPLOYMENT.md) |
 | Résoudre un problème local | [Dépannage](docs/TROUBLESHOOTING.md) |

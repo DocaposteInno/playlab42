@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ateliers et auto-évaluation — GitHub Copilot</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+</head>
+<body>
+  <article class="slide">
+    <h1>Passer de la découverte à une méthode</h1>
+    <p>Utilisez un dépôt d'exercice sans données sensibles, sur une branche ou un worktree dédié. Choisissez un atelier adapté à votre niveau ; les critères de réussite comptent davantage que le volume de code généré.</p>
+
+    <h2>Atelier 1 — Une petite correction comprise (15 min)</h2>
+    <p><strong>Débutant, VS Code ou CLI.</strong> Choisissez une fonction courte et son fichier de tests.</p>
+    <ol>
+      <li>Demandez une explication sans modification. Reformulez le comportement avec vos propres mots.</li>
+      <li>Donnez un cas manquant : entrée vide, valeur au seuil ou erreur attendue.</li>
+      <li>Demandez un plan, puis un test qui reproduit le problème et la correction minimale.</li>
+      <li>Exécutez les tests existants, inspectez le diff et vérifiez qu'aucun fichier hors périmètre n'a changé.</li>
+    </ol>
+    <pre><code>Lis cette fonction et ses tests. Explique le cas vide.
+Propose une correction sans modifier l'API publique.
+Ajoute d'abord un test qui échoue sur ce cas.
+Après validation du plan, corrige puis relance les tests ciblés.
+N'ajoute pas de dépendance et ne fais pas de commit.</code></pre>
+    <p><strong>Réussite :</strong> vous savez expliquer le bug, le test et chaque ligne modifiée. Vous pouvez refuser une suggestion et corriger le prompt.</p>
+
+    <h2>Atelier 2 — Une procédure réutilisable avec un skill (20 min)</h2>
+    <p><strong>Intermédiaire.</strong> Créez le skill <code>preparer-revue</code> du chapitre Skills dans <code>.github/skills/</code>.</p>
+    <ol>
+      <li>Adaptez sa description et sa checklist aux vrais critères de revue du dépôt.</li>
+      <li>Vérifiez qu'il est découvert par votre client, puis demandez une préparation de revue correspondant à sa description.</li>
+      <li>Contrôlez son invocation dans les traces ou les détails disponibles. Ne déduisez pas son chargement de la seule qualité de la réponse.</li>
+      <li>Essayez une demande sans rapport : le skill ne devrait pas encombrer systématiquement ce contexte.</li>
+    </ol>
+    <p><strong>Réussite :</strong> le résultat identifie fichiers, risques et commandes de validation, sans exécuter de publication ni recopier tout le skill dans les instructions globales.</p>
+
+    <h2>Atelier 3 — Paralléliser sans conflit (20 min)</h2>
+    <p><strong>Avancé, Copilot CLI.</strong> Choisissez deux recherches en lecture seule : cartographier une API et repérer ses tests.</p>
+    <ol>
+      <li>Consultez <code>/usage</code>, puis définissez le périmètre et les permissions.</li>
+      <li>Lancez <code>/fleet</code> avec deux tâches indépendantes et une synthèse finale.</li>
+      <li>Suivez les tâches avec <code>/tasks</code>. Comparez les résultats et la consommation à une recherche séquentielle.</li>
+      <li>Identifiez les dépendances qui imposeraient une étape séquentielle avant toute modification du code.</li>
+    </ol>
+    <p><strong>Réussite :</strong> aucune écriture concurrente, deux résultats vérifiables et une synthèse cohérente. Vous savez expliquer pourquoi Fleet serait excessif pour une simple lecture de fichier.</p>
+
+    <h2>Atelier 4 — Préparer un usage d'équipe (15 min)</h2>
+    <p><strong>Confirmé ou référent technique.</strong> Sans changer les réglages de l'organisation, repérez l'offre, l'entité facturée, les AI credits inclus et les règles de consommation supplémentaire visibles dans GitHub.</p>
+    <p>Rédigez une proposition : usages autorisés, permissions minimales, politique de skills/MCP, revues nécessaires et budget. Distinguez une alerte, une limite locale souple et un mécanisme de blocage côté facturation.</p>
+    <p><strong>Réussite :</strong> aucun prix supposé, aucun secret dans le compte rendu et une décision claire sur qui autorise une dépense supplémentaire.</p>
+
+    <h2>Auto-évaluation</h2>
+    <p>Répondez avant d'ouvrir les explications.</p>
+    <details>
+      <summary>1. Un skill est-il un agent qui s'exécute en parallèle ?</summary>
+      <p>Non. Il fournit une procédure et des ressources. Un profil d'agent définit un rôle ; un sous-agent est une exécution déléguée. Fleet orchestre des sous-agents.</p>
+    </details>
+    <details>
+      <summary>2. Une limite locale de 100 AI credits garantit-elle une facture plafonnée ?</summary>
+      <p>Non. <code>/limits</code> fournit une limite souple dont la portée doit être vérifiée selon la version. Le budget de facturation, l'entité concernée et l'option éventuelle de blocage se vérifient dans GitHub.</p>
+    </details>
+    <details>
+      <summary>3. Mettre « ne lis pas les secrets » dans les instructions suffit-il ?</summary>
+      <p>Non. Une consigne n'est pas un contrôle d'accès. Il faut aussi éviter les secrets dans le contexte et réduire les permissions des outils, chemins et services.</p>
+    </details>
+    <details>
+      <summary>4. Dois-je ouvrir VS Code pour utiliser Copilot CLI ?</summary>
+      <p>Non. Le CLI est autonome. Il peut se connecter à un IDE avec <code>/ide</code>, et VS Code peut proposer des sessions CLI. Les commandes des deux clients restent distinctes.</p>
+    </details>
+    <details>
+      <summary>5. Plus de sous-agents implique-t-il toujours un meilleur résultat ?</summary>
+      <p>Non. Les sous-agents coûtent du contexte, du temps de coordination et des crédits. Parallélisez des tâches suffisamment importantes et réellement indépendantes, puis relisez leur intégration.</p>
+    </details>
+
+    <h2>Checklist avant livraison</h2>
+    <ul>
+      <li>Le besoin et les critères d'acceptation sont couverts.</li>
+      <li>Le diff est compris, limité au périmètre et sans secret.</li>
+      <li>Les validations pertinentes ont été exécutées et les limites signalées.</li>
+      <li>Les permissions et la consommation sont maîtrisées.</li>
+      <li>Un humain décide du commit, de la publication et du déploiement.</li>
+    </ul>
+  </article>
+</body>
+</html>

@@ -4,6 +4,8 @@ node_modules/
 # Build (générés par npm run build:ts, le workflow deploy.yml les génère)
 dist/
 build/
+assets/vendor/
+docs/site/
 
 # IDE
 .idea/
@@ -28,6 +30,8 @@ npm-debug.log*
 
 # Testing
 coverage/
+playwright-report/
+test-results/
 
 # Docker
 .docker/

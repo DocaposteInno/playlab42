@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neural Style Transfer - Playlab42</title>
   <link rel="stylesheet" href="../lib/theme.css">
+  <link rel="stylesheet" href="../lib/ui.css">
+  <script type="module">
+    import { initTheme } from '../lib/theme.js';
+    initTheme();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@magenta/image@0.2.1"></script>
   <style>
 
@@ -85,12 +90,15 @@
       transition: border-color 0.2s, background 0.2s;
       overflow: hidden;
       position: relative;
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--color-bg);
+      width: 100%;
+      padding: 0;
+      font-weight: normal;
     }
 
     .image-zone:hover {
       border-color: var(--color-accent);
-      background: rgba(233, 69, 96, 0.05);
+      background: var(--color-bg-hover);
     }
 
     .image-zone.has-image {
@@ -118,6 +126,18 @@
       display: none;
     }
 
+    .selected-file {
+      font-size: var(--font-size-sm);
+      overflow-wrap: anywhere;
+      margin-top: var(--space-sm);
+    }
+
+    @media (max-width: 480px) {
+      body { padding: var(--space-md); }
+      .card { padding: var(--space-md); min-width: 0; }
+      h1 { font-size: var(--font-size-xl); }
+    }
+
     .result-zone {
       aspect-ratio: 1;
       border-radius: var(--radius-lg);
@@ -125,7 +145,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--color-bg);
     }
 
     #resultCanvas {
@@ -148,7 +168,7 @@
 
     button {
       background: var(--color-accent);
-      color: white;
+      color: var(--color-text-inverse);
       border: none;
       padding: 1rem 2rem;
       border-radius: var(--radius-lg);
@@ -173,6 +193,7 @@
 
     button.secondary {
       background: var(--color-bg-card);
+      color: var(--color-text);
     }
 
     .status {
@@ -187,11 +208,11 @@
     }
 
     .status.error {
-      color: #ff6b6b;
+      color: var(--color-error);
     }
 
     .status.success {
-      color: #51cf66;
+      color: var(--color-success);
     }
 
     .progress-bar {
@@ -274,7 +295,9 @@
     }
 
     .style-card {
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--color-bg-card);
+      padding: 0;
+      text-align: left;
       border-radius: 10px;
       overflow: hidden;
       cursor: pointer;
@@ -303,7 +326,7 @@
 
     .style-card .style-info {
       padding: 0.6rem 0.8rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
+      background: var(--color-bg-secondary);
       position: absolute;
       bottom: 0;
       left: 0;
@@ -381,7 +404,7 @@
       right: 0;
       background: transparent;
       border: none;
-      color: var(--color-text);
+      color: #fff;
       font-size: 1.5rem;
       cursor: pointer;
       padding: 0.5rem;
@@ -411,39 +434,41 @@
   <div class="container">
     <header>
       <h1><span>🎨</span> Neural Style Transfer</h1>
-      <p class="subtitle">Appliquez le style artistique d'une image sur une autre grâce au deep learning<br><small style="opacity: 0.7">Images automatiquement redimensionnées à 512px max pour la compatibilité GPU</small></p>
+      <p class="subtitle">Appliquez le style artistique d'une image sur une autre grâce au deep learning<br><small>Images automatiquement redimensionnées à 512px max pour la compatibilité GPU</small></p>
     </header>
 
     <div class="main-grid">
       <!-- Image de contenu -->
       <div class="card">
         <h2>Image de contenu</h2>
-        <div class="image-zone" id="contentZone" onclick="document.getElementById('contentInput').click()">
-          <div class="placeholder">
-            <div class="icon">📷</div>
-            <div>Cliquez pour charger une image</div>
-          </div>
-        </div>
-        <input type="file" id="contentInput" accept="image/*">
+        <button type="button" class="image-zone" id="contentZone" aria-label="Importer une image de contenu" aria-describedby="contentFilename">
+          <span class="placeholder">
+            <span class="icon" aria-hidden="true">📷</span><br>
+            <span>Choisir ou déposer une image</span>
+          </span>
+        </button>
+        <input type="file" id="contentInput" accept="image/*" aria-label="Fichier de contenu">
+        <p class="selected-file" id="contentFilename" role="status">Aucun fichier sélectionné</p>
       </div>
 
       <!-- Image de style -->
       <div class="card">
         <h2>Image de style</h2>
-        <div class="image-zone" id="styleZone" onclick="document.getElementById('styleInput').click()">
-          <div class="placeholder">
-            <div class="icon">🖼️</div>
-            <div>Cliquez pour charger un style</div>
-          </div>
-        </div>
-        <input type="file" id="styleInput" accept="image/*">
+        <button type="button" class="image-zone" id="styleZone" aria-label="Importer une image de style" aria-describedby="styleFilename">
+          <span class="placeholder">
+            <span class="icon" aria-hidden="true">🖼️</span><br>
+            <span>Choisir ou déposer un style</span>
+          </span>
+        </button>
+        <input type="file" id="styleInput" accept="image/*" aria-label="Fichier de style">
+        <p class="selected-file" id="styleFilename" role="status">Aucun fichier sélectionné</p>
       </div>
 
       <!-- Résultat -->
       <div class="card">
         <h2>Résultat</h2>
         <div class="result-zone" id="resultZone">
-          <canvas id="resultCanvas"></canvas>
+          <canvas id="resultCanvas" role="button" tabindex="0" aria-label="Agrandir le résultat stylisé" aria-haspopup="dialog" aria-controls="lightbox"></canvas>
           <div class="result-placeholder" id="resultPlaceholder">
             <div class="icon" style="font-size: 3rem; margin-bottom: 0.5rem;">✨</div>
             <div>Le résultat apparaîtra ici</div>
@@ -464,10 +489,10 @@
       </div>
     </div>
 
-    <div class="status" id="status">
+    <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true">
       Chargement du modèle IA (~12 Mo)...
     </div>
-    <div class="progress-bar active" id="progressBar">
+    <div class="progress-bar active" id="progressBar" aria-hidden="true">
       <div class="fill" id="progressFill"></div>
     </div>
 
@@ -482,9 +507,9 @@
     </div>
 
     <!-- Lightbox pour afficher l'image en grand -->
-    <div class="lightbox" id="lightbox">
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Résultat stylisé agrandi" tabindex="-1">
       <div class="lightbox-content">
-        <button class="lightbox-close" id="lightboxClose" title="Fermer (Échap)">✕</button>
+        <button class="lightbox-close" id="lightboxClose" title="Fermer (Échap)" aria-label="Fermer le résultat agrandi">✕</button>
         <img id="lightboxImage" alt="Résultat en grand">
         <div class="lightbox-actions">
           <button class="primary" id="lightboxDownload">📥 Télécharger</button>
@@ -516,6 +541,7 @@
     let styleImg = null;
     let model = null;
     let isProcessing = false;
+    let lightboxTrigger = null;
 
     // Taille maximale des images (pour éviter les problèmes de mémoire GPU)
     const MAX_IMAGE_SIZE = 512;
@@ -656,6 +682,7 @@
     function displayImage(zone, img) {
       zone.innerHTML = '';
       const displayImg = img.cloneNode();
+      displayImg.alt = zone === contentZone ? 'Aperçu de l’image de contenu' : 'Aperçu de l’image de style';
       displayImg.style.maxWidth = '100%';
       displayImg.style.maxHeight = '100%';
       zone.appendChild(displayImg);
@@ -677,7 +704,10 @@
 
       sampleStyles.forEach((style) => {
         // Créer la carte
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.setAttribute('aria-pressed', 'false');
+        card.setAttribute('aria-label', `Choisir ${style.name}, ${style.artist}`);
         card.className = 'style-card';
         card.title = `${style.name} - ${style.artist}`;
 
@@ -688,11 +718,11 @@
         img.loading = 'lazy';
 
         // Info overlay
-        const info = document.createElement('div');
+        const info = document.createElement('span');
         info.className = 'style-info';
         info.innerHTML = `
-          <div class="style-name">${style.name}</div>
-          <div class="style-artist">${style.artist}</div>
+          <span class="style-name">${style.name}</span><br>
+          <span class="style-artist">${style.artist}</span>
         `;
 
         card.appendChild(img);
@@ -703,7 +733,7 @@
           if (card.classList.contains('loading')) return;
 
           // Marquer comme loading
-          document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+          card.setAttribute('aria-busy', 'true');
           card.classList.add('loading');
 
           try {
@@ -711,15 +741,20 @@
             const originalImg = await loadImageFromUrl(style.url);
             styleImg = await resizeImage(originalImg);
             displayImage(styleZone, styleImg);
+            document.getElementById('styleFilename').textContent = `${style.name} — ${style.artist}`;
 
             card.classList.remove('loading');
+            clearSelectedStyles();
             card.classList.add('selected');
+            card.setAttribute('aria-pressed', 'true');
             setStatus(`Style "${style.name}" sélectionné`, 'success');
             updateStylizeButton();
           } catch (err) {
             card.classList.remove('loading');
             setStatus(`Erreur: impossible de charger "${style.name}"`, 'error');
             console.error(err);
+          } finally {
+            card.removeAttribute('aria-busy');
           }
         };
 
@@ -734,6 +769,7 @@
       if (!contentImg || !styleImg || !model || isProcessing) return;
 
       isProcessing = true;
+      document.getElementById('resultZone').setAttribute('aria-busy', 'true');
       stylizeBtn.disabled = true;
       document.body.classList.add('processing');
       progressBar.classList.add('active');
@@ -771,6 +807,7 @@
         console.error(err);
       } finally {
         isProcessing = false;
+        document.getElementById('resultZone').removeAttribute('aria-busy');
         document.body.classList.remove('processing');
         updateStylizeButton();
         setTimeout(() => {
@@ -825,8 +862,15 @@
       const dataUrl = getResultDataUrl();
       if (!dataUrl) return;
       lightboxImage.src = dataUrl;
+      if (!lightbox.classList.contains('active')) {
+        lightboxTrigger = document.activeElement;
+      }
       lightbox.classList.add('active');
+      [...lightbox.parentElement.children].forEach(element => {
+        if (element !== lightbox) element.inert = true;
+      });
       document.body.style.overflow = 'hidden';
+      lightboxClose.focus();
     }
 
     /**
@@ -834,7 +878,68 @@
      */
     function closeLightbox() {
       lightbox.classList.remove('active');
+      [...lightbox.parentElement.children].forEach(element => {
+        if (element !== lightbox) element.inert = false;
+      });
       document.body.style.overflow = '';
+      lightboxTrigger?.focus();
+    }
+
+    /**
+     * Réinitialise l’état accessible des cartes de styles.
+     */
+    function clearSelectedStyles() {
+      document.querySelectorAll('.style-card').forEach(card => {
+        card.classList.remove('selected');
+        card.setAttribute('aria-pressed', 'false');
+      });
+    }
+
+    /**
+     * Relie le bouton natif et le dépôt de fichiers au même chargement.
+     * @param {HTMLButtonElement} zone - Zone d’import
+     * @param {HTMLInputElement} input - Champ fichier
+     * @param {string} kind - Type d’image (content ou style)
+     */
+    function setupImageImport(zone, input, kind) {
+      const loadFile = async (file) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          setStatus('Choisissez un fichier image.', 'error');
+          return;
+        }
+        zone.setAttribute('aria-busy', 'true');
+        try {
+          setStatus('Chargement et redimensionnement...', 'loading');
+          const originalImg = await loadImageFromFile(file);
+          const image = await resizeImage(originalImg);
+          if (kind === 'content') {
+            contentImg = image;
+          } else {
+            styleImg = image;
+            clearSelectedStyles();
+          }
+          displayImage(zone, image);
+          document.getElementById(`${kind}Filename`).textContent = file.name;
+          setStatus(`${file.name} chargé${originalImg.width !== image.width ? ` — ${image.width}×${image.height}px` : ''}`, 'success');
+          updateStylizeButton();
+        } catch (err) {
+          setStatus(`Impossible de charger ${file.name} : ${err.message || 'image illisible'}`, 'error');
+        } finally {
+          zone.removeAttribute('aria-busy');
+          input.value = '';
+        }
+      };
+      zone.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => loadFile(input.files[0]));
+      zone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+      });
+      zone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        loadFile(event.dataTransfer.files[0]);
+      });
     }
 
     /**
@@ -842,45 +947,20 @@
      */
     async function init() {
       // Gestionnaires d'événements pour le chargement d'images
-      contentInput.addEventListener('change', async (e) => {
-        if (e.target.files[0]) {
-          try {
-            setStatus('Chargement et redimensionnement...', 'loading');
-            const originalImg = await loadImageFromFile(e.target.files[0]);
-            contentImg = await resizeImage(originalImg);
-            displayImage(contentZone, contentImg);
-            const resized = originalImg.width !== contentImg.width;
-            setStatus(resized
-              ? `Image redimensionnée à ${contentImg.width}x${contentImg.height}px`
-              : 'Image chargée', 'success');
-            updateStylizeButton();
-          } catch (err) {
-            setStatus(`Erreur de chargement: ${err.message}`, 'error');
-          }
-        }
-      });
-
-      styleInput.addEventListener('change', async (e) => {
-        if (e.target.files[0]) {
-          try {
-            setStatus('Chargement du style...', 'loading');
-            const originalImg = await loadImageFromFile(e.target.files[0]);
-            styleImg = await resizeImage(originalImg);
-            displayImage(styleZone, styleImg);
-            document.querySelectorAll('.style-card').forEach(s => s.classList.remove('selected'));
-            setStatus('Style chargé', 'success');
-            updateStylizeButton();
-          } catch (err) {
-            setStatus(`Erreur de chargement: ${err.message}`, 'error');
-          }
-        }
-      });
+      setupImageImport(contentZone, contentInput, 'content');
+      setupImageImport(styleZone, styleInput, 'style');
 
       stylizeBtn.addEventListener('click', stylize);
       downloadBtn.addEventListener('click', download);
 
       // Lightbox : clic sur le canvas pour agrandir
       resultCanvas.addEventListener('click', openLightbox);
+      resultCanvas.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox();
+        }
+      });
       lightboxClose.addEventListener('click', closeLightbox);
       lightboxDownload.addEventListener('click', download);
 
@@ -891,6 +971,11 @@
 
       // Fermer avec la touche Échap
       document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && lightbox.classList.contains('active')) {
+          e.preventDefault();
+          const target = document.activeElement === lightboxClose ? lightboxDownload : lightboxClose;
+          target.focus();
+        }
         if (e.key === 'Escape' && lightbox.classList.contains('active')) {
           closeLightbox();
         }

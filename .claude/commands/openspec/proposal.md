@@ -1,27 +1,17 @@
-Crée une nouvelle proposition de changement OpenSpec.
+Alias local de compatibilité pour préparer un change OpenSpec.
+Le workflow officiel actuel est OPSX (`/opsx:propose` avec l'intégration Claude).
 
-## Instructions
+1. Lire `AGENTS.md`, `docs/guides/openspec-workflow.md` et `openspec/config.yaml`.
+2. Réutiliser la demande utilisateur ; ne demander des précisions que si un
+   élément réellement bloquant manque. Lire les specs et changes concernés.
+3. Utiliser le CLI local épinglé dans Docker pour consulter les instructions
+   `spec-driven` et créer, si nécessaire, le change avec `openspec new change`.
+4. Rédiger `proposal.md`, `design.md`, `tasks.md` et les deltas avec les
+   en-têtes exacts et des scénarios observables.
+5. Consigner la base d'autorisation réelle. Une demande explicite
+   d'implémentation autorise son périmètre, pas un merge ou un déploiement.
+6. Valider avec `openspec validate <change-id> --strict --no-interactive`
+   dans Docker. Garder les autres changes et les archives intacts.
 
-1. Demande à l'utilisateur de décrire le changement souhaité
-2. Lis `@/openspec/AGENTS.md` pour comprendre le workflow
-3. Lis `@/openspec/project.md` pour les conventions
-4. Explore les specs existantes dans `@/openspec/specs/`
-5. Crée le dossier `openspec/changes/[change-id]/` avec :
-   - `proposal.md` : Pourquoi, Quoi, Impact
-   - `tasks.md` : Checklist d'implémentation
-   - `specs/` : Deltas des spécifications affectées
-
-## Format du Change ID
-
-Utilise kebab-case avec verbe d'action :
-- `add-[feature]` pour ajouts
-- `update-[feature]` pour modifications
-- `remove-[feature]` pour suppressions
-- `refactor-[scope]` pour refactoring
-
-## Validation
-
-Avant de finaliser, vérifie que :
-- [ ] Le proposal.md explique clairement le "pourquoi"
-- [ ] Les tâches sont concrètes et séquentielles
-- [ ] Les specs impactées sont identifiées
+Les artefacts restent modifiables. Les tâches indépendantes peuvent se mener
+en parallèle ; ne pas imposer une séquence sans dépendance réelle.

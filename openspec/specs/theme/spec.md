@@ -1,6 +1,6 @@
 # Theme Specification
 
-## Overview
+## Purpose
 
 Le système de thèmes gère l'apparence visuelle de Playlab42 (clair/sombre). Il :
 
@@ -35,7 +35,7 @@ The system SHALL persist theme preference in localStorage.
 
 #### Scenario: Save preference
 - **WHEN** user changes theme
-- **THEN** choice is saved to `playlab42_theme` key
+- **THEN** choice is saved to `playlab42.theme` key
 
 #### Scenario: Restore preference
 - **WHEN** page loads
@@ -57,7 +57,25 @@ The system SHALL notify components of theme changes.
 #### Scenario: Theme change event
 - **WHEN** effective theme changes
 - **THEN** `themechange` CustomEvent is dispatched on window
-- **AND** event.detail contains `{ theme, effectiveTheme }`
+- **AND** event.detail contains `{ theme }`, the effective `dark` or `light` mode
+
+#### Scenario: Same-origin standalone content
+- **WHEN** the theme preference changes in another same-origin frame or tab
+- **THEN** initialized standalone documents synchronize their `data-theme` attribute
+- **AND** their components receive `themechange`
+
+### Requirement: Accessible Shared Styles
+
+The system SHALL provide common color tokens and interaction styles for its interfaces.
+
+#### Scenario: Text contrast
+- **WHEN** normal-sized text uses the shared text, secondary text or accent tokens
+- **THEN** contrast on the corresponding background is at least 4.5:1 in light and dark modes
+
+#### Scenario: Keyboard focus and reduced motion
+- **WHEN** an interface loads `lib/ui.css`
+- **THEN** keyboard controls have visible focus indicators
+- **AND** nonessential CSS motion respects `prefers-reduced-motion`
 
 ## Interface
 
@@ -110,7 +128,7 @@ function onThemeChange(callback: (theme: EffectiveTheme) => void): () => void;
 ## Constantes
 
 ```typescript
-const THEME_STORAGE_KEY = 'playlab42_theme';
+const THEME_STORAGE_KEY = 'playlab42.theme';
 const THEME_MODES = ['dark', 'light', 'system'] as const;
 const DEFAULT_THEME: ThemeMode = 'system';
 ```
@@ -124,7 +142,7 @@ const DEFAULT_THEME: ThemeMode = 'system';
   <script>
     // Inline dans le head pour éviter FOUC
     (function() {
-      const saved = localStorage.getItem('playlab42_theme');
+      const saved = localStorage.getItem('playlab42.theme');
       const theme = saved || 'system';
       let effective = theme;
       if (theme === 'system') {

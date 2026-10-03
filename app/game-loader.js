@@ -9,6 +9,8 @@ import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
 import { addToRecent, savePreferences } from './storage.js';
 
+let returnFocus = null;
+
 /**
  * Charge un jeu depuis son ID
  * Valide l'existence et synchronise le hash
@@ -32,7 +34,8 @@ export async function openGame(gameId) {
     }
 
     // Charger le jeu (le nom sera trouvé dans le catalogue ou utilisé comme fallback)
-    loadGame(path, gameId, 'game', gameId);
+    const name = state.catalogue?.games.find(game => game.id === gameId)?.name || gameId;
+    loadGame(path, name, 'game', gameId);
 
     // Synchroniser le hash
     window.location.hash = `#/games/${gameId}`;
@@ -57,8 +60,9 @@ export async function openTool(toolId) {
     return;
   }
 
-  // Essayer d'abord le format complexe (dossier), puis le format simple (fichier)
-  const paths = [
+  const tool = state.catalogue?.tools.find(item => item.id === toolId);
+  // Le catalogue evite une requete 404 pour les outils au format fichier.
+  const paths = tool?.path ? [tool.path] : [
     `tools/${toolId}/index.html`,
     `tools/${toolId}.html`,
   ];
@@ -81,7 +85,8 @@ export async function openTool(toolId) {
     }
 
     // Charger l'outil
-    loadGame(validPath, toolId, 'tool', toolId);
+    const name = tool?.name || toolId;
+    loadGame(validPath, name, 'tool', toolId);
 
     // Synchroniser le hash
     window.location.hash = `#/tools/${toolId}`;
@@ -100,6 +105,9 @@ export async function openTool(toolId) {
  * @param {string} id - ID du jeu/outil
  */
 export function loadGame(path, name, type, id) {
+  if (state.currentView !== 'game') {
+    returnFocus = document.activeElement;
+  }
   setState({
     currentGame: { path, name, type, id },
     currentView: 'game',
@@ -113,6 +121,8 @@ export function loadGame(path, name, type, id) {
   el.loading.classList.remove('hidden');
 
   el.gameIframe.src = path;
+  el.gameIframe.title = `${type === 'game' ? 'Jeu' : 'Outil'} : ${name}`;
+  el.btnBack?.focus();
   addToRecent(id, type);
 
   const timeout = setTimeout(() => {
@@ -149,10 +159,15 @@ export function unloadGame() {
     el.viewSettings.classList.remove('active');
     el.viewCatalogue.classList.add('active');
     document.body.classList.remove('fullscreen');
+    el.btnFullscreen?.setAttribute('aria-pressed', 'false');
+    el.btnFullscreen?.setAttribute('aria-label', 'Plein écran');
     document.body.classList.remove('game-active');
 
     // Synchroniser le hash vers le catalogue
     window.location.hash = '#/';
+    if (returnFocus?.isConnected) {
+      returnFocus.focus();
+    }
   }, 100);
 }
 
@@ -161,6 +176,9 @@ export function unloadGame() {
  */
 export function toggleFullscreen() {
   document.body.classList.toggle('fullscreen');
+  const fullscreen = document.body.classList.contains('fullscreen');
+  el.btnFullscreen.setAttribute('aria-pressed', String(fullscreen));
+  el.btnFullscreen.setAttribute('aria-label', fullscreen ? 'Quitter le plein écran' : 'Plein écran');
 }
 
 /**
@@ -185,4 +203,6 @@ export function toggleSound() {
  */
 export function updateSoundButton() {
   el.btnSound.textContent = state.preferences.sound ? '🔊' : '🔇';
+  el.btnSound.setAttribute('aria-label', state.preferences.sound ? 'Désactiver le son' : 'Activer le son');
+  el.btnSound.setAttribute('aria-pressed', String(state.preferences.sound));
 }

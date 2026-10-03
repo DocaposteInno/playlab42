@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mastermind - Playlab42</title>
+    <link rel="stylesheet" href="../../lib/theme.css" />
+    <link rel="stylesheet" href="../../lib/ui.css" />
     <style>
       * {
         box-sizing: border-box;
@@ -12,8 +14,9 @@
       }
 
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-family);
+        background: var(--color-bg);
+        color: var(--color-text);
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -22,7 +25,7 @@
       }
 
       .container {
-        background: white;
+        background: var(--color-bg-card);
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         padding: 30px;
@@ -32,14 +35,14 @@
 
       h1 {
         text-align: center;
-        color: #333;
+        color: var(--color-text);
         margin-bottom: 10px;
         font-size: 2em;
       }
 
       .subtitle {
         text-align: center;
-        color: #666;
+        color: var(--color-text-muted);
         margin-bottom: 20px;
         font-size: 0.9em;
       }
@@ -49,7 +52,7 @@
         justify-content: space-between;
         margin-bottom: 20px;
         padding: 10px;
-        background: #f5f5f5;
+        background: var(--color-bg-secondary);
         border-radius: 10px;
       }
 
@@ -59,13 +62,13 @@
 
       .info-label {
         font-size: 0.8em;
-        color: #666;
+        color: var(--color-text-muted);
       }
 
       .info-value {
         font-size: 1.2em;
         font-weight: bold;
-        color: #333;
+        color: var(--color-text);
       }
 
       .attempts-grid {
@@ -77,20 +80,20 @@
         align-items: center;
         margin-bottom: 10px;
         padding: 10px;
-        background: #f9f9f9;
+        background: var(--color-bg-secondary);
         border-radius: 10px;
         min-height: 60px;
       }
 
       .attempt-row.active {
-        background: #e3f2fd;
-        border: 2px solid #2196f3;
+        background: var(--color-bg-secondary);
+        border: 2px solid var(--color-accent);
       }
 
       .attempt-number {
         width: 40px;
         font-weight: bold;
-        color: #666;
+        color: var(--color-text-muted);
       }
 
       .pegs-container {
@@ -114,27 +117,27 @@
         border-color: #999;
       }
 
-      .peg.R {
+      .peg.R, .color-button.R {
         background: #f44336;
         border-color: #c62828;
       }
-      .peg.B {
+      .peg.B, .color-button.B {
         background: #2196f3;
         border-color: #1565c0;
       }
-      .peg.G {
+      .peg.G, .color-button.G {
         background: #4caf50;
         border-color: #2e7d32;
       }
-      .peg.Y {
+      .peg.Y, .color-button.Y {
         background: #ffeb3b;
         border-color: #f9a825;
       }
-      .peg.O {
+      .peg.O, .color-button.O {
         background: #ff9800;
         border-color: #e65100;
       }
-      .peg.V {
+      .peg.V, .color-button.V {
         background: #9c27b0;
         border-color: #6a1b9a;
       }
@@ -169,7 +172,8 @@
         gap: 12px;
         margin-bottom: 20px;
         padding: 15px;
-        background: #f5f5f5;
+        background: var(--color-bg-secondary);
+        flex-wrap: wrap;
         border-radius: 10px;
       }
 
@@ -181,6 +185,18 @@
         cursor: pointer;
         transition: all 0.2s;
       }
+
+      .color-button, button.peg { padding: 0; flex-shrink: 0; }
+      .color-button span, button.peg span {
+        background: #fff;
+        color: #111;
+        border-radius: 3px;
+        padding: 0 2px;
+        font-size: 0.75rem;
+      }
+      .controls, .game-info { flex-wrap: wrap; gap: 10px; }
+      .attempt-row { flex-wrap: wrap; gap: 6px; }
+      .pegs-container { min-width: 0; }
 
       .color-button:hover {
         transform: scale(1.15);
@@ -208,23 +224,24 @@
       }
 
       .btn-primary {
-        background: #4caf50;
-        color: white;
+        background: var(--color-accent);
+        color: var(--color-text-inverse);
       }
 
       .btn-primary:hover:not(:disabled) {
-        background: #45a049;
+        background: var(--color-accent-hover);
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
       }
 
       .btn-secondary {
-        background: #2196f3;
-        color: white;
+        background: var(--color-bg-secondary);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
       }
 
       .btn-secondary:hover {
-        background: #1976d2;
+        background: var(--color-bg-hover);
       }
 
       button:disabled {
@@ -265,7 +282,7 @@
       .legend {
         margin-top: 20px;
         padding: 15px;
-        background: #f5f5f5;
+        background: var(--color-bg-secondary);
         border-radius: 10px;
         font-size: 0.9em;
       }
@@ -273,7 +290,7 @@
       .legend-title {
         font-weight: bold;
         margin-bottom: 10px;
-        color: #333;
+        color: var(--color-text);
       }
 
       .legend-item {
@@ -340,11 +357,11 @@
       <div class="game-info">
         <div class="info-item">
           <div class="info-label">Tentative</div>
-          <div class="info-value" id="attempt-count">0 / 10</div>
+          <div class="info-value" id="attempt-count" aria-live="polite">0 / 10</div>
         </div>
         <div class="info-item">
           <div class="info-label">Statut</div>
-          <div class="info-value" id="game-status">En cours</div>
+          <div class="info-value" id="game-status" role="status" aria-live="polite">En cours</div>
         </div>
       </div>
 
@@ -356,20 +373,21 @@
       <div class="attempt-row active" id="current-attempt">
         <div class="attempt-number">➜</div>
         <div class="pegs-container" id="current-pegs">
-          <div class="peg" data-index="0"></div>
-          <div class="peg" data-index="1"></div>
-          <div class="peg" data-index="2"></div>
-          <div class="peg" data-index="3"></div>
+          <button type="button" class="peg" data-index="0" aria-label="Position 1, vide"></button>
+          <button type="button" class="peg" data-index="1" aria-label="Position 2, vide"></button>
+          <button type="button" class="peg" data-index="2" aria-label="Position 3, vide"></button>
+          <button type="button" class="peg" data-index="3" aria-label="Position 4, vide"></button>
         </div>
       </div>
 
-      <div class="color-palette">
-        <div class="color-button R" data-color="R"></div>
-        <div class="color-button B" data-color="B"></div>
-        <div class="color-button G" data-color="G"></div>
-        <div class="color-button Y" data-color="Y"></div>
-        <div class="color-button O" data-color="O"></div>
-        <div class="color-button V" data-color="V"></div>
+      <p>Choisissez une couleur pour la première position vide. Activez une position pour changer sa couleur.</p>
+      <div class="color-palette" role="group" aria-label="Palette des couleurs">
+        <button type="button" class="color-button R" data-color="R" aria-label="Ajouter rouge"><span>R</span></button>
+        <button type="button" class="color-button B" data-color="B" aria-label="Ajouter bleu"><span>B</span></button>
+        <button type="button" class="color-button G" data-color="G" aria-label="Ajouter vert"><span>Ve</span></button>
+        <button type="button" class="color-button Y" data-color="Y" aria-label="Ajouter jaune"><span>J</span></button>
+        <button type="button" class="color-button O" data-color="O" aria-label="Ajouter orange"><span>O</span></button>
+        <button type="button" class="color-button V" data-color="V" aria-label="Ajouter violet"><span>Vi</span></button>
       </div>
 
       <div class="controls">
@@ -377,7 +395,7 @@
         <button class="btn-secondary" id="reset-btn">Nouvelle partie</button>
       </div>
 
-      <div id="game-over" style="display: none"></div>
+      <div id="game-over" role="status" aria-live="polite" style="display: none"></div>
 
       <div class="legend">
         <div class="legend-title">📖 Légende des indices</div>
@@ -394,9 +412,12 @@
 
     <script type="module">
       import { MastermindEngine } from './engine.js';
+      import { initTheme } from '../../lib/theme.js';
+      initTheme();
 
       const engine = new MastermindEngine();
       const COLORS = ['R', 'B', 'G', 'Y', 'O', 'V'];
+      const COLOR_NAMES = { R: 'rouge', B: 'bleu', G: 'vert', Y: 'jaune', O: 'orange', V: 'violet' };
       let state = null;
       let currentCode = ['', '', '', ''];
       let currentPegIndex = 0;
@@ -432,14 +453,14 @@
         if (view.gameOver) {
           if (view.winner) {
             gameStatus.textContent = '🎉 Victoire !';
-            gameStatus.style.color = '#2e7d32';
+            gameStatus.style.color = 'var(--color-success)';
           } else {
             gameStatus.textContent = '😔 Défaite';
-            gameStatus.style.color = '#c62828';
+            gameStatus.style.color = 'var(--color-error)';
           }
         } else {
           gameStatus.textContent = 'En cours';
-          gameStatus.style.color = '#333';
+          gameStatus.style.color = 'var(--color-text)';
         }
 
         // Afficher les tentatives précédentes
@@ -455,10 +476,12 @@
         // Bouton submit
         const isComplete = currentCode.every((c) => c !== '');
         submitBtn.disabled = !isComplete || view.gameOver;
+        document.querySelectorAll('.color-button').forEach(button => { button.disabled = view.gameOver || isComplete; });
 
         // Afficher le game over si nécessaire
         if (view.gameOver) {
           showGameOver(view);
+          resetBtn.focus();
         }
       }
 
@@ -466,6 +489,8 @@
       function createAttemptRow(number, code, feedback) {
         const row = document.createElement('div');
         row.className = 'attempt-row';
+        row.setAttribute('role', 'group');
+        row.setAttribute('aria-label', `Tentative ${number} : ${code.map(color => COLOR_NAMES[color]).join(', ')}. ${feedback.black} bien placée(s), ${feedback.white} mal placée(s).`);
 
         const numDiv = document.createElement('div');
         numDiv.className = 'attempt-number';
@@ -520,6 +545,8 @@
           if (currentCode[index]) {
             peg.classList.add(currentCode[index]);
           }
+          peg.setAttribute('aria-label', `Position ${index + 1}, ${COLOR_NAMES[currentCode[index]] || 'vide'}. Activer pour changer la couleur.`);
+          peg.innerHTML = `<span>${currentCode[index] || '?'}</span>`;
         });
       }
 
@@ -539,8 +566,9 @@
 
       // Click sur un peg de la tentative en cours pour changer la couleur
       currentPegs.addEventListener('click', (e) => {
-        if (e.target.classList.contains('peg')) {
-          const index = parseInt(e.target.dataset.index);
+        const peg = e.target.closest('button.peg');
+        if (peg) {
+          const index = parseInt(peg.dataset.index);
           if (currentCode[index]) {
             // Cycle vers la couleur suivante
             const currentColorIndex = COLORS.indexOf(currentCode[index]);
@@ -591,7 +619,7 @@
           html += '<p><strong>Le code secret était :</strong></p>';
           html += '<div class="secret-code-reveal">';
           state.secretCode.forEach((color) => {
-            html += `<div class="peg ${color}"></div>`;
+            html += `<div class="peg ${color}" role="img" aria-label="${COLOR_NAMES[color]}"></div>`;
           });
           html += '</div>';
         }

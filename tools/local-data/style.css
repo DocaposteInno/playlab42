@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  line-height: 1.6;
+}
+
+main {
+  max-width: 48rem;
+  margin: auto;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+section {
+  margin-block: var(--space-lg);
+}
+
+input,
+button {
+  max-width: 100%;
+}
+
+input[type="file"] {
+  box-sizing: border-box;
+  width: 100%;
+  margin-block: var(--space-sm) var(--space-md);
+}
+
+button {
+  white-space: normal;
+}

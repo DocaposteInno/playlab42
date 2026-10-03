@@ -49,6 +49,9 @@ export class MetronomeController extends EventEmitter {
 
     /** @type {Metronome|null} Instance du métronome */
     this._metronome = null;
+    this._disposed = false;
+    this._readyPromise = null;
+    this._playRequest = null;
   }
 
   // --------------------------------------------------------------------------
@@ -159,7 +162,10 @@ export class MetronomeController extends EventEmitter {
 
     // Bouton play/stop
     this.elements.playBtn?.addEventListener('click', () => {
-      this.toggle();
+      this.toggle().catch((error) => {
+        this._updateUI(false);
+        console.error('Audio du métronome indisponible:', error);
+      });
     });
 
     this._initialized = true;
@@ -185,12 +191,22 @@ export class MetronomeController extends EventEmitter {
    *
    * @returns {Promise<Metronome|null>}
    */
-  async ensureReady() {
+  ensureReady() {
+    if (this._disposed) {return Promise.resolve(null);}
     if (this._metronome) {
-      return this._metronome;
+      return Promise.resolve(this._metronome);
     }
+    if (!this._readyPromise) {
+      this._readyPromise = this._prepare().finally(() => {
+        this._readyPromise = null;
+      });
+    }
+    return this._readyPromise;
+  }
 
+  async _prepare() {
     await this._ensureAudioReady();
+    if (this._disposed) {return null;}
     this._createMetronome();
 
     if (this._metronome) {
@@ -210,14 +226,21 @@ export class MetronomeController extends EventEmitter {
    * Démarre le métronome.
    */
   async start() {
-    if (!this._metronome) {
+    if (this._disposed || this._playRequest || this.playing) {return;}
+    const request = {};
+    this._playRequest = request;
+    try {
       await this.ensureReady();
-    }
+      if (this._disposed || this._playRequest !== request) {return;}
 
-    if (this._metronome) {
-      await this._metronome.start();
-      this._updateUI(true);
-      this.emit('start');
+      if (this._metronome) {
+        await this._metronome.start();
+        if (this._disposed || this._playRequest !== request) {return;}
+        this._updateUI(this.playing);
+        if (this.playing) {this.emit('start');}
+      }
+    } finally {
+      if (this._playRequest === request) {this._playRequest = null;}
     }
   }
 
@@ -234,10 +257,9 @@ export class MetronomeController extends EventEmitter {
    * @private
    */
   _stop() {
-    if (this._metronome && this._metronome.playing) {
-      this._metronome.stop();
-      this._updateUI(false);
-    }
+    this._playRequest = null;
+    this._metronome?.stop();
+    this._updateUI(false);
   }
 
   /**
@@ -246,18 +268,12 @@ export class MetronomeController extends EventEmitter {
    * @returns {Promise<boolean>} Nouvel état (true = playing)
    */
   async toggle() {
-    if (!this._metronome) {
-      await this.ensureReady();
+    if (this.playing || this._playRequest) {
+      this.stop();
+    } else {
+      await this.start();
     }
-
-    if (this._metronome) {
-      const isPlaying = await this._metronome.toggle();
-      this._updateUI(isPlaying);
-      this.emit(isPlaying ? 'start' : 'stop');
-      return isPlaying;
-    }
-
-    return false;
+    return this.playing;
   }
 
   // --------------------------------------------------------------------------
@@ -337,6 +353,7 @@ export class MetronomeController extends EventEmitter {
   _updateUI(isPlaying) {
     const btn = this.elements.playBtn;
     if (btn) {
+      btn.setAttribute('aria-pressed', String(isPlaying));
       btn.classList.toggle('playing', isPlaying);
       const icon = btn.querySelector('.metronome-play-icon');
       const text = btn.querySelector('.metronome-play-text');
@@ -384,6 +401,7 @@ export class MetronomeController extends EventEmitter {
    * Nettoie et libère les ressources.
    */
   dispose() {
+    this._disposed = true;
     this._stop();
 
     if (this._metronome) {

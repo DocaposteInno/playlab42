@@ -1,0 +1,76 @@
+import { test, expect, activate, expectNoOverflow, expectVisibleHitTarget } from './fixtures.js';
+
+const epicId = 'hello-playlab42';
+const cardSelector = `.epic-card[data-epic-id="${epicId}"]`;
+
+test('apprentissage : catalogue réel complet, liens et progression de reprise', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator(cardSelector)).toBeVisible();
+  const catalogue = await (await page.request.get('/data/parcours.json')).json();
+  await expect(page.locator('#panel-parcours .epic-card')).toHaveCount(catalogue.epics.length);
+  const ids = await page.locator('#panel-parcours [id]').evaluateAll(elements => elements.map(element => element.id));
+  expect(new Set(ids).size).toBe(ids.length);
+  await expect(page.locator('#discovery-options')).not.toHaveAttribute('open', '');
+  await expect(page.locator(cardSelector)).toHaveAttribute('href', `#/parcours/${epicId}`);
+  await expect(page.locator(cardSelector)).toContainText('15 min');
+  await activate(page.locator(cardSelector));
+  const frame = page.locator('.pv-slide-frame');
+  await expect(frame).toHaveAttribute('src', /01-bienvenue\/index\.html$/);
+  await expect(page.frameLocator('.pv-slide-frame').locator('.slide')).toContainText('PlayLab42');
+  await activate(page.locator('.pv-btn-next'));
+  await expect(frame).toHaveAttribute('src', /02-methodologies\/index\.html$/);
+  await expect(page.locator('.pv-progress-text')).toHaveText('Étape 2 sur 7');
+  await expect(page.locator('.pv-progress-summary')).toHaveText('2 parcourues · 29 %');
+  await expect(page.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '29');
+  await activate(page.locator('.pv-btn-close'));
+  await expect(page.locator('[data-collection="continue"]')).toContainText('Continuer votre lecture');
+  await expect(page.locator(cardSelector)).toBeFocused();
+  await expect(page.locator(cardSelector)).toContainText('Continuer · 29 % parcouru');
+  await page.reload();
+  await expect(page.locator(cardSelector)).toContainText('Continuer · 29 % parcouru');
+  await activate(page.locator(cardSelector));
+  await expect(frame).toHaveAttribute('src', /02-methodologies\/index\.html$/);
+  await expect(page).toHaveURL(/#\/parcours\/hello-playlab42\/02-methodologies$/);
+  await expect(page.locator('.pv-menu-slide.current .pv-menu-item')).toHaveAttribute('aria-current', 'page');
+});
+
+test('apprentissage mobile : plan clavier, lien profond, thème et modèle partagé', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await activate(page.locator('#btn-settings'));
+  await activate(page.locator('#theme-light'));
+  await activate(page.locator('#btn-close-settings'));
+  await page.goto(`/#/parcours/${epicId}/04-creer-outil`);
+  const frame = page.locator('.pv-slide-frame');
+  const slide = page.frameLocator('.pv-slide-frame');
+  await expect(frame).toHaveAttribute('src', /04-creer-outil\/index\.html$/);
+  await expect(slide.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(slide.locator('.slide h1')).toContainText(/outil/i);
+  await expect(slide.locator('.slide')).toHaveCSS('line-height', '28.8px');
+  await expect(slide.locator('.slide .code-block').first()).toBeVisible();
+  await expect.poll(() => frame.evaluate(element =>
+    element.contentDocument.documentElement.scrollWidth <= element.contentWindow.innerWidth,
+  )).toBe(true);
+  await expect(page.locator('.pv-progress-summary')).toHaveText('1 parcourue · 14 %');
+  const menu = page.locator('.pv-btn-menu');
+  await expectVisibleHitTarget(menu);
+  await activate(menu);
+  await expect(page.locator('.pv-btn-close-menu')).toBeFocused();
+  const lastButton = page.locator('.pv-sidebar button').last();
+  await lastButton.focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.pv-btn-close-menu')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeFocused();
+  await expect(frame).toBeVisible();
+  await expect(page.locator('.pv-sidebar')).toBeHidden();
+  await expectNoOverflow(page);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#view-catalogue')).toBeVisible();
+  await expect(page.locator(cardSelector)).toContainText('Continuer · 14 % parcouru');
+  const template = await page.request.get('/parcours/_shared/slide-template.html');
+  expect(template.ok()).toBe(true);
+  expect(await template.text()).toContain('<article class="slide" aria-label="{{TITLE}}">');
+  expect(await (await page.request.get('/parcours/_shared/slide-base.css')).text()).toContain('@import url("./slide.css")');
+});
