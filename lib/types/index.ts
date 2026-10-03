@@ -44,3 +44,9 @@ export type {
   RealTimeGameEngine,
   Bot,
 } from './game-engine.js';
+
+export type {
+  PortalToGameMessage,
+  GameToPortalMessage,
+  GameKitHooks,
+} from './gamekit.js';

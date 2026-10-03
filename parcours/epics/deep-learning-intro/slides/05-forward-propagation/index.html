@@ -7,8 +7,8 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../../parcours/_shared/mathjax-config.js"></script>
+    <script id="MathJax-script" async src="../../../../../assets/vendor/mathjax/tex-mml-chtml.js"></script>
 
     <script type="module">
         import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
@@ -68,7 +68,7 @@
                     <h4 class="font-bold dl-accent-blue mb-3">Visualisez la Propagation</h4>
                     <p class="text-sm dl-text-muted mb-4">Observez les valeurs se propager couche par couche. Chaque neurone calcule <code class="dl-accent-cyan">z = Σ(w·a) + b</code> puis applique l'activation <code class="dl-accent-purple">a = tanh(z)</code>.</p>
                     <div class="my-4">
-                        <canvas id="forwardCanvas" width="700" height="320" class="w-full rounded-lg" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
+                        <canvas id="forwardCanvas" width="700" height="320" class="w-full rounded-lg" role="img" aria-label="Étapes de la propagation avant dans le réseau" style="max-width: 700px; margin: 0 auto; display: block;"></canvas>
                     </div>
                     <div class="flex justify-center gap-4 mt-3">
                         <button id="btnPause" class="px-3 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 text-slate-200">⏸ Pause</button>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JSON Formatter - Playlab42</title>
   <link rel="stylesheet" href="../lib/theme.css">
+  <link rel="stylesheet" href="../lib/ui.css">
   <style>
     * {
       margin: 0;
@@ -58,7 +59,7 @@
 
     button.primary {
       background: var(--color-accent);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     button.primary:hover {
@@ -80,6 +81,8 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1px;
+      min-height: 26rem;
+      min-width: 0;
       background: var(--color-border);
     }
 
@@ -91,6 +94,7 @@
     }
 
     .panel {
+      min-width: 0;
       background: var(--color-bg);
       display: flex;
       flex-direction: column;
@@ -105,6 +109,12 @@
       justify-content: space-between;
       align-items: center;
       transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    }
+
+    @media (max-width: 480px) {
+      header, footer { flex-wrap: wrap; gap: var(--space-sm); }
+      .actions { flex-wrap: wrap; }
+      textarea { min-height: 14rem; }
     }
 
     .panel-header h2 {
@@ -145,6 +155,11 @@
 
     textarea::placeholder {
       color: var(--color-text-muted);
+    }
+
+    textarea:focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: -3px;
     }
 
     .output {
@@ -209,22 +224,23 @@
   <main>
     <div class="panel">
       <div class="panel-header">
-        <h2>Entrée</h2>
-        <span class="status" id="status"></span>
+        <h2><label for="input">Entrée JSON</label></h2>
+        <span class="status" id="status" role="status" aria-atomic="true"></span>
       </div>
       <textarea
         id="input"
         placeholder="Collez votre JSON ici..."
         spellcheck="false"
+        aria-describedby="status"
       ></textarea>
     </div>
 
     <div class="panel">
       <div class="panel-header">
-        <h2>Sortie</h2>
+        <h2 id="output-title">Sortie</h2>
         <span id="size"></span>
       </div>
-      <div class="output" id="output"></div>
+      <div class="output" id="output" role="region" aria-labelledby="output-title" tabindex="0"></div>
     </div>
   </main>
 
@@ -232,6 +248,7 @@
     <span>Playlab42 - JSON Formatter</span>
     <span><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> pour formater</span>
   </footer>
+  <p id="copy-status" role="status" aria-atomic="true"></p>
 
   <script type="module">
     import { $, on, debounce, escapeHtml } from '../lib/dom.js';
@@ -247,21 +264,25 @@
 
     // État
     let lastValidJSON = null;
+    let hasValidJSON = false;
     const indentSize = 2;
 
     /**
      * Applique la coloration syntaxique au JSON (sans innerHTML dangereux)
      */
     function highlightJSON(json) {
-      // Échapper le HTML d'abord
-      const escaped = escapeHtml(json);
-      // Puis appliquer les classes de coloration
-      return escaped
-        .replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, '<span class="key">"$1"</span>:')
-        .replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="string">"$1"</span>')
-        .replace(/\b(-?\d+\.?\d*)\b/g, '<span class="number">$1</span>')
-        .replace(/\b(true|false)\b/g, '<span class="boolean">$1</span>')
-        .replace(/\bnull\b/g, '<span class="null">null</span>');
+      // Une seule passe sur les jetons JSON évite de recolorer les balises générées.
+      return json.replace(/"(?:\\.|[^"\\])*"(?:\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g, (token) => {
+        let type = 'number';
+        if (token.startsWith('"')) {
+          type = token.endsWith(':') ? 'key' : 'string';
+        } else if (token === 'null') {
+          type = 'null';
+        } else if (token === 'true' || token === 'false') {
+          type = 'boolean';
+        }
+        return `<span class="${type}">${escapeHtml(token)}</span>`;
+      });
     }
 
     /**
@@ -269,9 +290,12 @@
      */
     function formatJSON() {
       const input = inputEl.value.trim();
+      hasValidJSON = false;
+      inputEl.removeAttribute('aria-invalid');
 
       if (!input) {
         outputEl.innerHTML = '';
+        outputEl.classList.remove('error');
         statusEl.textContent = '';
         statusEl.className = 'status';
         sizeEl.textContent = '';
@@ -281,6 +305,7 @@
       try {
         const parsed = JSON.parse(input);
         lastValidJSON = parsed;
+        hasValidJSON = true;
         const formatted = JSON.stringify(parsed, null, indentSize);
 
         outputEl.innerHTML = highlightJSON(formatted);
@@ -292,6 +317,7 @@
         const bytes = new Blob([formatted]).size;
         sizeEl.textContent = formatBytes(bytes);
       } catch (e) {
+        inputEl.setAttribute('aria-invalid', 'true');
         outputEl.textContent = `Erreur de syntaxe:\n${e.message}`;
         outputEl.classList.add('error');
 
@@ -305,10 +331,8 @@
      * Minifie le JSON
      */
     function minifyJSON() {
-      if (!lastValidJSON) {
-        formatJSON();
-        if (!lastValidJSON) return;
-      }
+      formatJSON();
+      if (!hasValidJSON) return;
 
       const minified = JSON.stringify(lastValidJSON);
       outputEl.innerHTML = highlightJSON(minified);
@@ -329,10 +353,12 @@
         await navigator.clipboard.writeText(text);
         const originalText = btnCopy.textContent;
         btnCopy.textContent = 'Copié !';
+        $('#copy-status').textContent = 'Résultat copié dans le presse-papiers.';
         setTimeout(() => {
           btnCopy.textContent = originalText;
         }, 1500);
       } catch (e) {
+        $('#copy-status').textContent = 'Copie impossible. Sélectionnez le résultat pour le copier manuellement.';
         console.error('Erreur copie:', e);
       }
     }

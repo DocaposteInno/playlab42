@@ -1,0 +1,110 @@
+/** @jest-environment jsdom */
+import { jest } from '@jest/globals';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const setTheme = jest.fn();
+jest.unstable_mockModule('../../lib/theme.js', () => ({
+  getTheme: () => 'system',
+  initTheme: jest.fn(),
+  setTheme,
+}));
+
+beforeEach(async () => {
+  jest.resetModules();
+  setTheme.mockClear();
+  const html = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'index.html'), 'utf8');
+  document.body.innerHTML = html.match(/<body\b[^>]*>([\s\S]*)<\/body>/)[1];
+  document.documentElement.style.setProperty('--space-md', '1rem');
+  document.documentElement.style.setProperty('--color-bg', '#101827');
+  await import('./gallery.js');
+});
+
+describe('Galerie UI interactive', () => {
+  test('applique un formulaire sans interpréter le HTML saisi', () => {
+    document.getElementById('card-title').value = '<img src=x onerror=alert(1)>';
+    document.getElementById('description').value = 'Description personnalisée';
+    document.getElementById('kind').value = 'Jeu';
+    document.getElementById('spacing').value = '24';
+    document.getElementById('compact').checked = true;
+    document.querySelector('input[value="Prête à relire"]').checked = true;
+    document.getElementById('preview-form').dispatchEvent(new Event('submit', { cancelable: true }));
+    expect(document.getElementById('preview-name').textContent).toBe('<img src=x onerror=alert(1)>');
+    expect(document.getElementById('preview').querySelector('img')).toBeNull();
+    expect(document.getElementById('preview-kind').textContent).toBe('Jeu');
+    expect(document.getElementById('preview-state').textContent).toContain('Prête à relire');
+    expect(document.getElementById('preview').style.padding).toBe('24px');
+    expect(document.getElementById('preview').classList.contains('compact')).toBe(true);
+    expect(document.getElementById('form-status').textContent).toContain('Succès');
+  });
+
+  test('annonce le titre invalide et restitue le focus au champ', () => {
+    document.getElementById('card-title').value = '   ';
+    document.getElementById('preview-form').dispatchEvent(new Event('submit', { cancelable: true }));
+    expect(document.getElementById('form-status').textContent).toContain('Erreur');
+    expect(document.activeElement).toBe(document.getElementById('card-title'));
+    expect(document.getElementById('preview-name').textContent).toBe('Ma contribution');
+  });
+
+  test('utilise le thème partagé et exporte une propriété CSS adaptée au token', () => {
+    const theme = document.getElementById('theme');
+    theme.value = 'light';
+    theme.dispatchEvent(new Event('change'));
+    expect(setTheme).toHaveBeenCalledWith('light');
+    const token = document.getElementById('token');
+    token.value = '--space-md';
+    token.dispatchEvent(new Event('change'));
+    expect(document.getElementById('token-value').textContent).toBe('1rem');
+    expect(document.getElementById('token-code').textContent).toContain('padding: var(--space-md)');
+  });
+
+  test('ouvre un dialogue inspectable et laisse la fermeture native disponible', () => {
+    const dialog = document.getElementById('inspector');
+    dialog.showModal = jest.fn();
+    document.getElementById('open-dialog').click();
+    expect(dialog.showModal).toHaveBeenCalledTimes(1);
+    expect(document.getElementById('card-code').textContent).toContain('Ma contribution');
+    expect(dialog.classList.contains('ui-dialog')).toBe(true);
+    expect(dialog.querySelector('form').getAttribute('method')).toBe('dialog');
+    expect(dialog.querySelector('button').hasAttribute('autofocus')).toBe(true);
+    const cancel = new Event('cancel', { cancelable: true });
+    dialog.dispatchEvent(cancel);
+    expect(cancel.defaultPrevented).toBe(false);
+  });
+
+  test('les boutons produisent des statuts textuels', () => {
+    document.getElementById('primary').click();
+    expect(document.getElementById('button-status').textContent).toContain('Succès');
+    document.getElementById('secondary').click();
+    expect(document.getElementById('button-status').textContent).toContain('Information');
+  });
+
+  test('emploie les composants partagés pour tous les boutons et champs', () => {
+    for (const button of document.querySelectorAll('button')) {
+      expect(button.classList.contains('ui-button')).toBe(true);
+    }
+    for (const field of document.querySelectorAll('select, textarea, input:not([type="checkbox"]):not([type="radio"])')) {
+      expect(field.classList.contains('ui-field')).toBe(true);
+    }
+    expect(document.getElementById('preview').classList.contains('ui-card')).toBe(true);
+    expect(document.getElementById('form-status').classList.contains('ui-status')).toBe(true);
+  });
+
+  test('la feuille partagée reste opt-in et ne remplace pas le comportement du dialogue', () => {
+    const directory = dirname(fileURLToPath(import.meta.url));
+    const css = readFileSync(join(directory, '../../lib/components.css'), 'utf8');
+    expect(css).toContain('@import url("./theme.css")');
+    expect(css).toContain('@import url("./ui.css")');
+    const rules = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@import[^;]*;/g, '');
+    for (const [, selector] of rules.matchAll(/([^{}]+)\{/g)) {
+      if (selector.trim().startsWith('@media')) { continue; }
+      for (const part of selector.split(',')) {
+        expect(part).toContain('.ui-');
+      }
+    }
+    expect(css.match(/\.ui-dialog\s*\{([^}]*)\}/)[1]).not.toMatch(/\bdisplay\s*:/);
+    const local = readFileSync(join(directory, 'gallery.css'), 'utf8');
+    expect(local).not.toMatch(/\.ui-(button|field|status|dialog)\b/);
+  });
+});

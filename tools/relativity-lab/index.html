@@ -7,6 +7,7 @@
 
   <!-- Import du thème Playlab42 -->
   <link rel="stylesheet" href="../../lib/theme.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
 
   <!-- Styles spécifiques au Relativity Lab -->
   <style>
@@ -30,6 +31,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
     #canvas-container {
@@ -37,6 +39,27 @@
       position: relative;
       overflow: hidden;
     }
+
+    .panels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .panels > div {
+      pointer-events: auto;
+      max-height: calc(100dvh - 2 * var(--space-md));
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .panels > .lil-gui.root {
+      position: absolute;
+      top: var(--space-md);
+      right: 310px;
+    }
+
+    .simulation-actions { display: contents; }
 
     #canvas-container canvas {
       display: block;
@@ -115,7 +138,7 @@
 
     .hud-state--running {
       background: var(--color-success);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     .hud-section {
@@ -153,8 +176,9 @@
       border-color: var(--color-accent);
     }
 
-    .hud-select:focus {
-      outline: none;
+    .hud-select:focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: 3px;
       border-color: var(--color-accent);
     }
 
@@ -294,7 +318,6 @@
       margin-top: var(--space-sm);
       font-size: var(--font-size-xs);
       color: var(--color-text-muted);
-      opacity: 0.7;
     }
 
     /* === Vue cockpit (ObserverView) === */
@@ -463,7 +486,7 @@
       gap: var(--space-sm);
       padding: var(--space-md) var(--space-xl);
       background: var(--color-accent);
-      color: white;
+      color: var(--color-text-inverse);
       border: none;
       border-radius: var(--radius-lg);
       font-family: var(--font-family);
@@ -601,18 +624,18 @@
 
     .motor-panel-status--burning {
       background: var(--color-warning);
-      color: white;
+      color: var(--color-text-inverse);
       animation: pulse 0.5s infinite;
     }
 
     .motor-panel-status--success {
       background: var(--color-success);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     .motor-panel-status--error {
       background: var(--color-error);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     @keyframes pulse {
@@ -764,17 +787,17 @@
 
     .motor-thrust-btn--forward {
       background: var(--color-success);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     .motor-thrust-btn--backward {
       background: var(--color-warning);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     .motor-thrust-btn--fire {
       background: var(--color-accent);
-      color: white;
+      color: var(--color-text-inverse);
     }
 
     .motor-thrust-btn:hover {
@@ -1015,6 +1038,70 @@
       border-radius: 50%;
     }
 
+    /* Les panneaux quittent le canvas quand la fenêtre ne permet plus les superpositions. */
+    @media (max-width: 1100px), (max-height: 650px) {
+      html, body { height: auto; min-height: 100%; overflow: auto; }
+      .app-container { height: auto; min-height: 100dvh; }
+      #canvas-container { flex: none; height: clamp(240px, 50dvh, 420px); }
+      .panels {
+        position: static;
+        display: flex;
+        flex: none;
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-md);
+        min-height: 0;
+      }
+      .panels > div, .panels > .lil-gui.root {
+        position: static !important;
+        inset: auto !important;
+        flex: none;
+        width: 100% !important;
+        height: auto;
+        min-width: 0;
+        min-height: 0;
+        max-width: none;
+        max-height: none;
+        overflow: visible;
+      }
+      /* Seuls les graphiques ont une hauteur fixe ; les commandes restent dans le flux. */
+      .panels .oscillo-canvas-wrapper {
+        flex: none;
+        height: 180px;
+      }
+      .panels .doppler-graph-canvas-wrapper {
+        flex: none;
+        height: 120px;
+      }
+      .panels > .lil-gui.root > .children {
+        max-height: none;
+        overflow: visible;
+      }
+      [data-drag-handle] { cursor: default !important; }
+      /* Le statut ne doit pas deplacer un bouton pendant une poussee maintenue. */
+      .motor-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+      }
+      .motor-thrust-btn { min-height: 44px; }
+      .simulation-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-sm);
+        padding: var(--space-sm);
+        flex: none;
+        background: var(--color-bg-secondary);
+        border-top: 1px solid var(--color-border);
+      }
+      .play-button, .reset-button {
+        position: static;
+        transform: none;
+        padding: var(--space-sm) var(--space-md);
+      }
+      .play-button:hover, .play-button:active { transform: none; }
+    }
   </style>
 
   <!-- Initialisation du thème (le plus tôt possible) -->
@@ -1026,27 +1113,31 @@
 <body>
   <div class="app-container">
     <!-- Conteneur pour le canvas Three.js -->
-    <div id="canvas-container">
-      <div class="loading">Chargement</div>
+    <div id="canvas-container" aria-describedby="canvas-help">
+      <div class="loading" role="status">Chargement</div>
     </div>
+    <p id="canvas-help" class="sr-only">Vue 3D des observateurs. Glissez sur le canvas pour tourner, pincez ou utilisez la molette pour zoomer. Les panneaux donnent les données et les commandes de simulation. Espace : lecture ou pause ; R : réinitialiser hors des contrôles.</p>
 
+    <section class="panels" id="panels" aria-label="Panneaux de simulation">
     <!-- HUD (Head-Up Display) -->
-    <div id="hud" class="hud"></div>
+    <div id="hud" class="hud" role="region" aria-label="Mon référentiel" tabindex="0"></div>
 
     <!-- Panneau des horloges lumineuses -->
-    <div id="clock-panel" class="clock-panel"></div>
+    <div id="clock-panel" class="clock-panel" role="region" aria-label="Oscilloscope" tabindex="0"></div>
 
     <!-- Vue cockpit depuis l'observateur de référence -->
-    <div id="observer-view" class="observer-view"></div>
+    <div id="observer-view" class="observer-view" role="region" aria-label="Vue de l’observateur" tabindex="0"></div>
 
     <!-- Panneau de contrôle du moteur -->
-    <div id="motor-panel" class="motor-panel"></div>
+    <div id="motor-panel" class="motor-panel" role="region" aria-label="Moteur à photons" tabindex="0"></div>
 
     <!-- Graphique Doppler -->
-    <div id="doppler-graph" class="doppler-graph"></div>
+    <div id="doppler-graph" class="doppler-graph" role="region" aria-label="Réceptions Doppler" tabindex="0"></div>
+    </section>
 
+    <div class="simulation-actions" role="group" aria-label="Lecture de la simulation">
     <!-- Gros bouton Play/Pause -->
-    <button id="play-button" class="play-button" title="Play/Pause (Espace)">
+    <button id="play-button" class="play-button" title="Lecture/Pause (Espace)" aria-label="Lire la simulation" aria-pressed="false">
       <span class="play-button-icon">▶</span>
       <span class="play-button-text">Play</span>
     </button>
@@ -1055,6 +1146,7 @@
     <button id="reset-button" class="reset-button" title="Reset (R)">
       ↺ Reset
     </button>
+    </div>
   </div>
 
   <!-- Import Map pour les dépendances CDN -->

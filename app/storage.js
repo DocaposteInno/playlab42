@@ -6,53 +6,45 @@
  */
 
 import { state, STORAGE_KEYS, MAX_RECENT } from './state.js';
+import { readLocalData, writeLocalValues } from '../lib/local-data.js';
 
 /**
- * Charge les préférences depuis localStorage
+ * Charge les préférences validées, sans écraser l'état en cas d'erreur.
+ * @returns {boolean} false si le stockage ou une valeur est invalide.
  */
 export function loadPreferences() {
   try {
-    // Pseudo joueur
-    const player = localStorage.getItem(STORAGE_KEYS.PLAYER);
-    if (player) {
-      const parsed = JSON.parse(player);
-      state.preferences.pseudo = parsed.name || 'Anonyme';
-    }
-
-    // Préférences son
-    const prefs = localStorage.getItem(STORAGE_KEYS.PREFERENCES);
-    if (prefs) {
-      const parsed = JSON.parse(prefs);
-      state.preferences.sound = parsed.sound !== false;
-    }
-
-    // Historique récents
-    const recent = localStorage.getItem(STORAGE_KEYS.RECENT);
-    if (recent) {
-      state.recentGames = JSON.parse(recent);
-    }
-
-    // Onglet actif
-    const activeTab = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB);
-    if (activeTab === 'tools' || activeTab === 'games' || activeTab === 'parcours' || activeTab === 'bookmarks') {
-      state.activeTab = activeTab;
-    }
+    const player = readLocalData(STORAGE_KEYS.PLAYER, null);
+    const prefs = readLocalData(STORAGE_KEYS.PREFERENCES, null);
+    const recent = readLocalData(STORAGE_KEYS.RECENT, null);
+    const activeTab = readLocalData(STORAGE_KEYS.ACTIVE_TAB, null);
+    if (player) { state.preferences.pseudo = player.name || 'Anonyme'; }
+    if (prefs) { state.preferences.sound = prefs.sound !== false; }
+    if (recent) { state.recentGames = recent; }
+    if (activeTab) { state.activeTab = activeTab; }
+    return true;
   } catch (e) {
     console.warn('Erreur chargement préférences:', e);
+    return false;
   }
 }
 
 /**
- * Sauvegarde les préférences dans localStorage
+ * Sauvegarde les préférences en une opération avec retour arrière.
+ * @returns {boolean} false si aucune sauvegarde complète n'a pu être réalisée.
  */
 export function savePreferences() {
   try {
-    localStorage.setItem(STORAGE_KEYS.PLAYER, JSON.stringify({ name: state.preferences.pseudo }));
-    localStorage.setItem(STORAGE_KEYS.PREFERENCES, JSON.stringify({ sound: state.preferences.sound }));
-    localStorage.setItem(STORAGE_KEYS.RECENT, JSON.stringify(state.recentGames));
-    localStorage.setItem(STORAGE_KEYS.ACTIVE_TAB, state.activeTab);
+    writeLocalValues({
+      [STORAGE_KEYS.PLAYER]: { name: state.preferences.pseudo },
+      [STORAGE_KEYS.PREFERENCES]: { sound: state.preferences.sound },
+      [STORAGE_KEYS.RECENT]: state.recentGames,
+      [STORAGE_KEYS.ACTIVE_TAB]: state.activeTab,
+    });
+    return true;
   } catch (e) {
     console.warn('Erreur sauvegarde préférences:', e);
+    return false;
   }
 }
 
@@ -63,12 +55,10 @@ export function savePreferences() {
  */
 export function getEpicProgress(epicId) {
   try {
-    const key = 'parcours-progress';
-    const data = localStorage.getItem(key);
-    if (!data) { return { visited: [], current: null }; }
-    const progress = JSON.parse(data);
-    return progress[epicId] || { visited: [], current: null };
-  } catch {
+    const progress = readLocalData('parcours-progress', {});
+    return Object.hasOwn(progress, epicId) ? progress[epicId] : { visited: [], current: null };
+  } catch (e) {
+    console.warn('Erreur lecture progression:', e);
     return { visited: [], current: null };
   }
 }

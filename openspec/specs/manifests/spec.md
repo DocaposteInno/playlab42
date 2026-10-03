@@ -1,6 +1,6 @@
 # Manifests Specification
 
-## Overview
+## Purpose
 
 Les manifests sont des fichiers JSON qui décrivent les tools et games. Ils sont utilisés par le script de build pour générer le catalogue.
 

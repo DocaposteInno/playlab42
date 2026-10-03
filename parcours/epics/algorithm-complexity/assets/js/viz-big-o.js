@@ -23,10 +23,12 @@ export function initBigOViz(containerId) {
   canvas.width = 800;
   canvas.height = 400;
   canvas.className = 'w-full h-full object-contain';
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Comparaison des courbes de complexité en fonction de la taille des données');
 
   // Zoom Controls (Overlay)
   const zoomControls = document.createElement('div');
-  zoomControls.className = 'absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
+  zoomControls.className = 'absolute top-4 right-4 flex flex-col gap-2 group-hover:opacity-100 transition-opacity duration-200';
 
   const btnZoomIn = document.createElement('button');
   btnZoomIn.innerText = '+ Zoom';
@@ -54,6 +56,7 @@ export function initBigOViz(containerId) {
 
   const slider = document.createElement('input');
   slider.type = 'range';
+  slider.setAttribute('aria-label', 'Taille des données N');
   slider.min = '1';
   slider.max = '100'; // Will be scaled by maxN conceptually
   slider.value = '20';

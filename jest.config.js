@@ -8,6 +8,7 @@
  * - lib/module/__tests__/*.test.js : Tests pour modules complexes
  * - games/[id]/engine.test.js : Tests pour les moteurs de jeux
  * - tools/[id]/__tests__/*.test.js : Tests pour les tools complexes
+ * - parcours/.../module.test.js : Tests des interactions et styles pédagogiques
  * - scripts/*.test.js : Tests pour les scripts de build
  *
  * Supporte JavaScript (.js) et TypeScript (.ts)
@@ -28,6 +29,7 @@ export default {
     '**/lib/**/*.test.{js,ts}',
     '**/games/**/*.test.{js,ts}',
     '**/tools/**/*.test.{js,ts}',
+    '**/parcours/**/*.test.{js,ts}',
     '**/scripts/**/*.test.{js,ts}',
   ],
 
@@ -36,7 +38,9 @@ export default {
     '/node_modules/',
     '/data/',
     '/dist/',
+    '/assets/vendor/',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/assets/vendor/'],
 
   // Transformation : esbuild pour TypeScript (transpilation seule, sans
   // vérification de types ; celle-ci est assurée par `npm run typecheck`)

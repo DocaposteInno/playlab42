@@ -53,7 +53,7 @@ export class MotorPanel {
     this.container.innerHTML = `
       <div class="motor-panel-header" data-drag-handle>
         <div class="motor-panel-title">Moteur à photons</div>
-        <div class="motor-panel-status" id="motor-status">Prêt</div>
+        <div class="motor-panel-status" id="motor-status" role="status" aria-atomic="true">Prêt</div>
       </div>
 
       <div class="motor-panel-section">
@@ -71,31 +71,31 @@ export class MotorPanel {
         <div class="motor-panel-label">Direction de poussée</div>
         <div class="motor-direction-controls">
           <div class="motor-direction-row">
-            <label>X:</label>
+            <label for="motor-dir-x">X:</label>
             <input type="range" id="motor-dir-x" min="-1" max="1" step="0.1" value="1">
             <span id="motor-dir-x-val">1.0</span>
           </div>
           <div class="motor-direction-row">
-            <label>Y:</label>
+            <label for="motor-dir-y">Y:</label>
             <input type="range" id="motor-dir-y" min="-1" max="1" step="0.1" value="0">
             <span id="motor-dir-y-val">0.0</span>
           </div>
           <div class="motor-direction-row">
-            <label>Z:</label>
+            <label for="motor-dir-z">Z:</label>
             <input type="range" id="motor-dir-z" min="-1" max="1" step="0.1" value="0">
             <span id="motor-dir-z-val">0.0</span>
           </div>
         </div>
         <div class="motor-direction-presets">
-          <button class="motor-preset" data-dir="1,0,0" title="Avant (+X)">→</button>
-          <button class="motor-preset" data-dir="-1,0,0" title="Arrière (-X)">←</button>
-          <button class="motor-preset" data-dir="0,1,0" title="Haut (+Y)">↑</button>
-          <button class="motor-preset" data-dir="0,-1,0" title="Bas (-Y)">↓</button>
+          <button class="motor-preset" data-dir="1,0,0" title="Avant (+X)" aria-label="Direction avant, axe X positif">→</button>
+          <button class="motor-preset" data-dir="-1,0,0" title="Arrière (-X)" aria-label="Direction arrière, axe X négatif">←</button>
+          <button class="motor-preset" data-dir="0,1,0" title="Haut (+Y)" aria-label="Direction haut, axe Y positif">↑</button>
+          <button class="motor-preset" data-dir="0,-1,0" title="Bas (-Y)" aria-label="Direction bas, axe Y négatif">↓</button>
         </div>
       </div>
 
       <div class="motor-panel-section">
-        <div class="motor-panel-label">Impulsion (kg à brûler)</div>
+        <label class="motor-panel-label" for="motor-impulse">Impulsion (kg à brûler)</label>
         <div class="motor-impulse-controls">
           <input type="range" id="motor-impulse" min="1" max="100" step="1" value="10">
           <span id="motor-impulse-val">10 kg</span>
@@ -109,16 +109,17 @@ export class MotorPanel {
       <div class="motor-panel-section">
         <div class="motor-panel-label">Contrôles</div>
         <div class="motor-thrust-controls">
-          <button class="motor-thrust-btn motor-thrust-btn--backward" id="motor-backward" title="Freiner">
+          <button class="motor-thrust-btn motor-thrust-btn--backward" id="motor-backward" title="Freiner" aria-pressed="false" aria-describedby="motor-hold-help">
             ◀◀ Freiner
           </button>
           <button class="motor-thrust-btn motor-thrust-btn--fire" id="motor-fire" title="Impulsion unique">
             🔥 Fire
           </button>
-          <button class="motor-thrust-btn motor-thrust-btn--forward" id="motor-forward" title="Accélérer">
+          <button class="motor-thrust-btn motor-thrust-btn--forward" id="motor-forward" title="Accélérer" aria-pressed="false" aria-describedby="motor-hold-help">
             Accélérer ▶▶
           </button>
         </div>
+        <p id="motor-hold-help" class="motor-impulse-info">Maintenez le bouton, Entrée ou Espace pour une poussée continue.</p>
       </div>
 
       <div class="motor-panel-section motor-panel-section--small">
@@ -186,6 +187,35 @@ export class MotorPanel {
 
     backwardBtn.addEventListener('touchstart', (e) => { e.preventDefault(); this.#startBurn('backward'); });
     backwardBtn.addEventListener('touchend', () => this.#stopBurn());
+    [forwardBtn, backwardBtn].forEach(btn => {
+      btn.addEventListener('touchcancel', () => this.#stopBurn());
+      btn.addEventListener('blur', () => this.#stopBurn());
+      btn.addEventListener('keydown', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') {
+          event.preventDefault();
+          if (!event.repeat) {
+            this.#startBurn(btn === forwardBtn ? 'forward' : 'backward');
+          }
+        }
+      });
+      btn.addEventListener('keyup', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') {
+          event.preventDefault();
+          this.#stopBurn();
+        }
+      });
+    });
+
+    window.addEventListener('blur', () => {
+      if (this.isBurning) {
+        this.#stopBurn();
+      }
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.isBurning) {
+        this.#stopBurn();
+      }
+    });
   }
 
   /**
@@ -256,6 +286,8 @@ export class MotorPanel {
   #startBurn(direction) {
     this.isBurning = true;
     this.burnDirection = direction;
+    this.container.querySelector('#motor-forward').setAttribute('aria-pressed', String(direction === 'forward'));
+    this.container.querySelector('#motor-backward').setAttribute('aria-pressed', String(direction === 'backward'));
 
     const statusEl = this.container.querySelector('#motor-status');
     statusEl.textContent = direction === 'forward' ? '🔥 Accélération...' : '🔥 Freinage...';
@@ -268,6 +300,8 @@ export class MotorPanel {
   #stopBurn() {
     this.isBurning = false;
     this.burnDirection = null;
+    this.container.querySelector('#motor-forward').setAttribute('aria-pressed', 'false');
+    this.container.querySelector('#motor-backward').setAttribute('aria-pressed', 'false');
 
     const statusEl = this.container.querySelector('#motor-status');
     statusEl.textContent = 'Prêt';

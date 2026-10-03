@@ -7,8 +7,8 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../../parcours/_shared/mathjax-config.js"></script>
+    <script id="MathJax-script" async src="../../../../../assets/vendor/mathjax/tex-mml-chtml.js"></script>
 
     <script type="module">
         import { initSlide, initGlossary } from '../../../../../parcours/_shared/slide-utils.js';
@@ -77,27 +77,27 @@
                 <div class="concept-box mb-8">
                     <h4 class="font-bold dl-accent-blue mb-3">Expérimentez</h4>
                     <div class="my-4">
-                        <canvas id="neuronCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
+                        <canvas id="neuronCanvas" width="600" height="280" class="w-full rounded-lg" role="img" aria-label="Neurone interactif : somme pondérée des entrées et activation" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
                         <p class="text-center text-xs dl-text-muted mt-2">Ajustez les curseurs pour voir l'effet sur la sortie</p>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">x₁ (Diplôme)</label>
+                            <label for="x1" class="text-xs dl-text-muted block mb-1">x₁ (Diplôme)</label>
                             <input type="range" id="x1" min="0" max="10" value="7" class="w-full">
                             <span id="x1Val" class="dl-accent-cyan text-xs font-mono">7</span>
                         </div>
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">x₂ (Expérience)</label>
+                            <label for="x2" class="text-xs dl-text-muted block mb-1">x₂ (Expérience)</label>
                             <input type="range" id="x2" min="0" max="10" value="5" class="w-full">
                             <span id="x2Val" class="dl-accent-cyan text-xs font-mono">5</span>
                         </div>
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">x₃ (Motivation)</label>
+                            <label for="x3" class="text-xs dl-text-muted block mb-1">x₃ (Motivation)</label>
                             <input type="range" id="x3" min="0" max="10" value="8" class="w-full">
                             <span id="x3Val" class="dl-accent-cyan text-xs font-mono">8</span>
                         </div>
                         <div class="text-center">
-                            <label class="text-xs dl-text-muted block mb-1">Biais (b)</label>
+                            <label for="biasSlider" class="text-xs dl-text-muted block mb-1">Biais (b)</label>
                             <input type="range" id="biasSlider" min="-5" max="5" step="0.5" value="-3" class="w-full">
                             <span id="biasVal" class="dl-accent-orange text-xs font-mono">-3</span>
                         </div>
@@ -306,7 +306,7 @@
 
                     <!-- Visualisation interactive -->
                     <div class="my-4 relative">
-                        <canvas id="activationCanvas" width="600" height="280" class="w-full rounded-lg" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
+                        <canvas id="activationCanvas" width="600" height="280" class="w-full rounded-lg" role="img" aria-label="Comparaison des fonctions d'activation tanh, sigmoid et ReLU" style="max-width: 600px; margin: 0 auto; display: block;"></canvas>
                         <div class="flex justify-center gap-4 mt-3">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="showTanh" checked class="accent-cyan-400">

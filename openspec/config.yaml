@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Playlab42 : lire AGENTS.md a la racine, source commune de la stack,
+  des conventions et du workflow Docker-first. Ne pas substituer une stack
+  generique React, un backend ou une obligation TypeScript a ce projet.
+  Lire docs/guides/openspec-workflow.md et les specs et changes concernes.
+  Les guides metier et skills playlab-* referencent ces conventions communes.
+  Ecrire la documentation et les artefacts en francais ; conserver les
+  en-tetes normatifs OpenSpec en anglais. Preserver les archives historiques.
+
+rules:
+  proposal:
+    - Identifier les capabilities nouvelles et modifiees, les fichiers affectes et les exclusions.
+    - Consigner la base reelle de l'autorisation utilisateur sans inventer une revue ou une livraison.
+  specs:
+    - Utiliser les sections ADDED, MODIFIED, REMOVED ou RENAMED Requirements et les en-tetes Requirement et Scenario exacts.
+    - Chaque exigence ajoutee ou modifiee contient SHALL ou MUST et au moins un scenario observable.
+    - Un bloc MODIFIED conserve tous les scenarios existants non explicitement retires.
+  design:
+    - Reutiliser les mecanismes existants et expliquer les dependances reelles et les limites.
+    - Ne pas introduire de framework, backend ou runtime WebSocket pour ce travail.
+  tasks:
+    - Separer les scopes de fichiers et permettre les taches independantes en parallele.
+    - Cocher seulement le travail realise et verifie ; distinguer implementation, validation et livraison.
+
+operations:
+  apply:
+    guidance:
+      - Respecter AGENTS.md et executer les outils du projet uniquement dans Docker.
+      - Une demande explicite autorise son perimetre ; signaler les changements de perimetre.
+  archive:
+    guidance:
+      - Attendre la livraison et une decision explicite ; ne pas archiver un travail non merge ou non deploye si le deploiement est applicable.
+      - Conserver les archives existantes et ne pas inventer de preuve de revue ou de livraison.
+
+githubCopilot:
+  cloudAgent: false

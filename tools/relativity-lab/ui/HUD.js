@@ -30,11 +30,11 @@ export class HUD {
     this.container.innerHTML = `
       <div class="panel-header" data-drag-handle>
         <span class="panel-title">Mon Référentiel</span>
-        <div class="hud-state" id="hud-state">⏸ Pause</div>
+        <div class="hud-state" id="hud-state" role="status">⏸ Pause</div>
       </div>
 
       <div class="hud-section">
-        <div class="hud-label">Point de vue</div>
+        <label class="hud-label" for="hud-ref-select">Point de vue</label>
         <select id="hud-ref-select" class="hud-select"></select>
       </div>
 
