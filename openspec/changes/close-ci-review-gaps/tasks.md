@@ -37,6 +37,16 @@ existantes inchangées :
   Le runtime `.ci-security-validation` et le rapport local `trivy-results.json`
   ont été supprimés après consignation ; leur absence a été vérifiée.
 
-Les checks distants, CI native et publication n'ont pas été modifiés ou exécutés.
-Le coût natif du nouveau chemin critique reste à mesurer après livraison.
-La livraison et l'archivage attendent une décision distincte, hors de cette demande.
+Lors de cette préparation locale, les checks distants, CI native et publication
+n'avaient pas été modifiés ou exécutés.
+
+Après demande explicite d'ouverture de PR, la PR #145 a été créée vers main.
+Les runs natifs `37148235271` (CI) et `37148235235` (Security Audit) ont réussi
+sur le head `a5598b2` le 3 octobre 2026. La
+[preuve datée](../../../docs/guides/software-factory.md#livraison-constatée-et-correctifs-locaux)
+distingue cette validation de l'intégration/publication ; les checks de chaque
+tête ultérieure restent à consulter. Les réglages distants sont inchangés.
+L'utilisateur a ensuite fusionné la PR #145 à main (`8a643e8`) ; les runs de
+publication `37148586787` et de sécurité `37148586535` ont réussi sur ce commit.
+La livraison est constatée, pas effectuée par l'assistant. L'archivage attend
+toujours une décision distincte.

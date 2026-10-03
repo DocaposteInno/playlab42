@@ -83,12 +83,25 @@ describe('Playlab42 — Guide et usine logicielle', () => {
     for (const document of [factory, quality, operations, readme]) {
       expect(document).toMatch(/intégrés? à `?main`? et publiés?/);
       expect(document).toContain('fix/review-software-factory');
-      expect(document).toMatch(/ni intégrés à `?main`?, ni\s+validés par une\s+CI\s+native/);
     }
+    expect(factory).toContain('Validation native constatée');
+    expect(factory).toContain('Cette preuve datée concerne ce head');
+    expect(factory).toContain('quality/tests-first');
     expect(operations).toMatch(/pas qu'un run planifié a été exécuté/);
     expect(operations).toContain('Cela prouve une reprise de fichiers locaux, pas une reprise Pages en production.');
     expect(operations).toContain('Le manifeste est **non signé**');
     expect(readme).toContain("l'archivage nécessite une autorisation distincte");
+  });
+
+  it('explique les tests avant refactoring sans confondre implémentation et livraison', () => {
+    const quality = readFileSync(resolve(root, 'docs/guides/software-quality.md'), 'utf8');
+    const slide = readFileSync(resolve(epicDir, 'slides/10-qualite-ci/index.html'), 'utf8');
+    expect(quality).toContain('## Application tests-first');
+    expect(quality).toContain('tests de comportement avant les refactorings');
+    expect(quality).toContain('sans seuil global artificiel');
+    expect(quality).toContain('non intégrés à main');
+    expect(slide).toContain('Tests avant refactoring');
+    expect(slide).toContain('une couverture élevée ne prouve pas la qualité des assertions');
   });
 
   describe.each(ids)('Slide %s', id => {

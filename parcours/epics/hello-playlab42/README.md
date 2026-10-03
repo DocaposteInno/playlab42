@@ -59,11 +59,15 @@ et le contrôle strict tsc demeure séparé. Les heuristiques consultatives
 restent une dette de triage explicite.
 
 Les correctifs de revue des builders, des images OG et du mode d'écriture
-atomique sont préparés dans `fix/review-software-factory`, pas livrés.
-Le gate préparé sur Build, déjà requis, exige le succès de Security lint et
+atomique issus de `fix/review-software-factory` sont intégrés à main et publiés
+via la PR #145 ; la preuve datée distingue CI de PR et publication.
+Le gate sur Build, déjà requis, exige le succès de Security lint et
 Trivy HIGH/CRITICAL via un workflow réutilisable partagé, sans accepter un
-gate ignoré. Ces correctifs ne sont **ni intégrés à main, ni validés par une CI
-native**. Les neuf checks GitHub requis ne sont pas les dix ressources HTTP
+gate ignoré. Le [plan qualité suivant](../../../docs/guides/software-quality.md#suite-proposée--qualité-du-code-par-étapes)
+est proposé dans la PR #146. Son [application tests-first](../../../docs/guides/software-quality.md#application-tests-first)
+est autorisée dans `quality/tests-first` : caractériser avant refactoring,
+mesurer puis verrouiller les acquis. Ces nouveaux travaux ne sont pas encore livrés.
+Les neuf checks GitHub requis ne sont pas les dix ressources HTTP
 du smoke, qui incluent désormais le manifeste.
 Aucun run cron réussi, rollback de production ou archivage OpenSpec n'est
 déduit de la publication ; l'archivage nécessite une autorisation distincte.
