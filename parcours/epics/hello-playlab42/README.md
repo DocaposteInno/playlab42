@@ -39,6 +39,15 @@ sur autorisation : PR et neuf checks requis après observation de la PR #135, sa
 indépendante attend un second reviewer. L'extension des seuils, prévisualisations,
 provenance signée et surveillance périodique restent proposées.
 
+Le lot 1 est intégré à `main` via la [PR #135](https://github.com/z4ppy/playlab42/pull/135)
+(`b20c1e1`). Le change actif `pin-and-modernize-quality-toolchain`
+prépare le lot 2 dans un worktree empilé : lint de sécurité JS ciblé, références
+immuables, scanners vérifiés, corrections du glossaire et du formateur JSON.
+Les slides décrivent cette branche ; la livraison du lot 2 reste distincte.
+Le lot 3 priorise la couverture du lint (TS et scripts HTML pertinents), sans
+forcer les dépendances ; le lot 4 traite la qualité du code. Les heuristiques
+consultatives restent une dette de triage explicite.
+
 ## Présentation et validation
 
 Les styles sont locaux (`playlab-guide.css`) et utilisent le thème et les primitives partagés. Les exercices utilisent des éléments `<details>` natifs, sans JavaScript ni CDN supplémentaire. Le contenu se lit en thème clair, sombre ou système, sur desktop et mobile.
@@ -51,5 +60,6 @@ make npm CMD="run build:local"
 make npm CMD="test -- --runInBand --runTestsByPath scripts/playlab-guide.test.js scripts/parcours-utils.test.js"
 make npm CMD="run test:e2e -- e2e/learning.spec.js e2e/playlab-guide.spec.js"
 make lint
+make security-eslint
 make typecheck
 ```
