@@ -46,7 +46,7 @@ Jest pour moteur, invariants, reprise JSON et interaction DOM. Navigation réell
 si un navigateur est disponible ; ne pas ajouter de framework E2E au dépôt.
 Build catalogue, lint ciblé et typecheck existants dans le conteneur de l'agent.
 
-## Anomalie partagée isolée
+## Anomalie partagée isolée et intégration de main
 
 Un `SecurityError` de localStorage faisait échouer `GameKit.loadProgress` pendant
 le nettoyage tenté par son catch. Correction et régressions créées dans le worktree
@@ -54,13 +54,23 @@ le nettoyage tenté par son catch. Correction et régressions créées dans le w
 dans cette branche. Les erreurs inattendues restent propagées ; un refus d'accès
 est journalisé et ne provoque pas de suppression.
 
+Après la refonte SDK de main, la résolution du conflit conserve `readLocalData`
+et son stockage versionné. La régression du refus d'accès vérifie désormais la
+cause `SecurityError` de `LocalDataError`. Le nettoyage des JSON corrompus n'est
+pas réintroduit : les données restent disponibles pour sauvegarde/restauration.
+La politique du SDK courant remplace celle du correctif historique.
+
 ## Résultat de réalisation
 
 136 scénarios moteur, 20 scénarios contrôleur/records et 5 scénarios présentation.
-Les 44 scénarios GameKit couvrent aussi la correction isolée. Les parcours
+Les scénarios GameKit couvrent aussi la correction isolée. Les parcours
 Chromium couvrent clavier, boutons, modes, pause/reprise, unload, affichage à 320 px,
 réduction des animations et stockage refusé. Vignette PNG 380×180, moins de 50 Ko,
 générée depuis le SVG original ; aucune dépendance ajoutée au projet.
+
+Les parcours initialement exécutés depuis les artefacts de session sont désormais
+versionnés dans `e2e/tetris.spec.js`, avec les fixtures et la CI Playwright ajoutées
+depuis sur main. Ils ne dépendent plus du script temporaire pour être reproductibles.
 
 Les horloges fractionnaires peuvent présenter des écarts de quelques ulps entre
 partitions différentes ; les mêmes ticks restent strictement déterministes.

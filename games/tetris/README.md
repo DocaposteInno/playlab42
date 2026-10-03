@@ -113,9 +113,12 @@ npm test -- --runInBand games/tetris lib/gamekit.test.js
 npx --no-install eslint games/tetris
 npm run typecheck
 npm run build:catalogue
+npm run test:e2e -- e2e/tetris.spec.js
 ```
 
 Les tests Jest couvrent le moteur et le vrai contrôleur DOM (Canvas et audio
-injectés). Aucun outil E2E supplémentaire n'est ajouté aux dépendances du projet.
+injectés). Les parcours Playwright sont versionnés dans `e2e/tetris.spec.js` et
+utilisent les fixtures du projet : clavier, pause, modes, petite largeur, stockage
+refusé et intégration portail. Aucune dépendance supplémentaire n'est ajoutée.
 OpenSpec : `openspec/changes/add-tetris-game/`. La proposition reste active
 jusqu'à validation humaine et déploiement.
