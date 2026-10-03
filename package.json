@@ -43,10 +43,10 @@
     "@eslint/js": "^10.0.1",
     "@fission-ai/openspec": "1.14.0",
     "@mathjax/mathjax-newcm-font": "4.1.3",
-    "@playlab42/braces": "file:vendor/braces",
     "@playwright/test": "1.63.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.3",
+    "braces": "file:vendor/braces",
     "esbuild": "^0.28.0",
     "eslint": "^10.11.0",
     "globals": "^17.12.0",
@@ -64,6 +64,6 @@
     "yaml": "2.9.1"
   },
   "overrides": {
-    "braces": "$@playlab42/braces"
+    "braces": "$braces"
   }
 }

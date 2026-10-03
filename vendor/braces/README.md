@@ -4,7 +4,10 @@ This local, private package is based on **braces 3.0.3**, upstream commit
 `74b2db2938fad48a2ea54a9c8bf27a37a62c350d`:
 https://github.com/micromatch/braces/tree/3.0.3
 
-The original MIT license is preserved in `LICENSE`. The root npm override
+The original MIT license is preserved in `LICENSE`. The local version
+`3.0.4-playlab42.1` identifies this patched code and is not a published upstream
+version. The package retains its `braces` name so npm installs the same module
+for direct and transitive consumers. The root npm override
 replaces `braces` for every consumer, including OpenSpec 1.14.0's
 `fast-glob -> micromatch` chain. This is a patched fork, not an upstream
 release or an advisory exemption.

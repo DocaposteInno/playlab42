@@ -1,6 +1,6 @@
 {
-  "name": "@playlab42/braces",
-  "version": "3.0.3-playlab42.1",
+  "name": "braces",
+  "version": "3.0.4-playlab42.1",
   "private": true,
   "description": "Local MIT fork of braces 3.0.3 with bounded AST traversal",
   "type": "commonjs",
