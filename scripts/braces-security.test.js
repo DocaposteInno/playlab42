@@ -7,6 +7,7 @@ const fork = require('../vendor/braces');
 const micromatch = require('micromatch');
 const glob = require('fast-glob');
 const { MAX_DEPTH } = require('../vendor/braces/lib/depth');
+const { MAX_LENGTH } = require('../vendor/braces/lib/constants');
 
 const deepAst = (depth) => {
   let node = { type: 'text', value: 'a' };
@@ -31,12 +32,13 @@ describe('bounded braces dependency', () => {
   });
 
   it.each([
-    ['braces', '{'.repeat(20000) + 'a' + '}'.repeat(20000)],
-    ['parentheses', '('.repeat(20000) + 'a' + ')'.repeat(20000)],
-    ['mixed delimiters', '{('.repeat(10000) + 'a' + ')}'.repeat(10000)],
-    ['unclosed braces', '{'.repeat(20000) + 'a'],
-    ['unclosed parentheses', '('.repeat(20000) + 'a'],
+    ['braces', `${'{'.repeat(4000)}a${'}'.repeat(4000)}`],
+    ['parentheses', `${'('.repeat(4000)}a${')'.repeat(4000)}`],
+    ['mixed delimiters', `${'{('.repeat(2000)}a${')}'.repeat(2000)}`],
+    ['unclosed braces', `${'{'.repeat(8000)}a`],
+    ['unclosed parentheses', `${'('.repeat(8000)}a`],
   ])('rejects deeply nested %s before any recursive traversal', (_label, pattern) => {
+    expect(pattern.length).toBeLessThan(MAX_LENGTH);
     for (const method of ['parse', 'stringify', 'compile', 'expand']) {
       expectDepthError(() => braces[method](pattern, {
         maxLength: Infinity,
@@ -92,25 +94,25 @@ describe('bounded braces dependency', () => {
 
   it('bounds scheduled nodes before a wide cyclic AST can exhaust memory', () => {
     const node = { type: 'root', nodes: [] };
-    node.nodes = Array(65536).fill(node);
+    node.nodes = Array(MAX_LENGTH).fill(node);
     expect(() => braces.stringify(node)).toThrow(expect.objectContaining({
       code: 'ERR_BRACES_NODES',
     }));
   });
 
   it('accepts the depth boundary and rejects the next level', () => {
-    const pattern = '{'.repeat(MAX_DEPTH - 1) + 'a' + '}'.repeat(MAX_DEPTH - 1);
+    const pattern = `${'{'.repeat(MAX_DEPTH - 1)}a${'}'.repeat(MAX_DEPTH - 1)}`;
     expect(braces.stringify(pattern)).toBe(pattern);
     expect(braces.expand(pattern)).toEqual([pattern]);
-    expectDepthError(() => braces.parse('{' + pattern + '}'));
+    expectDepthError(() => braces.parse(`{${pattern}}`));
     expect(braces.stringify(deepAst(MAX_DEPTH))).toBe('a');
     expectDepthError(() => braces.stringify(deepAst(MAX_DEPTH + 1)));
   });
 
   it('preserves escaping, quotes and character classes without false depth errors', () => {
     const literal = '{'.repeat(200);
-    expect(braces.stringify('"' + literal + '"')).toBe(literal);
-    expect(braces.stringify('[' + literal + ']')).toBe('[' + literal + ']');
+    expect(braces.stringify(`"${literal}"`)).toBe(literal);
+    expect(braces.stringify(`[${literal}]`)).toBe(`[${literal}]`);
     expect(braces.stringify('\\{'.repeat(200))).toBe(literal);
   });
 
@@ -122,7 +124,7 @@ describe('bounded braces dependency', () => {
     ]);
     expect(braces.compile('a/{b,c}/d')).toBe('a/(b|c)/d');
     expect(braces.expand('a/{b,c}/d', { nodupes: true })).toEqual(['a/b/d', 'a/c/d']);
-    expect(braces.expand('{1..10001}')).toThrow(/range limit/);
+    expect(() => braces.expand('{1..10001}')).toThrow(/range limit/);
     expect(braces.stringify('a/{b,c')).toBe('a/{b,c');
     expect(braces(['{a,b}', '{b,c}'], { expand: true, nodupes: true })).toEqual(['a', 'b', 'c']);
   });
@@ -133,7 +135,7 @@ describe('bounded braces dependency', () => {
       'vendor/braces/index.js',
       'vendor/braces/lib/parse.js',
     ]);
-    expectDepthError(() => micromatch.braces('{'.repeat(20000) + 'a' + '}'.repeat(20000)));
+    expectDepthError(() => micromatch.braces(`${'{'.repeat(4000)}a${'}'.repeat(4000)}`));
   });
 
   it('keeps the actual OpenSpec CLI functional', () => {
