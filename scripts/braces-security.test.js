@@ -70,6 +70,14 @@ describe('bounded braces dependency', () => {
     }));
   });
 
+  it('bounds scheduled nodes before a wide cyclic AST can exhaust memory', () => {
+    const node = { type: 'root', nodes: [] };
+    node.nodes = Array(65536).fill(node);
+    expect(() => braces.stringify(node)).toThrow(expect.objectContaining({
+      code: 'ERR_BRACES_NODES',
+    }));
+  });
+
   it('accepts the depth boundary and rejects the next level', () => {
     const pattern = '{'.repeat(MAX_DEPTH - 1) + 'a' + '}'.repeat(MAX_DEPTH - 1);
     expect(braces.stringify(pattern)).toBe(pattern);
