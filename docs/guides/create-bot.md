@@ -499,4 +499,6 @@ Avant de finaliser votre bot :
 - [Créer un moteur](create-game-engine.md) - Logique de jeu
 - [Créer un client](create-game-client.md) - Interface utilisateur
 - [Spec Bot](../../openspec/specs/bot/spec.md) - Spécification complète
-- [Bots Tic-Tac-Toe](../../games/tictactoe/bots/) - Exemples réels
+- Bots Tic-Tac-Toe : [aléatoire](../../games/tictactoe/bots/random.js),
+  [bloqueur](../../games/tictactoe/bots/blocker.js) et
+  [optimal](../../games/tictactoe/bots/perfect.js) - Exemples réels

@@ -62,6 +62,9 @@ export class MenuController extends EventEmitter {
     }
 
     const filteredExercises = this._getFilteredExercises();
+    const focusedElement = this.container.contains(document.activeElement) ? document.activeElement : null;
+    const focusedFilter = focusedElement?.closest('[data-filter]')?.dataset.filter;
+    const focusedValue = focusedElement?.dataset.value;
 
     this.container.innerHTML = `
       <div class="menu-container">
@@ -71,7 +74,7 @@ export class MenuController extends EventEmitter {
         <div class="filters-bar">
           <div class="filter-group">
             <label class="filter-label">Catégorie</label>
-            <div class="filter-buttons" data-filter="category">
+            <div class="filter-buttons" data-filter="category" role="group" aria-label="Catégorie">
               <button class="filter-btn ${this.filters.category === 'all' ? 'active' : ''}" data-value="all">Tous</button>
               <button class="filter-btn ${this.filters.category === 'notes' ? 'active' : ''}" data-value="notes">🎼 Notes</button>
               <button class="filter-btn ${this.filters.category === 'intervals' ? 'active' : ''}" data-value="intervals">↕️ Intervalles</button>
@@ -82,7 +85,7 @@ export class MenuController extends EventEmitter {
 
           <div class="filter-group">
             <label class="filter-label">Difficulté</label>
-            <div class="filter-buttons" data-filter="difficulty">
+            <div class="filter-buttons" data-filter="difficulty" role="group" aria-label="Difficulté">
               <button class="filter-btn ${this.filters.difficulty === 'all' ? 'active' : ''}" data-value="all">Tous</button>
               <button class="filter-btn ${this.filters.difficulty === 1 ? 'active' : ''}" data-value="1">★☆☆</button>
               <button class="filter-btn ${this.filters.difficulty === 2 ? 'active' : ''}" data-value="2">★★☆</button>
@@ -110,7 +113,21 @@ export class MenuController extends EventEmitter {
       </div>
     `;
 
+    this.container.querySelectorAll('.filter-btn').forEach(button => {
+      button.setAttribute('aria-pressed', String(button.classList.contains('active')));
+      const group = button.closest('[data-filter]').dataset.filter;
+      if (group === 'difficulty' && button.dataset.value !== 'all') {
+        button.setAttribute('aria-label', `Difficulté ${button.dataset.value}`);
+      }
+    });
     this._setupEventListeners();
+    if (focusedFilter) {
+      const group = [...this.container.querySelectorAll('[data-filter]')].find(element => element.dataset.filter === focusedFilter);
+      const target = focusedValue
+        ? [...group.querySelectorAll('[data-value]')].find(element => element.dataset.value === focusedValue)
+        : group;
+      target?.focus();
+    }
   }
 
   /**
@@ -136,24 +153,24 @@ export class MenuController extends EventEmitter {
     const stars = '★'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
 
     return `
-      <div class="exercise-card ${locked ? 'locked' : ''}" data-exercise-id="${id}">
-        <div class="exercise-card-category">
+      <button type="button" class="exercise-card ${locked ? 'locked' : ''}" data-exercise-id="${id}" ${locked ? 'disabled' : ''}>
+        <span class="exercise-card-category">
           <span class="category-icon">${icon || ''}</span>
           <span class="category-name">${categoryName || ''}</span>
-        </div>
-        <div class="exercise-card-content">
-          <div class="exercise-card-info">
-            <div class="exercise-card-title">
+        </span>
+        <span class="exercise-card-content">
+          <span class="exercise-card-info">
+            <span class="exercise-card-title">
               ${locked ? '🔒 ' : ''}${title}
-            </div>
-            <div class="exercise-card-description">${description}</div>
-          </div>
-          <div class="exercise-card-meta">
-            <div class="exercise-card-stars">${stars}</div>
-            ${progress > 0 ? `<div class="exercise-card-progress">${Math.round(progress * 100)}%</div>` : ''}
-          </div>
-        </div>
-      </div>
+            </span>
+            <span class="exercise-card-description">${description}</span>
+          </span>
+          <span class="exercise-card-meta">
+            <span class="exercise-card-stars" role="img" aria-label="Difficulté ${difficulty} sur 5">${stars}</span>
+            ${progress > 0 ? `<span class="exercise-card-progress">${Math.round(progress * 100)}%</span>` : ''}
+          </span>
+        </span>
+      </button>
     `;
   }
 
@@ -210,7 +227,8 @@ export class MenuController extends EventEmitter {
    */
   _setupEventListeners() {
     // Délégation d'événements pour les filtres
-    this.container.addEventListener('click', (e) => {
+    if (this._clickHandler) {this.container.removeEventListener('click', this._clickHandler);}
+    this._clickHandler = (e) => {
       // Clic sur un bouton de filtre
       const filterBtn = e.target.closest('.filter-btn');
       if (filterBtn) {
@@ -235,7 +253,8 @@ export class MenuController extends EventEmitter {
         const exerciseId = card.dataset.exerciseId;
         this.emit('exercise-selected', { exerciseId });
       }
-    });
+    };
+    this.container.addEventListener('click', this._clickHandler);
 
     // Checkbox pour showLocked
     const lockedCheckbox = this.container.querySelector('[data-filter="showLocked"]');
@@ -273,6 +292,7 @@ export class MenuController extends EventEmitter {
   dispose() {
     super.dispose();
     if (this.container) {
+      this.container.removeEventListener('click', this._clickHandler);
       this.container.innerHTML = '';
     }
   }

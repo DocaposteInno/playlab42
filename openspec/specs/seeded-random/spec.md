@@ -1,6 +1,6 @@
 # SeededRandom Specification
 
-## Overview
+## Purpose
 
 SeededRandom est un générateur de nombres pseudo-aléatoires déterministe. Avec la même seed, il produit toujours la même séquence de nombres. C'est essentiel pour :
 

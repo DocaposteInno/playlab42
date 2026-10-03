@@ -67,6 +67,9 @@ export class Metronome {
 
     /** @type {number} Dernier temps joué (pour éviter les conflits Tone.js) */
     this._lastPlayTime = 0;
+    this._disposed = false;
+    this._startPromise = null;
+    this._startRequest = null;
   }
 
   // --------------------------------------------------------------------------
@@ -83,6 +86,7 @@ export class Metronome {
     if (!this.audioEngine.started) {
       await this.audioEngine.start();
     }
+    if (this._disposed || this._clickSynth) {return;}
 
     const Tone = this.audioEngine.Tone;
 
@@ -110,10 +114,21 @@ export class Metronome {
   /**
    * Démarre le métronome
    */
-  async start() {
-    if (this.playing) {return;}
+  start() {
+    if (this._disposed || this.playing) {return Promise.resolve();}
+    if (this._startPromise) {return this._startPromise;}
+    const request = {};
+    this._startRequest = request;
+    const promise = this._start(request).finally(() => {
+      if (this._startPromise === promise) {this._startPromise = null;}
+    });
+    this._startPromise = promise;
+    return promise;
+  }
 
+  async _start(request) {
     await this._initClickSynth();
+    if (this._disposed || this._startRequest !== request) {return;}
 
     this.playing = true;
     this.currentBeat = 0;
@@ -131,7 +146,8 @@ export class Metronome {
    * Arrête le métronome
    */
   stop() {
-    if (!this.playing) {return;}
+    this._startRequest = null;
+    this._startPromise = null;
 
     this.playing = false;
     this.currentBeat = 0;
@@ -148,7 +164,7 @@ export class Metronome {
    * @returns {Promise<boolean>} Nouvel état (true = playing)
    */
   async toggle() {
-    if (this.playing) {
+    if (this.playing || this._startRequest) {
       this.stop();
     } else {
       await this.start();
@@ -309,6 +325,7 @@ export class Metronome {
    * Nettoie et libère les ressources
    */
   dispose() {
+    this._disposed = true;
     this.stop();
 
     if (this._clickSynth) {

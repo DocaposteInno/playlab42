@@ -7,8 +7,8 @@
 
     <link rel="stylesheet" href="../../../../../lib/theme.css">
     <link rel="stylesheet" href="../../_shared/deep-learning.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../../parcours/_shared/mathjax-config.js"></script>
+    <script id="MathJax-script" async src="../../../../../assets/vendor/mathjax/tex-mml-chtml.js"></script>
 
     <script type="module">
         import { initSlide, initGlossary, sendTOC, setupScrollHandler } from '../../../../../parcours/_shared/slide-utils.js';
@@ -194,7 +194,7 @@
                         Dans la formule, on <strong>multiplie par σ'(z)</strong> à chaque couche. Problème : quand un neurone est <em>saturé</em> (z très grand ou très petit), sa dérivée σ'(z) ≈ 0. Le gradient se retrouve multiplié par ~0 et <strong>disparaît</strong>.
                     </p>
                     <div class="flex flex-col items-center">
-                        <canvas id="tanhDerivCanvas" width="450" height="180" class="rounded-lg" style="max-width: 450px;"></canvas>
+                        <canvas id="tanhDerivCanvas" width="450" height="180" class="rounded-lg" role="img" aria-label="Fonction tanh et sa dérivée" style="max-width: 450px;"></canvas>
                         <p class="text-xs dl-text-muted mt-2 italic">Survolez pour voir les valeurs. Notez que tanh'(z) → 0 aux extrémités.</p>
                         <div class="flex gap-6 mt-2">
                             <div class="flex items-center gap-2">
@@ -341,10 +341,10 @@
                 <div class="my-6 p-4 dl-card rounded-xl border">
                     <h4 class="font-bold dl-accent-blue mb-3 text-center">Descente de Gradient Interactive</h4>
                     <div class="flex flex-col items-center gap-3">
-                        <canvas id="gradientCanvas" width="480" height="220" class="rounded-lg" style="max-width: 480px;"></canvas>
+                        <canvas id="gradientCanvas" width="480" height="220" class="rounded-lg" role="img" aria-label="Descente de gradient sur la fonction de perte" style="max-width: 480px;"></canvas>
                         <div class="flex flex-wrap justify-center gap-3">
                             <div class="flex items-center gap-2">
-                                <label class="text-sm dl-text-secondary">η =</label>
+                                <label for="learningRate" class="text-sm dl-text-secondary">η =</label>
                                 <input type="range" id="learningRate" min="0.01" max="1.5" step="0.01" value="0.3" class="w-20">
                                 <span id="lrValue" class="font-mono dl-accent-cyan w-10 text-sm">0.30</span>
                             </div>
@@ -521,10 +521,10 @@
                 <div class="my-6 p-4 dl-card rounded-xl border">
                     <h4 class="font-bold dl-accent-blue mb-3 text-center text-sm">Adam vs Descente de Gradient</h4>
                     <div class="flex flex-col items-center gap-3">
-                        <canvas id="adamCanvas" width="480" height="200" class="rounded-lg" style="max-width: 480px;"></canvas>
+                        <canvas id="adamCanvas" width="480" height="200" class="rounded-lg" role="img" aria-label="Comparaison des trajectoires d'Adam et de la descente de gradient" style="max-width: 480px;"></canvas>
                         <div class="flex flex-wrap justify-center gap-3">
                             <div class="flex items-center gap-2">
-                                <label class="text-sm dl-text-secondary">η =</label>
+                                <label for="adamLR" class="text-sm dl-text-secondary">η =</label>
                                 <input type="range" id="adamLR" min="0.01" max="1.0" step="0.01" value="0.3" class="w-16">
                                 <span id="adamLRValue" class="font-mono dl-accent-cyan w-10 text-sm">0.30</span>
                             </div>

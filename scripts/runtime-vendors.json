@@ -1,0 +1,29 @@
+{
+  "libraries": [
+    {
+      "package": "tone",
+      "version": "15.1.22",
+      "bundle": "build/esm/index.js",
+      "destination": "tone/tone.js"
+    },
+    {
+      "package": "vexflow",
+      "version": "5.0.0",
+      "bundle": "build/esm/entry/vexflow.js",
+      "destination": "vexflow/vexflow.js"
+    },
+    {
+      "package": "mathjax",
+      "version": "4.1.3",
+      "copy": ["."],
+      "destination": "mathjax"
+    },
+    {
+      "package": "@mathjax/mathjax-newcm-font",
+      "version": "4.1.3",
+      "copy": ["chtml.js", "chtml", "svg.js", "svg"],
+      "destination": "mathjax-newcm-font",
+      "licenseFrom": "mathjax"
+    }
+  ]
+}

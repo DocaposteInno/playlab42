@@ -1,0 +1,12 @@
+.git
+node_modules
+assets/vendor
+docs/site
+coverage
+playwright-report
+test-results
+logs
+tmp
+temp
+.env
+.env.*

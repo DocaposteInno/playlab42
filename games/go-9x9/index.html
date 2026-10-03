@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go 9x9 - Playlab42</title>
     <link rel="stylesheet" href="../../lib/theme.css">
+    <link rel="stylesheet" href="../../lib/ui.css">
     <style>
         :root {
             --board-size: min(80vmin, 720px);
@@ -31,13 +32,14 @@
 
         .layout {
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: minmax(0, 1fr) 320px;
             gap: var(--space-xl);
             width: 100%;
             max-width: 1200px;
         }
 
         .panel {
+            min-width: 0;
             background: var(--color-bg-secondary);
             padding: var(--space-lg);
             border-radius: var(--radius-lg);
@@ -53,8 +55,9 @@
             position: relative;
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            width: var(--board-size);
-            height: var(--board-size);
+            width: min(var(--board-size), 100%);
+            aspect-ratio: 1;
+            box-sizing: border-box;
             background: #d2a15f;
             border: 6px solid #b58646;
             box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.1);
@@ -178,7 +181,7 @@
 
         .btn-primary {
             background: var(--color-accent);
-            color: #fff;
+            color: var(--color-text-inverse);
             border: none;
             cursor: pointer;
         }
@@ -221,6 +224,13 @@
             line-height: 1.4;
         }
 
+        .cell:focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: -4px;
+            box-shadow: inset 0 0 0 6px #111;
+            z-index: 2;
+        }
+
         @media (max-width: 960px) {
             .layout {
                 grid-template-columns: 1fr;
@@ -241,12 +251,12 @@
     <h1>⚫ Go 9x9</h1>
     <div class="layout">
         <div class="panel">
-            <div class="status" id="status">Configurez et jouez</div>
+            <div class="status" id="status" role="status" aria-live="polite">Configurez et jouez</div>
             <div class="board-wrapper">
-                <div class="board" id="board"></div>
+                <div class="board" id="board" role="group" aria-label="Plateau de Go, neuf lignes et neuf colonnes"></div>
             </div>
             <div class="legend" style="margin-top: var(--space-md);">
-                Règles : ko simple, suicide interdit, scoring chinois (komi 6.5). Actions : placer, passer, résigner.
+                Règles : ko simple, suicide interdit, scoring chinois (komi 6.5). Flèches : parcourir le plateau ; Entrée ou Espace : placer une pierre. Actions : placer, passer, résigner.
             </div>
         </div>
 
@@ -266,7 +276,7 @@
 
             <div class="meta" style="margin-top: var(--space-lg);">
                 <div class="card">
-                    <div>Captures Noir (vous)</div>
+                    <div>Captures Noir</div>
                     <strong id="captures-black">0</strong>
                 </div>
                 <div class="card">
@@ -291,8 +301,11 @@
         import { Go9x9Engine } from './engine.js';
         import { RandomBot } from './bots/random.js';
         import { GreedyBot } from './bots/greedy.js';
+        import { createBoardNavigation } from '../board-navigation.js';
+        import { createHumanControls } from './human-controls.js';
 
         const boardEl = $('#board');
+        const navigation = createBoardNavigation(boardEl, 9);
         const statusEl = $('#status');
         const capturesBlackEl = $('#captures-black');
         const capturesWhiteEl = $('#captures-white');
@@ -311,6 +324,17 @@
         let state = null;
         let rng = null;
         let bot = null;
+        const humanControls = createHumanControls({
+            engine,
+            getState: () => state,
+            setState: next => { state = next; },
+            hasBot: () => bot !== null,
+            humanId,
+            onUpdate: () => { render(); maybeBotTurn(); },
+            onInvalid: () => {
+                statusEl.textContent = 'Placement interdit : intersection occupée, ko ou suicide. Choisissez une autre intersection.';
+            },
+        });
 
         function buildBoard() {
             boardEl.innerHTML = '';
@@ -328,6 +352,7 @@
                     boardEl.appendChild(btn);
                 }
             }
+            navigation.afterRender();
         }
 
         function startGame() {
@@ -353,14 +378,7 @@
         }
 
         function handleHumanMove(x, y) {
-            if (!state || state.gameOver) return;
-            if (bot && state.currentPlayerId !== humanId) return;
-            const action = { type: 'place', x, y };
-            const player = state.currentPlayerId;
-            if (!engine.isValidAction(state, action, player)) return;
-            state = engine.applyAction(state, action, player);
-            render();
-            maybeBotTurn();
+            humanControls.play({ type: 'place', x, y });
         }
 
         function maybeBotTurn() {
@@ -378,29 +396,26 @@
         }
 
         function pass() {
-            if (!state || state.gameOver) return;
-            if (bot && state.currentPlayerId !== humanId) return;
-            const player = state.currentPlayerId;
-            state = engine.applyAction(state, { type: 'pass' }, player);
-            render();
-            maybeBotTurn();
+            humanControls.play({ type: 'pass' });
         }
 
         function resign() {
-            if (!state || state.gameOver) return;
-            if (bot && state.currentPlayerId !== humanId) return;
-            const player = state.currentPlayerId;
-            state = engine.applyAction(state, { type: 'resign' }, player);
-            render();
+            humanControls.play({ type: 'resign' });
         }
 
         function render() {
             if (!state) return;
+            const currentHuman = humanControls.getPlayerId();
+            btnPass.disabled = currentHuman === null;
+            btnResign.disabled = currentHuman === null;
 
             boardEl.querySelectorAll('.cell').forEach((cell) => {
                 const x = Number(cell.dataset.x);
                 const y = Number(cell.dataset.y);
                 const value = state.board[y][x];
+                const description = value === 1 ? 'pierre noire' : value === 2 ? 'pierre blanche' : 'vide';
+                cell.setAttribute('aria-label', `Ligne ${y + 1}, colonne ${x + 1}, ${description}`);
+                cell.setAttribute('aria-disabled', String(currentHuman === null || value !== 0));
                 cell.innerHTML = '';
                 cell.classList.remove('last-move');
                 if (value === 1 || value === 2) {
@@ -410,6 +425,7 @@
                 }
                 if (state.lastMove && state.lastMove.type === 'place' && state.lastMove.x === x && state.lastMove.y === y) {
                     cell.classList.add('last-move');
+                    cell.setAttribute('aria-label', `${cell.getAttribute('aria-label')}, dernier coup`);
                 }
             });
 
@@ -436,7 +452,8 @@
                     statusEl.textContent = 'Partie terminée';
                 }
             } else {
-                statusEl.textContent = state.currentPlayerId === humanId ? 'À vous (Noir)' : 'À l’adversaire (Blanc)';
+                const playerName = state.currentPlayerId === humanId ? 'Noir' : 'Blanc';
+                statusEl.textContent = bot ? (currentHuman ? 'À vous (Noir)' : 'Le bot joue (Blanc)') : `Au tour du joueur ${playerName}`;
             }
         }
 

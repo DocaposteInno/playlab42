@@ -51,6 +51,11 @@ préservation de deux yeux, passes gagnantes/perdantes, déterminisme, absence d
 mutation, identifiants numériques et partie terminée.
 
 La suite complète passe : **42 suites, 1 255 tests**, ainsi que le lint du dépôt.
+Après intégration du `main` courant pour préparer la PR, les commandes humaines
+utilisent le module partagé du jeu présent sur `main`. La vérification Docker
+compte 74 suites réussies et 1 582 tests réussis ; une suite est bloquée par
+l'absence de `yaml` dans l'image de revue. La réinstallation des dépendances
+du lockfile est bloquée par des erreurs DNS `EAI_AGAIN` vers registry.npmjs.org.
 Un scénario Chromium headless vérifie le défaut tactique, la réponse à un coup
 humain, la protection des commandes pendant le tour du bot et le jeu hot-seat,
 sans exception JavaScript. Les ressources locales sont relayées par DevTools

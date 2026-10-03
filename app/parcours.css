@@ -1,0 +1,130 @@
+/* Collections pédagogiques : styles limités au catalogue des parcours. */
+#panel-parcours .category-section {
+  margin: 0 0 3rem;
+}
+
+#panel-parcours .category-section-title {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+
+#panel-parcours :is(.category-epics, #cards-parcours) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1.5rem;
+}
+
+#panel-parcours .epic-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card, var(--color-bg-secondary));
+  color: var(--color-text);
+  text-decoration: none;
+  box-shadow: none;
+  transform: none;
+  transition: border-color .15s ease;
+}
+
+#panel-parcours .epic-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+#panel-parcours .epic-thumb {
+  display: grid;
+  place-items: center;
+  height: auto;
+  font-size: 2.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+#panel-parcours .epic-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#panel-parcours .epic-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  padding: 1.35rem;
+}
+
+#panel-parcours .epic-title {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  letter-spacing: -.02em;
+}
+
+#panel-parcours .epic-description {
+  display: block;
+  margin: 0;
+  overflow: visible;
+  font-size: .925rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  -webkit-line-clamp: unset;
+}
+
+#panel-parcours .epic-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem 1rem;
+  margin-top: auto;
+  padding-top: .5rem;
+  font-size: .8rem;
+  color: var(--color-text-muted);
+}
+
+#panel-parcours .epic-duration:empty,
+#panel-parcours .epic-tags {
+  display: none;
+}
+
+#panel-parcours .epic-progress-label {
+  display: block;
+  margin-top: .75rem;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+#panel-parcours .epic-progress {
+  height: 3px;
+  margin-top: .25rem;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+#panel-parcours .epic-progress-bar {
+  height: 100%;
+  background: var(--color-accent);
+}
+
+#panel-parcours .epic-card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  #panel-parcours .category-section { margin-bottom: 2rem; }
+  #panel-parcours .epic-info { padding: 1.1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #panel-parcours .epic-card { transition: none; }
+}

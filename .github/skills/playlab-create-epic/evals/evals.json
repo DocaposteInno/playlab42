@@ -1,0 +1,34 @@
+{
+  "skill_name": "playlab-create-epic",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crée un epic etat-actions pour débutants expliquant état, action et transition pure. Trois slides : introduction HTML, exemple commenté Markdown et exercice HTML avec bouton pour révéler la correction. Hiérarchie playlab42, auteur PlayLab42, utilise le kit et les styles partagés. L'implémentation est autorisée.",
+      "expected_output": "Epic publiable complet avec manifeste, trois slides, exercice accessible, styles partagés et build prévu dans Docker.",
+      "files": ["templates/epic/", "docs/guides/create-epic.md", "parcours/index.json", "parcours/_shared/slide-base.css"],
+      "assertions": [
+        "epic.json contient id etat-actions, hierarchy playlab42, metadata.author PlayLab42 et trois feuilles de content.",
+        "Chaque feuille possède un dossier avec slide.json dont l'id correspond et un contenu HTML ou Markdown.",
+        "Les slides HTML chargent theme.css, theme.js et slide-base.css avec des chemins relatifs valides.",
+        "L'exercice possède un bouton natif et une correction réellement présente dans le contenu.",
+        "Le diff n'ajoute ni data/parcours.json ni une copie locale des styles partagés."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Réorganise seulement le manifeste de hello-playlab42 pour que 07-aller-plus-loin soit dans une nouvelle section Conclusion. Garde les autres sections, les ids et le contenu des slides. Vérifie les références sans créer une nouvelle hiérarchie.",
+      "expected_output": "Modification minimale de la structure content de l'epic existant.",
+      "files": ["parcours/epics/hello-playlab42/epic.json", "scripts/parcours-utils.js"],
+      "assertions": [
+        "07-aller-plus-loin est une feuille d'une section nommée Conclusion et apparaît exactement une fois.",
+        "L'ensemble et l'ordre des sept ids de slides sont conservés.",
+        "Le diff ne modifie aucun contenu de slide ni parcours/index.json.",
+        "La validation utilise ou recommande make build-parcours, sans runtime sur le host."
+      ]
+    }
+  ],
+  "trigger_cases": [
+    {"query": "Transforme ce cours sur les moteurs purs en parcours avec quatre slides et un exercice.", "should_trigger": true},
+    {"query": "Crée une issue epic GitHub pour regrouper les bugs de thème du portail.", "should_trigger": false}
+  ]
+}

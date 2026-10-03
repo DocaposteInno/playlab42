@@ -374,8 +374,11 @@ async function main() {
     console.log(`  ${stats.duplicates} doublons supprimés`);
   }
 
-  // Enrichir avec OG
-  categories = await enrichWithOGMetadata(categories);
+  if (process.argv.includes('--skip-og')) {
+    console.log('\nEnrichissement Open Graph ignoré (--skip-og).');
+  } else {
+    categories = await enrichWithOGMetadata(categories);
+  }
 
   // Construire le catalogue
   console.log('\nConstruction du catalogue...');

@@ -261,7 +261,7 @@ export function initSortingViz(containerId) {
     const controls = document.createElement('div');
     controls.className = 'absolute bottom-4 left-0 right-0 flex justify-center gap-2 flex-wrap px-4 pointer-events-none';
 
-    const btnClass = 'pointer-events-auto px-3 py-1 bg-[var(--ac-bg-tertiary)] text-[var(--ac-text-primary)] rounded border border-[var(--ac-border)] hover:bg-[var(--ac-accent-blue)] hover:text-white transition text-xs font-mono disabled:opacity-50 disabled:cursor-not-allowed';
+    const btnClass = 'pointer-events-auto px-3 py-1 bg-[var(--ac-bg-tertiary)] text-[var(--ac-text-primary)] rounded border border-[var(--ac-border)] hover:bg-[var(--ac-accent-blue)] hover:slide-text-inverse transition text-xs font-mono disabled:opacity-50 disabled:cursor-not-allowed';
 
     const wrapper = (fn, label) => {
       const btn = document.createElement('button');

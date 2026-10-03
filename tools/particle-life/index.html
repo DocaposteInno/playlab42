@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Particle Life - Playlab42</title>
+  <link rel="stylesheet" href="../../lib/theme.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
+  <script type="module">
+    import { initTheme } from '../../lib/theme.js';
+    initTheme();
+  </script>
   <style>
     * {
       margin: 0;
@@ -12,10 +18,11 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #111;
-      color: #eee;
+      font-family: var(--font-family);
+      background: var(--color-bg);
+      color: var(--color-text);
       min-height: 100vh;
+      height: 100dvh;
       display: flex;
     }
 
@@ -23,8 +30,8 @@
     .controls {
       width: 280px;
       padding: 16px;
-      background: #1a1a1a;
-      border-right: 1px solid #333;
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border);
       overflow-y: auto;
       flex-shrink: 0;
     }
@@ -32,12 +39,12 @@
     .controls h1 {
       font-size: 1.4rem;
       margin-bottom: 8px;
-      color: #fff;
+      color: var(--color-text);
     }
 
     .controls p.subtitle {
       font-size: 0.85rem;
-      color: #888;
+      color: var(--color-text-muted);
       margin-bottom: 16px;
     }
 
@@ -47,7 +54,7 @@
 
     .control-group h3 {
       font-size: 0.9rem;
-      color: #aaa;
+      color: var(--color-text-muted);
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -66,7 +73,7 @@
 
     .control-row span {
       font-size: 0.85rem;
-      color: #888;
+      color: var(--color-text-muted);
       min-width: 40px;
       text-align: right;
     }
@@ -74,33 +81,33 @@
     input[type="range"] {
       width: 100%;
       margin: 4px 0;
-      accent-color: #4a9eff;
+      accent-color: var(--color-accent);
     }
 
     input[type="checkbox"] {
       width: 18px;
       height: 18px;
-      accent-color: #4a9eff;
+      accent-color: var(--color-accent);
     }
 
     button {
       padding: 8px 16px;
       margin: 4px;
-      border: none;
+      border: 1px solid var(--color-border);
       border-radius: 4px;
-      background: #333;
-      color: #fff;
+      background: var(--color-bg-card);
+      color: var(--color-text);
       cursor: pointer;
       font-size: 0.9rem;
       transition: background 0.2s;
     }
 
     button:hover {
-      background: #444;
+      background: var(--color-bg-hover);
     }
 
     button:active {
-      background: #555;
+      background: var(--color-bg-secondary);
     }
 
     .btn-group {
@@ -118,21 +125,21 @@
     }
 
     .stat {
-      background: #222;
+      background: var(--color-bg-card);
       padding: 8px;
       border-radius: 4px;
     }
 
     .stat-label {
       font-size: 0.75rem;
-      color: #666;
+      color: var(--color-text-muted);
       text-transform: uppercase;
     }
 
     .stat-value {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #4a9eff;
+      color: var(--color-accent);
     }
 
     /* Matrice d'attractions */
@@ -193,7 +200,7 @@
       .controls {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #333;
+        border-bottom: 1px solid var(--color-border);
         max-height: 40vh;
       }
 
@@ -212,9 +219,9 @@
     <div class="control-group">
       <h3>Contrôles</h3>
       <div class="btn-group">
-        <button id="playBtn">Pause</button>
-        <button id="resetBtn">Reset</button>
-        <button id="randomBtn">Randomize</button>
+        <button id="playBtn" aria-label="Mettre en pause la simulation" aria-pressed="false">Pause</button>
+        <button id="resetBtn">Réinitialiser</button>
+        <button id="randomBtn">Aléatoire</button>
       </div>
     </div>
 
@@ -278,16 +285,16 @@
     <!-- Matrice d'attractions -->
     <div class="control-group">
       <h3>Matrice d'attractions</h3>
-      <p style="font-size: 0.75rem; color: #666; margin-bottom: 8px;">
+      <p id="matrix-help" style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: 8px;">
         Vert = attraction, Rouge = répulsion
       </p>
-      <div id="attractionMatrix"></div>
+      <div id="attractionMatrix" aria-describedby="matrix-help"></div>
     </div>
   </aside>
 
   <main class="simulation">
     <div class="canvas-container">
-      <canvas id="canvas"></canvas>
+      <canvas id="canvas" role="img" aria-label="Simulation de particules colorées par groupe. Modifiez les paramètres et la matrice d’attractions dans le panneau de contrôle."></canvas>
     </div>
   </main>
 

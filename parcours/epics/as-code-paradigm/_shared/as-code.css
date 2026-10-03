@@ -4,6 +4,8 @@
  * Supporte les 3 modes de lecture : littéraire, scientifique, pratique
  */
 
+@import url("../../../_shared/slide-base.css");
+
 /* === Variables locales mappées sur le thème global === */
 :root {
     /* Backgrounds - mappés sur theme.css */
@@ -13,9 +15,9 @@
     --ac-bg-card: var(--color-bg-secondary);
 
     /* Couleurs d'accent par mode */
-    --ac-accent-literary: #8b4513;
-    --ac-accent-scientific: #1e5f74;
-    --ac-accent-practical: #2d5a27;
+    --ac-accent-literary: #f0b984;
+    --ac-accent-scientific: #7dd3fc;
+    --ac-accent-practical: #86efac;
     --ac-accent-current: var(--ac-accent-literary);
 
     /* Couleurs sémantiques - mappées sur theme.css */
@@ -37,6 +39,20 @@
     /* Code - fond sombre conservé pour meilleure lisibilité */
     --ac-code-bg: var(--color-bg-secondary);
     --ac-code-text: var(--color-text);
+}
+
+[data-theme="light"] {
+    --ac-accent-literary: #8b4513;
+    --ac-accent-scientific: #1e5f74;
+    --ac-accent-practical: #2d5a27;
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+        --ac-accent-literary: #8b4513;
+        --ac-accent-scientific: #1e5f74;
+        --ac-accent-practical: #2d5a27;
+    }
 }
 
 /* Couleurs de syntaxe adaptées au thème */
@@ -101,7 +117,7 @@ body {
 .mode-btn.active {
     background: var(--ac-accent-current);
     border-color: var(--ac-accent-current);
-    color: white;
+    color: var(--color-text-inverse);
 }
 
 /* === Mode-specific visibility === */
@@ -436,7 +452,7 @@ blockquote cite {
 
 .flow-node.highlight {
     background: var(--ac-accent-current);
-    color: white;
+    color: var(--color-text-inverse);
     border-color: var(--ac-accent-current);
 }
 
@@ -532,15 +548,15 @@ blockquote cite {
 
 /* === Summary Box === */
 .summary-box {
-    background: linear-gradient(135deg, var(--ac-accent-current) 0%, rgba(163, 82, 67, 0.9) 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--ac-accent-current), color-mix(in srgb, var(--ac-accent-current) 85%, var(--ac-bg-primary)));
+    color: var(--color-text-inverse);
     padding: 24px;
     border-radius: 12px;
     margin: 32px 0;
 }
 
 .summary-box h3 {
-    color: white;
+    color: var(--color-text-inverse);
     margin-top: 0;
     margin-bottom: 16px;
 }
@@ -561,7 +577,7 @@ blockquote cite {
     content: '✓';
     position: absolute;
     left: 0;
-    color: var(--ac-accent-green);
+    color: var(--color-text-inverse);
 }
 
 /* === Caution Box === */

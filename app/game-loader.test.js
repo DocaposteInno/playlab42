@@ -49,6 +49,7 @@ describe('game-loader: openGame and openTool functions', () => {
     global.fetch.mockReset();
     state.currentGame = null;
     state.currentView = 'catalogue';
+    state.catalogue = null;
     window.location.hash = '';
   });
 
@@ -118,6 +119,19 @@ describe('game-loader: openGame and openTool functions', () => {
   // ===== openTool TESTS =====
 
   describe('openTool(toolId)', () => {
+    it('uses the catalogue path without probing a nonexistent directory', async () => {
+      state.catalogue = {
+        tools: [{ id: 'json-formatter', name: 'JSON', path: 'tools/json-formatter.html' }],
+      };
+      global.fetch.mockResolvedValueOnce({ ok: true });
+
+      await openTool('json-formatter');
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith('tools/json-formatter.html', { method: 'HEAD' });
+      expect(state.currentGame).toMatchObject({ path: 'tools/json-formatter.html', name: 'JSON' });
+    });
+
     it('tries complex path first (tools/:id/index.html)', async () => {
       global.fetch.mockResolvedValueOnce({ ok: true });
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mes données locales — Playlab42</title>
+  <link rel="stylesheet" href="../../lib/theme.css">
+  <link rel="stylesheet" href="../../lib/ui.css">
+  <link rel="stylesheet" href="../../lib/components.css">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+  <main class="ui-card">
+    <h1>Mes données locales</h1>
+    <p>Sauvegardez vos préférences, scores et progressions sur cet appareil.
+      Aucun fichier n'est envoyé sur un serveur.</p>
+    <p>Neural Style, Relativity et les autres données du site sont exclus.
+      Une sauvegarde ne fonctionne que pour les données de la même origine
+      (protocole, domaine et port) ; un fichier exporté peut être restauré sur une autre origine.</p>
+    <section aria-labelledby="export-title">
+      <h2 id="export-title">Exporter</h2>
+      <p>Le fichier contient notamment votre pseudo et vos résultats.
+        Conservez-le dans un endroit privé.</p>
+      <button id="export" type="button" class="ui-button ui-button-primary">Télécharger la sauvegarde JSON</button>
+    </section>
+    <section aria-labelledby="import-title">
+      <h2 id="import-title">Restaurer</h2>
+      <p>Fermez les autres onglets et jeux avant la restauration.
+        Les clés présentes dans le fichier remplacent les valeurs actuelles ;
+        les clés absentes sont conservées. Exportez d'abord vos données.</p>
+      <label for="backup-file" class="ui-label">Fichier de sauvegarde JSON (maximum 5 Mio)</label>
+      <input id="backup-file" class="ui-field" type="file" accept=".json,application/json">
+      <button id="import" type="button" class="ui-button">Importer le fichier sélectionné</button>
+    </section>
+    <p id="status" class="ui-status" role="status" aria-live="polite" aria-atomic="true">Aucune opération effectuée.</p>
+    <p>Après restauration, rechargez le portail et les jeux déjà ouverts pour
+      afficher leurs données actualisées.</p>
+  </main>
+</body>
+</html>
