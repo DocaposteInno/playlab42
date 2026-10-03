@@ -25,8 +25,8 @@ restent distinctes du déclenchement des workflows.
 
 | Job | Commande / dépendance | Échec |
 |-----|----------------------|-------|
-| Lint | `npm run lint` | Erreurs et avertissements ESLint |
-| Security lint | `npm run lint:security`, rapport JSON | Erreurs des règles JS ciblées, sans installation de plugins à la volée |
+| Lint | `npm run lint` : ESLint JS/scripts HTML puis Biome `.ts` | Erreurs et avertissements bloquants ; tsc reste distinct |
+| Security lint | `npm run lint:security`, rapport JSON | Règles JS/scripts HTML ciblées, pas TS ; sans installation à la volée |
 | Tests | `npm run test:coverage`, puis Codecov | Tests ou seuils ciblés échoués ; upload Codecov non bloquant |
 | Dependency audit | `npm run audit:dependencies` | CVE modérée ou plus ; panne d'audit également bloquante |
 | TypeScript | `npm run typecheck` | Erreurs de types ; la transpilation appartient à Build |
@@ -130,8 +130,8 @@ make test-e2e
 
 Pour un périmètre réduit, commencer par les sélecteurs pertinents de la
 [matrice de validation](../skills/playlab-release/references/release.md),
-sans les présenter comme une CI complète. `build:local` n'exécute pas la
-collecte Open Graph du build de production.
+sans les présenter comme une CI complète. Le build normal lit le snapshot OG ;
+`build:local` omet cet enrichissement. Seul `refresh:bookmarks` autorise la collecte.
 
 ## Performance : mesurer avant de modifier les gates
 
@@ -152,7 +152,11 @@ Les variations de réseau et de charge runner restent possibles.
 Les installations isolées, le cache de téléchargement npm, les jobs parallèles,
 tous les gates et le test de la même archive restent inchangés. Ne pas partager
 `node_modules` entre Alpine et Ubuntu ; les modules natifs peuvent différer.
-La séparation du snapshot OG reste prévue au lot 5 : ce build conserve le réseau.
+Ces mesures décrivent le build réseau historique. Le lot 5 sépare désormais
+le refresh éditorial : la CI fixe SOURCE_DATE_EPOCH, compare deux manifestes,
+vérifie les fichiers et exerce une restauration tar locale. Le navigateur
+revérifie l'archive reçue sans la reconstruire. Mesurer le nouveau run, sans
+présenter ces anciens timings comme ceux du pipeline changé.
 
 ## Évolution
 

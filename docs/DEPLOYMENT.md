@@ -79,15 +79,19 @@ changement de nom ou structure. Les workflows seuls ne remplacent pas ce réglag
 Dans Docker :
 
 ```bash
-make npm CMD="run build"        # TypeScript, runtime, catalogues, OG, guides, site
-make npm CMD="run build:local"  # même chaîne, sans collecte distante Open Graph
+make npm CMD="run build"        # runtime, catalogues avec snapshot OG, site, SBOM/manifeste
+make npm CMD="run build:local"  # même chaîne, sans enrichissement OG
+make npm CMD="run verify:site"
+make npm CMD="run check:recovery" # exercice local uniquement
 ```
 
 `npm run build` inclut désormais `build:ts` ; le workflow n'a pas à ajouter
-une compilation séparée. Le build de production conserve l'enrichissement
-Open Graph des bookmarks. Il n'est donc **pas hermétique** : le réseau et les
-métadonnées distantes peuvent influencer les sorties. `build:local` ne prouve
-pas que cette collecte réseau de production a fonctionné.
+une compilation séparée. Le build utilise le snapshot éditorial versionné,
+sans collecte distante. Le réseau est réservé à `refresh:bookmarks` et à
+l'installation préalable des dépendances. La CI compare deux inventaires à
+commit/outils/plateforme/epoch identiques et vérifie l'archive extraite.
+Cela ne certifie pas un build hermétique : les CDN/modèles runtime restent
+hors SBOM npm de fabrication. Voir [les garanties et la reprise](guides/artifact-operations.md).
 
 `build:site` prépare **`site/`**, pas une copie aveugle du dépôt :
 
@@ -98,6 +102,7 @@ pas que cette collecte réseau de production a fonctionné.
 | Catalogues et images de bookmarks | Cache de collecte Open Graph |
 | Guides HTML, Markdown de référence et specs | `.github/`, `.claude/`, fichiers cachés et secrets |
 | README, conventions, licence et éventuel CNAME | Dockerfile, Makefile, package/lockfile de développement |
+| Manifeste hashé et SBOM CycloneDX de fabrication | Cache technique OG et snapshot source hors catalogue |
 
 Le lecteur de guides renvoie vers GitHub pour les fichiers réservés au dépôt.
 Les fichiers générés restent ignorés par Git, **y compris `site/`**. `.gitignore`
@@ -125,10 +130,51 @@ Le SHA ci-dessus est un exemple. En CI, la valeur réelle est `GITHUB_SHA` ;
 en local, elle vaut `null`, sauf identité explicitement fournie au build.
 Ce fichier identifie les sources mais **n'est pas une attestation signée**.
 
-Après publication, le job `smoke` vérifie neuf ressources : identité du build,
+Après publication, le job `smoke` vérifie dix ressources : identité du build,
+manifeste de fabrication,
 portail, accueil des guides, trois catalogues, premier outil, premier jeu et
 première slide. Il compare le commit au SHA du run et rejette un catalogue vide
 ou invalide, une erreur HTTP ou une ressource hors du sous-chemin publié.
+La CLI compare également les empreintes du lockfile et du snapshot éditorial
+avec les sources du checkout attendu. Un SHA publié correct ne prouve pas
+qu'une ancienne pile de PR a effectivement atteint main.
+
+### Ne pas confondre fusion et livraison
+
+Le 3 octobre 2026, #140, #142 et #143 ont été fusionnées dans leurs branches
+intermédiaires après livraison des parents. Main `f567fc3` et son déploiement
+réussi `37142017084` ne contenaient donc pas les lots lint/qualité/fabrication.
+La correction rassemble leurs neuf commits manquants sur une branche neuve
+depuis main, sans réintroduire les anciennes références d'actions.
+
+Avant chaque merge d'une pile, lire la **base effective** avec
+`gh pr view NUMERO --json state,baseRefName,headRefName,mergeCommit`.
+Un état `MERGED` dans une branche intermédiaire n'est pas une livraison à main.
+Recibler l'enfant vers main et vérifier son diff et ses checks avant le merge
+humain. Après squash, l'absence d'ancestralité du head n'est pas davantage une
+preuve d'absence : inspecter le contenu attendu dans main, les contrôles du
+commit de publication et son manifeste/SHA effectivement servis.
+Cette PR corrective ne constate ni merge à main ni nouvelle publication ;
+les changes OpenSpec restent actifs, sans archivage implicite.
+
+**Preuves de la correction #144, head `8b939b3` :** 98 suites / 2 046 tests,
+lint JS/HTML/TS et sécurité, types, audit sans vulnérabilité connue et
+28 validations OpenSpec strictes dans Docker. Deux builds avec `--network none`
+et même SHA/epoch produisent le même manifeste (972 fichiers publics) ;
+un troisième depuis `git archive HEAD`, sans cache OG et avec une copie physique
+des mêmes dépendances, produit exactement ce manifeste. SBOM : 511 composants.
+Reprise tar/corruption/refus/restauration exercée ; 64 Chromium sur le site
+préconstruit, intégrité et manifeste inchangés après interactions.
+Le contrat HTTP réel vérifie les dix ressources et les empreintes attendues.
+
+[CI native 37142662936](https://github.com/z4ppy/playlab42/actions/runs/37142662936)
+et [sécurité 37142662782](https://github.com/z4ppy/playlab42/actions/runs/37142662782)
+réussies : mêmes 98 suites / 2 046 tests, 28 validations, deux builds/comparaison/
+reprise et 64 Chromium sur l'archive extraite. L'archive téléchargée puis
+revérifiée localement contient 972 fichiers et 511 composants SBOM, avec les
+empreintes lockfile/snapshot attendues. Son identité est le merge de PR
+`3c2c23d`, **pas** main ni le head de branche. Ces preuves ne constatent pas
+une publication ; le commit documentaire suivant exige ses propres checks.
 
 Il effectue au plus cinq tentatives, annoncées dans les logs et espacées de
 10 secondes, pour la propagation Pages. Un échec final fait échouer le workflow :
@@ -171,8 +217,12 @@ tests locaux ; consulter les résultats GitHub du commit concerné.
 
 Un lancement manuel sur `main` redéploie son état courant : **ce n'est pas un
 rollback vers un ancien artefact**. Aucun `push --force` n'est une procédure
-normale de récupération. La restauration d'un artefact connu, le suivi de
-disponibilité et les notifications d'incident restent des évolutions proposées.
+normale de récupération. `check:recovery` exerce une vraie archive tar localement,
+sans toucher la production. Le monitoring quotidien préparé dans
+`site-monitor.yml` vérifiera main et dix ressources après son intégration à la
+branche par défaut ; configurer `PLAYLAB_SITE_URL` et les notifications GitHub.
+Il ne surveille pas en continu et ne republie pas automatiquement un ancien
+artefact. Le [runbook](guides/artifact-operations.md) décrit cette décision distincte.
 
 ## Versions et maintenance
 

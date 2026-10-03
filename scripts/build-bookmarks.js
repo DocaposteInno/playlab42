@@ -4,12 +4,17 @@
  * Génère data/bookmarks.json à partir des fichiers bookmarks/ et des manifests
  */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { fetchOGMetadata, loadCache, saveCache } from './og-fetcher.js';
+import { loadOGSnapshot, validateOGSnapshot, editorialMetadata } from './lib/bookmark-metadata.js';
 import {
   getRootDir,
   extractDomain,
+  readJSONSync,
+  writeJSONAtomicSync,
+  getBuildTimestamp,
+  printReport,
 } from './lib/build-utils.js';
 
 const ROOT = getRootDir(import.meta.url);
@@ -19,6 +24,7 @@ const GAMES_DIR = join(ROOT, 'games');
 const EPICS_DIR = join(ROOT, 'parcours', 'epics');
 const OUTPUT_FILE = join(ROOT, 'data', 'bookmarks.json');
 const CONFIG_FILE = join(BOOKMARKS_DIR, 'index.json');
+const SNAPSHOT_FILE = join(ROOT, 'metadata', 'bookmarks-og.json');
 
 // Statistiques
 const stats = {
@@ -33,18 +39,6 @@ const stats = {
   errors: [],
   warnings: [],
 };
-
-/**
- * Lit et parse un fichier JSON
- */
-function readJSON(path) {
-  try {
-    return JSON.parse(readFileSync(path, 'utf-8'));
-  } catch (err) {
-    stats.errors.push(`Erreur lecture ${path}: ${err.message}`);
-    return null;
-  }
-}
 
 /**
  * Valide un bookmark
@@ -92,7 +86,7 @@ function scanStandaloneBookmarks(config) {
 
   for (const file of files) {
     const filePath = join(BOOKMARKS_DIR, file);
-    const data = readJSON(filePath);
+    const data = readJSONSync(filePath, stats);
     if (!data) {continue;}
 
     const categoryId = data.category || file.replace('.json', '');
@@ -137,7 +131,7 @@ function scanToolsBookmarks() {
 
   for (const file of files) {
     const filePath = join(TOOLS_DIR, file);
-    const manifest = readJSON(filePath);
+    const manifest = readJSONSync(filePath, stats);
     if (!manifest?.bookmarks) {continue;}
 
     for (const bookmark of manifest.bookmarks) {
@@ -171,7 +165,7 @@ function scanGamesBookmarks() {
     const manifestPath = join(GAMES_DIR, dir, 'game.json');
     if (!existsSync(manifestPath)) {continue;}
 
-    const manifest = readJSON(manifestPath);
+    const manifest = readJSONSync(manifestPath, stats);
     if (!manifest?.bookmarks) {continue;}
 
     for (const bookmark of manifest.bookmarks) {
@@ -205,7 +199,7 @@ function scanParcoursBookmarks() {
     const manifestPath = join(EPICS_DIR, dir, 'epic.json');
     if (!existsSync(manifestPath)) {continue;}
 
-    const manifest = readJSON(manifestPath);
+    const manifest = readJSONSync(manifestPath, stats);
     if (!manifest?.bookmarks || manifest.draft) {continue;}
 
     for (const bookmark of manifest.bookmarks) {
@@ -276,6 +270,8 @@ function deduplicateBookmarks(categories, moduleBookmarks) {
  */
 async function enrichWithOGMetadata(categories) {
   const cache = loadCache();
+  const previous = loadOGSnapshot(SNAPSHOT_FILE, true);
+  const entries = {};
   const allBookmarks = [];
 
   // Collecter tous les bookmarks
@@ -295,12 +291,8 @@ async function enrichWithOGMetadata(categories) {
       if (result.fromCache) {
         stats.ogCached++;
       } else if (result.failed) {
-        // L'échec réseau reste un échec : le repli fournit l'image versionnée,
-        // pas le titre ni la description à jour.
+        // Les métadonnées précédentes restent utilisables, pas à jour pour autant.
         stats.ogFailed++;
-        if (result.meta?.fromVersionedImage) {
-          stats.ogImageRecovered++;
-        }
       } else if (result.meta) {
         stats.ogFetched++;
       } else {
@@ -308,19 +300,43 @@ async function enrichWithOGMetadata(categories) {
       }
 
       // Enrichir le bookmark (titre/description/image manuels prioritaires, OG en fallback)
-      bookmark.meta = result.meta || {};
+      entries[bookmark.url] = editorialMetadata(result, bookmark.url, previous);
+      bookmark.meta = { ...entries[bookmark.url] };
+      if (result.failed && bookmark.meta.ogImage?.startsWith('data/bookmarks-images/')) {
+        stats.ogImageRecovered++;
+      }
       // Si une image est spécifiée manuellement dans le bookmark, l'utiliser
       if (bookmark.image) {
         bookmark.meta.ogImage = bookmark.image;
       }
-      bookmark.displayTitle = bookmark.title || result.meta?.ogTitle;
-      bookmark.displayDescription = bookmark.description || result.meta?.ogDescription;
+      bookmark.displayTitle = bookmark.title || bookmark.meta.ogTitle;
+      bookmark.displayDescription = bookmark.description || bookmark.meta.ogDescription;
     }));
   }
 
   // Sauvegarder le cache
   saveCache(cache);
+  const snapshot = { version: 1, entries: Object.fromEntries(Object.keys(entries).sort().map(url => [url, entries[url]])) };
+  validateOGSnapshot(snapshot);
+  writeJSONAtomicSync(SNAPSHOT_FILE, snapshot);
+  console.log(`Snapshot OG actualisé : ${SNAPSHOT_FILE} ; relire le diff avant commit.`);
 
+  return categories;
+}
+
+function enrichFromSnapshot(categories) {
+  const entries = loadOGSnapshot(SNAPSHOT_FILE);
+  for (const category of categories.values()) {
+    for (const bookmark of category.bookmarks) {
+      const meta = entries[bookmark.url];
+      if (!meta || !Object.keys(meta).length) {stats.warnings.push(`Métadonnées OG absentes du snapshot : ${bookmark.url}`);}
+      bookmark.meta = { ...meta };
+      if (bookmark.image) {bookmark.meta.ogImage = bookmark.image;}
+      bookmark.displayTitle = bookmark.title || bookmark.meta.ogTitle;
+      bookmark.displayDescription = bookmark.description || bookmark.meta.ogDescription;
+    }
+  }
+  console.log('\nMétadonnées OG : snapshot éditorial, sans accès réseau.');
   return categories;
 }
 
@@ -351,7 +367,7 @@ async function main() {
   console.log('===============\n');
 
   // Charger la config
-  const config = readJSON(CONFIG_FILE) || { categories: [] };
+  const config = readJSONSync(CONFIG_FILE, stats) || { categories: [] };
   console.log('Config chargée:', CONFIG_FILE);
 
   // Scanner les sources
@@ -374,10 +390,19 @@ async function main() {
     console.log(`  ${stats.duplicates} doublons supprimés`);
   }
 
+  if (stats.errors.length) {
+    printReport(stats);
+    process.exit(1);
+  }
+  if (process.argv.includes('--skip-og') && process.argv.includes('--refresh-og')) {
+    throw new Error('--skip-og et --refresh-og sont incompatibles.');
+  }
   if (process.argv.includes('--skip-og')) {
     console.log('\nEnrichissement Open Graph ignoré (--skip-og).');
-  } else {
+  } else if (process.argv.includes('--refresh-og')) {
     categories = await enrichWithOGMetadata(categories);
+  } else {
+    categories = enrichFromSnapshot(categories);
   }
 
   // Construire le catalogue
@@ -390,14 +415,10 @@ async function main() {
 
   const catalogue = {
     version: '1.0',
-    generatedAt: new Date().toISOString(),
+    generatedAt: getBuildTimestamp(),
     categories: sortedCategories,
     tags: aggregateTags(categories),
   };
-
-  // Écrire le fichier
-  writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2));
-  console.log(`\nCatalogue généré: ${OUTPUT_FILE}`);
 
   // Rapport
   console.log('\n--- Rapport ---');
@@ -420,7 +441,12 @@ async function main() {
     process.exit(1);
   }
 
+  writeJSONAtomicSync(OUTPUT_FILE, catalogue);
+  console.log(`\nCatalogue généré: ${OUTPUT_FILE}`);
   console.log('\n✅ Build terminé avec succès');
 }
 
-main();
+main().catch(error => {
+  console.error(`Build Bookmarks impossible : ${error.message}`);
+  process.exitCode = 1;
+});
