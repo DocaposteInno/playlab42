@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facturation — AI credits, offres et budgets Copilot</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+</head>
+<body>
+  <article class="slide">
+    <h1>Facturation : comprendre les AI credits</h1>
+    <p><strong>Informations consultées le 3 octobre 2026.</strong> Prix en USD, hors taxes éventuelles. Les allocations, tarifs modèles et conditions peuvent évoluer : vérifiez les sources et votre compte avant de décider d'une dépense.</p>
+
+    <h2>Depuis le 1er juin 2026 : l'usage, pas le nombre de prompts</h2>
+    <p>La facturation générale de Copilot repose désormais sur les <strong>GitHub AI Credits</strong>. Une interaction consomme selon le modèle et les tokens d'entrée, de sortie et de cache. Les anciens multiplicateurs de <em>premium requests</em> ne décrivent plus ce fonctionnement.</p>
+    <blockquote><strong>1 AI credit = 0,01 USD.</strong> Ce n'est ni une requête, ni un nombre fixe de tokens. Un long contexte, plusieurs tours ou des sous-agents peuvent coûter davantage qu'un petit prompt.</blockquote>
+    <p>Le coût de l'abonnement et la consommation sont deux choses distinctes : l'offre inclut des crédits, puis un usage supplémentaire peut devenir facturable selon les réglages du compte.</p>
+
+    <h2>Offres publiées à la date de consultation</h2>
+    <table>
+      <caption>Abonnements mensuels et crédits inclus — 3 octobre 2026</caption>
+      <thead><tr><th>Offre</th><th>USD / mois</th><th>Crédits de base</th><th>Flex actuel</th><th>Total inclus actuel</th></tr></thead>
+      <tbody>
+        <tr><td>Pro</td><td>10</td><td>1 000</td><td>500</td><td>1 500</td></tr>
+        <tr><td>Pro+</td><td>39</td><td>3 900</td><td>3 100</td><td>7 000</td></tr>
+        <tr><td>Max</td><td>100</td><td>10 000</td><td>10 000</td><td>20 000</td></tr>
+        <tr><td>Business</td><td>19 / licence</td><td colspan="2">1 900 / licence, mutualisés</td><td>Pool de l'entité facturée</td></tr>
+        <tr><td>Enterprise</td><td>39 / licence</td><td colspan="2">3 900 / licence, mutualisés</td><td>Pool de l'entité facturée</td></tr>
+      </tbody>
+    </table>
+    <p>Pour les offres individuelles payantes, les crédits de base sont associés au prix d'abonnement. L'allocation <strong>flex est explicitement variable</strong> : le total ci-dessus n'est pas une promesse permanente. Les crédits de base sont utilisés avant le flex.</p>
+    <p>Free et Student ont aussi une allocation, mais les pages principales consultées n'en publient pas le montant chiffré. Ne réutilisez pas automatiquement l'ancien quota de 50 chats. Free propose 2 000 complétions par mois ; Student des complétions illimitées, selon les conditions d'éligibilité.</p>
+    <p>Les crédits inclus se renouvellent le <strong>1er du mois à 00:00 UTC</strong>, sans report du solde inutilisé, indépendamment de la date de paiement de l'abonnement.</p>
+
+    <h2>Qu'est-ce qui consomme des crédits ?</h2>
+    <table>
+      <thead><tr><th>Usage</th><th>Consommation</th></tr></thead>
+      <tbody>
+        <tr><td>Complétions et Next Edit Suggestions</td><td>Pas d'AI credits ; complétions illimitées pour les offres payantes.</td></tr>
+        <tr><td>Chat, CLI, agent cloud</td><td>Selon modèle, tokens et interactions effectuées.</td></tr>
+        <tr><td>Spaces, Spark et agents tiers</td><td>Consomment aussi des crédits selon les conditions applicables.</td></tr>
+        <tr><td>Fleet / sous-agents</td><td>Chaque sous-agent effectue ses propres interactions : consommation totale potentiellement supérieure.</td></tr>
+      </tbody>
+    </table>
+    <p>Les tarifs modèles différencient entrée, sortie et cache ; certains dépendent aussi de la taille du contexte. Le mode Auto bénéficie actuellement d'une réduction de 10 % sur le coût des modèles pour les offres payantes, sur les surfaces documentées. Vérifiez sa disponibilité et son tarif plutôt que de supposer que « Auto » signifie gratuit.</p>
+
+    <h3>Un calcul fictif pour comprendre l'unité</h3>
+    <p>Supposons, uniquement pour cet exercice, un modèle à 2 USD par million de tokens d'entrée et 10 USD par million en sortie, sans cache ni réduction :</p>
+    <pre><code>Entrée : 2 000 tokens × 2 / 1 000 000 = 0,004 USD
+Sortie : 1 000 tokens × 10 / 1 000 000 = 0,010 USD
+Total  : 0,014 USD / 0,01 = 1,4 AI credit</code></pre>
+    <p>Ce n'est pas le tarif d'un modèle recommandé. Pour un calcul réel, utilisez la page des prix et toutes les interactions de la tâche, pas seulement la réponse finale.</p>
+
+    <h2>Après épuisement des crédits inclus</h2>
+    <p>Pour un compte individuel, les options documentées sont : monter d'offre, autoriser un budget d'usage supplémentaire ou attendre le renouvellement. Un budget supplémentaire de <strong>10 USD correspond à 1 000 crédits</strong>. Des limites supplémentaires peuvent s'appliquer ; GitHub peut demander de solder l'usage déjà consommé avant de continuer.</p>
+    <p>Ne comptez pas sur une bascule automatique vers un modèle moins cher après épuisement d'un budget.</p>
+
+    <h2>En équipe : crédits mutualisés et dépenses par défaut</h2>
+    <p>Business et Enterprise utilisent un pool au niveau de l'entité de facturation. Par exemple, 100 licences Business donnent <strong>190 000 crédits</strong>, pas 100 quotas personnels indépendants.</p>
+    <blockquote><strong>Point d'attention :</strong> l'usage supplémentaire payant est activé par défaut pour les organisations et entreprises. Pour l'interdire, un administrateur doit désactiver la politique <strong>AI credits paid usage</strong>.</blockquote>
+    <p>Une licence ajoutée augmente immédiatement le pool ; une licence retirée le réduit au cycle suivant. Vérifiez l'entité facturée et les budgets applicables avant un lancement massif de tâches.</p>
+
+    <h2>Budget, alerte et limite souple : ne pas les confondre</h2>
+    <table>
+      <thead><tr><th>Contrôle</th><th>Périmètre</th><th>Blocage</th></tr></thead>
+      <tbody>
+        <tr><td>Budget utilisateur en organisation</td><td>Usage de l'utilisateur, crédits inclus et dépassement.</td><td>Arrêt obligatoire à la limite.</td></tr>
+        <tr><td>Budget organisation / centre de coûts / entreprise</td><td>Usage supplémentaire facturable au-delà du pool.</td><td>Seulement si <strong>Stop usage when budget limit is reached</strong> est activé.</td></tr>
+        <tr><td>Même budget sans l'option d'arrêt</td><td>Suivi des dépenses.</td><td>Les frais peuvent continuer au-delà du montant.</td></tr>
+        <tr><td><code>/limits</code> dans le CLI</td><td>Contrôle local du travail de l'agent.</td><td>Limite souple, pas un plafond financier garanti.</td></tr>
+      </tbody>
+    </table>
+    <p>L'option d'arrêt est <strong>désactivée par défaut</strong> pour les budgets organisation, centre de coûts et entreprise. <strong>Tout budget fixé à 0 USD bloque immédiatement les utilisateurs auxquels il s'applique.</strong> Ne faites pas un essai de configuration sur l'équipe entière pour découvrir ce comportement.</p>
+    <p>Un budget entreprise de dépassement <strong>n'inclut pas les licences</strong>. Exemple : 400 licences Business coûtent 7 600 USD ; un budget supplémentaire de 5 000 USD avec arrêt ne signifie pas une facture totale plafonnée à 5 000 USD.</p>
+    <p>Les sources CLI consultées divergent sur la portée exacte de <code>/limits</code> : par réponse ou par session. Vérifiez l'aide de votre version. Leur point commun est le caractère <strong>souple</strong>, insuffisant pour garantir un blocage financier.</p>
+
+    <h2>Le cas des abonnements annuels legacy</h2>
+    <p>Certains abonnements annuels Pro/Pro+ existants restent sur les <em>premium requests</em> jusqu'à leur expiration. La documentation décrit une rétrogradation vers Free à l'échéance et des options de transition, dont annulation avec remboursement proratisé ou passage au mensuel.</p>
+    <p>Consultez le statut réel de votre abonnement. Ne mélangez pas les quotas, multiplicateurs et tarifs legacy avec les AI credits du tableau actuel.</p>
+
+    <h2>Une routine de maîtrise du coût</h2>
+    <ol>
+      <li>Identifier l'offre, l'entité facturée, le pool et les budgets réellement applicables.</li>
+      <li>Décider explicitement si un dépassement payant est autorisé et qui peut le modifier.</li>
+      <li>Choisir un modèle adapté et un contexte ciblé ; éviter les relances ou sous-agents sans résultat mesurable.</li>
+      <li>Suivre <code>/usage</code> et les tableaux GitHub ; les métriques locales ne remplacent pas la facturation de tous les usages.</li>
+      <li>Arrêter et recadrer une tâche qui dérive avant d'augmenter l'autonomie ou le budget.</li>
+    </ol>
+
+    <h2>Sources officielles</h2>
+    <ul>
+      <li><a href="https://docs.github.com/en/copilot/get-started/plans" target="_blank" rel="noopener noreferrer">Comparaison des offres Copilot</a></li>
+      <li><a href="https://docs.github.com/en/copilot/concepts/billing-and-usage/individuals/billing" target="_blank" rel="noopener noreferrer">Facturation à l'usage des comptes individuels</a></li>
+      <li><a href="https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing" target="_blank" rel="noopener noreferrer">Modèles et prix des tokens</a></li>
+      <li><a href="https://docs.github.com/en/copilot/concepts/billing-and-usage/organizations-and-enterprises/billing" target="_blank" rel="noopener noreferrer">Facturation organisations et entreprises</a></li>
+      <li><a href="https://docs.github.com/en/copilot/concepts/billing-and-usage/organizations-and-enterprises/budgets" target="_blank" rel="noopener noreferrer">Budgets et conditions d'arrêt</a></li>
+      <li><a href="https://docs.github.com/en/copilot/reference/copilot-billing/request-based-billing-legacy/what-changed-with-billing" target="_blank" rel="noopener noreferrer">Migration et abonnements legacy</a></li>
+    </ul>
+  </article>
+</body>
+</html>

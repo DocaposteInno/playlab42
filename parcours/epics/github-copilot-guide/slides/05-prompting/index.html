@@ -122,9 +122,11 @@
         <tr><td><code>/fix</code></td><td>Corriger une erreur</td></tr>
         <tr><td><code>/tests</code></td><td>Générer des tests</td></tr>
         <tr><td><code>/doc</code></td><td>Documenter</td></tr>
-        <tr><td><code>/optimize</code></td><td>Améliorer les performances</td></tr>
+        <tr><td>Demande en langage naturel</td><td>« Analyse les performances, mesure puis propose une amélioration sans changer le comportement »</td></tr>
       </tbody>
     </table>
+
+    <p>Cette liste concerne le <strong>Chat de l'IDE</strong> et varie selon le client. Tapez <code>/</code> pour voir les commandes réellement proposées. Dans Copilot CLI, <code>/help</code> fait foi : <code>/tests</code> ou <code>/fix</code> ne sont pas des commandes universelles.</p>
 
     <h3>Participants (VS Code)</h3>
 
@@ -186,6 +188,17 @@ Pour chaque issue : localisation, gravité, suggestion de fix.</code></pre>
 - Préserver le comportement existant
 - Utiliser les nouvelles APIs recommandées
 - Signaler les breaking changes</code></pre>
+
+    <h2>5.4 Demander un plan avant l'exécution</h2>
+    <pre><code>Objectif : corriger le calcul des frais de livraison.
+Commence par lire le code et les tests existants.
+Propose un plan sans modifier les fichiers.
+Périmètre : panier et frais de livraison uniquement.
+Contraintes : aucune dépendance, aucun changement d'API publique.
+Critères : panier vide, seuil exact, montant au-dessus du seuil.
+Après validation du plan, implémente et lance les tests ciblés.
+Termine par les fichiers modifiés et les limites restantes.</code></pre>
+    <p>Utilisez l'agent Plan dans VS Code ou <code>/plan</code> dans le CLI pour une tâche qui nécessite un arbitrage. Un bon prompt explicite aussi ce qui <strong>ne doit pas changer</strong> et ce qui permettra de décider que le travail est terminé.</p>
   </article>
 </body>
 </html>

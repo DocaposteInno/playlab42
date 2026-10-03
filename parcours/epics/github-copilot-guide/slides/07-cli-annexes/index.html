@@ -3,331 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Copilot CLI, OpenCode et Annexes — GitHub Copilot Guide</title>
+  <title>Copilot CLI — Du premier lancement au workflow complet</title>
   <link rel="stylesheet" href="../../../../../lib/theme.css">
   <link rel="stylesheet" href="../../../../_shared/slide-base.css">
   <script type="module">
     import { initTheme } from '../../../../../lib/theme.js';
     initTheme();
   </script>
-  <style>
-    .cli-example {
-      background: var(--color-bg-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-md);
-      margin: var(--space-md) 0;
-    }
-    .cli-example h4 {
-      margin-top: 0;
-      color: var(--color-accent);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .file-tree {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      background: var(--color-bg-secondary);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border);
-      white-space: pre;
-    }
-    .link-table a {
-      color: var(--color-accent);
-    }
-    .tool-comparison {
-      background: var(--color-bg-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-md);
-      margin: var(--space-lg) 0;
-    }
-    .tool-comparison h3 {
-      margin-top: 0;
-      color: var(--color-accent);
-    }
-    .opencode-badge {
-      background: var(--color-success);
-      color: white;
-      padding: 0.2em 0.5em;
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin-left: var(--space-sm);
-    }
-    .preview-badge {
-      background: var(--color-warning);
-      color: var(--color-text-inverse);
-      padding: 0.2em 0.5em;
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin-left: var(--space-sm);
-    }
-    .slash-cmd {
-      display: inline-block;
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 0.1em 0.4em;
-      font-family: var(--font-mono);
-      font-size: 0.9em;
-    }
-  </style>
 </head>
 <body>
   <article class="slide">
-    <h1>GitHub Copilot CLI <span class="preview-badge">PREVIEW</span></h1>
+    <h1>Copilot CLI : un agent dans le terminal</h1>
+    <p>Le CLI actuel peut explorer un dépôt, modifier des fichiers, lancer des outils et coordonner des sous-agents. Il fonctionne <strong>sans VS Code</strong>, mais peut aussi s'y connecter. Ce n'est pas l'ancienne extension <code>gh copilot</code> qui suggérait des commandes shell.</p>
+    <p><strong>Disponibilité générale depuis le 25 février 2026.</strong> La dernière entrée du changelog officiel consulté est <strong>1.0.91, datée du 1er octobre 2026</strong>. Cette version est plus récente que celle disponible pour vérifier l'aide dans cet environnement.</p>
+    <p><strong>Repère de version :</strong> les commandes ci-dessous sont présentes dans l'aide de Copilot CLI <strong>1.0.82</strong>, consultée le 3 octobre 2026. Exécutez <code>/version</code>, <code>/help</code> et <code>/changelog</code> sur votre installation ; une politique d'organisation peut restreindre des fonctionnalités.</p>
 
-    <p><strong>GitHub Copilot CLI</strong> est un agent IA terminal qui apporte les capacités de Copilot coding agent directement dans votre ligne de commande. Il peut éditer du code, exécuter des commandes et interagir avec GitHub.</p>
-
-    <h2>Installation</h2>
-
-    <pre><code># macOS / Linux (Homebrew)
+    <h2>Installer et ouvrir un dépôt</h2>
+    <pre><code># Choisir UNE méthode d'installation
 brew install copilot-cli
-
-# Windows (WinGet)
+# ou sous Windows :
 winget install GitHub.Copilot
-
-# Via npm (toutes plateformes, Node.js v22+ requis)
+# ou via npm (vérifier les prérequis du paquet officiel) :
 npm install -g @github/copilot
 
-# Script rapide (macOS/Linux)
-curl -fsSL https://gh.io/copilot-install | bash</code></pre>
+cd mon-projet
+copilot</code></pre>
+    <p>Suivez l'authentification proposée, ou utilisez <code>/login</code>. N'insérez jamais un jeton dans une commande partagée ou l'URL d'un remote. Vérifiez vos droits Copilot et ceux du dépôt avant une opération GitHub.</p>
 
-    <p>Puis lancez <code>copilot</code> et authentifiez-vous avec <span class="slash-cmd">/login</span>.</p>
+    <h2>Premier workflow : cadrer, exécuter, relire</h2>
+    <pre><code>/help
+/permissions
+/init
+/instructions
+/plan
+Corriger le cas vide de la fonction de recherche.
+Propose un plan et les tests concernés sans modifier les fichiers.</code></pre>
+    <p><code>/init</code> écrit ou actualise <code>.github/copilot-instructions.md</code> : ce n'est pas une opération en lecture seule. Relisez les instructions produites. Validez le plan, puis demandez l'implémentation dans le même périmètre. Contrôlez les autorisations, le diff et les tests existants avant un commit.</p>
 
-    <h2>Fonctionnalités clés</h2>
-
+    <h2>L'aide-mémoire utile au quotidien</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Aspect</th>
-          <th>Détail</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Objectif</th><th>Commandes CLI</th><th>À retenir</th></tr></thead>
       <tbody>
-        <tr><td><strong>Agent complet</strong></td><td>Édite du code, crée des fichiers, exécute des commandes</td></tr>
-        <tr><td><strong>Modèle par défaut</strong></td><td>Claude Sonnet 4.5 (GPT-5 et autres disponibles via <span class="slash-cmd">/model</span>)</td></tr>
-        <tr><td><strong>Intégration GitHub</strong></td><td>Accès aux repos, issues, PRs en langage naturel</td></tr>
-        <tr><td><strong>Support MCP</strong></td><td>GitHub MCP server inclus + serveurs custom</td></tr>
-        <tr><td><strong>Contrôle total</strong></td><td>Chaque action requiert votre approbation</td></tr>
-        <tr><td><strong>Plans requis</strong></td><td>Copilot Pro, Pro+, Business ou Enterprise</td></tr>
+        <tr><td>Découvrir le client</td><td><code>/help</code>, <code>/version</code>, <code>/changelog</code>, <code>/update</code></td><td>L'aide installée fait foi.</td></tr>
+        <tr><td>Configurer le dépôt</td><td><code>/init</code>, <code>/instructions</code>, <code>/env</code></td><td>Inspecter les règles réellement chargées.</td></tr>
+        <tr><td>Choisir comment travailler</td><td><code>/model</code>, <code>/plan</code>, <code>/agent</code></td><td>Modèle, préparation et rôle sont trois choix différents.</td></tr>
+        <tr><td>Étendre les capacités</td><td><code>/skills</code>, <code>/mcp</code>, <code>/plugin</code>, <code>/lsp</code></td><td>Vérifier provenance et permissions des extensions.</td></tr>
+        <tr><td>Connecter l'éditeur</td><td><code>/ide</code></td><td>Connexion à un workspace IDE disponible, pas obligation d'utiliser VS Code.</td></tr>
+        <tr><td>Coordonner des tâches</td><td><code>/fleet</code>, <code>/tasks</code>, <code>/subagents</code></td><td>Chapitre Fleet : déléguer les tâches indépendantes.</td></tr>
+        <tr><td>Prolonger l'autonomie</td><td><code>/autopilot</code></td><td>Définir un objectif et surveiller consommation et actions.</td></tr>
+        <tr><td>Relire le résultat</td><td><code>/diff</code>, <code>/review</code>, <code>/security-review</code>, <code>/rubber-duck</code></td><td>Diff, revue, analyse sécurité ou critique indépendante ; aucun ne garantit l'absence de bugs.</td></tr>
+        <tr><td>Gérer les permissions</td><td><code>/permissions</code>, <code>/add-dir</code>, <code>/list-dirs</code>, <code>/cwd</code></td><td>Changer de répertoire n'est pas une isolation de sécurité.</td></tr>
+        <tr><td>Surveiller le contexte et le coût</td><td><code>/context</code>, <code>/compact</code>, <code>/usage</code>, <code>/limits</code></td><td>La limite AI credits est souple ; vérifier sa portée dans votre version.</td></tr>
+        <tr><td>Reprendre ou bifurquer</td><td><code>/resume</code>, <code>/rename</code>, <code>/fork</code>, <code>/session</code></td><td>Une session n'est pas une branche Git.</td></tr>
+        <tr><td>Déléguer à GitHub</td><td><code>/delegate</code>, <code>/pr</code></td><td>Actions distantes : accès, politiques et revue humaine nécessaires.</td></tr>
+        <tr><td>Partager</td><td><code>/share</code>, <code>/remote</code></td><td>Relire les données et le périmètre d'accès avant tout partage.</td></tr>
       </tbody>
     </table>
+    <h3>Ajouts des versions récentes</h3>
+    <p>La référence actuelle documente aussi <code>/sandbox</code> pour l'isolation locale, <code>/goal</code> pour un objectif autonome et <code>/research</code> pour une recherche sourcée. Le <strong>sandbox CLI est en public preview</strong>, avec des limites selon l'OS et les outils ; il ne confine pas les services MCP distants.</p>
+    <p>Depuis 1.0.85 (16 septembre 2026), les commandes non interactives <code>copilot skill enable/disable</code>, <code>copilot plugin enable/disable</code> et <code>copilot mcp enable/disable</code> permettent de gérer ces capacités. Ne les supposez pas disponibles sur 1.0.82 : consultez <code>copilot --help</code> et le changelog.</p>
 
-    <h2>Commandes slash</h2>
+    <h2>Mode non interactif : une demande depuis le shell</h2>
+    <pre><code>copilot -p "Explique la structure de ce dépôt sans modifier les fichiers."
+copilot --help</code></pre>
+    <p><code>-p</code> soumet une demande sans ouvrir le même dialogue interactif. Une commande reproductible n'est pas automatiquement sûre : contrôlez les permissions, la sortie et le code de retour avant de l'intégrer à un script ou à une CI. Ne compensez pas un problème d'autorisation en ajoutant aveuglément <code>--allow-all</code>.</p>
 
+    <h2>Contexte et raccourcis</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Commande</th>
-          <th>Usage</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Syntaxe</th><th>Usage</th></tr></thead>
       <tbody>
-        <tr><td><span class="slash-cmd">/login</span></td><td>Authentification GitHub</td></tr>
-        <tr><td><span class="slash-cmd">/model</span></td><td>Changer de modèle IA</td></tr>
-        <tr><td><span class="slash-cmd">/delegate</span></td><td>Pousser la session vers Copilot coding agent (crée une PR)</td></tr>
-        <tr><td><span class="slash-cmd">/usage</span></td><td>Voir la consommation de tokens</td></tr>
-        <tr><td><span class="slash-cmd">/mcp add</span></td><td>Configurer un serveur MCP</td></tr>
-        <tr><td><span class="slash-cmd">/cwd</span></td><td>Changer de répertoire de travail</td></tr>
-        <tr><td><span class="slash-cmd">/feedback</span></td><td>Envoyer un feedback</td></tr>
+        <tr><td><code>@chemin/fichier</code></td><td>Référencer un fichier dans le prompt.</td></tr>
+        <tr><td><code>!commande</code></td><td>Lancer explicitement une commande shell ; ce n'est pas une demande d'explication.</td></tr>
+        <tr><td><code>Shift+Tab</code></td><td>Changer de mode ; regarder le mode actif avant de valider.</td></tr>
+        <tr><td><code>Ctrl+C</code></td><td>Annuler ; deux pressions quittent le CLI.</td></tr>
+        <tr><td><code>Esc Esc</code></td><td>Interrompre, arrêter les agents ou accéder au retour arrière selon le contexte.</td></tr>
+        <tr><td><code>Ctrl+G</code></td><td>Éditer le prompt dans votre éditeur configuré.</td></tr>
       </tbody>
     </table>
+    <p><code>/rewind</code> peut revenir sur un tour et ses modifications de fichiers. Il n'annule pas magiquement un déploiement, un message envoyé ou une autre action externe. Git et vos sauvegardes restent indispensables.</p>
 
-    <h2>Raccourcis et syntaxe</h2>
+    <h2>CLI et VS Code : deux entrées, des ressources communes</h2>
+    <p>Vous pouvez utiliser le terminal intégré de VS Code, puis <code>/ide</code> pour connecter le CLI au workspace. Le Chat de VS Code conserve son propre sélecteur d'agents et ses commandes ; la connexion ne les transforme pas en commandes CLI.</p>
+    <p>La connexion peut être automatique lorsque le répertoire correspond à un workspace VS Code de confiance. Une seule instance IDE est connectée à la fois ; sélection, diagnostics et diff peuvent être partagés. Avec <code>--allow-all</code> ou <code>--yolo</code>, les changements sont appliqués directement <strong>sans diff d'approbation préalable</strong>.</p>
+    <p>Versionnez les instructions, profils et skills partageables dans le dépôt. Vérifiez leur prise en charge dans chaque client au lieu de supposer que paramètres personnels, permissions ou historique sont automatiquement communs.</p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Syntaxe</th>
-          <th>Usage</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><code>@fichier.ts</code></td><td>Inclure un fichier comme contexte</td></tr>
-        <tr><td><code>!commande</code></td><td>Exécuter une commande shell directement</td></tr>
-        <tr><td><code>Esc</code></td><td>Stopper une opération ou refuser une action</td></tr>
-        <tr><td><code>?</code></td><td>Afficher l'aide</td></tr>
-      </tbody>
-    </table>
+    <h2>Déléguer dans le cloud</h2>
+    <p><code>/delegate</code> transmet le travail à GitHub afin que l'agent poursuive et propose une pull request. C'est une exécution distante, différente de Fleet local. Vérifiez la branche de base, les accès au dépôt, les politiques et les coûts associés ; une PR proposée n'est ni un merge ni un déploiement.</p>
 
-    <h2>Agents personnalisés</h2>
-
-    <p>Copilot CLI reconnaît les agents définis dans :</p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Scope</th>
-          <th>Emplacement</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Utilisateur</td><td><code>~/.copilot/agents/</code></td></tr>
-        <tr><td>Repository</td><td><code>.github/agents/</code></td></tr>
-        <tr><td>Organisation</td><td><code>.github-private/agents/</code></td></tr>
-      </tbody>
-    </table>
-
-    <p>Lancement : <code>copilot --agent=refactor-agent</code> ou via slash command.</p>
-
-    <h2>Delegate — Déléguer à GitHub</h2>
-
-    <p>La commande <span class="slash-cmd">/delegate</span> pousse votre session vers Copilot coding agent sur GitHub :</p>
+    <blockquote><strong>À éviter pour commencer :</strong> <code>/allow-all</code> ou un lancement autorisant tout. Un mode autonome n'est pas un bac à sable. Gardez des confirmations pour les actions sensibles.</blockquote>
+    <h2>Sources et veille</h2>
     <ul>
-      <li>Crée une <strong>draft PR</strong> automatiquement</li>
-      <li>Copilot continue le travail en arrière-plan</li>
-      <li>Vous êtes notifié pour review quand c'est prêt</li>
+      <li><a href="https://github.com/github/copilot-cli" target="_blank" rel="noopener noreferrer">Dépôt officiel Copilot CLI et instructions d'installation</a></li>
+      <li><a href="https://github.com/github/copilot-cli/blob/main/changelog.md" target="_blank" rel="noopener noreferrer">Changelog officiel : versions et disponibilité</a></li>
+      <li><a href="https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference" target="_blank" rel="noopener noreferrer">Référence actuelle des commandes CLI</a></li>
+      <li><a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/connecting-vs-code" target="_blank" rel="noopener noreferrer">Connexion du CLI à VS Code</a></li>
+      <li><a href="https://docs.github.com/en/copilot/concepts/agents/copilot-cli/understanding-local-sandboxing" target="_blank" rel="noopener noreferrer">Sandbox CLI et limites de la preview</a></li>
     </ul>
-
-    <hr>
-
-    <h1>OpenCode <span class="opencode-badge">OPEN SOURCE</span></h1>
-
-    <p><strong>OpenCode</strong> est une alternative open-source à Copilot CLI. Il permet d'utiliser n'importe quel modèle IA et ne stocke aucune donnée.</p>
-
-    <h2>Caractéristiques</h2>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Aspect</th>
-          <th>Détail</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>Licence</strong></td><td>Open source</td></tr>
-        <tr><td><strong>Modèles</strong></td><td>75+ providers (Claude, GPT, Gemini, modèles locaux)</td></tr>
-        <tr><td><strong>Confidentialité</strong></td><td>Ne stocke aucune donnée de code</td></tr>
-        <tr><td><strong>Sessions</strong></td><td>Multi-sessions parallèles, sessions partageables</td></tr>
-        <tr><td><strong>LSP</strong></td><td>Intégration Language Server Protocol automatique</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Installation</h2>
-
-    <pre><code># Script rapide
-curl -fsSL https://opencode.ai/install | bash
-
-# npm
-npm i -g opencode-ai@latest
-
-# Homebrew (macOS/Linux)
-brew install opencode
-
-# Windows
-choco install opencode</code></pre>
-
-    <h2>Intégration GitHub</h2>
-
-    <pre><code># Dans un commentaire d'issue GitHub :
-/opencode explain this issue
-/opencode fix this</code></pre>
-
-    <div class="tool-comparison">
-      <h3>Comparaison des agents CLI</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Fonctionnalité</th>
-            <th>Copilot CLI</th>
-            <th>OpenCode</th>
-            <th>Claude Code</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Édition de code</td><td>✅</td><td>✅</td><td>✅</td></tr>
-          <tr><td>Exécution commandes</td><td>✅</td><td>✅</td><td>✅</td></tr>
-          <tr><td>Intégration GitHub</td><td>✅ Native</td><td>✅</td><td>❌</td></tr>
-          <tr><td>Delegate vers PR</td><td>✅</td><td>❌</td><td>❌</td></tr>
-          <tr><td>Support MCP</td><td>✅</td><td>❌</td><td>✅</td></tr>
-          <tr><td>Multi-sessions</td><td>✅</td><td>✅</td><td>❌</td></tr>
-          <tr><td>Open source</td><td>❌</td><td>✅</td><td>❌</td></tr>
-          <tr><td>Choix du modèle</td><td>✅ (limité)</td><td>✅ (75+)</td><td>❌</td></tr>
-          <tr><td>Prix</td><td>Inclus Copilot</td><td>Gratuit + API</td><td>Inclus Claude</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <hr>
-
-    <h1>Annexes</h1>
-
-    <h2>Structure de dossiers complète</h2>
-
-    <div class="file-tree">.github/
-├── copilot-instructions.md
-├── instructions/
-│   ├── csharp.instructions.md
-│   ├── php.instructions.md
-│   ├── react.instructions.md
-│   └── tests.instructions.md
-├── prompts/
-│   ├── generate-tests.prompt.md
-│   ├── code-review.prompt.md
-│   └── pre-commit.prompt.md
-└── agents/
-    ├── test-agent.md
-    ├── docs-agent.md
-    └── security-agent.md</div>
-
-    <h2>Raccourcis clavier IDE</h2>
-
-    <h3>VS Code</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Action</th>
-          <th>macOS</th>
-          <th>Windows/Linux</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Ouvrir Chat</td><td><code>Ctrl+Cmd+I</code></td><td><code>Ctrl+Alt+I</code></td></tr>
-        <tr><td>Chat inline</td><td><code>Cmd+I</code></td><td><code>Ctrl+I</code></td></tr>
-        <tr><td>Accepter suggestion</td><td><code>Tab</code></td><td><code>Tab</code></td></tr>
-        <tr><td>Suggestion suivante</td><td><code>Option+]</code></td><td><code>Alt+]</code></td></tr>
-        <tr><td>Déclencher suggestion</td><td><code>Option+\</code></td><td><code>Alt+\</code></td></tr>
-        <tr><td>Rejeter</td><td><code>Esc</code></td><td><code>Esc</code></td></tr>
-      </tbody>
-    </table>
-
-    <h2>Liens officiels</h2>
-
-    <table class="link-table">
-      <thead>
-        <tr>
-          <th>Ressource</th>
-          <th>URL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>GitHub Copilot CLI</td>
-          <td><a href="https://github.com/github/copilot-cli" target="_blank">github.com/github/copilot-cli</a></td>
-        </tr>
-        <tr>
-          <td>Documentation Copilot CLI</td>
-          <td><a href="https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli" target="_blank">docs.github.com/.../use-copilot-cli</a></td>
-        </tr>
-        <tr>
-          <td>Documentation GitHub Copilot</td>
-          <td><a href="https://docs.github.com/copilot" target="_blank">docs.github.com/copilot</a></td>
-        </tr>
-        <tr>
-          <td>OpenCode</td>
-          <td><a href="https://opencode.ai/" target="_blank">opencode.ai</a></td>
-        </tr>
-        <tr>
-          <td>OpenCode GitHub</td>
-          <td><a href="https://github.com/opencode-ai/opencode" target="_blank">github.com/opencode-ai/opencode</a></td>
-        </tr>
-      </tbody>
-    </table>
+    <p>OpenCode ou Claude Code sont d'autres clients agents, avec leurs propres offres et politiques. Une comparaison figée de modèles, prix ou confidentialité vieillit vite : consultez leurs sources officielles avant de choisir.</p>
   </article>
 </body>
 </html>

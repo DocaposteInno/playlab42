@@ -3,223 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCP — Model Context Protocol — GitHub Copilot Guide</title>
+  <title>MCP — Connecter Copilot à des outils externes</title>
   <link rel="stylesheet" href="../../../../../lib/theme.css">
   <link rel="stylesheet" href="../../../../_shared/slide-base.css">
   <script type="module">
     import { initTheme } from '../../../../../lib/theme.js';
     initTheme();
   </script>
-  <style>
-    .mcp-diagram {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      background: var(--color-bg-secondary);
-      padding: var(--space-md);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border);
-      text-align: center;
-      white-space: pre;
-    }
-    .server-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: var(--space-sm);
-      margin: var(--space-md) 0;
-    }
-    .server-card {
-      background: var(--color-bg-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-sm);
-    }
-    .server-card strong {
-      color: var(--color-accent);
-    }
-    .use-case {
-      background: var(--color-bg-secondary);
-      border-left: 4px solid var(--color-info);
-      padding: var(--space-md);
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      margin: var(--space-md) 0;
-    }
-    .use-case h4 {
-      margin-top: 0;
-      color: var(--color-info);
-    }
-    .beta-badge {
-      background: var(--color-warning);
-      color: var(--color-text-inverse);
-      padding: 0.2em 0.5em;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-  </style>
 </head>
 <body>
   <article class="slide">
-    <h1>MCP — Model Context Protocol</h1>
+    <h1>MCP : connecter Copilot à des outils externes</h1>
+    <p><strong>Model Context Protocol</strong> est un protocole ouvert pour relier un assistant à des outils et données. Par exemple : lire un ticket, rechercher une documentation ou interroger un service autorisé, sans coller manuellement son contenu dans chaque prompt.</p>
+    <p>Un <strong>skill</strong> décrit une procédure ; <strong>MCP</strong> fournit des outils et données pour l'appliquer. Ils peuvent se compléter, mais l'un n'installe pas automatiquement l'autre.</p>
 
-    <h2>Qu'est-ce que MCP ?</h2>
-
-    <p><strong>MCP (Model Context Protocol)</strong> est un protocole open-source créé par <strong>Anthropic</strong> pour connecter les applications d'IA à des systèmes externes de manière standardisée.</p>
-
-    <blockquote>
-      MCP est à l'IA ce que l'<strong>USB-C</strong> est aux périphériques : un connecteur universel standardisé.
-    </blockquote>
-
-    <h3>Objectif</h3>
-
-    <p>Permettre aux assistants IA d'accéder de manière standardisée à :</p>
-    <ul>
-      <li><strong>Sources de données</strong> — fichiers locaux, bases de données, APIs</li>
-      <li><strong>Outils</strong> — moteurs de recherche, calculateurs, services externes</li>
-      <li><strong>Workflows</strong> — prompts spécialisés, processus métier</li>
-    </ul>
-
-    <h2>Architecture</h2>
-
-    <div class="mcp-diagram">┌─────────────────┐         ┌──────────────────┐
-│   MCP Client    │◄───────►│   MCP Server     │
-│  (Copilot, etc.)│  JSON   │  (Expose tools)  │
-└─────────────────┘  RPC    └──────────────────┘</div>
-
+    <h2>Les pièces du système</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Composant</th>
-          <th>Rôle</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Composant</th><th>Rôle</th></tr></thead>
       <tbody>
-        <tr><td><strong>MCP Servers</strong></td><td>Exposent des données et des outils via le protocole</td></tr>
-        <tr><td><strong>MCP Clients</strong></td><td>Applications qui se connectent aux serveurs (Copilot, Claude...)</td></tr>
-        <tr><td><strong>Resources</strong></td><td>Accès en lecture aux sources de données</td></tr>
-        <tr><td><strong>Tools</strong></td><td>Fonctions exécutables par l'IA</td></tr>
-        <tr><td><strong>Prompts</strong></td><td>Templates de prompts réutilisables</td></tr>
+        <tr><td>Hôte / client</td><td>L'application agent (VS Code, CLI) et sa connexion au serveur.</td></tr>
+        <tr><td>Serveur</td><td>Expose des capacités et gère l'accès au service concerné.</td></tr>
+        <tr><td>Tools</td><td>Fonctions exécutables, pouvant lire mais aussi modifier des données.</td></tr>
+        <tr><td>Resources</td><td>Sources de contexte proposées par le serveur.</td></tr>
+        <tr><td>Prompts</td><td>Modèles de demandes exposés par le serveur.</td></tr>
+        <tr><td>Transport</td><td>Processus local (stdio) ou serveur distant HTTP selon le client et le serveur.</td></tr>
       </tbody>
     </table>
+    <p>Tous les clients et serveurs ne prennent pas en charge les mêmes capacités. Le protocole ne rend pas une intégration automatiquement sûre ou disponible.</p>
 
-    <h2>Support dans GitHub Copilot <span class="beta-badge">BETA</span></h2>
+    <h2>MCP dans Copilot, pas les anciennes Extensions</h2>
+    <p>MCP est <strong>GA dans VS Code depuis 1.102, publiée le 9 juillet 2025</strong>. Les anciennes Copilot Extensions construites comme GitHub Apps ont été retirées le 10 novembre 2025 ; cela ne concerne pas les extensions client VS Code ni les nouveaux plugins agents. Leur configuration n'est pas une référence MCP.</p>
+    <p>Dans VS Code, configurez les serveurs et sélectionnez les outils nécessaires à l'agent. Dans le CLI, utilisez <code>/mcp</code> ; <code>/env</code> aide à inspecter les capacités chargées. Les politiques d'organisation peuvent restreindre ces usages.</p>
 
-    <p>Depuis <strong>décembre 2024</strong>, GitHub Copilot supporte MCP via les <strong>Copilot Extensions</strong> (bêta publique).</p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Aspect</th>
-          <th>Détail</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><strong>Annonce</strong></td><td>4 décembre 2024</td></tr>
-        <tr><td><strong>Statut</strong></td><td>Bêta publique</td></tr>
-        <tr><td><strong>Via</strong></td><td>GitHub Copilot Extensions</td></tr>
-        <tr><td><strong>IDE</strong></td><td>VS Code principalement</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Serveurs MCP disponibles</h2>
-
-    <h3>Bases de données</h3>
-    <div class="server-grid">
-      <div class="server-card"><strong>PostgreSQL</strong><br>Requêtes SQL, schéma</div>
-      <div class="server-card"><strong>MySQL</strong><br>Connexion bases MySQL</div>
-      <div class="server-card"><strong>SQLite</strong><br>Bases locales légères</div>
-      <div class="server-card"><strong>MongoDB</strong><br>Documents NoSQL</div>
-    </div>
-
-    <h3>Services et APIs</h3>
-    <div class="server-grid">
-      <div class="server-card"><strong>GitHub</strong><br>Repos, issues, PRs</div>
-      <div class="server-card"><strong>Slack</strong><br>Messages, channels</div>
-      <div class="server-card"><strong>Notion</strong><br>Pages et bases</div>
-      <div class="server-card"><strong>Google Drive</strong><br>Fichiers cloud</div>
-    </div>
-
-    <h3>Outils de développement</h3>
-    <div class="server-grid">
-      <div class="server-card"><strong>Filesystem</strong><br>Accès fichiers locaux</div>
-      <div class="server-card"><strong>Git</strong><br>Opérations Git</div>
-      <div class="server-card"><strong>Puppeteer</strong><br>Automatisation web</div>
-      <div class="server-card"><strong>Memory</strong><br>Mémoire contextuelle</div>
-    </div>
-
-    <h2>Cas d'usage</h2>
-
-    <div class="use-case">
-      <h4>Chatbot d'entreprise</h4>
-      <p>Connectez Copilot à vos bases de données internes pour répondre à des questions métier via conversation naturelle.</p>
-    </div>
-
-    <div class="use-case">
-      <h4>Assistant de développement enrichi</h4>
-      <p>Accès au filesystem, opérations Git automatisées, recherche dans la documentation, interaction avec vos APIs internes.</p>
-    </div>
-
-    <div class="use-case">
-      <h4>Analyse de données</h4>
-      <p>Connexion directe à PostgreSQL ou MongoDB. L'IA génère les requêtes, analyse les résultats, propose des insights.</p>
-    </div>
-
-    <div class="use-case">
-      <h4>Workflow automatisé</h4>
-      <p>Création de tickets Jira depuis une conversation, mise à jour de Notion, envoi de messages Slack — le tout orchestré par l'IA.</p>
-    </div>
-
-    <h2>Configuration</h2>
-
-    <p>Les serveurs MCP se configurent généralement via un fichier JSON :</p>
-
+    <h2>Nouvelle configuration : préférer le format portable</h2>
+    <p>VS Code 1.140 propose <code>.mcp.json</code> à la racine du workspace ou <code>~/.copilot/mcp-config.json</code> pour l'utilisateur (<code>$COPILOT_HOME/mcp-config.json</code> si défini). Agent Host lit directement ce format.</p>
+    <p>Exemple de schéma pour <strong>un serveur local déjà présent dans votre projet</strong> ; le fichier <code>tools/mcp-server.js</code> doit être un vrai serveur MCP, cet exemple ne le crée pas :</p>
     <pre><code>{
   "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"]
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "DATABASE_URL": "postgresql://user:pass@localhost/db"
-      }
+    "outil-local": {
+      "command": "node",
+      "args": ["./tools/mcp-server.js"]
     }
   }
 }</code></pre>
+    <p>Dans le CLI, <code>/mcp</code> permet de gérer les serveurs. Vérifiez les chemins et champs pris en charge par votre version avant d'importer une configuration portable.</p>
+    <blockquote><strong>Différence de formats :</strong> <code>.mcp.json</code> et <code>~/.copilot/mcp-config.json</code> utilisent <code>mcpServers</code>. L'ancien <code>.vscode/mcp.json</code> utilise <code>servers</code>. Ne changez pas le nom du fichier sans adapter son schéma.</blockquote>
 
-    <h2>Ressources</h2>
+    <h3>Compatibilité VS Code : exemple GitHub distant</h3>
+    <p>Le format <code>.vscode/mcp.json</code> reste compatible, mais cette destination est dépréciée pour les nouvelles configurations. Avec un harness capable de gérer son authentification, par exemple Local :</p>
+    <pre><code>{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    }
+  }
+}</code></pre>
+    <p>Suivez le flux d'authentification du client et la documentation du serveur. Ne placez pas de jeton en clair dans le fichier. Les capacités dépendent des droits de votre compte et des outils activés.</p>
+    <p><strong>Limite actuelle :</strong> la documentation du harness Copilot indique seulement l'accès aux serveurs MCP locaux sans authentification. Ne supposez pas qu'un serveur distant authentifié fonctionnant avec Local fonctionnera aussi avec Copilot. Les configurations VS Code exigeant des entrées interactives ne sont pas transmises à Agent Host.</p>
 
+    <h2>Premier essai : lire avant d'écrire</h2>
+    <ol>
+      <li>Identifiez l'éditeur du serveur, sa maintenance et les données transmises.</li>
+      <li>Activez le minimum d'outils, idéalement en lecture seule.</li>
+      <li>Demandez une lecture simple ; inspectez l'appel et la source du résultat.</li>
+      <li>Gardez une validation humaine pour toute action externe.</li>
+    </ol>
+    <pre><code>Lis le ticket indiqué avec le serveur GitHub autorisé.
+Résume le comportement attendu et les critères d'acceptation.
+Cite le ticket comme source.
+Ne crée aucun commentaire, commit ou pull request.</code></pre>
+    <p>Une demande en lecture seule dans le prompt ne suffit pas : limitez aussi les permissions des outils et du compte utilisé.</p>
+
+    <h2>Cas d'usage et précautions</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Ressource</th>
-          <th>URL</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Usage</th><th>Précaution</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Site officiel MCP</td>
-          <td><a href="https://modelcontextprotocol.io" target="_blank">modelcontextprotocol.io</a></td>
-        </tr>
-        <tr>
-          <td>Serveurs de référence</td>
-          <td><a href="https://github.com/modelcontextprotocol/servers" target="_blank">github.com/modelcontextprotocol/servers</a></td>
-        </tr>
-        <tr>
-          <td>Spécification</td>
-          <td><a href="https://modelcontextprotocol.io/specification" target="_blank">modelcontextprotocol.io/specification</a></td>
-        </tr>
-        <tr>
-          <td>Copilot Extensions</td>
-          <td><a href="https://docs.github.com/copilot/using-github-copilot/using-extensions-to-integrate-external-tools-with-copilot-chat" target="_blank">docs.github.com/.../extensions</a></td>
-        </tr>
+        <tr><td>Documentation interne</td><td>Vérifier les droits d'accès et éviter la divulgation dans une session partagée.</td></tr>
+        <tr><td>Tickets / PR</td><td>Distinguer lecture, commentaire, création et fusion ; exiger l'accord pour les écritures.</td></tr>
+        <tr><td>Base de données</td><td>Compte de lecture seule, environnement d'exercice, aucune donnée personnelle réelle.</td></tr>
+        <tr><td>Automatisation navigateur</td><td>Pas de session de production ou d'action financière sans supervision.</td></tr>
+        <tr><td>Serveur stdio</td><td>Relire la commande et les packages exécutés ; fixer les versions selon la politique du projet.</td></tr>
       </tbody>
     </table>
+    <p>Les serveurs GitHub, filesystem, bases de données ou documentation sont des exemples de catégories, pas une liste de produits garantis ou approuvés.</p>
 
-    <blockquote>
-      <strong>Note :</strong> MCP est un protocole jeune mais en adoption rapide. Son intégration dans Copilot et Claude suggère qu'il deviendra un standard pour les intégrations IA-systèmes externes.
-    </blockquote>
+    <h2>Les risques à ne pas oublier</h2>
+    <p>Un serveur local peut exécuter un programme ; un serveur distant peut recevoir vos données. Les réponses d'outils peuvent aussi contenir des injections de prompt. Le protocole MCP ne garantit <strong>ni la confidentialité, ni la qualité, ni l'innocuité</strong> du serveur.</p>
+    <p>N'ajoutez pas un connecteur « au cas où » : chaque outil élargit le périmètre accessible à l'agent et peut consommer du contexte.</p>
+
+    <h2>Sources officielles</h2>
+    <ul>
+      <li><a href="https://code.visualstudio.com/docs/agent-customization/mcp-servers" target="_blank" rel="noopener noreferrer">Configurer MCP dans VS Code</a></li>
+      <li><a href="https://code.visualstudio.com/docs/agents/reference/mcp-configuration" target="_blank" rel="noopener noreferrer">Schémas VS Code et portable</a></li>
+      <li><a href="https://github.blog/changelog/2025-09-24-deprecate-github-copilot-extensions-github-apps" target="_blank" rel="noopener noreferrer">Retrait des anciennes Copilot Extensions GitHub Apps</a></li>
+      <li><a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener noreferrer">Serveur MCP GitHub</a></li>
+      <li><a href="https://modelcontextprotocol.io/specification" target="_blank" rel="noopener noreferrer">Spécification Model Context Protocol</a></li>
+    </ul>
   </article>
 </body>
 </html>
