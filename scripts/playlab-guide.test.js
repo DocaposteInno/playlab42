@@ -131,6 +131,11 @@ describe('Playlab42 — Guide et usine logicielle', () => {
     expect(current).toContain('37205096915');
     expect(current).toContain('## Fabrication et vérification');
     expect(current).toContain('quality/artifact-pipeline');
+    expect(current).toContain('PR #151');
+    expect(current).toContain('a54954c');
+    expect(current).toContain('37209561127');
+    expect(current).toContain('## Contrats et qualité applicative');
+    expect(current).toContain('quality/application-contracts');
     expect(current).toContain('refactor-core-with-contracts');
     expect(current).toContain('sans migration des états JSON');
     expect(current).toContain('pas une certification');
@@ -150,7 +155,21 @@ describe('Playlab42 — Guide et usine logicielle', () => {
       expect(document).toContain('quality:report');
       expect(document).toContain('PR #149');
       expect(document).toContain('PR #150');
+      expect(document).toContain('PR #151');
+      expect(document).toContain('quality/application-contracts');
     }
+  });
+
+  it('explique budgets bloquants et smoke multi-moteurs sans certification globale', () => {
+    const quality = readFileSync(resolve(root, 'docs/guides/software-quality.md'), 'utf8');
+    const slide = readFileSync(resolve(epicDir, 'slides/10-qualite-ci/index.html'), 'utf8');
+    expect(quality).toContain('quality-budgets.json');
+    expect(quality).toContain('typecheck:js-contracts');
+    expect(quality).toContain('Ces preuves locales ne sont pas une fusion');
+    expect(slide).toContain('CI : dix contrôles complémentaires');
+    expect(slide).toContain('dépassement bloquant pour Build');
+    expect(slide).toContain('La suite complète reste Chromium');
+    expect(slide).toContain('neuf noms de checks requis restent inchangés');
   });
 
   describe.each(ids)('Slide %s', id => {
