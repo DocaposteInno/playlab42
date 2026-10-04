@@ -100,8 +100,15 @@ describe('Chaîne épinglée et reproductibilité bornée', () => {
       }
     }
     const browserUpload = workflows['ui-e2e.yml'].jobs.browser.steps
-      .find(step => step.uses?.startsWith('actions/upload-artifact@'));
-    expect(browserUpload.uses).toBe('actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02');
+      .find(step => step.with?.name === 'ui-e2e-failure');
+    expect(browserUpload.uses).toMatch(/^actions\/upload-artifact@[a-f0-9]{40}$/);
+    expect(browserUpload.if).toBe('failure()');
+    expect(browserUpload.with).toEqual({
+      name: 'ui-e2e-failure',
+      path: 'playwright-report/\ntest-results/\n',
+      'if-no-files-found': 'ignore',
+      'retention-days': 14,
+    });
   });
 
   test('les images de base portent un digest et Dependabot couvre les deux répertoires', () => {
@@ -128,18 +135,22 @@ describe('Chaîne épinglée et reproductibilité bornée', () => {
     expect(deploy.jobs.validate.uses).toBe('./.github/workflows/ci.yml');
     expect(deploy.jobs.deploy.needs).toBe('validate');
     expect(ci.jobs.browser.uses).toBe('./.github/workflows/ui-e2e.yml');
-    expect(ci.jobs.browser.needs).toBe('build');
+    expect(ci.jobs.browser.needs).toContain('build');
     expect(audit.jobs['npm-audit'].name).toBe('Audit dépendances npm');
     expect(audit.jobs.gitleaks.name).toBe('Détection de secrets');
   });
 
   test('aucune élévation globale, seules publication et rapports ont des droits dédiés', () => {
-    for (const workflow of Object.values(workflows)) {
+    for (const [name, workflow] of Object.entries(workflows)) {
       expect(workflow.permissions).toEqual({ contents: 'read' });
-      for (const job of Object.values(workflow.jobs)) {
+      for (const [id, job] of Object.entries(workflow.jobs)) {
         if (job.permissions) {
           expect(job.permissions.contents).toBe('read');
-          expect(job.permissions).not.toHaveProperty('actions');
+          if ((name === 'ci.yml' && id === 'impact') || (name === 'deploy.yml' && id === 'validate')) {
+            expect(job.permissions.actions).toBe('read');
+          } else {
+            expect(job.permissions).not.toHaveProperty('actions');
+          }
         }
       }
     }
@@ -158,7 +169,8 @@ describe('Chaîne épinglée et reproductibilité bornée', () => {
     ]) {
       expect(job['continue-on-error']).toBeUndefined();
       const upload = job.steps.find(step => step.uses?.startsWith('actions/upload-artifact@'));
-      expect(upload.if).toBe('always()');
+      expect(upload.if).toBe(job === ci.jobs['security-lint']
+        ? "always() && steps.decision.outputs.mode == 'execute'" : 'always()');
       expect(upload.with['if-no-files-found']).toBe('error');
       expect(job.steps.every(step => !step['continue-on-error'])).toBe(true);
     }
