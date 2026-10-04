@@ -961,7 +961,7 @@ aucune > 20, et **58 clones / 610 lignes**. L'archivage reste une décision dist
 
 ## Contrats et qualité applicative
 
-**Continuation autorisée dans `quality/application-contracts`, non livrée.**
+**Travaux de `quality/application-contracts` livrés via la PR #152 sur main `5956cd9`.**
 Le change `strengthen-application-quality` poursuit les axes du bilan :
 orchestration et contrôles musicaux, Relativity, portail, commandes des jeux,
 contrats JS, budgets explicites et interactions critiques multi-navigateur.
@@ -1007,7 +1007,7 @@ explicitement la Promise, sans entrée de cache invalide.
 Le corpus de **139 scénarios du portail**, les appels de rendu Tetris et les
 trajectoires à seeds fixes des bots préservent le comportement caractérisé.
 
-`quality-budgets.json` fixe la production à **10 par fonction JS/HTML**,
+À la livraison de #152, `scripts/quality-budgets.json` fixait la production à **10 par fonction JS/HTML**,
 **15 en cognitif TS**, et au maximum **58 clones / 610 lignes / 4 474 tokens**.
 Le rapport v2 garde JSON/Markdown en cas de dépassement et échoue ; une configuration
 invalide ou un scanner incomplet ne produit pas de faux zéro. Le job Build déjà
@@ -1032,7 +1032,8 @@ Ces preuves locales ne sont pas une fusion ou une publication constatée.
 
 ### Première preuve native corrigée
 
-La [PR #152](https://github.com/z4ppy/playlab42/pull/152) est ouverte, non fusionnée.
+À cette première preuve, la [PR #152](https://github.com/z4ppy/playlab42/pull/152)
+était ouverte, non fusionnée.
 La CI [37213958151](https://github.com/z4ppy/playlab42/actions/runs/37213958151)
 et l'audit [37213958191](https://github.com/z4ppy/playlab42/actions/runs/37213958191)
 réussissent sur le head **26c838f**, après reproduction et correction d'une
@@ -1055,6 +1056,155 @@ triées intégralement, et pas de validation complète audio/3D/performance sur
 Firefox/WebKit. Le détecteur d'accordeur à très basse fréquence demande un contrat
 de plage exploitable avant modification de l'algorithme. Ce lot ne certifie donc
 ni une base « parfaite », ni un taux global de 100 %, ni zéro duplication.
+
+### Livraison constatée
+
+La PR #152 est fusionnée sur main
+`5956cd92f69c2a2d36c9f27fcc838dd6e4dd1290` :
+[publication 37218066993](https://github.com/z4ppy/playlab42/actions/runs/37218066993)
+et [audit 37218066738](https://github.com/z4ppy/playlab42/actions/runs/37218066738)
+réussis. Les rapports natifs de ce main sont téléchargés et leurs provenances,
+compteurs, Markdown et **66 sélecteurs / 96 fichiers appariés** vérifiés.
+La baseline confirme **56 clones / 584 lignes / 4 360 tokens**, aucune fonction
+JS/HTML >10 et couverture S/B/F/L **89,07/84,41/90,11/89,18 %**.
+Cette livraison ne vaut pas autorisation d'archiver le change.
+
+## Réduction sémantique des clones
+
+**Continuation autorisée dans `quality/semantic-deduplication`, PR #153 ouverte, non livrée.**
+Le change `reduce-semantic-clones` part du main #152 livré, avec des scopes
+indépendants sur styles partagés, pages jeux, musique, outils et petits contrats JS.
+Un clone de tokens n'est pas automatiquement un contrat commun : la cascade CSS,
+les palettes conditionnelles, les métadonnées HTML obligatoires et certaines
+branches de règles peuvent justifier une similarité conservée.
+
+Les contrats de styles sont caractérisés avant consolidation par des propriétés
+calculées dans le navigateur : thèmes, responsive et états concernés. Les
+trajectoires à seeds fixes, erreurs, données et messages des helpers JS restent
+caractérisés. Aucun changement de formatage, minimum de tokens/lignes, exclusion
+ou ratio ne doit masquer une dette ; les budgets absolus sont resserrés après
+mesure intégrée, jamais par anticipation.
+
+La première mutualisation réutilise `scripts/lib/build-report.js` pour publier
+les catalogues Parcours/Bookmarks après leurs diagnostics. **38 cas** sont verts
+avant extraction ; **64 cas ciblés** sont verts après, y compris le refus de
+remplacement sans faux succès. Le helper conserve **100/100/100/100 %** et
+les deux catalogues à epoch fixe restent identiques octet par octet.
+La mesure bornée du parent passe de **56/584/4 360** à **55/570/4 307**
+clones/lignes/tokens, sans changer les scanners ou leurs paramètres.
+Ce résultat partiel est distinct de la mesure consolidée ci-dessous.
+
+### Mesure consolidée
+
+Les six scopes sont intégrés avec leurs tests de caractérisation antérieurs au
+refactoring. Sur les mêmes outils, paramètres et exclusions que le main livré :
+
+| Compteur absolu de production | Main #152 | Intégration locale | Budget resserré |
+|------------------------------|-----------|-------------------|-----------------|
+| Clones | 56 | 15 | 15 |
+| Lignes dupliquées | 584 | 146 | 146 |
+| Tokens dupliqués | 4 360 | 1 398 | 1 398 |
+
+Le rapport sélectionne **210 sources** et en scanne **199 pour la duplication** :
+ces deux périmètres ne sont pas interchangeables. Aucune fonction JS/HTML ne
+dépasse 10 ; la limite cognitive TS reste 15. Les vrais CLI et tests aux bornes
+refusent le compteur suivant, sans relâcher la collecte ou les scanners.
+
+Le socle CSS des quatre jeux est partagé dans `games/game-page.css`, chargé avant
+leurs règles propres. Les styles partagés, musicaux et outils regroupent seulement
+des déclarations compatibles avec leur cascade. Les références de styles calculés
+sont capturées avant refactoring ; thèmes explicites et système, états interactifs,
+responsive et absence de JavaScript sont couverts selon les pages concernées.
+Les tokens publics du thème gardent des valeurs utilisables par les renderers JS,
+pas seulement des expressions CSS visuellement correctes.
+
+Les petits contrats communs sont l'initialisation asynchrone unique, les presets
+et abonnements musicaux, l'intervalle relatif d'une gamme, les paliers d'indices,
+les lignes gagnantes du morpion et l'énumération ordonnée des pièces aux Dames.
+Les lignes gagnantes partagées sont figées ; leur lecture publique renvoie une
+copie pour ne pas permettre la corruption du moteur. La collecte Jest inclut
+explicitement le bot Blocker. Les quatre nouveaux sélecteurs couvrent cinq modules
+avec un floor **100/100/100/100 %**, sans réduire les 66 sélecteurs hérités.
+
+Les **15 clones résiduels sont CSS ou HTML**, pas des duplications JS ignorées :
+deux palettes claires conditionnelles, du boilerplate de pages standalone,
+des fragments musicaux aux contrats voisins mais distincts, et deux fragments
+entre feuilles de style locales/partagées. Un fragment de bouton de 52 tokens
+apparaît entre `game-page.css` et l'accordeur ; il n'est pas masqué en réordonnant
+les déclarations. Mutualiser tous ces fragments imposerait une abstraction de
+palette, du templating ou des changements de cascade sans bénéfice établi.
+Le budget absolu protège les acquis mais n'interdit pas individuellement chaque
+nouveau clone si un ancien disparaît. Ni zéro clone, ni perfection certifiée.
+
+### Validation locale intégrée
+
+Sur le head **461db11**, les **181 suites / 4 105 tests / 3 snapshots** passent.
+Les **70 sélecteurs / 101 fichiers appariés** satisfont leurs floors par fichier ;
+S/B/F/L **89,66/84,91/90,58/89,76 %**. Ce total n'est pas directement comparable
+à #152 : Blocker et les nouveaux helpers élargissent la collecte.
+Lint source/sécurité, Biome, les trois projets de types, les 37 validations
+OpenSpec strictes et l'audit npm passent.
+
+Deux vrais builds sans réseau, à `SOURCE_DATE_EPOCH=1791132448`, produisent le même
+manifeste : **1 070 fichiers**, intégrité puis corruption/refus/restauration
+vérifiés. Les **152 interactions Chromium**, dont les nouvelles références CSS,
+et les **9 smokes sur trois moteurs** passent contre le site monté en lecture seule.
+La suite Chromium prend environ 5,4 minutes dans ce runtime ; le job natif doit
+encore confirmer sa durée, installation et smoke inclus, dans sa limite de 15 minutes.
+Ces preuves locales sont datées, pas une certification d'un head ultérieur.
+
+### Première CI et portabilité des contrats de styles
+
+La [PR #153](https://github.com/z4ppy/playlab42/pull/153) est ouverte.
+La première [CI 37227111602](https://github.com/z4ppy/playlab42/actions/runs/37227111602),
+head **5da95a7**, confirme le rapport **15/146/1 398**, les **70 sélecteurs /
+101 fichiers appariés** et les builds ; les sept fichiers qualité/Jest sont
+téléchargés et vérifiés sur le merge testé **421d3c588ab84a04de591e5864af0328b5579ea7**.
+L'[audit 37227111574](https://github.com/z4ppy/playlab42/actions/runs/37227111574)
+réussit. La couverture native S/B/F/L est **89,63/84,88/90,54/89,73 %**.
+
+**Cette première CI échoue sur Browser**, pas sur les budgets : les dimensions
+typographiques des références Docker diffèrent de celles des polices système du
+runner, par exemple un titre Dames à 186,75×32 contre 222,516×28 pixels.
+Ce constat ne justifie ni ignorer largeur/hauteur, ni des tolérances, ni changer
+les polices de production ou régénérer une référence sur le code refactoré.
+
+Le corpus `e2e/fixtures/styles-before-reduction.json` est extrait des **dix CSS
+du main 5956cd9 avant refactoring**, avec son SHA et un hash de contenu verrouillé.
+`withOriginalStyles` rejoue ces octets au même emplacement, dans le même
+navigateur/OS et DOM que les styles refactorés ; le nouveau socle jeux est
+désactivé pendant la référence. Les mêmes propriétés, y compris les dimensions,
+doivent rester **exactement égales**. Les CSS courants sont restaurés après la
+capture, même rejetée. Les références calculées initiales restent immuables
+pour leurs formes et états ; la palette publique garde ses assertions de valeurs.
+Les tests du helper vérifient provenance, distinction d'une mutation réelle,
+restauration après rejet et refus d'un lien de style absent. Le style inline de
+la page est identifié par ses octets courants, pas par son rang dans `head` :
+les styles injectés par lil-gui restent actifs et à leur place.
+
+Au head **bafe510**, les **157 interactions Chromium** corrigées passent en
+environ **6,7 minutes avec deux workers**, puis les **9 smokes trois moteurs**.
+Les mêmes éléments, propriétés et états sont conservés ; les quatre cases
+thème/viewport du portail sont désormais réparties en quatre tests parallélisables.
+Deux nouvelles preuves couvrent le corpus et la restauration du helper.
+Les deux nouveaux builds offline sont identiques et vérifient encore **1 070
+fichiers**, sans publier de test ou de référence CSS. Aucun timeout de CI n'est
+relevé : la première mesure native corrigée doit confirmer le budget de 15 minutes.
+
+La dernière tête native corrigée doit encore être vérifiée et référencée dans
+la PR. Une preuve locale ou un job partiellement vert n'est pas une livraison.
+Fusion, publication et archivage restent distincts.
+
+La deuxième CI **37230262226**, head **d921058**, valide les comparaisons exactes
+avec les CSS originales, mais révèle encore des attentes héritées du golden
+Docker : translation du bonus Triomino, marges `auto` des panneaux et bordures
+d'un select synthé dont l'état implicite du pointeur diffère. Les golden de ces
+trois scopes verrouillent donc les **éléments, propriétés et états**, et le
+corpus CSS d'origine devient l'unique autorité des **valeurs**, comparées sans
+tolérance dans le même DOM. Aucun champ n'est retiré de cette comparaison.
+Cette séparation remplace les listes heuristiques de propriétés dépendantes
+des polices. Les tokens publics du thème conservent en plus leurs valeurs
+initiales et leur format lisible par les renderers JS.
 
 ## Maintenance des références et exceptions
 

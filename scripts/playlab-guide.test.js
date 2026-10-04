@@ -172,6 +172,30 @@ describe('Playlab42 — Guide et usine logicielle', () => {
     expect(slide).toContain('neuf noms de checks requis restent inchangés');
   });
 
+  it('distingue la livraison applicative de la réduction de clones encore en cours', () => {
+    const quality = readFileSync(resolve(root, 'docs/guides/software-quality.md'), 'utf8');
+    const factory = readFileSync(resolve(root, 'docs/guides/software-factory.md'), 'utf8');
+    const current = quality.split('## Réduction sémantique des clones')[1]
+      .split('## Maintenance des références')[0];
+    expect(quality).toContain('5956cd92f69c2a2d36c9f27fcc838dd6e4dd1290');
+    expect(quality).toContain('37218066993');
+    expect(factory).toContain('37218066738');
+    expect(current).toContain('quality/semantic-deduplication');
+    expect(current).toContain('reduce-semantic-clones');
+    expect(current).toContain('non livrée');
+    expect(current).toContain('cascade CSS');
+    expect(current).toContain('minimum de tokens/lignes');
+    const budget = JSON.parse(readFileSync(resolve(root, 'scripts/quality-budgets.json'), 'utf8'));
+    const { maxClones, maxDuplicatedLines, maxDuplicatedTokens } = budget.production.duplication;
+    expect(current).toContain(`| Clones | 56 | ${maxClones} | ${maxClones} |`);
+    expect(current).toContain(`| Lignes dupliquées | 584 | ${maxDuplicatedLines} | ${maxDuplicatedLines} |`);
+    const tokens = maxDuplicatedTokens.toLocaleString('fr-FR').replace(/\s/g, ' ');
+    expect(current).toContain(`| Tokens dupliqués | 4 360 | ${tokens} | ${tokens} |`);
+    expect(current).toContain('210 sources');
+    expect(current).toContain('199 pour la duplication');
+    expect(current).toContain('15 clones résiduels sont CSS ou HTML');
+  });
+
   describe.each(ids)('Slide %s', id => {
     const path = resolve(epicDir, 'slides', id, 'index.html');
 
