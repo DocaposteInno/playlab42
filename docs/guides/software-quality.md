@@ -56,6 +56,10 @@ Les seuils `jest.config.js` s'appliquent à `test:coverage`, exécuté en CI :
 | `games/go-9x9/engine.js` | 98 % | 100 % | 99 % |
 | Tetris : racine ; modules extraits | 98 % ; 100 % | 100 % | 100 % |
 | Triomino : placement et scoring extraits | 100 % | 100 % | 100 % |
+| Helpers de validation/déploiement/bilan extraits | 100 % | 100 % | 100 % |
+| Clavier App Diese & Mat ; forces Particle Life | 100 % | 100 % | 100 % |
+| Simulation Particle Life | 85 % | 100 % | 100 % |
+| Rapport Code quality | 75 % | 90 % | 90 % |
 
 Ces composants protègent déterminisme, portail, moteurs, outils et livraison. Les seuils
 ont été choisis après mesure, pas pour imposer 80 % à tout le dépôt.
@@ -538,7 +542,11 @@ l'audit de livraison, distinct de son état ignoré sur PR.
 
 ## Corrections prioritaires du cœur
 
-**Travaux autorisés dans `quality/core-refactors`, non intégrés à main.**
+**Travaux de `quality/core-refactors` intégrés à main et publiés via la PR #148.**
+La fusion `ef0a2aa0b888ca3c0b660d0042bd54392dc78a2d` a été constatée :
+[publication 37162681481](https://github.com/z4ppy/playlab42/actions/runs/37162681481)
+et [audit 37162681303](https://github.com/z4ppy/playlab42/actions/runs/37162681303)
+réussis. Cette livraison ne décide pas l'archivage OpenSpec.
 Le change [refactor-core-with-contracts](../../openspec/changes/refactor-core-with-contracts/proposal.md)
 part du socle livré `611a29b`. La demande de corrections autorise le code,
 pas une fusion, une publication ou un archivage.
@@ -611,6 +619,136 @@ manifeste de hashes, avec `SOURCE_DATE_EPOCH=1791061551` (main de référence).
 Les **1 024 fichiers** sont vérifiés, la restauration tar détecte une corruption
 et les **70 scénarios Chromium** passent sur ce site préparé, vérifié à nouveau
 après les interactions. Ces preuves locales ne se substituent pas à la CI native.
+
+## Duplication et complexité
+
+**Continuation autorisée dans `quality/duplication-complexity`, non livrée.**
+Le change `reduce-duplication-and-complexity` poursuit les responsabilités
+ciblées après la PR #148, avec tests avant refactoring.
+
+Avant ce lot, la CI publiait lint, couverture et sécurité, mais pas de rapport
+global de duplication/complexité. Le budget ESLint ciblé est un gate,
+pas un rapport de tous les hotspots. Le job **Code quality** ajouté dans cette
+branche exécute `npm ci` puis `npm run quality:report`, publie son résumé dans
+le run et archive deux fichiers : `code-quality.json` et `code-quality.md`,
+dans `code-quality-<sha>-<run>-<attempt>` (30 jours).
+Ce job appartient à la CI réutilisée par PR et publication ; les neuf checks
+de protection GitHub ne sont pas modifiés automatiquement.
+
+Les trois outils sont verrouillés : **jscpd 5.4.0**, ESLint 10.12.0 et
+Biome 2.5.15. Aucun outil n'est téléchargé à la volée ni source envoyée à un
+service externe. jscpd utilise des clones exacts locaux, mode `mild`,
+minimum **50 tokens / 5 lignes**, avec JS/TS, HTML et CSS.
+ESLint mesure le cyclomatique JS/HTML (scripts seulement), Biome le cognitif
+TS > 1 : ce ne sont pas deux valeurs interchangeables.
+
+Le rapport sélectionne les sources suivies JS/CJS/MJS/TS/HTML/CSS et partage
+les exclusions des sorties/vendor avec le lint. Production, tests/fixtures
+et pédagogie (`parcours`, documentation) sont scannés **séparément** : les
+clones entre scopes ne sont pas mesurés. Les assets JS des parcours restent
+visibles. jscpd peut écarter un fichier trop court ; nombre sélectionné et
+nombre scanné sont distincts. Une erreur, sortie invalide ou diagnostic
+tronqué fait échouer la commande ; un ancien rapport est supprimé avant
+analyse. Aucun zéro manquant n'est présenté comme un succès.
+
+Baseline locale du main **`ef0a2aa`**, avec la configuration définitive :
+
+| Scope | Sources sélectionnées / scannées | Clones | Lignes dupliquées / lignes | Cyclomatique JS/HTML > 10 / > 20 | Cognitif TS > 15 |
+|-------|----------------------------------|--------|----------------------------|--------------------------------|-----------------|
+| Production | 181 / 170 | 68 | 782 / 46 765 | 75 / 8 | 1 |
+| Pédagogie | 104 / 104 | 150 | 1 643 / 25 361 | 10 / 2 | 0 |
+| Tests | 144 / 144 | 79 | 694 / 29 597 | 2 / 0 | 1 |
+
+La première exploration ne comptait pas les CSS autonomes : ses 44 clones et
+1,31 % ne sont pas directement comparables à cette baseline. Les 85 fonctions
+JS/HTML > 10 regroupaient production **et** pédagogie ; les tables les séparent.
+Les thèmes clair/sombre, slides et fixtures peuvent légitimement répéter du
+code. La duplication est un signal de revue, pas un objectif à diminuer par
+des exclusions, suppressions d'exemples ou abstractions artificielles.
+
+Depuis un clone ordinaire, dans Docker :
+
+```bash
+make npm CMD="run quality:report"
+```
+
+Dans un worktree dont `.git` référence un dépôt extérieur, exposer aussi
+ses métadonnées Git en lecture seule (le chemin est conservé dans le conteneur) :
+
+```bash
+GIT_COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir)"
+docker compose run --rm -v "$GIT_COMMON_DIR:$GIT_COMMON_DIR:ro" dev npm run quality:report
+```
+
+La provenance contient SHA, run/tentative et état propre/modifié du checkout.
+Les métriques sont consultatives, sans seuil global artificiel ; l'exécution
+et la publication du rapport doivent réussir, et les budgets ciblés du lint
+et de Jest restent bloquants. Les résultats avant/après se comparent avec
+les mêmes outils, paramètres et périmètres, pas à partir d'un seul pourcentage.
+
+### Corrections caractérisées de cette continuation
+
+| Responsabilité | Avant → après |
+|----------------|----------------|
+| `checkDeployment` | Cyclomatique 39 → 3 ; validation et HTTP séparés |
+| `buildHierarchy` | Cyclomatique 19 → 5 ; ordre et regroupement conservés |
+| Quatre builders catalogue/parcours/bookmarks/TS | Maximum 20 → 10 ; neuf fonctions > 10 → zéro |
+| `App.handleKeydown` Diese & Mat | Cyclomatique 32 → 1 ; helper maximum 8 |
+| `Simulation.update` Particle Life | Cognitif 31 → 2 ; forces pures maximum 5 |
+| Niveau XP | Un calcul partagé ; suppression du clone de 87 tokens |
+
+Les tests CLI comparent code de sortie, stdout exact et JSON sur les anciens
+builders avant extraction ; l'archive précédente est préservée en cas d'erreur.
+Le clavier est exercé avec le vrai App et DOM, y compris focus, ordre d'Escape,
+modificateurs et fallback piano. Les coordonnées et forces conservent l'ordre
+des opérations ; trois snapshots seedés de 14 particules à 1/25/60 ticks sont
+identiques sans tolérance numérique.
+
+Le calcul XP rejette désormais explicitement les entrées non numériques
+(`TypeError`) et non finies (`RangeError`) : l'ancien calcul bouclait avec
+NaN/+Infinity. Ce correctif intentionnel ne prétend pas préserver le blocage.
+Les XP finies, négatives et fractionnaires restent compatibles, ainsi que la
+normalisation NaN → 0 déjà effectuée par ProgressTracker.
+
+Les nouveaux helpers JS, builders, contrôles de publication et hiérarchie
+sont protégés par ESLint **≤ 10**. Simulation et forces TS ont un budget
+cognitif Biome **≤ 10**, avec vrai CLI acceptant 10 et refusant 11.
+Les extractions restent collectées, le clavier App auparavant hors couverture
+est ajouté explicitement. Les seuils existants ne baissent pas ; les cinq
+nouveaux sélecteurs de couverture figurent dans la table du socle.
+Les appels CLI en subprocessus ne sont pas artificiellement comptés comme
+couverture Jest des wrappers.
+
+La comparaison locale intégrée, avec les mêmes paramètres que `ef0a2aa`,
+donne **68 → 62 clones de production**, **782 → 693 lignes dupliquées**,
+**75 → 62 fonctions JS/HTML > 10** et **8 → 6 > 20**.
+Les fonctions TS > 15 passent de **1 à 0**. Les clones pédagogiques restent
+à 150 ; aucune slide ou fixture n'est supprimée pour améliorer le score.
+Ces chiffres ne signifient pas que les 62 hotspots restants sont corrigés.
+Restent notamment AudioEngine/contrôleurs musicaux, rendus Dames/Triomino,
+helpers de fabrication et animations pédagogiques : les prioriser après
+caractérisation, pas imposer universellement un 10 avec des ignores.
+
+Validation locale au commit `b41eaab` : **131 suites / 2 883 tests**,
+lint qualité/sécurité, types, audit npm et **33 validations OpenSpec** verts.
+Deux builds Docker hors réseau produisent le même manifeste à
+`SOURCE_DATE_EPOCH=1791071014`. Les **1 033 fichiers** sont vérifiés,
+la reprise tar refuse une corruption puis restaure l'archive ; les
+**70 scénarios Chromium** passent sur ce site préparé et revérifié.
+La revue indépendante n'a trouvé aucune régression qualifiée ; le cas des
+sources ignorées par ESLint a ensuite reçu un refus explicite et une fixture
+réelle. Les résultats natifs de la dernière tête seront consignés en PR.
+
+Première preuve native de la [PR #149](https://github.com/z4ppy/playlab42/pull/149),
+head `365af23` : [CI 37164388196](https://github.com/z4ppy/playlab42/actions/runs/37164388196)
+et [audit 37164388203](https://github.com/z4ppy/playlab42/actions/runs/37164388203)
+réussis. **Code quality** est exécuté et son artefact de deux fichiers
+téléchargé : compteurs de production 62 clones / 693 lignes / 62 fonctions
+JS/HTML > 10, aucune fonction TS cognitive > 15 ; outils et scopes contrôlés.
+Sa provenance référence la merge SHA `39f0720b1bf7c123c64463c234e61bebba9d969f`,
+run/tentative `37164388196` / `1`, checkout propre, distinct du head de PR.
+Chaque nouvelle tête exige sa propre validation ; la dernière preuve est
+consignée en commentaire, sans confondre PR verte et livraison.
 
 ## Maintenance des références et exceptions
 

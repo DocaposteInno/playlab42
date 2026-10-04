@@ -7,6 +7,8 @@
  * @module engine/ScoreCalculator
  */
 
+import { calculateLevelProgress } from './level-progress.js';
+
 // ============================================================================
 // Constantes
 // ============================================================================
@@ -198,28 +200,13 @@ export class ScoreCalculator {
   /**
    * Calcule le niveau depuis l'XP total
    *
-   * @param {number} xp - XP total
+   * @param {number} xp - XP total (nombre fini ; négatif ou fractionnaire accepté)
+   * @throws {TypeError} Si l'XP n'est pas un nombre
+   * @throws {RangeError} Si l'XP est NaN ou ±Infinity
    * @returns {{ level: number, currentXP: number, requiredXP: number, progress: number }}
    */
   static calculateLevel(xp) {
-    // Formule : XP requis pour niveau N = 100 * N^1.5
-    let level = 1;
-    let usedXP = 0;
-
-    while (true) {
-      const requiredForNext = Math.floor(100 * Math.pow(level, 1.5));
-      if (usedXP + requiredForNext > xp) {
-        const currentXP = xp - usedXP;
-        return {
-          level,
-          currentXP,
-          requiredXP: requiredForNext,
-          progress: Math.round((currentXP / requiredForNext) * 100),
-        };
-      }
-      usedXP += requiredForNext;
-      level++;
-    }
+    return calculateLevelProgress(xp);
   }
 
   // --------------------------------------------------------------------------

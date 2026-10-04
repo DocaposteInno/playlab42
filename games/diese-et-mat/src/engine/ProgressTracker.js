@@ -8,6 +8,7 @@
  */
 
 import GameKit from '../../../../lib/gamekit.js';
+import { calculateLevelProgress } from './level-progress.js';
 
 // ============================================================================
 // Constantes
@@ -221,27 +222,14 @@ export class ProgressTracker {
   /**
    * Retourne le niveau global
    *
+   * Un XP global NaN ou absent est lu comme 0 ; Infinity ou un type non numérique
+   * (progression corrompue) lève une erreur explicite au lieu d'un repli silencieux.
+   *
+   * @throws {TypeError|RangeError} Si l'XP global est invalide
    * @returns {{ level: number, currentXP: number, requiredXP: number, progress: number }}
    */
   getLevel() {
-    const xp = this.getGlobalXP();
-    let level = 1;
-    let usedXP = 0;
-
-    while (true) {
-      const requiredForNext = Math.floor(100 * Math.pow(level, 1.5));
-      if (usedXP + requiredForNext > xp) {
-        const currentXP = xp - usedXP;
-        return {
-          level,
-          currentXP,
-          requiredXP: requiredForNext,
-          progress: Math.round((currentXP / requiredForNext) * 100),
-        };
-      }
-      usedXP += requiredForNext;
-      level++;
-    }
+    return calculateLevelProgress(this.getGlobalXP());
   }
 
   // --------------------------------------------------------------------------
