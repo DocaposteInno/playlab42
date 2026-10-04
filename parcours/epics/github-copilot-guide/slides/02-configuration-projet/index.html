@@ -23,7 +23,11 @@
 
     <h3>Emplacement et rôle</h3>
 
-    <p>Le fichier <code>.github/copilot-instructions.md</code> est le <strong>contexte global</strong> automatiquement injecté dans chaque interaction Copilot Chat. C'est le point d'entrée pour configurer Copilot sur un projet.</p>
+    <p>Le fichier <code>.github/copilot-instructions.md</code> contient les <strong>règles communes du dépôt</strong> pour les clients Copilot qui le prennent en charge. C'est un bon point d'entrée pour la stack, les commandes et les conventions ; ce n'est ni une configuration de permissions ni une garantie que toutes les suggestions les respecteront.</p>
+
+    <h3>Initialiser et vérifier les instructions</h3>
+    <p>Dans <strong>Copilot CLI</strong>, lancez <code>/init</code> pour proposer des instructions adaptées au dépôt. Relisez le fichier généré avant de le versionner : l'agent peut mal déduire une commande ou l'architecture. <code>/instructions</code> permet de consulter les fichiers chargés et <code>/env</code> d'inspecter l'environnement.</p>
+    <p><code>AGENTS.md</code> est un autre format d'instructions reconnu notamment par le CLI. Il ne faut pas le confondre avec les profils <code>.github/agents/*.agent.md</code>. Gardez une source commune et évitez de recopier des règles contradictoires entre clients.</p>
 
     <h3>Structure recommandée</h3>
 
@@ -242,19 +246,20 @@ applyTo: "**/tests/**/*,**/*.test.*,**/*.spec.*,**/*Tests.cs"
     <hr>
 
     <h2>2.3 Fichiers de prompts réutilisables</h2>
+    <blockquote><strong>Compatibilité actuelle :</strong> les fichiers <code>.prompt.md</code> sont dépréciés pour les sessions <strong>Agent Host</strong> et ne sont pas chargés par celui-ci. Ils restent utilisables avec le harness <strong>Local</strong>. Pour une nouvelle procédure portable entre VS Code et CLI, privilégiez un skill.</blockquote>
 
     <h3>Principe</h3>
 
-    <p>Les fichiers <code>.github/prompts/*.prompt.md</code> sont des <strong>templates de prompts</strong> invocables à la demande pour standardiser les tâches récurrentes.</p>
+    <p>Avec le harness Local, les fichiers <code>.github/prompts/*.prompt.md</code> sont des <strong>templates de prompts</strong> invocables à la demande. Les exemples ci-dessous servent à maintenir un usage Local existant, pas à recommander un nouveau format portable.</p>
 
     <h3>Structure</h3>
 
     <pre><code>---
 description: "[Description pour le menu]"
-mode: [ask|agent]
-tools: ['codebase', 'terminal']  # optionnel
+agent: agent
 ---
 [Corps du prompt]</code></pre>
+    <p>Exemple pour VS Code : <code>agent</code> sélectionne l'agent cible. Les outils optionnels doivent correspondre aux identifiants proposés par votre version. Le format et la découverte des prompts ne sont pas identiques dans tous les clients.</p>
 
     <h3>Exemples</h3>
 
@@ -262,8 +267,7 @@ tools: ['codebase', 'terminal']  # optionnel
 
     <pre><code>---
 description: "Génère des tests unitaires complets"
-mode: agent
-tools: ['codebase', 'terminal']
+agent: agent
 ---
 Génère des tests unitaires pour le code sélectionné.
 
@@ -282,7 +286,7 @@ Génère des tests unitaires pour le code sélectionné.
 
     <pre><code>---
 description: "Analyse le code pour une revue"
-mode: ask
+agent: ask
 ---
 Analyse le code sélectionné et identifie :
 
@@ -300,8 +304,7 @@ Pour chaque problème :
 
     <pre><code>---
 description: "Checklist avant commit"
-mode: agent
-tools: ['terminal', 'codebase']
+agent: agent
 ---
 Vérifie avant commit :
 
@@ -313,6 +316,20 @@ Vérifie avant commit :
 6. [ ] Pas de code commenté inutile
 
 Signale chaque problème avec sa localisation.</code></pre>
+
+    <h2>Choisir le bon mécanisme</h2>
+    <table>
+      <thead><tr><th>Besoin</th><th>Fichier ou mécanisme</th></tr></thead>
+      <tbody>
+        <tr><td>Règles communes</td><td><code>.github/copilot-instructions.md</code> ou <code>AGENTS.md</code> selon le client</td></tr>
+        <tr><td>Règles ciblées par fichiers</td><td><code>.github/instructions/*.instructions.md</code> avec <code>applyTo</code></td></tr>
+        <tr><td>Une demande réutilisable Local existante</td><td><code>.github/prompts/*.prompt.md</code> ; non chargés par Agent Host</td></tr>
+        <tr><td>Un rôle et un ensemble d'outils</td><td><code>.github/agents/*.agent.md</code></td></tr>
+        <tr><td>Une procédure avec ressources</td><td><code>.github/skills/&lt;nom&gt;/SKILL.md</code> — chapitre Skills</td></tr>
+        <tr><td>Accéder à un système externe</td><td>Serveur MCP — chapitre dédié</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Sources :</strong> <a href="https://code.visualstudio.com/docs/agents/concepts/customization" target="_blank" rel="noopener noreferrer">Choisir les personnalisations</a> et <a href="https://code.visualstudio.com/docs/agent-customization/prompt-files" target="_blank" rel="noopener noreferrer">prompts et dépréciation pour Agent Host</a>. Les réglages personnels et les politiques d'organisation peuvent modifier ce qui est effectivement chargé.</p>
   </article>
 </body>
 </html>

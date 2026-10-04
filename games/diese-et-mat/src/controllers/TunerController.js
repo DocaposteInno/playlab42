@@ -7,6 +7,37 @@
  */
 
 import EventEmitter from '../utils/EventEmitter.js';
+import { hidePanel, isPanelVisible, showPanel } from './panel-visibility.js';
+import { detectPitch } from './tuner-pitch.js';
+
+/** Classe CSS de justesse selon l'écart en cents. */
+function tuningClass(cents) {
+  if (Math.abs(cents) <= 5) {return 'in-tune';}
+  return cents < 0 ? 'flat' : 'sharp';
+}
+
+/** Valeur d'une variable CSS du document, avec repli. */
+function cssVar(name, fallback) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
+function isAudibleFrequency(freq) {
+  return freq !== null && freq > 0;
+}
+
+function frequencyToY(freq, { height, minFreq, maxFreq }) {
+  return height - ((freq - minFreq) / (maxFreq - minFreq)) * height;
+}
+
+/** Point sur la dernière fréquence, à droite du graphe. */
+function drawCurrentPoint(ctx, lastFreq, scale) {
+  if (!isAudibleFrequency(lastFreq)) {return;}
+  ctx.beginPath();
+  ctx.arc(scale.width - 4, frequencyToY(lastFreq, scale), 4, 0, Math.PI * 2);
+  ctx.fillStyle = ctx.strokeStyle;
+  ctx.fill();
+}
+
 
 // ============================================================================
 // Classe TunerController
@@ -54,6 +85,9 @@ export class TunerController extends EventEmitter {
     /** @type {MediaStream|null} Stream audio du micro */
     this._stream = null;
 
+    /** @type {Object|null} Jeton de la demande de démarrage en cours */
+    this._startRequest = null;
+
     /** @type {AudioContext|null} Contexte audio */
     this._audioContext = null;
 
@@ -87,19 +121,14 @@ export class TunerController extends EventEmitter {
    * Affiche le panel accordeur.
    */
   show() {
-    if (this.elements.overlay) {
-      this.elements.overlay.classList.add('visible');
-      this._init();
-    }
+    showPanel(this);
   }
 
   /**
    * Cache le panel accordeur.
    */
   hide() {
-    if (this.elements.overlay) {
-      this.elements.overlay.classList.remove('visible');
-    }
+    hidePanel(this);
     this.stop();
   }
 
@@ -108,7 +137,7 @@ export class TunerController extends EventEmitter {
    * @returns {boolean}
    */
   isVisible() {
-    return this.elements.overlay?.classList.contains('visible') || false;
+    return isPanelVisible(this);
   }
 
   /**
@@ -147,37 +176,22 @@ export class TunerController extends EventEmitter {
    * Démarre l'accordeur.
    */
   async start() {
+    // Jeton : un stop() ou un nouveau start() pendant l'attente annule cette demande
+    const request = {};
+    this._startRequest = request;
     try {
       // Demander l'accès au micro
-      this._stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      // Créer le contexte audio
-      this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      this._analyser = this._audioContext.createAnalyser();
-      this._analyser.fftSize = 4096;
-
-      const source = this._audioContext.createMediaStreamSource(this._stream);
-      source.connect(this._analyser);
-
-      this._active = true;
-      this._buffer = new Float32Array(this._analyser.fftSize);
-
-      // Réinitialiser les historiques
-      this._frequencyHistory = [];
-      this._noteHistory = [];
-      this._lastNoteName = null;
-
-      // Initialiser le graphe
-      this._initGraph();
-
-      // Mettre à jour l'UI
-      this._updateUI(true);
-
-      // Démarrer l'analyse
-      this._loop();
-
-      this.emit('started');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (this._startRequest !== request) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+      this._stream = stream;
+      this._openAnalyser(stream);
+      this._beginListening();
     } catch (error) {
+      if (this._startRequest !== request) {return;}
+      this._releaseAudioResources();
       console.error('Erreur accès micro:', error);
       this._updateStatus('Accès micro refusé', true);
       this.emit('error', error);
@@ -185,22 +199,62 @@ export class TunerController extends EventEmitter {
   }
 
   /**
-   * Arrête l'accordeur.
+   * Crée le contexte audio et l'analyseur branchés sur le micro.
+   * @param {MediaStream} stream - Flux du micro
+   * @private
    */
-  stop() {
+  _openAnalyser(stream) {
+    this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    this._analyser = this._audioContext.createAnalyser();
+    this._analyser.fftSize = 4096;
+
+    const source = this._audioContext.createMediaStreamSource(stream);
+    source.connect(this._analyser);
+  }
+
+  /**
+   * Passe en écoute : état, UI, boucle d'analyse.
+   * @private
+   */
+  _beginListening() {
+    this._active = true;
+    this._buffer = new Float32Array(this._analyser.fftSize);
+
+    // Réinitialiser les historiques
+    this._frequencyHistory = [];
+    this._noteHistory = [];
+    this._lastNoteName = null;
+
+    this._initGraph();
+    this._updateUI(true);
+    this._loop();
+    this.emit('started');
+  }
+
+  /**
+   * Libère le flux du micro et le contexte audio.
+   * @private
+   */
+  _releaseAudioResources() {
     this._active = false;
 
-    // Arrêter le stream
     if (this._stream) {
       this._stream.getTracks().forEach(track => track.stop());
       this._stream = null;
     }
 
-    // Fermer le contexte audio
     if (this._audioContext) {
       this._audioContext.close();
       this._audioContext = null;
     }
+  }
+
+  /**
+   * Arrête l'accordeur.
+   */
+  stop() {
+    this._startRequest = null;
+    this._releaseAudioResources();
 
     // Réinitialiser les historiques
     this._frequencyHistory = [];
@@ -278,51 +332,7 @@ export class TunerController extends EventEmitter {
    * @private
    */
   _detectPitch(buffer, sampleRate) {
-    const SIZE = buffer.length;
-
-    // Vérifier qu'il y a du signal
-    let rms = 0;
-    for (let i = 0; i < SIZE; i++) {
-      rms += buffer[i] * buffer[i];
-    }
-    rms = Math.sqrt(rms / SIZE);
-
-    if (rms < 0.01) {return -1;} // Trop silencieux
-
-    // Autocorrélation
-    const correlations = new Float32Array(SIZE);
-    for (let lag = 0; lag < SIZE; lag++) {
-      let sum = 0;
-      for (let i = 0; i < SIZE - lag; i++) {
-        sum += buffer[i] * buffer[i + lag];
-      }
-      correlations[lag] = sum;
-    }
-
-    // Trouver le premier pic après le lag 0
-    const minLag = Math.floor(sampleRate / 1000); // Min ~1000 Hz
-    const maxLag = Math.floor(sampleRate / 50);   // Max ~50 Hz
-
-    let bestLag = -1;
-    let bestCorr = 0;
-    let foundPeak = false;
-
-    for (let lag = minLag; lag < maxLag && lag < SIZE; lag++) {
-      if (correlations[lag] > bestCorr) {
-        bestCorr = correlations[lag];
-        bestLag = lag;
-        foundPeak = true;
-      } else if (foundPeak && correlations[lag] < bestCorr * 0.9) {
-        // On a dépassé le pic
-        break;
-      }
-    }
-
-    if (bestLag === -1 || bestCorr < correlations[0] * 0.5) {
-      return -1;
-    }
-
-    return sampleRate / bestLag;
+    return detectPitch(buffer, sampleRate);
   }
 
   /**
@@ -406,73 +416,60 @@ export class TunerController extends EventEmitter {
     if (!canvas) {return;}
 
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const { width, height } = canvas.getBoundingClientRect();
 
-    // Effacer
+    // Effacer puis fond
     ctx.clearRect(0, 0, width, height);
-
-    // Fond
-    ctx.fillStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-bg-secondary').trim() || '#1a1a2e';
+    ctx.fillStyle = cssVar('--color-bg-secondary', '#1a1a2e');
     ctx.fillRect(0, 0, width, height);
 
     const history = this._frequencyHistory;
     if (history.length < 2) {return;}
 
-    // Calculer min/max pour l'échelle
-    const validFreqs = history.filter(f => f !== null && f > 0);
+    const validFreqs = history.filter(isAudibleFrequency);
     if (validFreqs.length === 0) {return;}
 
     const minFreq = Math.min(...validFreqs) * 0.9;
     const maxFreq = Math.max(...validFreqs) * 1.1;
 
-    // Mettre à jour l'affichage de la plage
     if (this.elements.graphRange) {
       this.elements.graphRange.textContent =
         `${Math.round(minFreq)}-${Math.round(maxFreq)} Hz`;
     }
 
-    // Dessiner les lignes de référence (notes)
     this._drawGraphNoteLines(ctx, width, height, minFreq, maxFreq);
 
-    // Dessiner la courbe
+    const scale = { width, height, minFreq, maxFreq };
+    this._drawGraphCurve(ctx, history, scale);
+    drawCurrentPoint(ctx, history[history.length - 1], scale);
+  }
+
+  /**
+   * Trace la courbe de fréquence ; les trous (null/0) sont sautés.
+   * @param {CanvasRenderingContext2D} ctx - Contexte canvas
+   * @param {Array<number|null>} history - Historique des fréquences
+   * @param {Object} scale - {width, height, minFreq, maxFreq}
+   * @private
+   */
+  _drawGraphCurve(ctx, history, scale) {
     ctx.beginPath();
-    ctx.strokeStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-accent').trim() || '#6366f1';
+    ctx.strokeStyle = cssVar('--color-accent', '#6366f1');
     ctx.lineWidth = 2;
 
     let started = false;
-    for (let i = 0; i < history.length; i++) {
-      const freq = history[i];
-      const x = (i / (this._maxHistoryLength - 1)) * width;
-
-      if (freq !== null && freq > 0) {
-        const y = height - ((freq - minFreq) / (maxFreq - minFreq)) * height;
-
-        if (!started) {
-          ctx.moveTo(x, y);
-          started = true;
-        } else {
-          ctx.lineTo(x, y);
-        }
+    history.forEach((freq, i) => {
+      if (!isAudibleFrequency(freq)) {return;}
+      const x = (i / (this._maxHistoryLength - 1)) * scale.width;
+      const y = frequencyToY(freq, scale);
+      if (started) {
+        ctx.lineTo(x, y);
+      } else {
+        ctx.moveTo(x, y);
+        started = true;
       }
-    }
+    });
 
     ctx.stroke();
-
-    // Point actuel (dernier point)
-    const lastFreq = history[history.length - 1];
-    if (lastFreq !== null && lastFreq > 0) {
-      const x = width;
-      const y = height - ((lastFreq - minFreq) / (maxFreq - minFreq)) * height;
-
-      ctx.beginPath();
-      ctx.arc(x - 4, y, 4, 0, Math.PI * 2);
-      ctx.fillStyle = ctx.strokeStyle;
-      ctx.fill();
-    }
   }
 
   /**
@@ -594,56 +591,61 @@ export class TunerController extends EventEmitter {
    * @private
    */
   _updateDisplay(noteData, frequency) {
-    const { note: noteEl, octave: octaveEl, frequency: freqEl, cents: centsEl, indicator } = this.elements;
-
     if (!noteData) {
-      if (noteEl) {
-        noteEl.textContent = '-';
-        noteEl.className = 'tuner-note';
-      }
-      if (octaveEl) {octaveEl.textContent = '';}
-      if (freqEl) {freqEl.textContent = '-- Hz';}
-      if (centsEl) {centsEl.textContent = '-- cents';}
-      if (indicator) {indicator.style.left = '50%';}
+      this._resetDisplay();
       return;
     }
+    this._renderNote(noteData);
+    this._renderReadings(noteData, frequency);
+  }
 
-    // Note (avec la notation choisie par l'utilisateur)
+  /**
+   * Affiche l'état "aucune note détectée".
+   * @private
+   */
+  _resetDisplay() {
+    const { note: noteEl, octave: octaveEl, frequency: freqEl, cents: centsEl, indicator } = this.elements;
     if (noteEl) {
-      noteEl.textContent = this.formatNote(noteData.note);
-      // Couleur selon justesse
+      noteEl.textContent = '-';
       noteEl.className = 'tuner-note';
-      if (Math.abs(noteData.cents) <= 5) {
-        noteEl.classList.add('in-tune');
-      } else if (noteData.cents < 0) {
-        noteEl.classList.add('flat');
-      } else {
-        noteEl.classList.add('sharp');
-      }
     }
+    if (octaveEl) {octaveEl.textContent = '';}
+    if (freqEl) {freqEl.textContent = '-- Hz';}
+    if (centsEl) {centsEl.textContent = '-- cents';}
+    if (indicator) {indicator.style.left = '50%';}
+  }
 
-    // Octave
-    if (octaveEl) {
-      octaveEl.textContent = noteData.octave;
-    }
+  /**
+   * Affiche la note (notation choisie) colorée selon la justesse.
+   * @param {Object} noteData - Données de la note détectée
+   * @private
+   */
+  _renderNote(noteData) {
+    const noteEl = this.elements.note;
+    if (!noteEl) {return;}
+    noteEl.textContent = this.formatNote(noteData.note);
+    noteEl.className = 'tuner-note';
+    noteEl.classList.add(tuningClass(noteData.cents));
+  }
 
-    // Fréquence
-    if (freqEl) {
-      freqEl.textContent = `${frequency.toFixed(1)} Hz`;
-    }
-
-    // Cents
+  /**
+   * Affiche octave, fréquence, cents et position de l'indicateur.
+   * @param {Object} noteData - Données de la note détectée
+   * @param {number} frequency - Fréquence brute
+   * @private
+   */
+  _renderReadings(noteData, frequency) {
+    const { octave: octaveEl, frequency: freqEl, cents: centsEl, indicator } = this.elements;
+    if (octaveEl) {octaveEl.textContent = noteData.octave;}
+    if (freqEl) {freqEl.textContent = `${frequency.toFixed(1)} Hz`;}
     if (centsEl) {
       const sign = noteData.cents > 0 ? '+' : '';
       centsEl.textContent = `${sign}${noteData.cents} cents`;
     }
-
-    // Indicateur
     if (indicator) {
       // Clamp entre -50 et +50 cents
       const clampedCents = Math.max(-50, Math.min(50, noteData.cents));
-      const percent = 50 + (clampedCents / 50) * 50;
-      indicator.style.left = `${percent}%`;
+      indicator.style.left = `${50 + (clampedCents / 50) * 50}%`;
     }
   }
 
@@ -653,29 +655,42 @@ export class TunerController extends EventEmitter {
    * @private
    */
   _updateUI(active) {
-    const { toggle: btn, status, liveDot } = this.elements;
+    this._updateToggleButton(active);
+    this._updateStatusLine(active);
 
-    if (btn) {
-      btn.classList.toggle('active', active);
-      const icon = btn.querySelector('.tuner-btn-icon');
-      const text = btn.querySelector('.tuner-btn-text');
-      if (icon) {icon.textContent = active ? '⏹' : '🎤';}
-      if (text) {text.textContent = active ? 'Arrêter' : 'Activer le micro';}
-    }
-
-    if (status) {
-      status.textContent = active ? 'Écoute en cours...' : 'Cliquez pour démarrer';
-      status.className = 'tuner-status';
-      if (active) {status.classList.add('active');}
-    }
-
-    // Live indicator
+    const liveDot = this.elements.liveDot;
     if (liveDot) {
       liveDot.classList.toggle('active', active);
-      if (!active) {
-        liveDot.classList.remove('detecting');
-      }
+      if (!active) {liveDot.classList.remove('detecting');}
     }
+  }
+
+  /**
+   * Met à jour le bouton d'activation du micro.
+   * @param {boolean} active - Accordeur actif
+   * @private
+   */
+  _updateToggleButton(active) {
+    const btn = this.elements.toggle;
+    if (!btn) {return;}
+    btn.classList.toggle('active', active);
+    const icon = btn.querySelector('.tuner-btn-icon');
+    const text = btn.querySelector('.tuner-btn-text');
+    if (icon) {icon.textContent = active ? '⏹' : '🎤';}
+    if (text) {text.textContent = active ? 'Arrêter' : 'Activer le micro';}
+  }
+
+  /**
+   * Met à jour la ligne de statut.
+   * @param {boolean} active - Accordeur actif
+   * @private
+   */
+  _updateStatusLine(active) {
+    const status = this.elements.status;
+    if (!status) {return;}
+    status.textContent = active ? 'Écoute en cours...' : 'Cliquez pour démarrer';
+    status.className = 'tuner-status';
+    if (active) {status.classList.add('active');}
   }
 
   /**

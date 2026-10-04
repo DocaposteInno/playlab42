@@ -2,6 +2,8 @@
  * Checkers Engine - Moteur de jeu de Dames isomorphe
  * Fonctionne côté client ET serveur
  * Règles françaises (10x10)
+ * La résolution canonique des trajets précède la transition du plateau ;
+ * les conditions de victoire et de nullité sont évaluées ensuite, dans cet ordre.
  *
  * @see openspec/specs/game-engine/spec.md
  */
@@ -35,6 +37,8 @@
  * @property {'move'} type - Type d'action
  * @property {Position} from - Position de départ
  * @property {Position} to - Position d'arrivée
+ * @property {Position[]} [captured] - Trajet proposé : utilisé seulement s'il
+ * correspond à une action légale. Sinon, premier trajet légal pour from/to.
  *
  * @typedef {Object} CheckersConfig
  * @property {number} seed - Seed pour le RNG
@@ -101,33 +105,13 @@ export class CheckersEngine {
       throw new Error('Not your turn');
     }
 
-    if (!this.isValidAction(state, action, playerId)) {
+    const legalAction = this.#getLegalAction(state, action, playerId);
+    if (!legalAction) {
       throw new Error('Invalid action');
     }
 
-    // Copier l'état
-    const newBoard = state.board.map((row) => [...row]);
-    const piece = newBoard[action.from.row][action.from.col];
-
-    // Calculer les captures (utiliser action.captured si fourni, sinon calculer)
-    const captures = action.captured || this.#getCapturesForMove(state, action.from, action.to);
-
-    // Déplacer la pièce
-    newBoard[action.to.row][action.to.col] = piece;
-    newBoard[action.from.row][action.from.col] = null;
-
-    // Supprimer les pièces capturées
-    for (const capture of captures) {
-      newBoard[capture.row][capture.col] = null;
-    }
-
-    // Promouvoir en dame si dernière rangée
-    if (piece.type === 'pawn') {
-      const lastRow = piece.player === 0 ? 9 : 0;
-      if (action.to.row === lastRow) {
-        newBoard[action.to.row][action.to.col] = { ...piece, type: 'king' };
-      }
-    }
+    const captures = legalAction.captured || [];
+    const newBoard = this.#movePiece(state.board, action, captures);
 
     const move = {
       from: action.from,
@@ -142,16 +126,33 @@ export class CheckersEngine {
       currentPlayer: state.currentPlayer === 0 ? 1 : 0,
     };
 
-    // Vérifier fin de partie
-    this.#checkGameEnd(newState);
-
-    // Vérifier règle des 40 coups sans capture
-    if (!this.#checkDrawByNoCaptureRule(newState)) {
-      // Vérifier répétition de position
-      this.#checkDrawByRepetition(newState);
-    }
-
+    this.#updateOutcome(newState);
     return newState;
+  }
+
+  /**
+   * Applique uniquement le déplacement canonique et la promotion finale.
+   * @param {(Piece | null)[][]} board
+   * @param {CheckersAction} action
+   * @param {Position[]} captures - Trajet autorisé par le moteur.
+   * @returns {(Piece | null)[][]}
+   */
+  #movePiece(board, action, captures) {
+    const next = board.map(row => [...row]);
+    const piece = next[action.from.row][action.from.col];
+    next[action.to.row][action.to.col] = piece;
+    next[action.from.row][action.from.col] = null;
+    for (const capture of captures) { next[capture.row][capture.col] = null; }
+    if (piece.type === 'pawn' && action.to.row === (piece.player === 0 ? 9 : 0)) {
+      next[action.to.row][action.to.col] = { ...piece, type: 'king' };
+    }
+    return next;
+  }
+
+  /** @param {CheckersState} state - Copie privée ; la victoire prime sur la nullité. */
+  #updateOutcome(state) {
+    this.#checkGameEnd(state);
+    if (!this.#checkDrawByNoCaptureRule(state)) { this.#checkDrawByRepetition(state); }
   }
 
   /**
@@ -162,19 +163,41 @@ export class CheckersEngine {
    * @returns {boolean}
    */
   isValidAction(state, action, playerId) {
-    if (state.status !== 'playing') {return false;}
+    return Boolean(this.#getLegalAction(state, action, playerId));
+  }
 
-    const playerIndex = state.playerIds.indexOf(playerId);
-    if (playerIndex !== state.currentPlayer) {return false;}
-
-    const validActions = this.getValidActions(state, playerId);
-    return validActions.some(
+  /**
+   * Résout les extrémités et, si fourni, un trajet légal pour les départager.
+   * Les métadonnées absentes ou contradictoires ne changent pas la validité
+   * de from/to : le premier trajet légal fait foi dans ce cas.
+   * @param {CheckersState} state
+   * @param {CheckersAction} action
+   * @param {string} playerId
+   * @returns {CheckersAction | undefined}
+   */
+  #getLegalAction(state, action, playerId) {
+    if (!action || action.type !== 'move' || !action.from || !action.to) {
+      return undefined;
+    }
+    const matchingActions = this.getValidActions(state, playerId).filter(
       (a) =>
         a.from.row === action.from.row &&
         a.from.col === action.from.col &&
         a.to.row === action.to.row &&
         a.to.col === action.to.col,
     );
+    if (matchingActions.length === 0) {return undefined;}
+    if (Array.isArray(action.captured)) {
+      const matchingRoute = matchingActions.find((a) =>
+        (a.captured || []).length === action.captured.length &&
+        (a.captured || []).every((capture, index) =>
+          capture.row === action.captured[index]?.row &&
+          capture.col === action.captured[index]?.col,
+        ),
+      );
+      if (matchingRoute) {return matchingRoute;}
+    }
+    return matchingActions[0];
   }
 
   /**
@@ -192,26 +215,20 @@ export class CheckersEngine {
     const allMoves = [];
     const allCaptures = [];
 
-    // Trouver toutes les pièces du joueur
-    for (let row = 0; row < 10; row++) {
-      for (let col = 0; col < 10; col++) {
-        const piece = state.board[row][col];
-        if (piece && piece.player === playerIndex) {
-          const from = { row, col };
-
-          // Obtenir les mouvements possibles
-          const moves = this.#getPossibleMoves(state, from);
-          const captures = this.#getPossibleCaptures(state, from);
-
-          allMoves.push(...moves);
-          allCaptures.push(...captures);
-        }
-      }
+    for (const from of this.#getPlayerPositions(state, playerIndex)) {
+      allMoves.push(...this.#getPossibleMoves(state, from));
+      allCaptures.push(...this.#getPossibleCaptures(state, from));
     }
 
-    // Si des captures sont possibles, seules les captures sont valides (prise obligatoire)
+    // Prise obligatoire et majoritaire, sans priorité entre pions et dames.
     if (allCaptures.length > 0) {
-      return allCaptures.map((move) => ({ type: 'move', ...move }));
+      const maxCaptures = allCaptures.reduce(
+        (maximum, move) => Math.max(maximum, move.captured.length),
+        0,
+      );
+      return allCaptures
+        .filter((move) => move.captured.length === maxCaptures)
+        .map((move) => ({ type: 'move', ...move }));
     }
 
     return allMoves.map((move) => ({ type: 'move', ...move }));
@@ -228,6 +245,31 @@ export class CheckersEngine {
     return state;
   }
 
+  /** @param {CheckersState} state @returns {boolean} */
+  isGameOver(state) { return state.status !== 'playing'; }
+
+  /** @param {CheckersState} state @returns {string[] | null} */
+  getWinners(state) {
+    return state.status === 'won' && state.winner !== null ? [state.playerIds[state.winner]] : null;
+  }
+
+  /** @param {CheckersState} state @returns {string | null} */
+  getCurrentPlayer(state) { return this.isGameOver(state) ? null : state.playerIds[state.currentPlayer]; }
+
+  /**
+   * Positions des pièces d'un joueur, en ordre ligne puis colonne
+   * @param {CheckersState} state
+   * @param {number} player
+   * @returns {Position[]}
+   */
+  #getPlayerPositions(state, player) {
+    const positions = [];
+    state.board.forEach((cells, row) => cells.forEach((piece, col) => {
+      if (piece && piece.player === player) {positions.push({ row, col });}
+    }));
+    return positions;
+  }
+
   /**
    * Vérifie et met à jour l'état de fin de partie
    * @param {CheckersState} state
@@ -236,19 +278,8 @@ export class CheckersEngine {
   #checkGameEnd(state) {
     const opponent = state.currentPlayer;
 
-    // Compter les pièces de l'adversaire
-    let opponentPieces = 0;
-    for (let row = 0; row < 10; row++) {
-      for (let col = 0; col < 10; col++) {
-        const piece = state.board[row][col];
-        if (piece && piece.player === opponent) {
-          opponentPieces++;
-        }
-      }
-    }
-
     // Victoire par élimination
-    if (opponentPieces === 0) {
+    if (this.#getPlayerPositions(state, opponent).length === 0) {
       state.status = 'won';
       state.winner = opponent === 0 ? 1 : 0;
       return;
@@ -354,102 +385,28 @@ export class CheckersEngine {
     visitedPositions.add(posKey);
 
     for (const [dr, dc] of directions) {
-      if (piece.type === 'pawn') {
-        // Pion : capture simple
-        const target = { row: pos.row + dr, col: pos.col + dc };
-        const landing = { row: pos.row + dr * 2, col: pos.col + dc * 2 };
+      const steps = piece.type === 'pawn'
+        ? this.#getPawnCaptureSteps(state, pos, piece, dr, dc, capturedSoFar)
+        : this.#getKingCaptureSteps(state, pos, piece, dr, dc, capturedSoFar);
 
-        if (
-          this.#isValidPosition(target) &&
-          this.#isValidPosition(landing) &&
-          state.board[target.row][target.col] &&
-          state.board[target.row][target.col].player !== piece.player &&
-          !state.board[landing.row][landing.col] &&
-          !this.#isPositionCaptured(target, capturedSoFar)
-        ) {
-          const newCaptured = [...capturedSoFar, target];
+      for (const { target, landing } of steps) {
+        const newCaptured = [...capturedSoFar, target];
+        const tempBoard = state.board.map((row) => [...row]);
+        tempBoard[landing.row][landing.col] = piece;
+        tempBoard[pos.row][pos.col] = null;
+        tempBoard[target.row][target.col] = null;
 
-          // Simuler l'état après cette capture
-          const tempBoard = state.board.map((row) => [...row]);
-          tempBoard[landing.row][landing.col] = piece;
-          tempBoard[pos.row][pos.col] = null;
-          tempBoard[target.row][target.col] = null;
+        const furtherCaptures = this.#findAllCaptureSequences(
+          { ...state, board: tempBoard },
+          landing,
+          newCaptured,
+          new Set(visitedPositions),
+        );
 
-          const tempState = { ...state, board: tempBoard };
-
-          // Chercher des captures multiples
-          const furtherCaptures = this.#findAllCaptureSequences(
-            tempState,
-            landing,
-            newCaptured,
-            new Set(visitedPositions),
-          );
-
-          if (furtherCaptures.length > 0) {
-            sequences.push(...furtherCaptures);
-          } else {
-            sequences.push({ positions: [landing], captured: newCaptured });
-          }
-        }
-      } else {
-        // Dame : capture avec atterrissage libre
-        let step = 1;
-        let targetFound = null;
-
-        // Trouver la pièce adverse
-        while (true) {
-          const checkPos = { row: pos.row + dr * step, col: pos.col + dc * step };
-          if (!this.#isValidPosition(checkPos)) {break;}
-
-          const checkPiece = state.board[checkPos.row][checkPos.col];
-          if (checkPiece) {
-            if (
-              checkPiece.player !== piece.player &&
-              !this.#isPositionCaptured(checkPos, capturedSoFar)
-            ) {
-              targetFound = checkPos;
-              step++;
-              break;
-            } else {
-              break; // Pièce alliée ou déjà capturée
-            }
-          }
-          step++;
-        }
-
-        // Si une pièce adverse est trouvée, chercher les positions d'atterrissage
-        if (targetFound) {
-          while (true) {
-            const landing = { row: pos.row + dr * step, col: pos.col + dc * step };
-            if (!this.#isValidPosition(landing)) {break;}
-            if (state.board[landing.row][landing.col]) {break;}
-
-            const newCaptured = [...capturedSoFar, targetFound];
-
-            // Simuler l'état après cette capture
-            const tempBoard = state.board.map((row) => [...row]);
-            tempBoard[landing.row][landing.col] = piece;
-            tempBoard[pos.row][pos.col] = null;
-            tempBoard[targetFound.row][targetFound.col] = null;
-
-            const tempState = { ...state, board: tempBoard };
-
-            // Chercher des captures multiples
-            const furtherCaptures = this.#findAllCaptureSequences(
-              tempState,
-              landing,
-              newCaptured,
-              new Set(visitedPositions),
-            );
-
-            if (furtherCaptures.length > 0) {
-              sequences.push(...furtherCaptures);
-            } else {
-              sequences.push({ positions: [landing], captured: newCaptured });
-            }
-
-            step++;
-          }
+        if (furtherCaptures.length > 0) {
+          sequences.push(...furtherCaptures);
+        } else {
+          sequences.push({ positions: [landing], captured: newCaptured });
         }
       }
     }
@@ -458,34 +415,75 @@ export class CheckersEngine {
   }
 
   /**
-   * Calcule les pièces capturées pour un mouvement
+   * Calcule le saut immédiat d'un pion dans une diagonale, sans modifier l'état.
    * @param {CheckersState} state
-   * @param {Position} from
-   * @param {Position} to
-   * @returns {Position[]}
-   * @private
+   * @param {Position} pos
+   * @param {Piece} piece
+   * @param {number} dr
+   * @param {number} dc
+   * @param {Position[]} capturedSoFar
+   * @returns {{target: Position, landing: Position}[]}
    */
-  #getCapturesForMove(state, from, to) {
-    const piece = state.board[from.row][from.col];
-    if (!piece) {return [];}
+  #getPawnCaptureSteps(state, pos, piece, dr, dc, capturedSoFar) {
+    const target = { row: pos.row + dr, col: pos.col + dc };
+    const landing = { row: pos.row + dr * 2, col: pos.col + dc * 2 };
 
-    const dr = Math.sign(to.row - from.row);
-    const dc = Math.sign(to.col - from.col);
-    const distance = Math.max(Math.abs(to.row - from.row), Math.abs(to.col - from.col));
+    if (
+      this.#isValidPosition(target) &&
+      this.#isValidPosition(landing) &&
+      state.board[target.row][target.col] &&
+      state.board[target.row][target.col].player !== piece.player &&
+      !state.board[landing.row][landing.col] &&
+      !this.#isPositionCaptured(target, capturedSoFar)
+    ) {
+      return [{ target, landing }];
+    }
+    return [];
+  }
 
-    const captures = [];
+  /**
+   * Calcule les atterrissages d'une dame derrière la première pièce adverse.
+   * Leur ordre conserve le parcours de la diagonale, du plus proche au plus loin.
+   * @param {CheckersState} state
+   * @param {Position} pos
+   * @param {Piece} piece
+   * @param {number} dr
+   * @param {number} dc
+   * @param {Position[]} capturedSoFar
+   * @returns {{target: Position, landing: Position}[]}
+   */
+  #getKingCaptureSteps(state, pos, piece, dr, dc, capturedSoFar) {
+    let step = 1;
+    let target = null;
 
-    // Parcourir le chemin
-    for (let step = 1; step < distance; step++) {
-      const checkPos = { row: from.row + dr * step, col: from.col + dc * step };
+    while (true) {
+      const checkPos = { row: pos.row + dr * step, col: pos.col + dc * step };
+      if (!this.#isValidPosition(checkPos)) {break;}
+
       const checkPiece = state.board[checkPos.row][checkPos.col];
-
-      if (checkPiece && checkPiece.player !== piece.player) {
-        captures.push(checkPos);
+      if (checkPiece) {
+        if (
+          checkPiece.player !== piece.player &&
+          !this.#isPositionCaptured(checkPos, capturedSoFar)
+        ) {
+          target = checkPos;
+          step++;
+        }
+        break;
       }
+      step++;
     }
 
-    return captures;
+    if (!target) {return [];}
+    const steps = [];
+    while (true) {
+      const landing = { row: pos.row + dr * step, col: pos.col + dc * step };
+      if (!this.#isValidPosition(landing)) {break;}
+      if (state.board[landing.row][landing.col]) {break;}
+      steps.push({ target, landing });
+      step++;
+    }
+    return steps;
   }
 
   /**

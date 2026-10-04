@@ -6,21 +6,15 @@
     <title>Triomino - Playlab42</title>
     <link rel="stylesheet" href="../../lib/theme.css" />
     <link rel="stylesheet" href="../../lib/ui.css" />
+    <link rel="stylesheet" href="../game-page.css" />
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-
       body {
-        font-family: var(--font-family);
-        background: var(--color-bg);
-        color: var(--color-text);
-        min-height: 100vh;
-        display: flex;
         flex-direction: column;
         align-items: center;
         padding: 16px;
       }
 
-      h1 { color: var(--color-text); font-size: 2em; margin-bottom: 4px; text-align: center; }
+      h1 { color: var(--color-text); font-size: 2em; margin-bottom: 4px; }
       .subtitle { color: var(--color-text-muted); font-size: 0.9em; margin-bottom: 16px; text-align: center; }
 
       /* — Écrans — */
@@ -58,11 +52,6 @@
         margin-top: 10px;
       }
       .btn-secondary:hover { background: var(--color-bg-secondary); }
-      .btn-draw { background: #3b82f6; color: white; }
-      .btn-pass { background: #6b7280; color: white; }
-      .btn-quit { background: #dc2626; color: white; margin-top: 8px; }
-      .btn-rules { background: #8b5cf6; color: white; margin-top: 8px; text-decoration: none; text-align: center; display: block; }
-      .btn-draw:not(:disabled):hover, .btn-pass:not(:disabled):hover, .btn-quit:hover, .btn-rules:hover { opacity: 0.85; }
 
       /* — Partie — */
       #game-screen { width: 100%; max-width: 960px; }
@@ -261,8 +250,8 @@
       </div>
 
       <button class="btn-primary" id="start-btn">Démarrer la partie</button>
-      <button class="btn-secondary" id="btn-rules-setup" onclick="window.open('https://www.regledujeu.fr/triominos/', '_blank')">📖 Règles du jeu</button>
-      <button class="btn-secondary" id="back-btn" onclick="window.location.href='../../index.html'">↩ Retour au menu principal</button>
+      <button class="btn-secondary" id="btn-rules-setup">📖 Règles du jeu</button>
+      <button class="btn-secondary" id="back-btn">↩ Retour au menu principal</button>
     </div>
 
     <!-- Écran de jeu -->
@@ -311,7 +300,7 @@
             <button class="btn-action btn-quit" id="btn-quit">
               ✕ Quitter la partie
             </button>
-            <button class="btn-action btn-rules" onclick="window.open('https://www.regledujeu.fr/triominos/', '_blank')">
+            <button class="btn-action btn-rules">
               📖 Règles du jeu
             </button>
           </div>
@@ -348,22 +337,15 @@
     </div>
 
     <script type="module">
-      import { TriominoEngine, generateAllTiles, isValidPlacement, detectBonus } from './dist/engine.js';
+      import { TriominoEngine, detectBonus } from './dist/engine.js';
       import { SeededRandom } from '../../lib/seeded-random.js';
       import { GreedyBot } from './bots/dist/greedy.js';
-      import { RandomBot } from './bots/dist/random.js';
       import { initTheme } from '../../lib/theme.js';
       import { createPlacementControls } from './placement-controls.js';
       import { observeDialog } from '../dialog-accessibility.js';
       import { createRackButton } from './rack-button.js';
+      import { renderTriominoBoard } from './ui/board-view.js';
       initTheme();
-
-      // — Constantes visuelles —
-      // Côté d'un triangle équilatéral
-      const SIDE = 60;
-      // Demi-côté and hauteur
-      const HALF_SIDE = SIDE / 2;
-      const TRI_H = SIDE * Math.sqrt(3) / 2;
 
       // — État global —
       const engine = new TriominoEngine();
@@ -401,6 +383,14 @@
       // — Démarrage —
       document.getElementById('start-btn').addEventListener('click', startGame);
       document.getElementById('restart-btn').addEventListener('click', () => showScreen(setupScreen));
+      document.getElementById('back-btn').addEventListener('click', () => {
+        window.location.href = '../../index.html';
+      });
+      document.querySelectorAll('#btn-rules-setup, .btn-rules').forEach(button => {
+        button.addEventListener('click', () => {
+          window.open('https://www.regledujeu.fr/triominos/', '_blank', 'noopener');
+        });
+      });
 
       btnDraw.addEventListener('click', () => {
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
@@ -496,7 +486,7 @@
 
       // — Rendu —
       function render() {
-        if (!gameState) return;
+        if (!gameState) {return;}
         const focusedTile = rackEl.contains(document.activeElement) ? document.activeElement.dataset.tileId : null;
         renderStatus();
         renderScores();
@@ -522,116 +512,19 @@
         scoresBar.innerHTML = '';
         gameState.players.forEach((p, i) => {
           const card = document.createElement('div');
-          card.className = 'score-card' + (i === gameState.currentPlayerIndex ? ' active' : '');
+          card.className = `score-card${  i === gameState.currentPlayerIndex ? ' active' : ''}`;
           card.innerHTML = `<div class="player-name">${p.id}</div><div class="player-score">${p.score} pts</div>`;
           scoresBar.appendChild(card);
         });
       }
 
       function renderBoard() {
-        // Vider le plateau sauf les defs
-        boardSvg.innerHTML = '<defs><filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.15"/></filter><filter id="last-tile-glow"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#f97316" flood-opacity="0.8"/></filter></defs>';
-
-        const legalPositions = getLegalPositionsForSelected();
-
-        // Collecter toutes les positions à afficher pour calculer le viewBox
-        const allPositions = [];
-        for (const key of Object.keys(gameState.board)) {
-          allPositions.push(gameState.board[key].position);
-        }
-        for (const { pos } of legalPositions) {
-          allPositions.push(pos);
-        }
-
-        // Calculer le viewBox englobant
-        if (allPositions.length > 0) {
-          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-          for (const pos of allPositions) {
-            for (const [x, y] of triangleCorners(pos)) {
-              if (x < minX) minX = x;
-              if (y < minY) minY = y;
-              if (x > maxX) maxX = x;
-              if (y > maxY) maxY = y;
-            }
-          }
-          const pad = SIDE;
-          boardSvg.setAttribute('viewBox',
-            `${minX - pad} ${minY - pad} ${maxX - minX + 2 * pad} ${maxY - minY + 2 * pad}`);
-        }
-
-        // Dessiner les zones de drop disponibles
-        const selectedPlacement = placementControls.getSelected();
-        const distinctPositions = new Map();
-        for (const placement of legalPositions) {
-          const { pos } = placement;
-          const key = `${pos.col},${pos.row},${pos.orientation}`;
-          const selectedPosition = selectedPlacement?.pos;
-          if (!distinctPositions.has(key) || (selectedPosition?.col === pos.col && selectedPosition?.row === pos.row
-            && selectedPosition?.orientation === pos.orientation && placement.placed.join(',') === selectedPlacement.placed.join(','))) {
-            distinctPositions.set(key, placement);
-          }
-        }
-        for (const { pos, placed } of distinctPositions.values()) {
-          const pts = trianglePoints(pos);
-          const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-          poly.setAttribute('points', pts);
-          poly.setAttribute('fill', 'rgba(249,115,22,0.18)');
-          poly.setAttribute('stroke', '#f97316');
-          poly.setAttribute('stroke-width', '2');
-          poly.setAttribute('stroke-dasharray', '4 3');
-          poly.setAttribute('aria-hidden', 'true');
-          poly.style.cursor = 'pointer';
-          poly.addEventListener('click', () => placeTile(pos, placed));
-          boardSvg.appendChild(poly);
-        }
-
-        // Dessiner les tuiles posées
-        for (const key of Object.keys(gameState.board)) {
-          const cell = gameState.board[key];
-          drawPlacedTile(cell, key === lastPlacedPositionKey);
-        }
-      }
-
-      function drawPlacedTile(cell, isLastPlaced = false) {
-        const { position, placed } = cell;
-        const pts = trianglePoints(position);
-        const [cx, cy] = triangleCenter(position);
-
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('role', 'img');
-        g.setAttribute('aria-label', `Tuile ${placed.join(', ')}, colonne ${position.col}, ligne ${position.row}, ${position.orientation}${isLastPlaced ? ', dernière tuile posée' : ''}`);
-        if (isLastPlaced) {
-          g.setAttribute('filter', 'url(#last-tile-glow)');
-        }
-
-        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly.setAttribute('points', pts);
-        poly.setAttribute('fill', isLastPlaced ? '#fed7aa' : '#fffff0');
-        poly.setAttribute('stroke', isLastPlaced ? '#f97316' : '#000000');
-        poly.setAttribute('stroke-width', isLastPlaced ? '3' : '2');
-        if (!isLastPlaced) poly.setAttribute('filter', 'url(#shadow)');
-        g.appendChild(poly);
-
-        // Afficher les 3 valeurs aux sommets, insetées vers le centre.
-        // placed[0] ? corners[0] (sommet), placed[1] ? corners[1], placed[2] ? corners[2]
-        const corners = triangleCorners(position);
-        const CORNER_INSET = 0.45;
-        placed.forEach((val, i) => {
-          const nx = corners[i][0] + (cx - corners[i][0]) * CORNER_INSET;
-          const ny = corners[i][1] + (cy - corners[i][1]) * CORNER_INSET;
-          const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          tx.setAttribute('x', nx);
-          tx.setAttribute('y', ny);
-          tx.setAttribute('text-anchor', 'middle');
-          tx.setAttribute('dominant-baseline', 'central');
-          tx.setAttribute('font-size', '13');
-          tx.setAttribute('font-weight', '800');
-          tx.setAttribute('fill', '#7c1d0e');
-          tx.textContent = val;
-          g.appendChild(tx);
-        });
-
-        boardSvg.appendChild(g);
+        renderTriominoBoard(boardSvg, {
+          board: gameState.board,
+          legalPositions: getLegalPositionsForSelected(),
+          selectedPlacement: placementControls.getSelected(),
+          lastPlacedKey: lastPlacedPositionKey,
+        }, placeTile);
       }
 
       function renderRack() {
@@ -642,11 +535,11 @@
           isHuman ? `Ma réglette (${currentPlayer.rack.length} tuiles)` : `${currentPlayer.id} joue...`;
 
         rackEl.innerHTML = '';
-        if (!isHuman) return;
+        if (!isHuman) {return;}
 
         // Trier les tuiles : par chiffre du sommet (values[0]) puis par nombre de points
         const sortedRack = [...currentPlayer.rack].sort((a, b) => {
-          if (a.values[0] !== b.values[0]) return a.values[0] - b.values[0];
+          if (a.values[0] !== b.values[0]) {return a.values[0] - b.values[0];}
           const sumA = a.values[0] + a.values[1] + a.values[2];
           const sumB = b.values[0] + b.values[1] + b.values[2];
           return sumA - sumB;
@@ -668,8 +561,8 @@
           svg.setAttribute('height', '56');
           svg.setAttribute('viewBox', '-28 -28 56 56');
           svg.classList.add('rack-tile');
-          if (tile.id === selectedTileId) svg.classList.add('selected');
-          if (gameState.lastDrawnTile && tile.id === gameState.lastDrawnTile.id) svg.classList.add('drawn');
+          if (tile.id === selectedTileId) {svg.classList.add('selected');}
+          if (gameState.lastDrawnTile && tile.id === gameState.lastDrawnTile.id) {svg.classList.add('drawn');}
 
           const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
           poly.setAttribute('points', '0,-22 -22,18 22,18');
@@ -737,12 +630,12 @@
       // — Interactions —
       function getLegalPositionsForSelected() {
         const activeId = selectedTileId ?? hoveredTileId;
-        if (activeId === null || gameState.phase === 'finished') return [];
+        if (activeId === null || gameState.phase === 'finished') {return [];}
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-        if (!humanPlayerIds.includes(currentPlayer.id)) return [];
+        if (!humanPlayerIds.includes(currentPlayer.id)) {return [];}
 
         const tile = currentPlayer.rack.find(t => t.id === activeId);
-        if (!tile) return [];
+        if (!tile) {return [];}
 
         const actions = engine.getLegalActions(gameState, currentPlayer.id);
         return actions
@@ -752,10 +645,10 @@
 
       function placeTile(pos, placed) {
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-        if (selectedTileId === null) return;
+        if (selectedTileId === null) {return;}
 
         const action = { type: 'PLACE', triominoId: selectedTileId, position: pos, placed };
-        if (!engine.isValidAction(gameState, action, currentPlayer.id)) return;
+        if (!engine.isValidAction(gameState, action, currentPlayer.id)) {return;}
 
         // Détecter le bonus avant d'appliquer (pour affichage)
         const boardAfter = {
@@ -775,7 +668,7 @@
         render();
         (rackEl.querySelector('button') || gameScreen).focus();
 
-        if (bonus) showBonus(bonus);
+        if (bonus) {showBonus(bonus);}
 
         if (gameState.phase === 'finished') {
           setTimeout(showEnd, bonus ? 1800 : 400);
@@ -787,7 +680,7 @@
 
       // — Bots —
       function scheduleBotTurnIfNeeded() {
-        if (!gameState || gameState.phase === 'finished') return;
+        if (!gameState || gameState.phase === 'finished') {return;}
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         const botEntry = botPlayers.find(b => b.id === currentPlayer.id);
         if (botEntry) {
@@ -796,13 +689,13 @@
       }
 
       function playBotTurn(botEntry) {
-        if (!gameState || gameState.phase === 'finished') return;
+        if (!gameState || gameState.phase === 'finished') {return;}
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-        if (currentPlayer.id !== botEntry.id) return;
+        if (currentPlayer.id !== botEntry.id) {return;}
 
         const view = engine.getPlayerView(gameState, botEntry.id);
         const actions = engine.getLegalActions(gameState, botEntry.id);
-        if (actions.length === 0) return;
+        if (actions.length === 0) {return;}
 
         const action = botEntry.bot.chooseAction(view, actions, rng);
 
@@ -823,7 +716,7 @@
         gameState = engine.applyAction(gameState, action, botEntry.id);
         render();
 
-        if (bonus) showBonus(bonus);
+        if (bonus) {showBonus(bonus);}
 
         if (gameState.phase === 'finished') {
           setTimeout(showEnd, bonus ? 1800 : 400);
@@ -858,7 +751,7 @@
 
         sorted.forEach((p, i) => {
           const li = document.createElement('li');
-          li.innerHTML = `<span class="rank">${ranks[i] ?? (i+1)+'.'}</span> <span>${p.id}</span> <strong>${p.score} pts</strong>`;
+          li.innerHTML = `<span class="rank">${ranks[i] ?? `${i+1}.`}</span> <span>${p.id}</span> <strong>${p.score} pts</strong>`;
           podiumEl.appendChild(li);
         });
 
@@ -872,55 +765,6 @@
 
         showScreen(endScreen);
       }
-
-      // — Géométrie SVG —
-
-      function triangleCorners(pos) {
-        const { col, row, orientation } = pos;
-        const seqX = col * 2 + (orientation === 'DOWN' ? 1 : 0);
-        const seqY = row;
-        const isVisualUp = ((seqX + seqY) % 2 + 2) % 2 === 0;
-
-        const leftX = seqX * HALF_SIDE;
-        const rightX = leftX + SIDE;
-        const midX = leftX + HALF_SIDE;
-        const topY = seqY * TRI_H;
-        const botY = topY + TRI_H;
-
-        if (isVisualUp) {
-          // △ : corners[0]=sommet haut, [1]=bas-gauche, [2]=bas-droit
-          return [
-            [midX,   topY],
-            [leftX,  botY],
-            [rightX, botY],
-          ];
-        } else {
-          // ▽ : corners[0]=sommet bas, [1]=haut-gauche, [2]=haut-droit
-          return [
-            [midX,   botY],
-            [leftX,  topY],
-            [rightX, topY],
-          ];
-        }
-      }
-
-      function isVisuallyUp(pos) {
-        const seqX = pos.col * 2 + (pos.orientation === 'DOWN' ? 1 : 0);
-        return ((seqX + pos.row) % 2 + 2) % 2 === 0;
-      }
-
-      function trianglePoints(pos) {
-        return triangleCorners(pos).map(c => c.join(',')).join(' ');
-      }
-
-      function triangleCenter(pos) {
-        const corners = triangleCorners(pos);
-        return [
-          (corners[0][0] + corners[1][0] + corners[2][0]) / 3,
-          (corners[0][1] + corners[1][1] + corners[2][1]) / 3,
-        ];
-      }
-
     </script>
   </body>
 </html>

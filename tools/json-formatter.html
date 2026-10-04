@@ -23,14 +23,18 @@
       transition: background-color var(--transition-normal), color var(--transition-normal);
     }
 
-    header {
-      padding: var(--space-md);
+    header,
+    .panel-header {
       background: var(--color-bg-secondary);
       border-bottom: 1px solid var(--color-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    }
+
+    header {
+      padding: var(--space-md);
     }
 
     header h1 {
@@ -103,12 +107,6 @@
 
     .panel-header {
       padding: 0.75rem var(--space-md);
-      background: var(--color-bg-secondary);
-      border-bottom: 1px solid var(--color-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background-color var(--transition-normal), border-color var(--transition-normal);
     }
 
     @media (max-width: 480px) {
@@ -266,6 +264,7 @@
     let lastValidJSON = null;
     let hasValidJSON = false;
     const indentSize = 2;
+    const autoFormat = debounce(formatJSON, 300);
 
     /**
      * Applique la coloration syntaxique au JSON (sans innerHTML dangereux)
@@ -289,6 +288,7 @@
      * Formate le JSON avec indentation
      */
     function formatJSON() {
+      autoFormat.cancel();
       const input = inputEl.value.trim();
       hasValidJSON = false;
       inputEl.removeAttribute('aria-invalid');
@@ -332,7 +332,7 @@
      */
     function minifyJSON() {
       formatJSON();
-      if (!hasValidJSON) return;
+      if (!hasValidJSON) {return;}
 
       const minified = JSON.stringify(lastValidJSON);
       outputEl.innerHTML = highlightJSON(minified);
@@ -347,7 +347,7 @@
      */
     async function copyOutput() {
       const text = outputEl.textContent;
-      if (!text) return;
+      if (!text) {return;}
 
       try {
         await navigator.clipboard.writeText(text);
@@ -367,8 +367,8 @@
      * Formate une taille en bytes
      */
     function formatBytes(bytes) {
-      if (bytes < 1024) return `${bytes} B`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      if (bytes < 1024) {return `${bytes} B`;}
+      if (bytes < 1024 * 1024) {return `${(bytes / 1024).toFixed(1)} KB`;}
       return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 
@@ -378,7 +378,7 @@
     on(btnCopy, 'click', copyOutput);
 
     // Auto-format au fur et à mesure (débounce)
-    on(inputEl, 'input', debounce(formatJSON, 300));
+    on(inputEl, 'input', autoFormat);
 
     // Raccourci clavier Ctrl+Enter
     on(inputEl, 'keydown', (e) => {

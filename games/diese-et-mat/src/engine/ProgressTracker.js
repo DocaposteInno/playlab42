@@ -8,6 +8,7 @@
  */
 
 import GameKit from '../../../../lib/gamekit.js';
+import { calculateLevelProgress } from './level-progress.js';
 
 // ============================================================================
 // Constantes
@@ -25,6 +26,17 @@ const DEFAULT_PROGRESS = {
     defaultDifficulty: 1,
   },
 };
+
+/** Chaque chargement/reset possède ses collections et paramètres mutables. */
+function createDefaultProgress() {
+  return {
+    ...DEFAULT_PROGRESS,
+    skills: {},
+    sessions: [],
+    achievements: [],
+    settings: { ...DEFAULT_PROGRESS.settings },
+  };
+}
 
 /** Définition des compétences */
 const SKILLS = {
@@ -75,6 +87,18 @@ const ACHIEVEMENTS = {
     icon: '🎹',
   },
 };
+
+/** Critères dans l'ordre des notifications, indépendants du déblocage persistant. */
+const ACHIEVEMENT_RULES = [
+  {
+    id: 'first-perfect',
+    matches: (context) => context.accuracy === 100 && context.totalQuestions >= 10,
+  },
+  { id: 'streak10', matches: (context) => context.bestStreak >= 10 },
+  { id: 'streak25', matches: (context) => context.bestStreak >= 25 },
+  { id: 'level5', matches: (_context, level) => level >= 5 },
+  { id: 'level10', matches: (_context, level) => level >= 10 },
+];
 
 // ============================================================================
 // Classe ProgressTracker
@@ -134,7 +158,7 @@ export class ProgressTracker {
     }
 
     // Progression par défaut
-    this.progress = { ...DEFAULT_PROGRESS };
+    this.progress = createDefaultProgress();
     return this.progress;
   }
 
@@ -169,7 +193,7 @@ export class ProgressTracker {
    */
   _migrate(data) {
     // Pour l'instant, pas de migration nécessaire
-    return { ...DEFAULT_PROGRESS, ...data };
+    return { ...createDefaultProgress(), ...data };
   }
 
   // --------------------------------------------------------------------------
@@ -198,27 +222,14 @@ export class ProgressTracker {
   /**
    * Retourne le niveau global
    *
+   * Un XP global NaN ou absent est lu comme 0 ; Infinity ou un type non numérique
+   * (progression corrompue) lève une erreur explicite au lieu d'un repli silencieux.
+   *
+   * @throws {TypeError|RangeError} Si l'XP global est invalide
    * @returns {{ level: number, currentXP: number, requiredXP: number, progress: number }}
    */
   getLevel() {
-    const xp = this.getGlobalXP();
-    let level = 1;
-    let usedXP = 0;
-
-    while (true) {
-      const requiredForNext = Math.floor(100 * Math.pow(level, 1.5));
-      if (usedXP + requiredForNext > xp) {
-        const currentXP = xp - usedXP;
-        return {
-          level,
-          currentXP,
-          requiredXP: requiredForNext,
-          progress: Math.round((currentXP / requiredForNext) * 100),
-        };
-      }
-      usedXP += requiredForNext;
-      level++;
-    }
+    return calculateLevelProgress(this.getGlobalXP());
   }
 
   // --------------------------------------------------------------------------
@@ -355,33 +366,11 @@ export class ProgressTracker {
    */
   checkAchievements(context) {
     const newAchievements = [];
-
-    // Perfect score
-    if (context.accuracy === 100 && context.totalQuestions >= 10) {
-      if (this._unlockAchievement('first-perfect')) {
-        newAchievements.push(ACHIEVEMENTS['first-perfect']);
-      }
-    }
-
-    // Streaks
-    if (context.bestStreak >= 10) {
-      if (this._unlockAchievement('streak10')) {
-        newAchievements.push(ACHIEVEMENTS['streak10']);
-      }
-    }
-    if (context.bestStreak >= 25) {
-      if (this._unlockAchievement('streak25')) {
-        newAchievements.push(ACHIEVEMENTS['streak25']);
-      }
-    }
-
-    // Niveaux
     const level = this.getLevel().level;
-    if (level >= 5 && this._unlockAchievement('level5')) {
-      newAchievements.push(ACHIEVEMENTS['level5']);
-    }
-    if (level >= 10 && this._unlockAchievement('level10')) {
-      newAchievements.push(ACHIEVEMENTS['level10']);
+    for (const rule of ACHIEVEMENT_RULES) {
+      if (rule.matches(context, level) && this._unlockAchievement(rule.id)) {
+        newAchievements.push(ACHIEVEMENTS[rule.id]);
+      }
     }
 
     return newAchievements;
@@ -472,9 +461,10 @@ export class ProgressTracker {
 
   /**
    * Réinitialise toute la progression
+   * Remplace aussi les collections et paramètres avant sauvegarde/notification.
    */
   async reset() {
-    this.progress = { ...DEFAULT_PROGRESS };
+    this.progress = createDefaultProgress();
     await this.save();
   }
 }

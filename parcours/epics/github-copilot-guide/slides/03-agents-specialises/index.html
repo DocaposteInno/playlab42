@@ -47,11 +47,10 @@
 
     <h3>Pourquoi des agents plutôt qu'un assistant générique ?</h3>
 
-    <p>L'analyse de plus de 2500 fichiers agents.md révèle un constat clair : <strong>les assistants génériques échouent car ils sont trop vagues</strong>.</p>
+    <p>Un agent personnalisé précise un <strong>rôle, un périmètre et des outils</strong>. Il aide à reproduire une méthode de travail ; il ne rend pas le modèle infaillible et n'isole pas automatiquement ses actions.</p>
 
     <blockquote>
-      ❌ "Tu es un assistant de code utile" → ne fonctionne pas<br>
-      ✅ "Tu es un ingénieur QA qui écrit des tests xUnit, suit ces conventions, et ne modifie jamais le code source" → fonctionne
+      Une consigne vague donne peu de repères. Préférez : « Tu écris des tests xUnit, suis les conventions du dépôt et demandes l'accord avant de modifier le code source. »
     </blockquote>
 
     <h3>L'approche "équipe de spécialistes"</h3>
@@ -59,16 +58,16 @@
     <p>Créez plusieurs agents avec des rôles précis plutôt qu'un assistant générique :</p>
 
     <div class="file-tree">.github/agents/
-├── docs-agent.md      # Rédaction documentation
-├── test-agent.md      # Écriture de tests
-├── review-agent.md    # Revue de code
-└── security-agent.md  # Analyse sécurité</div>
+├── docs-agent.agent.md      # Rédaction documentation
+├── test-agent.agent.md      # Écriture de tests
+├── review-agent.agent.md    # Revue de code
+└── security-agent.agent.md  # Analyse sécurité</div>
 
-    <p>Invocation : <code>@docs-agent génère la doc de cette classe</code></p>
+    <p>Dans <strong>VS Code</strong>, choisissez le profil dans le sélecteur d'agents du Chat. Dans <strong>Copilot CLI</strong>, utilisez <code>/agent</code> ou <code>/agent docs-agent</code>. Une mention <code>@workspace</code> est un participant de chat, pas la syntaxe universelle d'invocation d'un agent.</p>
 
     <hr>
 
-    <h2>3.2 Anatomie d'un bon agent.md</h2>
+    <h2>3.2 Anatomie d'un bon fichier .agent.md</h2>
 
     <h3>Les 6 domaines essentiels</h3>
 
@@ -149,7 +148,7 @@ public User Get(int x)
     <h2>3.3 Catalogue d'agents recommandés</h2>
 
     <div class="agent-card">
-      <h4>@test-agent — Qualité et tests</h4>
+      <h4>test-agent — Qualité et tests</h4>
       <pre><code>---
 name: test-agent
 description: Ingénieur QA qui écrit des tests complets
@@ -180,7 +179,7 @@ Tu es un ingénieur qualité logiciel pour ce projet.
     </div>
 
     <div class="agent-card">
-      <h4>@docs-agent — Documentation technique</h4>
+      <h4>docs-agent — Documentation technique</h4>
       <pre><code>---
 name: docs-agent
 description: Rédacteur technique pour la documentation
@@ -209,7 +208,7 @@ Tu es un rédacteur technique expert.
     </div>
 
     <div class="agent-card">
-      <h4>@security-agent — Analyse sécurité</h4>
+      <h4>security-agent — Analyse sécurité</h4>
       <pre><code>---
 name: security-agent
 description: Analyste sécurité qui détecte les vulnérabilités
@@ -235,6 +234,10 @@ Tu es un expert en sécurité applicative.
 - ⚠️ **Ask first:** Avant de modifier du code existant
 - 🚫 **Never:** Logger ou afficher des secrets trouvés</code></pre>
     </div>
+    <h2>Agent, skill et sous-agent : trois notions distinctes</h2>
+    <p>Un <strong>agent</strong> définit le rôle ; un <strong>skill</strong> apporte une procédure chargée quand elle est pertinente ; un <strong>sous-agent</strong> exécute une tâche déléguée dans un contexte séparé. Fleet coordonne plusieurs sous-agents, pas simplement plusieurs fichiers de profils.</p>
+    <blockquote>Les « Never » du prompt ne sont pas une barrière de sécurité. Limitez aussi les outils disponibles et les permissions effectives, notamment pour les rôles de revue en lecture seule.</blockquote>
+    <p><strong>Source :</strong> <a href="https://code.visualstudio.com/docs/agent-customization/custom-agents" target="_blank" rel="noopener noreferrer">Agents personnalisés dans VS Code</a>. Des fichiers <code>.md</code> simples dans <code>.github/agents/</code> restent reconnus par VS Code pour compatibilité ; <code>.agent.md</code> est le format à privilégier.</p>
   </article>
 </body>
 </html>

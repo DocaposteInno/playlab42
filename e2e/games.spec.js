@@ -25,6 +25,9 @@ test('Go: les deux humains jouent puis passent dans le vrai moteur', async ({ pa
   await expect(page.locator('.cell[data-x="1"][data-y="0"]')).toBeFocused();
   await activate(page.locator('#btn-pass'));
   await activate(page.locator('#btn-pass'), 'Space');
+  await expect(page.locator('#status')).toContainText('Comptage');
+  await expect(page.locator('#score-black')).toHaveText('-');
+  await activate(page.locator('#btn-confirm-score'));
   await expect(page.locator('#status')).toContainText(/termin|gagn|victoire|score/i);
 });
 
@@ -136,13 +139,18 @@ test('Diese: echec du bundle audio annonce sans bloquer le clavier ni la fermetu
   await page.route('**/assets/vendor/tone/tone.js', route => route.abort('internetdisconnected'));
   await page.goto('/games/diese-et-mat/index.html');
   await activate(page.locator('#btn-piano'));
+  const dialog = page.locator('#piano-overlay');
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#piano-close')).toBeFocused();
   const note = page.locator('.piano-key[data-note="C4"]');
   await note.focus();
+  await expect(note).toBeFocused();
   await page.keyboard.down('Enter');
+  await expect(note).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#piano-note-display')).toContainText('Audio indisponible');
   await page.keyboard.up('Enter');
   await expect(note).toHaveAttribute('aria-pressed', 'false');
   await page.keyboard.press('Escape');
-  await expect(page.locator('#piano-overlay')).toBeHidden();
+  await expect(dialog).toBeHidden();
   await expect(page.locator('#btn-piano')).toBeFocused();
 });

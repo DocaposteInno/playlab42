@@ -5,6 +5,8 @@
  * @see openspec/specs/game-engine/spec.md
  */
 
+import { WINNING_LINES } from './engine/winning-lines.js';
+
 /**
  * @typedef {'X' | 'O' | null} Cell
  * @typedef {[Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell]} Board
@@ -16,6 +18,8 @@
  * @property {string[]|null} winners - Gagnant(s) ou null si nul
  * @property {number} turn - Numéro du tour
  * @property {number} rngState - État du RNG (pour replay)
+ * @property {[string, string]} playerIds - IDs des deux joueurs
+ * @property {Record<string, 'X' | 'O'>} symbols - Symboles par ID de joueur
  *
  * @typedef {Object} TicTacToeAction
  * @property {'place'} type - Type d'action
@@ -25,18 +29,6 @@
  * @property {number} seed - Seed pour le RNG
  * @property {[string, string]} playerIds - IDs des 2 joueurs
  */
-
-// Lignes gagnantes (indices)
-const WINNING_LINES = [
-  [0, 1, 2], // Ligne 1
-  [3, 4, 5], // Ligne 2
-  [6, 7, 8], // Ligne 3
-  [0, 3, 6], // Colonne 1
-  [1, 4, 7], // Colonne 2
-  [2, 5, 8], // Colonne 3
-  [0, 4, 8], // Diagonale \
-  [2, 4, 6], // Diagonale /
-];
 
 /**
  * Moteur de jeu Tic-Tac-Toe
@@ -117,7 +109,11 @@ export class TicTacToeEngine {
     return (
       !state.gameOver &&
       state.currentPlayerId === playerId &&
+      action !== null &&
+      typeof action === 'object' &&
+      !Array.isArray(action) &&
       action.type === 'place' &&
+      Number.isInteger(action.position) &&
       action.position >= 0 &&
       action.position <= 8 &&
       state.board[action.position] === null
@@ -184,13 +180,17 @@ export class TicTacToeEngine {
    * @returns {number[]|null}
    */
   getWinningLine(board) {
-    for (const line of WINNING_LINES) {
-      const [a, b, c] = line;
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return line;
-      }
-    }
-    return null;
+    const line = this.#findWinningLine(board);
+    return line ? [...line] : null;
+  }
+
+  /**
+   * Trouve la première ligne complète, sans copie
+   * @param {Board} board
+   * @returns {readonly number[]|null}
+   */
+  #findWinningLine(board) {
+    return WINNING_LINES.find(([a, b, c]) => board[a] && board[a] === board[b] && board[a] === board[c]) ?? null;
   }
 
   /**
@@ -199,12 +199,8 @@ export class TicTacToeEngine {
    * @returns {Cell}
    */
   #checkWinner(board) {
-    for (const [a, b, c] of WINNING_LINES) {
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
-      }
-    }
-    return null;
+    const line = this.#findWinningLine(board);
+    return line ? board[line[0]] : null;
   }
 
   /**

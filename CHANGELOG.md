@@ -8,6 +8,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 ## [Unreleased]
 
 ### Added
+- Snapshot OG éditorial et refresh explicite, SOURCE_DATE_EPOCH pour les
+  catalogues, SBOM CycloneDX de fabrication, manifeste public SHA-256,
+  vérification de l'archive et exercice local de reprise tar.
+- Comparaison de deux fabrications en CI et monitoring HTTP quotidien préparé,
+  sans déploiement/rollback implicite ni attestation signée.
+- Gate de complexité ciblé (10) et seuils de couverture sur helpers de fabrication
+  et OG ; régressions de contrats JSON, permissions, cache et persistance.
+- Lint des sources `.ts` avec Biome 2.5.15 et des scripts HTML avec
+  eslint-plugin-html 8.2.1 ; commande globale requise en local et CI,
+  fixtures des vrais CLI et politique sans attributs événementiels.
 - `package.json` : champ `engines` fixant Node >= 24, pour qu'un runtime trop
   ancien produise un avertissement npm au lieu d'échouer plus loin
 
@@ -16,6 +26,27 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
   elles ne correspondaient plus à aucune URL du catalogue
 
 ### Changed
+- Images OG : un téléchargement ignoré par Git n'est plus référencé comme image
+  locale persistante ; URL distante d'origine utilisée, entités HTML décodées,
+  images éditoriales locales conservées et vérifiées. Cache non référencé exclu
+  du site, métadonnées précédentes conservées sur échec de refresh.
+- Le build normal ne collecte plus les métadonnées OG distantes :
+  `refresh:bookmarks` produit le snapshot à relire ; `build:local` omet
+  l'enrichissement. Les échecs et limites restent explicites.
+- Diese & Mat : la fin de session conserve son timestamp ; terminer deux fois
+  ne modifie plus la durée du bilan. Régression à horloge contrôlée, y compris
+  réinitialisation pour une nouvelle session et événement émis une seule fois.
+- Builders : lectures JSON partagées et diagnostiquées, racine fiable même dans
+  un projet nommé `library`, écritures atomiques conservant le dernier catalogue
+  en cas d'échec. Un cache corrompu est désormais une erreur explicite.
+- OG : parsing/enrichissement/repli séparés, dates futures refusées, entités
+  numériques hors Unicode remplacées sans faire échouer la page.
+- Triomino : `getPlayerView` refuse explicitement un ID absent, au lieu d'un
+  `TypeError` incident ; `GreedyBot.chooseAction` refuse une liste d'actions
+  vide, au lieu d'un `undefined` contraire à son type. Les appels valides et
+  signatures restent compatibles, avec tests négatifs et de transitions.
+- Listeners des règles/retour Triomino et fermeture de notification du
+  laboratoire Deep Learning déplacés des attributs HTML vers des scripts lintés.
 - CI : les workflows s'exécutent sur Node 26 au lieu de Node 20, pour tester
   sur le runtime réellement déployé (`node:26-alpine` au Dockerfile). Node 20
   n'a plus reçu de version depuis mars 2026. Huit occurrences alignées dans

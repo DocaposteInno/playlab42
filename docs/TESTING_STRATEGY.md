@@ -94,6 +94,13 @@ Ce document décrit l'approche de test, les objectifs de coverage, et les bonnes
 
 **Statut** : Suite Playwright obligatoire en CI (`.github/workflows/ui-e2e.yml`).
 
+La CI appelle ce workflow après le build et lui transmet l'archive publique.
+Avec `PLAYWRIGHT_PREBUILT=1`, le serveur sert `site/` sans reconstruire :
+les fichiers testés sont ceux qui seront publiés. Les commandes locales et le
+lancement manuel du workflow navigateur gardent la préparation `build:local`.
+Le serveur réutilise `serve.json` de la racine pour conserver les URL `.html`
+et ne pas casser les chemins relatifs des modules.
+
 **Objectif** : Un petit socle de contrats utilisateur dans Chromium réel, sans ferme de captures.
 Les tests vivent dans `e2e/`, séparés de la découverte Jest.
 
@@ -111,7 +118,7 @@ Les tests vivent dans `e2e/`, séparés de la découverte Jest.
 | Mobile | Portail et viewer à 320/390 px et paysage 844×390 ; Relativity après redimensionnement, cible moteur visible/non recouverte et activation réelle |
 | Galerie UI | Formulaire et carte réels, texte échappé, dialogue natif au clavier avec retour du focus, thèmes et tokens à 320 px |
 
-**Déterminisme** : contextes navigateur neufs, date fixe pour les seeds `Date.now()`,
+**Déterminisme** : contextes navigateur neufs, date fixe pour les seeds `Date.now()` fournies par les clients,
 seed explicite de Triomino et générateur aléatoire fixe pour Particle Life. Les catalogues
 sont construits à partir des manifests actuels : aucun nombre global de cartes n'est figé.
 Les bookmarks proviennent de `bookmarks/` et des images versionnées, avec `--skip-og`.
@@ -125,9 +132,13 @@ locales nécessaires font échouer le test.
 Le test `window.blur` envoie cet événement au vrai handler après une pression clavier ;
 il ne prétend pas tester le gestionnaire de fenêtres de l'OS headless.
 
-**Réseau et dépendances réelles** : `e2e/fixtures.js` intercepte les URL CDN publiques
-et sert les distributions npm épinglées `three@0.160.0`, `lil-gui@0.19.2`
-pour les outils 3D qui utilisent encore ces importmaps. Tone 15.1.22,
+**Réseau et dépendances réelles** : Three **0.186.1** et lil-gui **0.21.0**
+sont construits dans `assets/vendor/` par `build:runtime`, avec le core,
+les addons et dépendances internes utilisés par Relativity. Son rendu réel
+exige WebGL2 ; Particle Life conserve son Canvas2D. `e2e/three-runtime.spec.js`
+vérifie les versions, les imports locaux, les contrôles et les erreurs de rendu.
+`e2e/fixtures.js` intercepte encore les URL CDN publiques déclarées pour les
+supports qui en ont besoin. Tone 15.1.22,
 VexFlow 5.0.0 et MathJax 4.1.3 sont construits dans `assets/vendor/` par
 `build:runtime`, également lancé par `build:local`. Le navigateur charge
 les bundles et les fontes locales de production, sans substitution CDN.
@@ -138,6 +149,16 @@ utilise la vraie bibliothèque Tone ; les assertions headless ne constituent pas
 mesure de la restitution sonore ni de sa qualité perceptive. Neural Style
 doit afficher l'erreur de chargement du modèle quand sa bibliothèque est absente,
 puis accepter les imports locaux ; aucune inférence ni exactitude ML n'est revendiquée.
+`e2e/neural-style-gallery.spec.js` couvre aussi les 24 miniatures, la sélection
+clavier de Sunflowers, la lecture/export Canvas sans contamination CORS et
+l'erreur d'une image indisponible sans remplacement du style précédent.
+Les réponses image sont contrôlées : une largeur non standard renvoie HTTP 400,
+comme Wikimedia, et une indisponibilité HTTP 429 reste une erreur visible.
+La galerie utilise **330 px**, une taille de miniature
+[standard Wikimedia](https://www.mediawiki.org/wiki/Common_thumbnail_sizes) :
+les URL directes à 300, 350 ou 400 px sont désormais refusées par ce service.
+Ces tests déterministes ne certifient pas sa disponibilité distante ; les images
+et le modèle Magenta restent des dépendances réseau.
 Le laboratoire Deep Learning/Chart.js n'est pas couvert par ce socle.
 La vieille arborescence TensorFlow de Magenta n'est pas ajoutée aux dépendances npm du projet.
 
@@ -147,6 +168,17 @@ le rejet sans mutation et la réinitialisation confirmée dans les réglages.
 Le cas mobile contrôle aussi l'absence de débordement à 320 px.
 Le portail transmet sa préférence sonore à une nouvelle session GameKit
 sur `ready` ; ce contrat est exercé dans `e2e/portal.spec.js`.
+
+`e2e/board-game-ux.spec.js` mesure le contraste des séparations du morpion
+(au moins 3:1) dans quatre modes de thème, sur desktop et mobile, puis couvre
+la revue Go après deux passes : score encore absent, groupes entiers réversibles,
+confirmation et reprise. Les tests Jest de page suspendent aussi le bot pendant
+la revue et vérifient son redémarrage ; les tests moteur gardent le replay
+automatique historique et vérifient les états de revue gelés et restaurés en JSON.
+La référence CSS d'avant déduplication reste immuable : sa capture applique
+explicitement la seule nouvelle règle `.board` du morpion, avec attente des
+transitions et restauration, y compris sans JavaScript. Aucune propriété ou
+scénario n'est ignoré pour accepter ce changement intentionnel.
 
 ### Lancer la suite navigateur
 
@@ -253,7 +285,7 @@ navigateur officiel installé pour la version exacte du runner.
 
 ### Targets par module
 
-| Module | Coverage actuel | Target | Justification |
+| Module | Repère historique, à remesurer | Target | Justification |
 |--------|-----------------|--------|---------------|
 | `lib/seeded-random.js` | 100% | 100% | Bibliothèque critique, déterministe |
 | `lib/gamekit.js` | N/A | 90%+ | SDK utilisé par tous les jeux |
@@ -276,19 +308,24 @@ coverage:
         threshold: 1%     # Tolérance -1%
     patch:
       default:
-        target: 80%       # Nouveau code doit être >= 80%
+        target: 80%       # Cible du code modifié
+        threshold: 5%     # Tolérance configurée
 ```
 
 **Interprétation** :
 
 - **Project target: auto** : Codecov ajuste le target automatiquement en fonction de l'historique
 - **Threshold: 1%** : Autoriser une baisse de 1% maximum
-- **Patch target: 80%** : Tout nouveau code doit avoir au moins 80% de coverage
+- **Patch target: 80%** : Cible sur le code modifié, avec tolérance de 5%
+- Les seuils Jest sont bloquants sur SeededRandom et les scripts packaging/smoke,
+  pas sur tout le code. Voir la [politique qualité](guides/software-quality.md).
+- L'envoi Codecov est non bloquant. Un statut Codecov et son caractère obligatoire
+  dépendent aussi de l'intégration et des règles GitHub, pas de ce guide.
 
 **Statut dans les PRs** :
 
 - ✅ : Coverage maintenu ou amélioré
-- ❌ : Coverage baisse de plus de 1% OU nouveau code < 80%
+- ❌ : Statut selon les cibles et tolérances de `codecov.yml`
 
 ---
 
@@ -764,21 +801,32 @@ describe('TicTacToeEngine', () => {
 
 ### Workflow GitHub Actions
 
-**Fichiers** : `.github/workflows/ci.yml` (lint/Jest/types/build) et
-`.github/workflows/ui-e2e.yml` (contrats navigateur sur PR et main).
+**Fichiers** : `.github/workflows/ci.yml` (lint qualité/sécurité JS, Jest, types, audit npm, OpenSpec, build et appel
+navigateur), `.github/workflows/ui-e2e.yml` (workflow réutilisé) et
+`.github/workflows/deploy.yml` (publication après cette CI).
 
 Le job navigateur suit Node 26 et `npm ci`, installe Chromium avec la commande
 supportée `npx playwright install --with-deps chromium`, puis lance `test:e2e`.
 Il ne dépend d'aucun DNS de laboratoire, serveur partagé ou accès CDN au runtime.
-Le build hors réseau `build:local` est lancé par le serveur géré Playwright.
+En CI, il extrait l'archive `github-pages` et sert `site/` avec
+`PLAYWRIGHT_PREBUILT=1`, sans second build. La préparation locale habituelle
+reste `build:local`. Le build de production conserve sa collecte Open Graph ;
+les fixtures isolent les requêtes externes du navigateur, pas cette collecte.
 Le rapport et les
 traces sont publiés comme artefact pendant 14 jours uniquement en cas d'échec.
 Tout échec UI doit être corrigé avant fusion ; ne pas le rendre optionnel ni
 remplacer les vraies bibliothèques par des globals factices pour verdir la CI.
 
+Le gate JS de sécurité utilise les plugins verrouillés et une configuration flat.
+Les tests de cette politique incluent entrées interdites/sûres et sortie JSON
+avec le véritable code d'échec. Les heuristiques consultatives ne sont pas
+présentées comme bloquantes ; le parser actuel ne supporte pas TS 7.
+Voir la [politique de qualité](guides/software-quality.md).
+
 ### Statut dans les PRs
 
-Codecov ajoute automatiquement un commentaire sur chaque PR :
+Une intégration Codecov configurée et un upload réussi peuvent ajouter un
+commentaire sur la PR, par exemple :
 
 ```markdown
 ## Codecov Report
@@ -794,7 +842,10 @@ The diff coverage is `85.71%`.
 
 - Si coverage baisse : Ajouter des tests
 - Si patch < 80% : Ajouter des tests pour nouveau code
-- Si échec : Bloquer le merge
+- Si échec : corriger avant merge ; le blocage automatique nécessite les règles GitHub
+
+Le [guide de l'usine](guides/software-factory.md) distingue ces recommandations,
+les garanties automatisées et les améliorations restantes.
 
 ---
 

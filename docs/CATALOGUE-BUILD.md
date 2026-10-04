@@ -14,7 +14,7 @@ Les catalogues (`data/*.json`) sont **générés à partir des manifests sources
 |---------|--------|--------|
 | `data/catalogue.json` | `tools/*.json`, `games/*/game.json` | `build-catalogue.js` |
 | `data/parcours.json` | `parcours/epics/*/epic.json` | `build-parcours.js` |
-| `data/bookmarks.json` | `bookmarks/*.json`, manifests | `build-bookmarks.js` |
+| `data/bookmarks.json` | `bookmarks/*.json`, manifests, `metadata/bookmarks-og.json` | `build-bookmarks.js` |
 
 ## Scripts de build
 
@@ -23,14 +23,28 @@ Tous les scripts sont dans `scripts/` et partagent des utilitaires via `scripts/
 ### Commandes
 
 ```bash
-# Build complet (les 3 catalogues)
-make build
+# Build complet, dans Docker (make build construit l'image)
+make npm CMD="run build"
 
 # Builds individuels
 docker compose exec dev npm run build:catalogue
 docker compose exec dev npm run build:parcours
 docker compose exec dev npm run build:bookmarks
+make npm CMD="run refresh:bookmarks" # actualisation éditoriale, réseau autorisé
 ```
+
+Le build normal lit le snapshot OG revu, sans réseau. Le refresh explicite
+respecte la TTL du cache technique (sept jours), signale les échecs et réécrit
+le snapshot à relire. `--skip-og` omet l'enrichissement, il n'est pas un refresh.
+Une nouvelle URL sans métadonnées conserve ses champs manuels avec un warning.
+Ne pas modifier les catalogues générés pour corriger une métadonnée :
+modifier les sources/snapshot puis reconstruire. Voir
+[fabrication et reprise](guides/artifact-operations.md).
+Le build normal ne consulte pas les images du cache en repli. Le refresh
+conserve une URL OG distante pour un nouveau téléchargement ignoré par Git,
+ou l'image locale éditoriale déjà revue ; un échec conserve les métadonnées
+précédentes. Le packaging refuse les images locales référencées absentes et
+exclut les images non référencées du cache.
 
 ### Structure des scripts
 
@@ -72,16 +86,28 @@ Les scripts valident les manifests au build :
 - Formats corrects (IDs en kebab-case, etc.)
 - Fichiers référencés existants
 
-En cas d'erreur, le build échoue avec un message explicite.
+En cas d'erreur, le build échoue avec un message explicite et conserve le dernier
+catalogue. Un manifest d'outil simple sans son `tools/[id].html` est une erreur
+bloquante, comme un outil complexe sans `index.html` ; il n'est pas ignoré même
+si d'autres outils sont valides.
+
+Les slides Markdown sont régénérées à chaque build, y compris après une
+modification du titre ou du template. Le marqueur de sortie distingue le HTML
+généré du HTML auteur ; les paires sans marqueur sont refusées. Voir le
+[contrat des sources et la migration](guides/create-epic.md#3-créer-les-slides).
+La conservation du catalogue ne constitue pas une transaction de toutes les
+slides : certaines sorties générées peuvent avoir été actualisées avant qu'une
+autre entrée ne fasse échouer le build.
 
 ## CI/CD
 
 Le workflow GitHub Actions (`deploy.yml`) :
-1. Installe les dépendances (`npm ci`)
-2. Lance le build complet (`npm run build`)
-3. Déploie sur GitHub Pages
+1. Réutilise la CI : installation, gates, build complet depuis le snapshot revu.
+2. Compare deux fabrications avec la même epoch et vérifie l'archive.
+3. Teste cette même archive dans Chromium, puis la publie sur GitHub Pages.
 
-Les fichiers `data/*.json` sont générés à chaque déploiement, garantissant leur cohérence avec les sources.
+Les fichiers `data/*.json` sont générés par la CI ; la publication ne les
+reconstruit pas et réutilise l'artefact testé.
 
 ## Module partagé
 

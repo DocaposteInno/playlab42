@@ -4,10 +4,11 @@
  * Télécharge les images OG en cache local
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
+import { readJSONSync, writeJSONAtomicSync } from './lib/build-utils.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -21,45 +22,43 @@ const CONFIG = {
   // User-Agent réaliste pour éviter les blocages
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   // Re-télécharger les images OG déjà présentes dans data/bookmarks-images/.
-  // Désactivé par défaut : ces fichiers sont versionnés et peuvent avoir été
+  // Désactivé par défaut : des fichiers sont versionnés et peuvent avoir été
   // optimisés (redimensionnement/recompression). Un re-téléchargement écraserait
   // ce travail par l'original pleine taille à la première expiration du cache
   // de métadonnées (cacheDays), y compris quand data/bookmarks-cache.json est
   // absent — il est gitignoré, donc vide sur une machine fraîche.
-  // Forcer avec : OG_REFRESH_IMAGES=1 npm run build:bookmarks
+  // Lors du refresh éditorial : OG_REFRESH_IMAGES=1 npm run refresh:bookmarks
   refreshImages: process.env.OG_REFRESH_IMAGES === '1',
 };
 
 /**
  * Charge le cache depuis le disque
  */
-export function loadCache() {
-  if (!existsSync(CACHE_FILE)) {
-    return {};
-  }
+export function loadCache(path = CACHE_FILE) {
   try {
-    return JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
-  } catch {
-    return {};
+    return readJSONSync(path);
+  } catch (err) {
+    if (err.cause?.code === 'ENOENT') {
+      return {};
+    }
+    throw err;
   }
 }
 
 /**
  * Sauvegarde le cache sur le disque
  */
-export function saveCache(cache) {
-  writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+export function saveCache(cache, path = CACHE_FILE) {
+  writeJSONAtomicSync(path, cache);
 }
 
 /**
  * Vérifie si une entrée de cache est encore valide
  */
 function isCacheValid(entry) {
-  if (!entry?.fetchedAt) {return false;}
-  const fetchedAt = new Date(entry.fetchedAt);
-  const now = new Date();
-  const diffDays = (now - fetchedAt) / (1000 * 60 * 60 * 24);
-  return diffDays < CONFIG.cacheDays;
+  if (typeof entry?.fetchedAt !== 'string') {return false;}
+  const age = Date.now() - Date.parse(entry.fetchedAt);
+  return age >= 0 && age < CONFIG.cacheDays * 24 * 60 * 60 * 1000;
 }
 
 /**
@@ -68,25 +67,18 @@ function isCacheValid(entry) {
 function extractOGTags(html) {
   const meta = {};
 
-  // og:title
-  const titleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i);
-  if (titleMatch) {meta.ogTitle = decodeHTMLEntities(titleMatch[1]);}
-
-  // og:description
-  const descMatch = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i);
-  if (descMatch) {meta.ogDescription = decodeHTMLEntities(descMatch[1]);}
-
-  // og:image
-  const imgMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-  if (imgMatch) {meta.ogImage = imgMatch[1];}
-
-  // og:site_name
-  const siteMatch = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:site_name["']/i);
-  if (siteMatch) {meta.ogSiteName = decodeHTMLEntities(siteMatch[1]);}
+  const tags = [...html.matchAll(/<meta\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi)].map(([tag]) => new Map(
+    [...tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/gs)].map(([, name, , value]) => [name.toLowerCase(), value]),
+  ));
+  for (const [property, field] of [
+    ['og:title', 'ogTitle'], ['og:description', 'ogDescription'],
+    ['og:image', 'ogImage'], ['og:site_name', 'ogSiteName'],
+  ]) {
+    const content = findMetaContent(tags, 'property', property);
+    if (content) {
+      meta[field] = field === 'ogImage' ? content : decodeHTMLEntities(content);
+    }
+  }
 
   // Fallback: title standard
   if (!meta.ogTitle) {
@@ -96,18 +88,31 @@ function extractOGTags(html) {
 
   // Fallback: meta description
   if (!meta.ogDescription) {
-    const metaDesc = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)
-      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
-    if (metaDesc) {meta.ogDescription = decodeHTMLEntities(metaDesc[1]);}
+    const description = findMetaContent(tags, 'name', 'description');
+    if (description) {meta.ogDescription = decodeHTMLEntities(description);}
   }
 
   return meta;
 }
 
+function findMetaContent(tags, attribute, value) {
+  return tags.find(tag => tag.get(attribute)?.toLowerCase() === value && tag.get('content'))?.get('content');
+}
+
+function decodeCodePoint(value, radix) {
+  const code = parseInt(value, radix);
+  if (code === 0 || code > 0x10FFFF || (code >= 0xD800 && code <= 0xDFFF)) {
+    return '\uFFFD';
+  }
+  return String.fromCodePoint(code);
+}
+
 /**
  * Décode les entités HTML (nommées et numériques)
+ * @param {string} str Texte ou attribut HTML
+ * @returns {string} Valeur décodée
  */
-function decodeHTMLEntities(str) {
+export function decodeHTMLEntities(str) {
   // Entités nommées courantes (utilise codes Unicode pour éviter pb encodage)
   const namedEntities = {
     '&amp;': '&',
@@ -137,12 +142,12 @@ function decodeHTMLEntities(str) {
 
   // Remplacer les entités numériques hexadécimales (&#xNNNN;)
   result = result.replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
-    String.fromCodePoint(parseInt(hex, 16)),
+    decodeCodePoint(hex, 16),
   );
 
   // Remplacer les entités numériques décimales (&#NNNN;)
   result = result.replace(/&#(\d+);/g, (_, dec) =>
-    String.fromCodePoint(parseInt(dec, 10)),
+    decodeCodePoint(dec, 10),
   );
 
   return result;
@@ -161,29 +166,28 @@ function buildFaviconUrl(url) {
 }
 
 /**
- * Effectue un fetch borné dans le temps, en garantissant la libération du
- * minuteur.
+ * Borne en-têtes et corps, puis libère aussi les réponses abandonnées.
+ * Un corps HTTP non consommé peut retenir le processus pendant plusieurs minutes.
  *
- * Sans le `finally`, un rejet de `fetch` sautait le `clearTimeout` : le
- * minuteur de CONFIG.timeout restait armé. Sur un build de 120 URLs hors
- * ligne, autant de minuteurs survivaient huit secondes à la fin du travail et
- * retenaient le processus.
- *
+ * @template T
  * @param {string} url - URL à appeler
  * @param {Record<string, string>} headers - En-têtes de la requête
- * @returns {Promise<Response>}
+ * @param {(response: Response) => Promise<T>} readResponse - Consommation de la réponse
+ * @returns {Promise<T>}
  */
-async function fetchWithTimeout(url, headers) {
+async function fetchWithTimeout(url, headers, readResponse) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CONFIG.timeout);
   try {
-    return await fetch(url, {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers,
       redirect: 'follow',
     });
+    return await readResponse(response);
   } finally {
     clearTimeout(timeoutId);
+    controller.abort();
   }
 }
 
@@ -240,18 +244,18 @@ export function findExistingImage(pageUrl) {
 }
 
 /**
- * Construit des métadonnées de repli à partir des fichiers versionnés.
+ * Construit des métadonnées de repli à partir des fichiers locaux disponibles.
  *
- * Les images de data/bookmarks-images/ sont versionnées : elles restent
- * exploitables même quand la page n'est pas joignable (CI sans réseau sortant,
- * site hors ligne, domaine qui bloque le User-Agent du build). Sans ce repli,
- * un échec réseau vidait la preview de son image alors que le fichier était là.
+ * Ce dossier mêle quelques images versionnées et le cache technique ignoré.
+ * Le repli de transport ne décide pas de leur publication : editorialMetadata
+ * conserve une référence locale uniquement si le snapshot précédent la contient.
+ * Le flag historique fromVersionedImage ne prouve pas le suivi Git.
  *
  * Le repli ne porte volontairement pas de `fetchedAt` : il ne doit pas entrer
  * dans le cache ni empêcher une vraie tentative réseau au build suivant.
  *
  * @param {string} url - URL de la page
- * @returns {object|null} Métadonnées minimales, ou null si aucune image versionnée
+ * @returns {object|null} Métadonnées minimales, ou null si aucune image locale
  */
 export function buildFallbackMeta(url) {
   const existing = findExistingImage(url);
@@ -291,28 +295,35 @@ async function downloadImage(imageUrl, pageUrl) {
       ? imageUrl
       : new URL(imageUrl, pageUrl).href;
 
-    const response = await fetchWithTimeout(absoluteUrl, {
+    const image = await fetchWithTimeout(absoluteUrl, {
       'User-Agent': CONFIG.userAgent,
       'Accept': 'image/*',
+    }, async response => {
+      if (!response.ok) {
+        console.warn(`  ⚠️  image OG ${absoluteUrl}: HTTP ${response.status}`);
+        return null;
+      }
+      return {
+        ext: getImageExtension(absoluteUrl, response.headers.get('content-type')),
+        buffer: Buffer.from(await response.arrayBuffer()),
+      };
     });
 
-    if (!response.ok) {
+    if (!image) {
       return null;
     }
 
-    const contentType = response.headers.get('content-type');
-    const ext = getImageExtension(absoluteUrl, contentType);
-    const filename = `${hashUrl(pageUrl)}${ext}`;
+    const filename = `${hashUrl(pageUrl)}${image.ext}`;
     const filepath = join(IMAGES_DIR, filename);
 
     // Sauvegarder l'image
-    const buffer = Buffer.from(await response.arrayBuffer());
-    writeFileSync(filepath, buffer);
+    writeFileSync(filepath, image.buffer);
 
     // Retourner le chemin relatif pour le JSON
     return `data/bookmarks-images/${filename}`;
 
-  } catch {
+  } catch (err) {
+    console.warn(`  ⚠️  image OG ${imageUrl}: ${err.message}`);
     return null;
   }
 }
@@ -323,7 +334,7 @@ async function downloadImage(imageUrl, pageUrl) {
  * @param {object} cache - Cache des métadonnées
  * @returns {Promise<{meta: object|null, fromCache: boolean, failed?: boolean}>}
  *   `failed` signale un échec réseau. `meta` peut malgré tout être renseigné,
- *   via le repli sur les images versionnées (cf. buildFallbackMeta).
+ *   via le repli sur les images locales (cf. buildFallbackMeta).
  */
 export async function fetchOGMetadata(url, cache) {
   // Vérifier le cache
@@ -332,39 +343,22 @@ export async function fetchOGMetadata(url, cache) {
   }
 
   try {
-    const response = await fetchWithTimeout(url, {
+    const page = await fetchWithTimeout(url, {
       'User-Agent': CONFIG.userAgent,
       'Accept': 'text/html,application/xhtml+xml',
       'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
-    });
+    }, async response => ({
+      status: response.status,
+      html: response.ok ? await response.text() : null,
+    }));
 
-    if (!response.ok) {
-      const fallback = buildFallbackMeta(url);
-      console.log(`  ⚠️  ${url}: HTTP ${response.status}${fallback ? ' (image versionnée conservée)' : ''}`);
-      return { meta: fallback, fromCache: false, failed: true };
+    if (page.html === null) {
+      return failedMetadata(url, `⚠️  ${url}: HTTP ${page.status}`);
     }
 
-    const html = await response.text();
-    const meta = extractOGTags(html);
+    const meta = extractOGTags(page.html);
 
-    // Télécharger l'image OG en cache local
-    if (meta.ogImage) {
-      const localImage = await downloadImage(meta.ogImage, url);
-      if (localImage) {
-        meta.ogImageOriginal = meta.ogImage; // Garder l'URL originale
-        meta.ogImage = localImage;           // Utiliser le chemin local
-      }
-    }
-
-    // La page répond mais n'expose pas (ou plus) d'og:image : si une image a
-    // été téléchargée par un build précédent, elle reste la meilleure source.
-    if (!meta.ogImage) {
-      const existing = findExistingImage(url);
-      if (existing) {
-        meta.ogImage = existing;
-        meta.fromVersionedImage = true;
-      }
-    }
+    await enrichImage(meta, url);
 
     // Ajouter favicon
     meta.favicon = buildFaviconUrl(url);
@@ -375,20 +369,44 @@ export async function fetchOGMetadata(url, cache) {
     // Mettre en cache
     cache[url] = meta;
 
-    const hasOG = meta.ogTitle || meta.ogDescription || meta.ogImage;
-    const hasImg = meta.ogImage?.startsWith('data/') ? '🖼️' : '';
-    console.log(`  ${hasOG ? '✓' : '○'} ${hasImg} ${new URL(url).hostname}`);
+    reportMetadata(url, meta);
 
     return { meta, fromCache: false };
 
   } catch (err) {
-    const fallback = buildFallbackMeta(url);
-    const kept = fallback ? ' (image versionnée conservée)' : '';
-    if (err.name === 'AbortError') {
-      console.log(`  ⏱️  ${url}: timeout${kept}`);
+    return failedMetadata(url, err.name === 'AbortError'
+      ? `⏱️  ${url}: timeout`
+      : `❌ ${url}: ${err.message}`);
+  }
+}
+
+function reportMetadata(url, meta) {
+  const hasOG = meta.ogTitle || meta.ogDescription || meta.ogImage;
+  const hasImg = meta.ogImage?.startsWith('data/') ? '🖼️' : '';
+  console.log(`  ${hasOG ? '✓' : '○'} ${hasImg} ${new URL(url).hostname}`);
+}
+
+function failedMetadata(url, message) {
+  const meta = buildFallbackMeta(url);
+  console.log(`  ${message}${meta ? ' (image locale disponible)' : ''}`);
+  return { meta, fromCache: false, failed: true };
+}
+
+async function enrichImage(meta, url) {
+  if (meta.ogImage) {
+    const imageURL = new URL(decodeHTMLEntities(meta.ogImage), url).href;
+    const localImage = await downloadImage(imageURL, url);
+    if (localImage) {
+      meta.ogImageOriginal = meta.ogImage;
+      meta.ogImage = localImage;
     } else {
-      console.log(`  ❌ ${url}: ${err.message}${kept}`);
+      meta.ogImage = imageURL;
     }
-    return { meta: fallback, fromCache: false, failed: true };
+    return;
+  }
+  const existing = findExistingImage(url);
+  if (existing) {
+    meta.ogImage = existing;
+    meta.fromVersionedImage = true;
   }
 }

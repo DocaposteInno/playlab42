@@ -7,7 +7,7 @@
 
 import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
-import { on, delegate, debounce, isEditableTarget } from '../lib/dom.js';
+import { on, delegate, debounce } from '../lib/dom.js';
 import { THEMES } from '../lib/theme.js';
 import { updateDiscoveryControls } from '../lib/catalogue-ui.js';
 
@@ -17,6 +17,10 @@ import { renderParcours, selectParcoursCategory } from './parcours.js';
 import { renderBookmarks, selectBookmarkTag } from './bookmarks.js';
 import { unloadGame, toggleFullscreen, toggleSound } from './game-loader.js';
 import { showSettings, hideSettings, setSoundPreference, setThemePreference, clearAllData } from './settings.js';
+import { handlePortalKeydown } from './keyboard-commands.js';
+import { handleGameMessage } from './game-messages.js';
+
+export { handlePortalKeydown };
 
 /**
  * Configure tous les event listeners de l'application
@@ -104,81 +108,5 @@ export function setupEventListeners() {
   on(document, 'keydown', handlePortalKeydown);
 
   // === Messages du jeu ===
-  on(window, 'message', (e) => {
-    if (!e.data || !e.data.type) { return; }
-
-    switch (e.data.type) {
-      case 'ready':
-        console.log(`[Portal] Jeu prêt: ${e.data.game}`);
-        if (e.source === el.gameIframe.contentWindow && e.origin === window.location.origin) {
-          e.source.postMessage({
-            type: 'preference',
-            key: 'sound',
-            value: state.preferences.sound,
-          }, window.location.origin);
-        }
-        break;
-      case 'score':
-        console.log(`[Portal] Score: ${e.data.score}`);
-        break;
-      case 'quit':
-        unloadGame();
-        break;
-      case 'error':
-        console.error('[Portal] Erreur jeu:', e.data.error);
-        break;
-    }
-  });
-}
-
-/**
- * Applique les raccourcis sans intercepter les contrôles de saisie.
- * @param {KeyboardEvent} e - Événement clavier
- */
-export function handlePortalKeydown(e) {
-  if (e.defaultPrevented) { return; }
-  if (e.key === 'Escape') {
-    if (state.currentView === 'game') {
-      unloadGame();
-    } else if (state.currentView === 'settings') {
-      hideSettings();
-    }
-  }
-
-  if (e.altKey || e.ctrlKey || e.metaKey || isEditableTarget(e.target)) { return; }
-
-  if (e.key === 'f' && state.currentView === 'game') {
-    toggleFullscreen();
-  }
-
-  if (e.key === 'm' && state.currentView === 'game') {
-    toggleSound();
-  }
-
-  if (e.key === '/' && state.currentView === 'catalogue') {
-    e.preventDefault();
-    el.search.focus();
-  }
-
-  if (e.key === '1' && state.currentView === 'catalogue') {
-    switchTab('parcours');
-  }
-
-  if (e.key === '2' && state.currentView === 'catalogue') {
-    switchTab('tools');
-  }
-
-  if (e.key === '3' && state.currentView === 'catalogue') {
-    switchTab('games');
-  }
-
-  if (e.key === '4' && state.currentView === 'catalogue') {
-    switchTab('bookmarks');
-  }
-
-  // Retour à l'accueil parcours (Backspace quand en mode catégorie)
-  if (e.key === 'Backspace' && state.currentView === 'catalogue' && state.activeTab === 'parcours' && state.parcoursCategory) {
-    e.preventDefault();
-    selectParcoursCategory(null);
-  }
+  on(window, 'message', handleGameMessage);
 }

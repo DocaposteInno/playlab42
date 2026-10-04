@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Marked } from 'marked';
+import { isPublicSitePath } from './build-site.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -37,6 +38,15 @@ function hrefBetween(from, to) {
   return relative(from, to).split(sep).map(segment => encodeURIComponent(segment)).join('/') || './';
 }
 
+function specialGuideLink(value) {
+  if (/^[a-z][a-z\d+.-]*:/i.test(value)) {
+    return { href: /^(https?:|mailto:|tel:)/i.test(value) ? value : '#', source: false };
+  }
+  if (value.startsWith('//')) { return { href: '#', source: false }; }
+  if (!value || value.startsWith('#') || value.startsWith('?')) { return { href: value, source: false }; }
+  return null;
+}
+
 /**
  * Préserve fragments et requêtes ; une cible Markdown non rendue reste explicitement source.
  * @param {string} href URL Markdown.
@@ -46,14 +56,21 @@ function hrefBetween(from, to) {
  */
 export function resolveGuideLink(href, source, output, pages) {
   const value = href.trim();
-  if (/^[a-z][a-z\d+.-]*:/i.test(value)) {
-    return { href: /^(https?:|mailto:|tel:)/i.test(value) ? value : '#', source: false };
-  }
-  if (value.startsWith('//')) { return { href: '#', source: false }; }
-  if (!value || value.startsWith('#') || value.startsWith('?')) { return { href: value, source: false }; }
+  const special = specialGuideLink(value);
+  if (special) { return special; }
   const [, pathname, suffix = ''] = value.match(/^([^?#]*)(.*)$/);
   const decoded = decodeURIComponent(pathname);
   const target = resolve(dirname(source), decoded);
+  const docsIndex = source.lastIndexOf(`${sep}docs${sep}`);
+  if (docsIndex > 0) {
+    const repoPath = relative(source.slice(0, docsIndex), target).split(sep).join('/');
+    if (repoPath && !repoPath.startsWith('../') && !isPublicSitePath(repoPath)) {
+      return {
+        href: `https://github.com/z4ppy/playlab42/blob/main/${repoPath.split('/').map(encodeURIComponent).join('/')}${suffix}`,
+        source: true,
+      };
+    }
+  }
   return {
     href: hrefBetween(dirname(output), pages.get(target) || target) + suffix,
     source: /\.(?:md|[cm]?js|ts|json|ya?ml|css)$/i.test(decoded) && !pages.has(target),
@@ -165,6 +182,8 @@ const GROUPS = [
       ['TESTING_STRATEGY.md', 'Tester sa contribution', 'Tests unitaires, navigateur et commandes de validation.'],
       ['guides/project-skills.md', 'Utiliser les skills du projet', 'Les bons points d’entrée pour les assistants de développement.'],
       ['guides/openspec-workflow.md', 'Suivre le workflow OpenSpec', 'Clarifier un changement, l’implémenter, puis le vérifier.'],
+      ['guides/software-factory.md', 'Comprendre l’usine logicielle', 'De la demande à une publication vérifiée, avec les limites et la feuille de route.'],
+      ['guides/software-quality.md', 'Construire du logiciel de qualité', 'Conception, contrôles bloquants, sécurité, tests et revue.'],
       ['guides/local-data.md', 'Comprendre les données locales', 'Persistance navigateur, portabilité et sécurité.'],
       ['guides/runtime-libraries.md', 'Utiliser les bibliothèques runtime', 'Dépendances locales et distributions reproductibles.'],
     ],

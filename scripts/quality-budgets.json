@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1,
+  "production": {
+    "cyclomatic": { "maxPerFunction": 10 },
+    "cognitive": { "maxPerFunction": 15 },
+    "duplication": { "maxClones": 15, "maxDuplicatedLines": 146, "maxDuplicatedTokens": 1398 }
+  },
+  "advisory": ["pedagogy", "tests"]
+}

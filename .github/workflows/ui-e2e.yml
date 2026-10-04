@@ -1,41 +1,126 @@
 name: UI browser
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      prebuilt:
+        type: boolean
+        default: false
+      mode:
+        type: string
+        default: execute
+      runner:
+        type: string
+        default: ''
+      node-version:
+        type: string
+        default: '26'
+      gates:
+        type: string
+        default: ''
+    outputs:
+      mode:
+        value: ${{ jobs.browser.outputs.mode }}
+      eligible:
+        value: ${{ jobs.browser.outputs.eligible }}
 
 permissions:
   contents: read
 
 concurrency:
   group: ui-e2e-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !inputs.prebuilt }}
 
 jobs:
   browser:
     name: Chromium interactions
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      mode: ${{ steps.decision.outputs.mode }}
+      eligible: ${{ steps.decision.outputs.eligible }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '26'
+          node-version: ${{ inputs.node-version || '26' }}
           cache: npm
+      - name: Exiger les gates avant les dependances et l'archive
+        if: inputs.prebuilt
+        run: node scripts/ci-evidence.js guard
+        env:
+          CI_JOB_RESULTS: ${{ inputs.gates }}
+      - name: Decision du controle
+        id: decision
+        env:
+          CI_MODE: ${{ inputs.mode || 'execute' }}
+          CI_RUNNER: ${{ inputs.runner }}
+        run: |
+          if [ -z "$CI_RUNNER" ]; then
+            export CI_RUNNER="$(node --input-type=module -e "import { currentRunner } from './scripts/ci-evidence.js'; console.log(JSON.stringify(currentRunner()));")"
+          fi
+          node scripts/ci-evidence.js start
       - name: Dependencies
         run: npm ci
-      - name: Chromium and system dependencies
-        run: npx playwright install --with-deps chromium
+      - name: Browsers and system dependencies
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Archive construite par la CI
+        if: inputs.prebuilt
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/pages-artifact
+      - name: Extraire le site sans le reconstruire
+        if: inputs.prebuilt
+        run: |
+          mkdir -p site
+          tar -xf "$RUNNER_TEMP/pages-artifact/artifact.tar" -C site
+      - name: Vérifier tous les octets de l'archive reçue
+        if: inputs.prebuilt
+        run: npm run verify:site
       - name: Real browser suite
+        if: steps.decision.outputs.mode == 'execute'
         run: npm run test:e2e
+        env:
+          PLAYWRIGHT_PREBUILT: ${{ inputs.prebuilt && '1' || '0' }}
+      - name: Guides sur la nouvelle archive (suite applicative non applicable ou reutilisee)
+        if: steps.decision.outputs.mode == 'documentation' || steps.decision.outputs.mode == 'reused'
+        run: npm run test:e2e -- e2e/guides.spec.js
+        env:
+          PLAYWRIGHT_PREBUILT: ${{ inputs.prebuilt && '1' || '0' }}
+      - name: Cross-engine smoke (Chromium, Firefox, WebKit)
+        run: npx playwright test --config playwright.cross-engine.config.js
+        env:
+          PLAYWRIGHT_PREBUILT: ${{ inputs.prebuilt && '1' || '0' }}
+      - name: Plan verifie par le check Browser requis
+        if: inputs.prebuilt
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ci-plan
+          path: ${{ runner.temp }}
+      - name: Consigner les preuves seulement apres les tests et smokes
+        if: inputs.prebuilt
+        run: node scripts/ci-evidence.js finish
+        env:
+          CI_PLAN_PATH: ${{ runner.temp }}/ci-plan.json
+          CI_EVIDENCE_PATH: ${{ runner.temp }}/ci-evidence.json
+          CI_JOB_RESULTS: ${{ inputs.gates }}
+          CI_BROWSER_MODE: ${{ steps.decision.outputs.mode }}
+          CI_BROWSER_ELIGIBLE: ${{ steps.decision.outputs.eligible }}
+      - name: Preuves du run complet, bloquees par Browser
+        if: inputs.prebuilt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ci-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ci-evidence.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Failure report and traces
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ui-e2e-failure
           path: |

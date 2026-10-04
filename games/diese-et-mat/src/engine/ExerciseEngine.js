@@ -23,12 +23,18 @@ const SESSION_STATES = {
   FINISHED: 'finished',
 };
 
+/** Texte normalisé d'une réponse, ou null si ce n'est pas une chaîne (ex. skip = -1). */
+const normalizeTextAnswer = (answer) => (typeof answer === 'string' ? answer.toLowerCase().trim() : null);
+
 // ============================================================================
 // Classe ExerciseEngine
 // ============================================================================
 
 /**
  * Moteur d'exercices
+ *
+ * Orchestration avec horloge murale : les pauses restent incluses dans les
+ * durées et le bonus temps. Ce n'est pas un moteur de plateau déterministe.
  *
  * @fires ExerciseEngine#session-start - Quand une session démarre
  * @fires ExerciseEngine#session-end - Quand une session se termine
@@ -69,6 +75,9 @@ export class ExerciseEngine extends EventEmitter {
     /** @type {number} Timestamp de début de session */
     this.sessionStartTime = 0;
 
+    /** @type {number|null} Timestamp de fin, conservé pour les appels répétés */
+    this.sessionEndTime = null;
+
     /** @type {number} Timestamp de début de question */
     this.questionStartTime = 0;
   }
@@ -87,23 +96,25 @@ export class ExerciseEngine extends EventEmitter {
    * @returns {Object} Première question
    */
   startSession(exercise) {
+    const config = exercise.config || {};
     this.exercise = exercise;
-    this.totalQuestions = exercise.config?.questionsCount || 20;
+    this.totalQuestions = config.questionsCount || 20;
     this.currentIndex = 0;
     this.hintsUsed = 0;
     this.sessionStartTime = Date.now();
+    this.sessionEndTime = null;
 
-    // Créer le générateur
+    // Les valeurs par défaut des questions appartiennent au générateur.
     this.generator = new QuestionGenerator({
-      clef: exercise.config?.clef || 'treble',
-      range: exercise.config?.range,
-      accidentals: exercise.config?.accidentals || false,
-      difficulty: exercise.config?.difficulty || 1,
+      clef: config.clef,
+      range: config.range,
+      accidentals: config.accidentals,
+      difficulty: config.difficulty,
     });
 
     // Créer le calculateur
     this.calculator = new ScoreCalculator({
-      timeBonus: exercise.config?.timing === 'timed',
+      timeBonus: config.timing === 'timed',
     });
 
     this.state = SESSION_STATES.RUNNING;
@@ -151,6 +162,7 @@ export class ExerciseEngine extends EventEmitter {
    */
   _generateQuestion() {
     const mode = this.exercise?.mode || 'visual-to-name';
+    const config = this.exercise?.config || {};
 
     switch (mode) {
       case 'visual-to-name':
@@ -159,19 +171,19 @@ export class ExerciseEngine extends EventEmitter {
 
       case 'interval':
         return this.generator.generateInterval({
-          types: this.exercise.config?.intervalTypes,
+          types: config.intervalTypes,
         });
 
       case 'chord':
         return this.generator.generateChord({
-          types: this.exercise.config?.chordTypes,
+          types: config.chordTypes,
         });
 
       case 'rhythm':
         return this.generator.generateRhythm({
-          durations: this.exercise.config?.durations,
-          beatsPerMeasure: this.exercise.config?.beatsPerMeasure,
-          tempo: this.exercise.config?.tempo,
+          durations: config.durations,
+          beatsPerMeasure: config.beatsPerMeasure,
+          tempo: config.tempo,
         });
 
       default:
@@ -271,7 +283,8 @@ export class ExerciseEngine extends EventEmitter {
     }
 
     // Normaliser la réponse
-    const normalized = answer.toLowerCase().trim();
+    const normalized = normalizeTextAnswer(answer);
+    if (normalized === null) {return false;}
     const frenchName = pitch.toFrench().slice(0, -1).toLowerCase();
     const englishName = pitch.toEnglish().slice(0, -1).toLowerCase();
 
@@ -290,7 +303,8 @@ export class ExerciseEngine extends EventEmitter {
       return answer === interval.toSemitones();
     }
 
-    const normalized = answer.toLowerCase().trim();
+    const normalized = normalizeTextAnswer(answer);
+    if (normalized === null) {return false;}
     const abbrev = interval.toAbbrev().toLowerCase();
     const french = interval.toFrench().toLowerCase();
 
@@ -304,8 +318,7 @@ export class ExerciseEngine extends EventEmitter {
   _validateChordAnswer(answer) {
     const expectedType = this.currentQuestion.expectedType;
 
-    const normalized = answer.toLowerCase().trim();
-    return normalized === expectedType;
+    return normalizeTextAnswer(answer) === expectedType;
   }
 
   /**
@@ -378,6 +391,19 @@ export class ExerciseEngine extends EventEmitter {
   }
 
   /**
+   * Sélectionne le palier d'indice selon le nombre d'indices demandés
+   * @private
+   *
+   * @param {string[]} hints - Indices du plus vague au plus précis
+   */
+  _hintFor(hints) {
+    return {
+      level: Math.min(this.hintsUsed, hints.length),
+      text: hints[Math.min(this.hintsUsed - 1, hints.length - 1)],
+    };
+  }
+
+  /**
    * Retourne un indice pour une note
    * @private
    */
@@ -389,10 +415,7 @@ export class ExerciseEngine extends EventEmitter {
       `C'est la note ${pitch.toFrench()}`,
     ];
 
-    return {
-      level: Math.min(this.hintsUsed, hints.length),
-      text: hints[Math.min(this.hintsUsed - 1, hints.length - 1)],
-    };
+    return this._hintFor(hints);
   }
 
   /**
@@ -406,10 +429,7 @@ export class ExerciseEngine extends EventEmitter {
       `C'est une ${interval.toFrench()}`,
     ];
 
-    return {
-      level: Math.min(this.hintsUsed, hints.length),
-      text: hints[Math.min(this.hintsUsed - 1, hints.length - 1)],
-    };
+    return this._hintFor(hints);
   }
 
   /**
@@ -423,10 +443,7 @@ export class ExerciseEngine extends EventEmitter {
       `C'est un accord ${chord.toFrench()}`,
     ];
 
-    return {
-      level: Math.min(this.hintsUsed, hints.length),
-      text: hints[Math.min(this.hintsUsed - 1, hints.length - 1)],
-    };
+    return this._hintFor(hints);
   }
 
   // --------------------------------------------------------------------------
@@ -443,6 +460,7 @@ export class ExerciseEngine extends EventEmitter {
       return this._getSessionSummary();
     }
 
+    this.sessionEndTime = Date.now();
     this.state = SESSION_STATES.FINISHED;
 
     const summary = this._getSessionSummary();
@@ -458,7 +476,7 @@ export class ExerciseEngine extends EventEmitter {
    */
   _getSessionSummary() {
     const stats = this.calculator.getStats();
-    const duration = Date.now() - this.sessionStartTime;
+    const duration = (this.sessionEndTime ?? Date.now()) - this.sessionStartTime;
 
     return {
       exerciseId: this.exercise?.id,
@@ -477,6 +495,7 @@ export class ExerciseEngine extends EventEmitter {
 
   /**
    * Met en pause la session
+   * Bloque les réponses et l'avancement sans décaler les timestamps.
    */
   pause() {
     if (this.state === SESSION_STATES.RUNNING) {

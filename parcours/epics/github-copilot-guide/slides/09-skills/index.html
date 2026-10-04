@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills — Des procédures réutilisables pour Copilot</title>
+  <link rel="stylesheet" href="../../../../../lib/theme.css">
+  <link rel="stylesheet" href="../../../../_shared/slide-base.css">
+  <script type="module">
+    import { initTheme } from '../../../../../lib/theme.js';
+    initTheme();
+  </script>
+</head>
+<body>
+  <article class="slide">
+    <h1>Skills : apprendre une procédure à l'agent</h1>
+    <p>Un <strong>Agent Skill</strong> est un dossier contenant un fichier <code>SKILL.md</code> et, éventuellement, des ressources ou scripts. Il décrit une méthode de travail que Copilot peut charger lorsqu'une tâche correspond à sa description.</p>
+    <p>Exemples : préparer une revue, appliquer les conventions d'un framework, analyser un document ou réaliser une procédure de migration. Un skill n'entraîne pas le modèle et ne crée pas automatiquement un sous-agent.</p>
+
+    <h2>Pourquoi ne pas tout mettre dans les instructions ?</h2>
+    <table>
+      <thead><tr><th>Mécanisme</th><th>Question à laquelle il répond</th><th>Exemple</th></tr></thead>
+      <tbody>
+        <tr><td>Instructions</td><td>Quelles règles respecter dans ce dépôt ?</td><td>Commandes de test, stack, conventions de nommage.</td></tr>
+        <tr><td>Prompt réutilisable Local</td><td>Quelle demande déclencher explicitement dans un usage existant ?</td><td>Générer les tests de la sélection ; non chargé par Agent Host.</td></tr>
+        <tr><td>Agent personnalisé</td><td>Quel rôle et quels outils choisir ?</td><td>Un relecteur spécialisé.</td></tr>
+        <tr><td>Skill</td><td>Comment réaliser cette catégorie de tâche ?</td><td>Checklist de revue et modèles de compte rendu.</td></tr>
+        <tr><td>MCP</td><td>À quel outil ou système accéder ?</td><td>Lire un ticket ou consulter une documentation externe.</td></tr>
+      </tbody>
+    </table>
+    <p>Dans la documentation de septembre 2026, les <code>.prompt.md</code> sont dépréciés pour Agent Host. Les skills sont le choix conseillé pour de nouvelles procédures portables.</p>
+
+    <h2>Un exemple versionné avec le dépôt</h2>
+    <pre><code>.github/
+  skills/
+    preparer-revue/
+      SKILL.md
+      references/
+        checklist.md</code></pre>
+    <p>Le fichier <code>SKILL.md</code> commence par un frontmatter YAML :</p>
+    <pre><code>---
+name: preparer-revue
+description: Préparer une revue de code à partir d'un diff, en recensant les changements, risques et validations nécessaires. À utiliser quand une revue de modifications est demandée.
+---
+
+# Préparer une revue
+
+1. Lire les instructions du dépôt et le diff fourni.
+2. Identifier les fichiers et contrats concernés.
+3. Appliquer la checklist de [revue](references/checklist.md).
+4. Distinguer les bugs démontrables des hypothèses à confirmer.
+5. Produire un compte rendu : fichier, risque, justification,
+   commande de validation proposée et limites de l'analyse.
+
+Ne pas modifier les fichiers ni publier de commentaire sans accord.
+Ne jamais recopier de secret découvert dans le résultat.</code></pre>
+    <p>Utilisez un nom court et explicite, cohérent avec le dossier. La <strong>description</strong> explique à la fois la capacité et les situations où l'employer. « Aide au développement » est trop large ; « préparer une revue de diff » est testable.</p>
+
+    <h2>Chargement progressif</h2>
+    <ol>
+      <li>Copilot découvre les métadonnées des skills disponibles.</li>
+      <li>Lorsqu'un skill est pertinent, il lit son <code>SKILL.md</code>.</li>
+      <li>Il consulte les ressources liées ou exécute les scripts nécessaires, selon les permissions du client.</li>
+    </ol>
+    <p>Gardez le corps lisible et déplacez les longs exemples dans des fichiers de référence. Reliez-les explicitement depuis <code>SKILL.md</code> plutôt que de supposer qu'un agent explorera tout le dossier.</p>
+
+    <h2>Découvrir et utiliser</h2>
+    <p>Dans <strong>Copilot CLI</strong>, <code>/skills</code> permet de gérer les skills ; <code>/env</code> aide à inspecter les capacités chargées. Dans <strong>VS Code</strong>, <code>/skills</code> ouvre leur configuration. Vous pouvez invoquer explicitement un skill par son nom slash dans les clients compatibles :</p>
+    <pre><code>/preparer-revue</code></pre>
+    <pre><code>Prépare une revue du diff actuel avec la procédure preparer-revue.
+Reste en lecture seule et cite les fichiers concernés.
+Si ce skill n'est pas disponible, signale-le.</code></pre>
+    <p>Les clients qui prennent en charge les skills peuvent en activer un automatiquement selon la description. Vérifiez le chargement réel dans les traces ou les détails proposés par le client ; mentionner un nom dans un prompt n'est pas une preuve.</p>
+
+    <h2>Qualité et sécurité</h2>
+    <ul>
+      <li>Une responsabilité claire par skill ; ne recopiez pas toutes les instructions générales.</li>
+      <li>Des critères de réussite, des erreurs à signaler et un format de sortie précis.</li>
+      <li>Des scripts limités au besoin, inspectés avant exécution et sans secret embarqué.</li>
+      <li>Une provenance fiable : un skill téléchargé est du contenu actif, pas une simple documentation inoffensive.</li>
+      <li>Des essais sur des demandes pertinentes et non pertinentes pour vérifier le déclenchement.</li>
+    </ul>
+    <blockquote><strong>Limite importante :</strong> « lecture seule » écrit dans un skill reste une consigne. Restreignez également les outils et permissions si cette propriété est nécessaire.</blockquote>
+    <h2>Où les clients cherchent-ils les skills ?</h2>
+    <table>
+      <thead><tr><th>Portée</th><th>Emplacements documentés</th></tr></thead>
+      <tbody>
+        <tr><td>Projet — VS Code et CLI</td><td><code>.github/skills/</code>, <code>.claude/skills/</code>, <code>.agents/skills/</code></td></tr>
+        <tr><td>Personnel — CLI</td><td><code>~/.copilot/skills/</code>, <code>~/.agents/skills/</code></td></tr>
+        <tr><td>Personnel — VS Code</td><td>Les deux précédents et <code>~/.claude/skills/</code></td></tr>
+      </tbody>
+    </table>
+    <p>Privilégiez une source partagée dans le dépôt, pas trois copies du même skill. Gardez les préférences personnelles hors du dépôt. Un chemin reconnu par un client n'est pas une garantie de découverte identique dans tous les clients.</p>
+    <p><strong>Sources :</strong> <a href="https://code.visualstudio.com/docs/agent-customization/agent-skills" target="_blank" rel="noopener noreferrer">Agent Skills dans VS Code</a> et <a href="https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills" target="_blank" rel="noopener noreferrer">skills dans Copilot CLI</a>.</p>
+  </article>
+</body>
+</html>

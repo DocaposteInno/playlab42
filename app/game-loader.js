@@ -10,40 +10,51 @@ import { el } from './dom-cache.js';
 import { addToRecent, savePreferences } from './storage.js';
 
 let returnFocus = null;
+let navigationId = 0;
+let pendingNavigation = false;
+let loadTimeout = null;
+let unloadTimeout = null;
+let iframeSession = null;
+
+// Une intention plus récente annule les HEAD et la fermeture différée précédents.
+function beginNavigation() {
+  clearTimeout(unloadTimeout);
+  pendingNavigation = false;
+  return ++navigationId;
+}
+
+function setLoadingText(text) {
+  const label = el.loading.querySelector('p') || el.loading;
+  label.textContent = text;
+}
+
+/**
+ * Indique si la session affichée peut encore piloter le portail.
+ * Un HEAD suivant la suspend ; unload l'invalide immédiatement.
+ * @param {boolean} [allowPendingNavigation=false] - Autoriser ready non destructif pendant un HEAD.
+ * @returns {boolean}
+ */
+export function isCurrentGameSession(allowPendingNavigation = false) {
+  return iframeSession !== null && iframeSession === state.currentGame &&
+    (allowPendingNavigation || !pendingNavigation);
+}
 
 /**
  * Charge un jeu depuis son ID
- * Valide l'existence et synchronise le hash
+ * Valide l'existence et synchronise le hash, uniquement si la demande est courante.
  * @param {string} gameId - ID du jeu
+ * @returns {Promise<void>} - Résolution après validation de la demande
  */
-export async function openGame(gameId) {
-  // Ne pas recharger si le jeu est déjà ouvert
-  if (state.currentGame?.id === gameId && state.currentView === 'game') {
-    return;
-  }
+export function openGame(gameId) {
+  return openResource(gameId, 'game', describeGame);
+}
 
-  const path = `games/${gameId}/index.html`;
-
-  try {
-    // Valider que le jeu existe avec une HEAD request
-    const response = await fetch(path, { method: 'HEAD' });
-    if (!response.ok) {
-      console.error(`Jeu non trouvé: ${gameId}`);
-      window.location.hash = '#/';
-      return;
-    }
-
-    // Charger le jeu (le nom sera trouvé dans le catalogue ou utilisé comme fallback)
-    const name = state.catalogue?.games.find(game => game.id === gameId)?.name || gameId;
-    loadGame(path, name, 'game', gameId);
-
-    // Synchroniser le hash
-    window.location.hash = `#/games/${gameId}`;
-
-  } catch (error) {
-    console.error(`Erreur chargement jeu ${gameId}:`, error);
-    window.location.hash = '#/';
-  }
+function describeGame(id) {
+  return {
+    paths: [`games/${id}/index.html`],
+    // Le catalogue des jeux peut arriver pendant le HEAD.
+    getName: () => state.catalogue?.games.find(game => game.id === id)?.name || id,
+  };
 }
 
 /**
@@ -52,47 +63,59 @@ export async function openGame(gameId) {
  * Les outils peuvent être:
  * - Simples: tools/{id}.html
  * - Complexes: tools/{id}/index.html
+ * Une demande remplacée ne poursuit pas le repli et ne modifie pas le portail.
  * @param {string} toolId - ID de l'outil
+ * @returns {Promise<void>} - Résolution après validation de la demande
  */
-export async function openTool(toolId) {
-  // Ne pas recharger si l'outil est déjà ouvert
-  if (state.currentGame?.id === toolId && state.currentView === 'game') {
-    return;
-  }
+export function openTool(toolId) {
+  return openResource(toolId, 'tool', describeTool);
+}
 
-  const tool = state.catalogue?.tools.find(item => item.id === toolId);
-  // Le catalogue evite une requete 404 pour les outils au format fichier.
-  const paths = tool?.path ? [tool.path] : [
-    `tools/${toolId}/index.html`,
-    `tools/${toolId}.html`,
-  ];
+function describeTool(id) {
+  const tool = state.catalogue?.tools.find(item => item.id === id);
+  return {
+    // Le catalogue évite une requête 404 pour les outils au format fichier.
+    paths: tool?.path ? [tool.path] : [`tools/${id}/index.html`, `tools/${id}.html`],
+    getName: () => tool?.name || id,
+  };
+}
+
+function isAlreadyDisplayed(id) {
+  return isCurrentGameSession() && state.currentGame.id === id && state.currentView === 'game';
+}
+
+async function findExistingPath(paths, navigation) {
+  for (const path of paths) {
+    const response = await fetch(path, { method: 'HEAD' });
+    if (navigation !== navigationId) { return null; }
+    if (response.ok) { return path; }
+  }
+  return null;
+}
+
+async function openResource(id, type, describe) {
+  const navigation = beginNavigation();
+  if (isAlreadyDisplayed(id)) { return; }
+  const { paths, getName } = describe(id);
+  const label = type === 'game' ? 'Jeu' : 'Outil';
+  pendingNavigation = true;
 
   try {
-    let validPath = null;
-
-    for (const path of paths) {
-      const response = await fetch(path, { method: 'HEAD' });
-      if (response.ok) {
-        validPath = path;
-        break;
-      }
-    }
-
-    if (!validPath) {
-      console.error(`Outil non trouvé: ${toolId}`);
+    const path = await findExistingPath(paths, navigation);
+    if (navigation !== navigationId) { return; }
+    pendingNavigation = false;
+    if (!path) {
+      console.error(`${label} non trouvé: ${id}`);
       window.location.hash = '#/';
       return;
     }
 
-    // Charger l'outil
-    const name = tool?.name || toolId;
-    loadGame(validPath, name, 'tool', toolId);
-
-    // Synchroniser le hash
-    window.location.hash = `#/tools/${toolId}`;
-
+    renderGame(path, getName(), type, id);
+    window.location.hash = `#/${type}s/${id}`;
   } catch (error) {
-    console.error(`Erreur chargement outil ${toolId}:`, error);
+    if (navigation !== navigationId) { return; }
+    pendingNavigation = false;
+    console.error(`Erreur chargement ${label.toLowerCase()} ${id}:`, error);
     window.location.hash = '#/';
   }
 }
@@ -105,11 +128,21 @@ export async function openTool(toolId) {
  * @param {string} id - ID du jeu/outil
  */
 export function loadGame(path, name, type, id) {
+  beginNavigation();
+  renderGame(path, name, type, id);
+}
+
+function renderGame(path, name, type, id) {
+  clearTimeout(loadTimeout);
+  const session = { path, name, type, id };
+  iframeSession = session;
+  // Le HEAD suivant suspend les callbacks ; resélectionner ce jeu les réautorise.
+  const isCurrent = () => iframeSession === session && isCurrentGameSession();
   if (state.currentView !== 'game') {
     returnFocus = document.activeElement;
   }
   setState({
-    currentGame: { path, name, type, id },
+    currentGame: session,
     currentView: 'game',
   });
 
@@ -118,37 +151,48 @@ export function loadGame(path, name, type, id) {
   el.viewGame.classList.add('active');
   document.body.classList.add('game-active');
   el.gameTitle.textContent = name;
+  setLoadingText('Chargement...');
   el.loading.classList.remove('hidden');
 
-  el.gameIframe.src = path;
   el.gameIframe.title = `${type === 'game' ? 'Jeu' : 'Outil'} : ${name}`;
   el.btnBack?.focus();
   addToRecent(id, type);
 
-  const timeout = setTimeout(() => {
-    el.loading.textContent = 'Chargement lent...';
+  loadTimeout = setTimeout(() => {
+    if (!isCurrent()) { return; }
+    setLoadingText('Chargement lent...');
   }, 5000);
 
   el.gameIframe.onload = () => {
-    clearTimeout(timeout);
+    if (!isCurrent()) { return; }
+    clearTimeout(loadTimeout);
     el.loading.classList.add('hidden');
   };
 
   el.gameIframe.onerror = () => {
-    clearTimeout(timeout);
-    el.loading.textContent = 'Erreur de chargement';
+    if (!isCurrent()) { return; }
+    clearTimeout(loadTimeout);
+    el.loading.classList.remove('hidden');
+    setLoadingText('Erreur de chargement');
   };
+  el.gameIframe.src = path;
 }
 
 /**
  * Décharge le jeu et retourne au catalogue
  */
 export function unloadGame() {
+  const navigation = beginNavigation();
+  iframeSession = null;
+  clearTimeout(loadTimeout);
+  el.gameIframe.onload = null;
+  el.gameIframe.onerror = null;
   if (el.gameIframe.contentWindow) {
     el.gameIframe.contentWindow.postMessage({ type: 'unload' }, '*');
   }
 
-  setTimeout(() => {
+  unloadTimeout = setTimeout(() => {
+    if (navigation !== navigationId) { return; }
     el.gameIframe.src = 'about:blank';
     setState({
       currentGame: null,

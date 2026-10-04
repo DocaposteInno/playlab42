@@ -7,6 +7,7 @@
  */
 
 import EventEmitter from '../utils/EventEmitter.js';
+import { hidePanel, isPanelVisible, showPanel } from './panel-visibility.js';
 import { Metronome } from '../audio/Metronome.js';
 
 // ============================================================================
@@ -85,19 +86,14 @@ export class MetronomeController extends EventEmitter {
    * Affiche le panel métronome.
    */
   show() {
-    if (this.elements.overlay) {
-      this.elements.overlay.classList.add('visible');
-      this._init();
-    }
+    showPanel(this);
   }
 
   /**
    * Cache le panel métronome.
    */
   hide() {
-    if (this.elements.overlay) {
-      this.elements.overlay.classList.remove('visible');
-    }
+    hidePanel(this);
     // Arrêter le métronome si actif
     this._stop();
   }
@@ -108,7 +104,7 @@ export class MetronomeController extends EventEmitter {
    * @returns {boolean}
    */
   isVisible() {
-    return this.elements.overlay?.classList.contains('visible') || false;
+    return isPanelVisible(this);
   }
 
   // --------------------------------------------------------------------------
@@ -230,18 +226,37 @@ export class MetronomeController extends EventEmitter {
     const request = {};
     this._playRequest = request;
     try {
-      await this.ensureReady();
-      if (this._disposed || this._playRequest !== request) {return;}
-
-      if (this._metronome) {
-        await this._metronome.start();
-        if (this._disposed || this._playRequest !== request) {return;}
-        this._updateUI(this.playing);
-        if (this.playing) {this.emit('start');}
-      }
+      await this._startRequested(request);
     } finally {
       if (this._playRequest === request) {this._playRequest = null;}
     }
+  }
+
+  /**
+   * Prépare puis lance le métronome tant que la demande reste la dernière.
+   * @private
+   *
+   * @param {Object} request - Jeton de la demande de démarrage
+   */
+  async _startRequested(request) {
+    await this.ensureReady();
+    if (this._isStale(request) || !this._metronome) {return;}
+
+    await this._metronome.start();
+    if (this._isStale(request)) {return;}
+    this._updateUI(this.playing);
+    if (this.playing) {this.emit('start');}
+  }
+
+  /**
+   * Indique si la demande a été annulée (arrêt, nouvelle demande ou destruction).
+   * @private
+   *
+   * @param {Object} request - Jeton de la demande
+   * @returns {boolean}
+   */
+  _isStale(request) {
+    return this._disposed || this._playRequest !== request;
   }
 
   /**

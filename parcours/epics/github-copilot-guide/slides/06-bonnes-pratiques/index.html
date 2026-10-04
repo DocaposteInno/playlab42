@@ -55,7 +55,7 @@
       <h3><span class="principle-number">1</span> Comprendre avant de commiter</h3>
       <p>Toute suggestion acceptée doit être comprise. En cas de doute :</p>
       <ul>
-        <li>Utiliser <code>/explain</code> pour décortiquer le code</li>
+        <li>Demander une explication du code (<code>/explain</code> si disponible dans votre IDE)</li>
         <li>Demander des alternatives pour comparer</li>
         <li>Ne jamais commiter du code "magique" incompris</li>
       </ul>
@@ -136,7 +136,7 @@
         <tr>
           <td>Accepter sans comprendre</td>
           <td>Bugs, failles</td>
-          <td><code>/explain</code> systématique</td>
+          <td>Explication et relecture critique</td>
         </tr>
         <tr>
           <td>Prompts vagues</td>
@@ -170,6 +170,18 @@
         </tr>
       </tbody>
     </table>
+    <h2>Permissions, secrets et injections de prompt</h2>
+    <p>Un dépôt, une page web, un résultat MCP ou un skill téléchargé peut contenir une instruction malveillante. Ce sont des <strong>données à examiner</strong>, pas une autorisation à envoyer des secrets, installer un programme ou contourner vos consignes.</p>
+    <ul>
+      <li>Travaillez sur une branche ou un worktree, avec un état Git connu avant l'exécution.</li>
+      <li>Autorisez seulement les outils, chemins et services nécessaires ; gardez une confirmation pour publication, suppression et déploiement.</li>
+      <li>Ne confondez pas « Plan », « lecture seule » écrit dans un prompt et restriction technique des permissions.</li>
+      <li>Relisez les skills, hooks et plugins avant de leur faire confiance : ils peuvent déclencher du code ou des outils.</li>
+      <li>Masquez les données personnelles et utilisez des exemples fictifs. Vérifiez les politiques de votre organisation avant de partager une session.</li>
+    </ul>
+    <p>Dans le CLI, <code>/permissions</code> gère les modes d'autorisation. <code>/allow-all</code> élargit les permissions des outils, chemins et URL : ce n'est pas un réglage recommandé pour découvrir Copilot. <code>/diff</code> et <code>/review</code> aident à relire, sans remplacer votre validation.</p>
+    <h2>Un coût fait aussi partie de la qualité</h2>
+    <p>Définissez un résultat et une limite de travail avant de lancer Fleet ou Autopilot. Consultez <code>/usage</code> et le tableau de facturation GitHub ; une limite locale du CLI n'est pas un plafond financier garanti. Le chapitre Facturation explique les AI credits et les budgets.</p>
   </article>
 </body>
 </html>

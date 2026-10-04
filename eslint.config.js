@@ -5,8 +5,11 @@
 
 import js from '@eslint/js';
 import globals from 'globals';
+import html from 'eslint-plugin-html';
+import { sourceIgnores } from './scripts/lint-source-policy.js';
 
 export default [
+  { ignores: sourceIgnores },
   // Configuration de base recommandée
   js.configs.recommended,
 
@@ -42,6 +45,8 @@ export default [
       'curly': ['error', 'all'],
       'no-eval': 'error',
       'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-script-url': 'error',
       'no-return-await': 'error',
       'require-await': 'error',
 
@@ -50,6 +55,50 @@ export default [
       'no-duplicate-imports': 'error',
       'prefer-arrow-callback': 'error',
       'prefer-template': 'error',
+    },
+  },
+
+  {
+    files: ['**/*.html'],
+    plugins: { html },
+  },
+
+  {
+    // Ces supports utilisent quatre espaces dans leurs scripts embarqués.
+    files: [
+      'games/go-9x9/**/*.html',
+      'parcours/_shared/templates/**/*.html',
+      'parcours/epics/algorithm-complexity/**/*.html',
+      'parcours/epics/as-code-paradigm/**/*.html',
+      'parcours/epics/deep-learning-intro/**/*.html',
+    ],
+    rules: {
+      indent: ['error', 4, { SwitchCase: 1 }],
+    },
+  },
+
+  {
+    files: ['tools/neural-style.html'],
+    languageOptions: {
+      globals: { mi: 'readonly' },
+    },
+  },
+
+  {
+    files: [
+      '*.{js,cjs}',
+      'app/**/*.{js,html}',
+      'lib/**/*.{js,html}',
+      'games/**/*.{js,html}',
+      'tools/**/*.{js,html}',
+      'scripts/**/*.js',
+    ],
+    ignores: [
+      '**/*.test.js', '**/*.spec.js', '**/__tests__/**',
+      '**/__mocks__/**', '**/tests/**',
+    ],
+    rules: {
+      complexity: ['error', 10],
     },
   },
 
@@ -66,15 +115,4 @@ export default [
     },
   },
 
-  // Fichiers ignorés
-  {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      'data/**',
-      'assets/vendor/**',
-      'games/**/index.html',
-    ],
-  },
 ];

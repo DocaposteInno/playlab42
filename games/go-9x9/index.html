@@ -115,7 +115,7 @@
             /* Ensure line is still drawn */
         }
 
-        /* Hoshi dot using radial gradient on the cell itself, but we need to be careful not to hide lines if we use background-color. 
+        /* Hoshi dot using radial gradient on the cell itself, but we need to be careful not to hide lines if we use background-color.
            We use background-image. */
         .cell.hoshi {
             background-image: radial-gradient(circle at center, #000 3px, transparent 3.5px);
@@ -142,6 +142,24 @@
         .stone.white {
             background: #f5f5f5;
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .stone.dead {
+            background: rgba(255, 255, 255, 0.45);
+            box-shadow: none;
+            border: 2px dashed #182338;
+            box-sizing: border-box;
+        }
+
+        .stone.dead::after {
+            content: '×';
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: #182338;
+            font-size: calc(var(--cell-size) * 0.6);
+            font-weight: bold;
         }
 
         .last-move .stone::after {
@@ -256,7 +274,7 @@
                 <div class="board" id="board" role="group" aria-label="Plateau de Go, neuf lignes et neuf colonnes"></div>
             </div>
             <div class="legend" style="margin-top: var(--space-md);">
-                Règles : ko simple, suicide interdit, scoring chinois (komi 6.5). Flèches : parcourir le plateau ; Entrée ou Espace : placer une pierre. Actions : placer, passer, résigner.
+                Règles : ko simple, suicide interdit, scoring chinois (komi 6.5). Flèches : parcourir le plateau ; Entrée ou Espace : placer une pierre. Après deux passes, activez les groupes morts, puis confirmez le score. Activez à nouveau un groupe pour le déclarer vivant, ou reprenez la partie en cas de désaccord.
             </div>
         </div>
 
@@ -264,13 +282,15 @@
             <div class="controls">
                 <label for="bot-select">Adversaire</label>
                 <select id="bot-select">
-                    <option value="random">🤖 Random (défaut)</option>
-                    <option value="greedy">🤖 Greedy</option>
+                    <option value="greedy">🤖 Tactique (défaut)</option>
+                    <option value="random">🤖 Aléatoire (facile)</option>
                     <option value="human">👤 Hot-seat</option>
                 </select>
                 <button class="btn-primary" id="btn-start">Démarrer</button>
                 <button id="btn-pass">Passer</button>
                 <button id="btn-resign">Résigner</button>
+                <button class="btn-primary" id="btn-confirm-score" hidden>Confirmer le score</button>
+                <button id="btn-resume-play" hidden>Reprendre la partie</button>
                 <button id="btn-reset">Reset</button>
             </div>
 
@@ -303,6 +323,7 @@
         import { GreedyBot } from './bots/greedy.js';
         import { createBoardNavigation } from '../board-navigation.js';
         import { createHumanControls } from './human-controls.js';
+        import { renderCell, scoreTexts, statusText } from './board-render.js';
 
         const boardEl = $('#board');
         const navigation = createBoardNavigation(boardEl, 9);
@@ -315,6 +336,8 @@
         const btnStart = $('#btn-start');
         const btnPass = $('#btn-pass');
         const btnResign = $('#btn-resign');
+        const btnConfirmScore = $('#btn-confirm-score');
+        const btnResumePlay = $('#btn-resume-play');
         const btnReset = $('#btn-reset');
 
         const engine = new Go9x9Engine();
@@ -360,7 +383,7 @@
             const seed = rng.getState();
 
             const playerIds = [humanId, opponentId];
-            state = engine.init({ seed, playerIds });
+            state = engine.init({ seed, playerIds, manualScoring: true });
 
             const opponent = botSelect.value;
             if (opponent === 'human') {
@@ -378,17 +401,26 @@
         }
 
         function handleHumanMove(x, y) {
+            if (state.scoring) {
+                if (state.board[y][x] === 0) {
+                    statusEl.textContent = 'Sélectionnez une pierre pour marquer son groupe vivant ou mort.';
+                    return;
+                }
+                state = engine.toggleDeadGroup(state, x, y);
+                render();
+                return;
+            }
             humanControls.play({ type: 'place', x, y });
         }
 
         function maybeBotTurn() {
-            if (!bot || state.gameOver) return;
-            if (state.currentPlayerId !== opponentId) return;
+            if (!bot || state.gameOver || state.scoring) {return;}
+            if (state.currentPlayerId !== opponentId) {return;}
             setTimeout(playBot, 150);
         }
 
         function playBot() {
-            if (!bot || state.gameOver || state.currentPlayerId !== opponentId) return;
+            if (!bot || state.gameOver || state.scoring || state.currentPlayerId !== opponentId) {return;}
             const valid = engine.getValidActions(state, opponentId);
             const action = bot.chooseAction(state, valid, rng);
             state = engine.applyAction(state, action, opponentId);
@@ -404,62 +436,39 @@
         }
 
         function render() {
-            if (!state) return;
+            if (!state) {return;}
             const currentHuman = humanControls.getPlayerId();
-            btnPass.disabled = currentHuman === null;
-            btnResign.disabled = currentHuman === null;
+            btnPass.disabled = Boolean(state.scoring) || currentHuman === null;
+            btnResign.disabled = Boolean(state.scoring) || currentHuman === null;
+            btnConfirmScore.hidden = !state.scoring;
+            btnResumePlay.hidden = !state.scoring;
 
             boardEl.querySelectorAll('.cell').forEach((cell) => {
-                const x = Number(cell.dataset.x);
-                const y = Number(cell.dataset.y);
-                const value = state.board[y][x];
-                const description = value === 1 ? 'pierre noire' : value === 2 ? 'pierre blanche' : 'vide';
-                cell.setAttribute('aria-label', `Ligne ${y + 1}, colonne ${x + 1}, ${description}`);
-                cell.setAttribute('aria-disabled', String(currentHuman === null || value !== 0));
-                cell.innerHTML = '';
-                cell.classList.remove('last-move');
-                if (value === 1 || value === 2) {
-                    const stone = document.createElement('div');
-                    stone.className = `stone ${value === 1 ? 'black' : 'white'}`;
-                    cell.appendChild(stone);
-                }
-                if (state.lastMove && state.lastMove.type === 'place' && state.lastMove.x === x && state.lastMove.y === y) {
-                    cell.classList.add('last-move');
-                    cell.setAttribute('aria-label', `${cell.getAttribute('aria-label')}, dernier coup`);
-                }
+                renderCell(cell, state, currentHuman !== null, document);
             });
 
             const captures = state.captures || {};
             capturesBlackEl.textContent = captures[humanId] ?? 0;
             capturesWhiteEl.textContent = captures[opponentId] ?? 0;
 
-            if (state.scores) {
-                scoreBlackEl.textContent = state.scores.black.toFixed(1);
-                scoreWhiteEl.textContent = state.scores.white.toFixed(1);
-            } else {
-                scoreBlackEl.textContent = '-';
-                scoreWhiteEl.textContent = '-';
-            }
-
-            if (state.gameOver) {
-                if (state.winners === null) {
-                    statusEl.textContent = 'Partie terminée : égalité';
-                } else if (state.winners.includes(humanId)) {
-                    statusEl.textContent = 'Victoire Noir';
-                } else if (state.winners.includes(opponentId)) {
-                    statusEl.textContent = 'Victoire Blanc';
-                } else {
-                    statusEl.textContent = 'Partie terminée';
-                }
-            } else {
-                const playerName = state.currentPlayerId === humanId ? 'Noir' : 'Blanc';
-                statusEl.textContent = bot ? (currentHuman ? 'À vous (Noir)' : 'Le bot joue (Blanc)') : `Au tour du joueur ${playerName}`;
-            }
+            const scores = scoreTexts(state);
+            scoreBlackEl.textContent = scores.black;
+            scoreWhiteEl.textContent = scores.white;
+            statusEl.textContent = statusText(state, { humanId, opponentId, bot, currentHuman });
         }
 
         on(btnStart, 'click', startGame);
         on(btnPass, 'click', pass);
         on(btnResign, 'click', resign);
+        on(btnConfirmScore, 'click', () => {
+            state = engine.confirmScore(state);
+            render();
+        });
+        on(btnResumePlay, 'click', () => {
+            state = engine.resumePlay(state);
+            render();
+            maybeBotTurn();
+        });
         on(btnReset, 'click', startGame);
 
         buildBoard();

@@ -6,19 +6,9 @@
   <title>Tic-Tac-Toe - Playlab42</title>
   <link rel="stylesheet" href="../../lib/theme.css">
   <link rel="stylesheet" href="../../lib/ui.css">
+  <link rel="stylesheet" href="../game-page.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: var(--font-family);
-      background: var(--color-bg);
-      color: var(--color-text);
-      min-height: 100vh;
-      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -29,7 +19,6 @@
     h1 {
       font-size: var(--font-size-xl);
       margin-bottom: var(--space-md);
-      text-align: center;
     }
 
     /* Écran de configuration */
@@ -76,18 +65,6 @@
     .btn {
       width: 100%;
       padding: var(--space-md);
-      background: var(--color-accent);
-      border: none;
-      border-radius: var(--radius-md);
-      color: var(--color-text-inverse);
-      font-size: var(--font-size-md);
-      font-weight: 600;
-      cursor: pointer;
-      transition: background var(--transition-normal);
-    }
-
-    .btn:hover {
-      background: var(--color-accent-hover);
     }
 
     /* Écran de jeu */
@@ -125,7 +102,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--radius-md);
-      background: var(--color-bg-secondary);
+      background: var(--color-text-muted);
       padding: var(--radius-md);
       border-radius: var(--radius-lg);
       transition: background-color var(--transition-normal);
@@ -304,7 +281,7 @@
     GameKit.init('tictactoe');
 
     // === État ===
-    let engine = new TicTacToeEngine();
+    const engine = new TicTacToeEngine();
     let state = null;
     let rng = null;
     let bot = null;
@@ -441,16 +418,16 @@
     }
 
     function handleCellClick(index) {
-      if (state.gameOver) return;
+      if (state.gameOver) {return;}
 
       const currentPlayer = state.currentPlayerId;
 
       // En mode vs bot, seul l'humain peut jouer avec les clics
-      if (isVsBot && currentPlayer !== humanId) return;
+      if (isVsBot && currentPlayer !== humanId) {return;}
 
       const action = { type: 'place', position: index };
 
-      if (!engine.isValidAction(state, action, currentPlayer)) return;
+      if (!engine.isValidAction(state, action, currentPlayer)) {return;}
 
       // Appliquer l'action
       state = engine.applyAction(state, action, currentPlayer);
@@ -469,12 +446,12 @@
     }
 
     function playBot() {
-      if (state.gameOver || state.currentPlayerId !== opponentId) return;
+      if (state.gameOver || state.currentPlayerId !== opponentId) {return;}
 
       const view = engine.getPlayerView(state, opponentId);
       const validActions = engine.getValidActions(state, opponentId);
 
-      if (validActions.length === 0) return;
+      if (validActions.length === 0) {return;}
 
       const action = bot.chooseAction(view, validActions, rng);
       state = engine.applyAction(state, action, opponentId);

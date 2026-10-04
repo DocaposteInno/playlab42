@@ -34,10 +34,19 @@ Support de formation où les participants créent des outils, jeux et parcours a
 Le projet s'enrichit des contributions de chaque session.
 
 **Qualité code** : Ce projet étant un support de cours, le code doit être exemplaire :
-- Bien commenté en français
+- Commentaires utiles en français pour les décisions non évidentes
 - Nommage explicite
 - Tests unitaires systématiques
-- Documentation JSDoc exhaustive
+- JSDoc des contrats publics et documentation cohérente avec le comportement
+
+Le [guide qualité](docs/guides/software-quality.md) fixe les pratiques communes :
+conception simple, contrats, déterminisme, erreurs visibles, tests de comportement
+et revue. Les seuils ciblés et l'audit npm sont bloquants dans la CI ; ni couverture
+ni audit vert ne certifient l'absence de défauts.
+Le lint de sécurité utilise la configuration et les plugins verrouillés du dépôt.
+Les références d'actions/images/scanners sont vérifiées avant mise à jour.
+Ne pas masquer un échec avec `|| true`, forcer des peers incompatibles ou
+inventer une validation TS : tsc est le contrôle de types, pas un linter.
 
 ## Environnement Docker-first
 
@@ -87,7 +96,7 @@ et [le kit de contribution](docs/guides/contribution-kit.md).
 Les corps des skills sont versionnés uniquement dans **`.github/skills/`**.
 Le lien `.claude/skills -> ../.github/skills` expose cette même source à
 Claude sans seconde copie. Les skills OpenSpec générés se placent donc dans
-`.github/skills/openspec-*`, à côté des quatre skills métier `playlab-*`.
+`.github/skills/openspec-*`, à côté des cinq skills métier `playlab-*`.
 Ce lien ne crée pas de commandes `/opsx:*` ; leur disponibilité dépend de
 l'intégration de commandes du client.
 
@@ -131,7 +140,7 @@ applicable) et une décision explicite ; ne jamais archiver pour simuler l'achè
 | Build TS | esbuild (transpilation rapide) |
 | Tests unitaires | Jest + esbuild |
 | Tests navigateur | Playwright |
-| Linting | ESLint |
+| Linting | ESLint (JS et scripts HTML), Biome (sources `.ts`) |
 | Infra | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
 | Hébergement | GitHub Pages |
@@ -149,6 +158,7 @@ Le projet supporte TypeScript pour les tools, games et epics complexes. L'utilis
 
 ```bash
 make typecheck      # Vérifier les types (tsc --noEmit)
+make npm CMD="run lint:ts" # Lint TS avec Biome, distinct de tsc
 make build-ts       # Transpiler .ts → .js (dans dist/)
 ```
 
@@ -209,11 +219,28 @@ make lint               # Lint (exclut dist/)
 make build-ts           # Regénérer les fichiers dist/
 ```
 
+`make lint` exécute ESLint puis Biome avec warnings bloquants. Les scripts
+HTML sont analysés, pas le markup ou les attributs événementiels : utiliser
+`addEventListener` dans un script linté. Un test de politique refuse les
+attributs `onclick` et analogues dans les HTML source, templates compris.
+Les sorties générées et bibliothèques tierces ne sont pas des sources à linter.
+Le lint Biome utilise son propre parser : il ne remplace pas tsc et ne fournit
+pas les règles de sécurité des plugins ESLint pour TS.
+
 ### Déploiement (GitHub Pages)
 
 Les fichiers `dist/` sont **générés automatiquement** par le workflow de déploiement (`deploy.yml`). Pas besoin de les versionner.
 
-Le workflow exécute `npm run build:ts` avant le déploiement, ce qui génère les fichiers JavaScript transpilés pour tous les tools TypeScript.
+Le build complet `npm run build` inclut `build:ts`, puis prépare le dossier
+public `site/`. La CI teste l'archive produite dans Chromium avant que le workflow
+de publication ne déploie cette même archive. Le contrôle HTTP après publication
+vérifie le commit ; il ne remplace pas les tests ni les protections GitHub.
+Le build normal utilise `metadata/bookmarks-og.json`, sans collecte distante.
+`make npm CMD="run refresh:bookmarks"` est une actualisation éditoriale explicite :
+relire snapshot et images avant commit. `build:local` omet cet enrichissement.
+La CI fixe SOURCE_DATE_EPOCH, compare deux fabrications, vérifie manifeste/SBOM
+et exerce une reprise locale. Aucune attestation signée ou restauration en
+production n'est implicite ; voir `docs/guides/artifact-operations.md`.
 
 ### Types disponibles
 
@@ -291,7 +318,7 @@ playlab42/
 │   └── dom-cache.js          # Cache éléments DOM
 ├── tools/                    # Outils HTML standalone
 │   ├── [tool-name]/
-│   │   ├── index.html        # Un fichier = un outil
+│   │   ├── index.html        # Point d'entrée, modules locaux possibles
 │   │   └── tool.json         # Manifest
 ├── games/                    # Jeux autonomes
 │   └── [game-id]/
@@ -351,6 +378,7 @@ Les specs détaillées sont dans `openspec/specs/` :
 - `docs/guides/openspec-workflow.md` - OPSX, CLI Docker et compatibilité des anciens alias
 - `docs/guides/project-skills.md` - Skills métier et source commune des conventions
 - `docs/guides/contribution-kit.md` - Gabarits game/tool/epic et galerie UI
+- `docs/guides/software-factory.md` - Chaîne de livraison, preuves et améliorations restantes
 - `openspec/legacy/README.md` - Brouillons historiques conservés sans déclaration de livraison
 
 ## Guidelines pour agents IA

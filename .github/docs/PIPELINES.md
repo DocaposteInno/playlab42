@@ -1,552 +1,207 @@
-# Pipelines CI/CD - Documentation
+# Pipelines CI/CD
 
-Ce document décrit tous les workflows automatisés de Playlab42.
+Sources de vérité : fichiers sous `.github/workflows/`, `package.json` et
+`Makefile`. Node **26**, installation par `npm ci`. Les commandes locales
+s'exécutent dans Docker ; les runners GitHub sont des environnements CI isolés.
 
-## Vue d'ensemble
+## Déclencheurs et dépendances
 
-| Workflow | Déclenchement | Durée | Objectif |
-|----------|---------------|-------|----------|
-| **CI** | Push/PR vers main | ~2-3 min | Vérifier qualité code (lint, tests, build) |
-| **Deploy** | Push vers main | ~1-2 min | Déployer sur GitHub Pages |
-| **Security Audit** | Push/PR/Daily 6h UTC | ~5-7 min | Scan de sécurité complet (7 jobs) |
+| Workflow | Déclenchement | Rôle |
+|----------|---------------|------|
+| `ci.yml` | PR toute base, manuel, appel réutilisable | Validation et archive publique |
+| `deploy.yml` | Push `main`, manuel | Appelle CI, puis publie et contrôle le site |
+| `ui-e2e.yml` | Appel depuis CI, manuel | Interactions Chromium |
+| `security-audit.yml` | Push `main`, PR toute base, quotidien 6 h UTC, manuel | Audits et rapport séparés |
+| `trivy-scan.yml` | Appel depuis CI et Security Audit | Même scan bloquant et rapports nommés par appelant |
 
-## Workflow 1 : CI (Continuous Integration)
+Une PR ne déploie pas de site. Un push `main` appelle CI **via Deploy**, sans
+second déclenchement indépendant de CI. Le lancement manuel de Deploy hors
+`main` échoue.
 
-**Fichier** : `.github/workflows/ci.yml`
+Les PR empilées sur une branche de contribution reçoivent les mêmes contrôles
+automatiques ; elles ne déploient pas non plus. Les protections GitHub de `main`
+restent distinctes du déclenchement des workflows.
 
-### Déclenchement
+## CI
 
-- Push vers `main`
-- Pull Request vers `main`
-- Manuel (workflow_dispatch)
+| Job | Commande / dépendance | Échec |
+|-----|----------------------|-------|
+| Lint | `npm run lint` : ESLint JS/scripts HTML puis Biome `.ts` | Erreurs et avertissements bloquants ; tsc reste distinct |
+| Security lint | `npm run lint:security`, rapport JSON | Règles JS/scripts HTML ciblées, pas TS ; sans installation à la volée |
+| Trivy Security Scan | Appelle `trivy-scan.yml` | Vulnérabilités/secrets HIGH/CRITICAL, dépendances de développement incluses ; erreur d'outil bloquante |
+| Tests | `npm run test:coverage`, puis Codecov | Tests ou seuils ciblés échoués ; upload Codecov non bloquant |
+| Dependency audit | `npm run audit:dependencies` | CVE modérée ou plus ; panne d'audit également bloquante |
+| TypeScript | `npm run typecheck` | Erreurs de types ; la transpilation appartient à Build |
+| OpenSpec | `npm run openspec:validate` | Validation stricte des specs/changes |
+| Build | Attend Security lint et Trivy, refuse tout statut différent de `success`, puis `npm run build`, archive `site/` | Gate sécurité, build ou upload de l'archive |
+| Browser | Attend Build, appelle `ui-e2e.yml` avec `prebuilt: true` | Test navigateur échoué |
 
-### Jobs
+Les analyses, tests, types et OpenSpec peuvent commencer en parallèle. Build
+attend seulement Security lint et Trivy ; Browser attend l'archive Build.
+Build utilise `if: always()` et un premier guard Bash : `failure`, `skipped`,
+`cancelled` ou un statut absent/inconnu donnent un **échec explicite avant checkout,
+installation, fabrication ou archive**, pas un job Build ignoré. Un simple
+`needs` laisserait Build ignoré après échec, état accepté par une protection
+GitHub de check requis. Un succès de Build ne signifie pas que toute la CI est verte.
+OpenSpec valide la structure des spécifications, pas la conformité du code.
 
-#### 1.1 Lint
+## Navigateur
 
-Vérifie la qualité du code avec ESLint.
+Le job installe Chromium compatible avec Playwright, extrait `github-pages`
+dans `site/` et lance `npm run test:e2e` avec `PLAYWRIGHT_PREBUILT=1`.
+Le serveur Playwright sert ce dossier **sans build supplémentaire**.
 
-**Étapes** :
-1. Checkout du code
-2. Configuration Node.js 20 avec cache npm
-3. Installation des dépendances (`npm ci`)
-4. Exécution ESLint sur `lib/`, `src/`, `games/`
+Un lancement manuel de UI browser utilise la préparation locale habituelle
+`build:local` : il est utile au diagnostic, mais ne valide pas une ancienne
+archive de release. Les commandes locales sont détaillées dans la
+[stratégie de tests](../../docs/TESTING_STRATEGY.md).
 
-**Commande** : `npm run lint`
+En cas d'échec : rapport, captures et traces dans `ui-e2e-failure`, conservés
+14 jours. La rétention de l'archive Pages est de 7 jours.
 
-**Échec si** : Erreurs ESLint détectées
+## Publication
 
-#### 1.2 Tests
-
-Exécute les tests unitaires avec coverage.
-
-**Étapes** :
-1. Checkout du code
-2. Configuration Node.js 20 avec cache npm
-3. Installation des dépendances (`npm ci`)
-4. Exécution des tests avec coverage (`npm run test:coverage`)
-5. Upload du rapport de coverage vers Codecov
-
-**Commande** : `npm run test:coverage`
-
-**Artifacts** :
-- Coverage LCOV uploadé vers Codecov
-- Flag : `unittests`
-
-**Échec si** : Tests en échec
-
-**Configuration coverage** : Voir `codecov.yml`
-- Target : Auto (basé sur historique)
-- Patch : 80% minimum sur nouveau code
-- Precision : 2 décimales
-
-#### 1.3 Build
-
-Valide que le build fonctionne.
-
-**Étapes** :
-1. Checkout du code
-2. Configuration Node.js 20 avec cache npm
-3. Installation des dépendances (`npm ci`)
-4. Build complet (`npm run build`)
-
-**Commande** : `npm run build`
-
-**Ce qui est build** :
-- `data/catalogue.json` (via `build-catalogue.js`)
-- `data/parcours.json` (via `build-parcours.js`)
-- `data/bookmarks.json` (via `build-bookmarks.js`)
-
-**Échec si** : Erreurs de build
-
-### Visualisation
-
-```
-┌─────────────┐
-│   Push/PR   │
-└─────┬───────┘
-      │
-      ├─────► [Lint] ──────► ✓ Code quality OK
-      │
-      ├─────► [Tests] ─────► ✓ Tests passing + Coverage
-      │
-      └─────► [Build] ─────► ✓ Build succeeds
+```text
+check-ref → validate (CI complète) → deploy → smoke
 ```
 
-### Secrets requis
+Le job de publication reçoit seul les permissions Pages et OIDC.
+L'artefact `github-pages` provient du même run et n'est pas reconstruit.
+Le smoke test contrôle le SHA publié et neuf ressources HTTP avec cinq
+tentatives bornées. Il ne réalise ni rollback ni archivage OpenSpec.
 
-- `CODECOV_TOKEN` : Token pour uploader le coverage vers Codecov
+Voir le [guide de déploiement](../../docs/DEPLOYMENT.md) pour le contenu public,
+les limites, les réglages GitHub et la récupération après incident.
 
-## Workflow 2 : Deploy (GitHub Pages)
+## Audits de sécurité : politique réelle
 
-**Fichier** : `.github/workflows/deploy.yml`
+Le workflow de sécurité complémentaire reste indépendant. L'audit npm,
+Security lint et le scan Trivy partagé sont aussi bloquants dans la CI appelée
+avant publication et sur PR. Les noms de rapports Trivy sont distincts
+(`ci-trivy-results`, `audit-trivy-results`) pour éviter une collision si les deux
+appelants utilisent un même run.
+Il faut distinguer les codes de sortie des outils de leur caractère obligatoire
+avant un merge, qui dépend des règles GitHub.
+Les permissions par défaut sont `contents: read` ; seuls Docker/SARIF et le
+rapport/commentaire PR reçoivent les droits d'écriture nécessaires.
 
-### Déclenchement
+| Contrôle | Politique versionnée |
+|----------|----------------------|
+| npm audit | Échec au niveau modéré et au-dessus |
+| Gitleaks | Analyse de l'historique ; détection = échec |
+| ESLint Security | Gate ciblé avec configuration flat, plugins verrouillés ; diagnostics JSON, pas d'erreur masquée |
+| Trivy | Workflow réutilisable commun ; un scan JSON par invocation, vulnérabilités/secrets HIGH/CRITICAL incluant devDependencies ; outil versionné/checksum vérifié, échec bloquant |
+| Packages obsolètes | Informatif |
+| Hadolint | Push/manuel seulement, deux Dockerfiles, `no-fail: true` ; consultatif |
+| Rapport | Attend les six analyses, `if: always()`, états réels des jobs y compris Trivy réutilisé ; artefact et summary sur les forks aussi ; commentaire uniquement PR du même dépôt |
 
-- Push vers `main` (automatique)
-- Manuel (workflow_dispatch)
+Le rapport ne déduit pas un succès d'un fichier absent et distingue échec,
+annulation, analyse ignorée et succès consultatif. Les logs et artefacts conservent
+les diagnostics détaillés ; ce résumé ne certifie pas l'absence de problème.
+Le commentaire attend l'appel API : une erreur est explicite. Sur une PR de fork,
+le token public est en lecture seule ; aucun commentaire n'est tenté, mais le
+rapport reste archivé et ajouté au résumé du run. Aucun `pull_request_target`,
+secret supplémentaire ou élévation globale n'est introduit.
 
-### Permissions
+Gitleaks 8.30.1 et Trivy 0.75.0 sont téléchargés par version puis vérifiés par
+checksum avant extraction. Les actions sont épinglées par SHA ; images Node et
+Playwright par digest. Les paquets OS installés et bases CVE restent évolutifs.
+Ce n'est ni une build hermétique ni une signature/provenance SLSA.
+Le scan de secrets utilise la redaction ; ne pas publier les valeurs détectées.
+Les heuristiques de lint consultatives sont accessibles par
+`npm run lint:security:advisory`, distinct du gate de publication.
 
-```yaml
-contents: read      # Lire le code
-pages: write       # Écrire sur GitHub Pages
-id-token: write    # Générer token d'authentification
+## Dépendances et couverture
+
+- Dependabot : npm, GitHub Actions et Docker, chaque lundi à 6 h Europe/Paris.
+  La configuration regroupe les mises à jour npm mineures/patch et limite les PR.
+  Les Dockerfiles de `/docker` sont aussi suivis.
+- Codecov : cible projet automatique avec tolérance 1 %, cible patch 80 % avec
+  tolérance 5 %, plage d'affichage 60–100 %.
+- Les seuils Jest sont bloquants pour SeededRandom (100 %) et packaging/smoke
+  (80 % lignes/statements/branches, 100 % fonctions). Aucun seuil global.
+  Voir la [politique qualité](../../docs/guides/software-quality.md).
+- Une protection classique de `main` a été activée sur autorisation et relue
+  via l'API le 3 octobre 2026 : PR, neuf checks natifs après observation de la PR #135, branche à jour,
+  discussions résolues et historique linéaire, y compris pour l'admin.
+  Aucun force-push ni suppression. Zéro approbation externe obligatoire tant
+  qu'un seul reviewer habilité est disponible. Voir le
+  [réglage et la transition des noms de checks](../../docs/DEPLOYMENT.md#protection-de-main--activée-sur-github).
+- La correction locale `close-ci-review-gaps` ne modifie **aucun réglage distant** :
+  les neuf checks exacts restent `Lint`, `Tests`, `TypeScript`, `Build`,
+  `Audit dépendances npm`, `Détection de secrets`, `Browser / Chromium interactions`,
+  `OpenSpec` et `Dependency audit`. `Security lint` et Trivy ne deviennent pas
+  des checks distants requis supplémentaires ; le check déjà requis **Build**
+  agrège leur succès et ferme le trou de merge de Security lint.
+  Cette couverture effective dépend de l'intégration des workflows corrigés ;
+  les tests locaux ne suffisent pas à attester une CI native, fusion ou publication.
+  La [preuve native datée de la PR](../../docs/guides/software-factory.md#livraison-constatée-et-correctifs-locaux)
+  est désormais disponible ; elle ne constitue pas une livraison.
+
+## Vérifier avant une PR
+
+```bash
+make lint
+make security-eslint
+make test
+make npm CMD="run test:coverage"
+make npm CMD="run audit:dependencies"
+make typecheck
+make openspec-validate
+make npm CMD="run build:local"
+make test-e2e
 ```
 
-### Concurrency
-
-Un seul déploiement à la fois (`group: "pages"`). Les déploiements concurrents sont annulés.
-
-### Jobs
-
-#### 2.1 Build
-
-Prépare l'artifact pour le déploiement.
-
-**Étapes** :
-1. Checkout du code
-2. Configuration Node.js 20 avec cache npm
-3. Installation des dépendances (`npm ci`)
-4. Build complet (`npm run build`)
-5. Configuration GitHub Pages
-6. Upload de l'artifact (tout le répertoire racine)
-
-**Ce qui est déployé** :
-- `index.html` (portail principal)
-- `style.css`, `app.js`
-- `tools/` (tous les outils)
-- `games/` (tous les jeux)
-- `parcours/` (contenus pédagogiques)
-- `lib/` (bibliothèques)
-- `data/` (catalogues générés)
-- `assets/` (images, favicons)
-
-#### 2.2 Deploy
-
-Déploie l'artifact sur GitHub Pages.
-
-**Étapes** :
-1. Attend la fin du job `build`
-2. Déploie via `actions/deploy-pages@v4`
-
-**Environment** : `github-pages`
-
-**URL** : Disponible dans `steps.deployment.outputs.page_url`
-
-### Visualisation
-
-```
-┌─────────────────┐
-│  Push to main   │
-└────────┬────────┘
-         │
-         ▼
-    [Build Job]
-         │
-         ├─► npm ci
-         ├─► npm run build
-         ├─► Upload artifact
-         │
-         ▼
-   [Deploy Job]
-         │
-         └─► Deploy to GitHub Pages
-              │
-              ▼
-         🌐 https://z4ppy.github.io/playlab42/
-```
-
-### Rollback
-
-Voir [docs/DEPLOYMENT.md](../../docs/DEPLOYMENT.md) pour la procédure de rollback.
-
-## Workflow 3 : Security Audit
-
-**Fichier** : `.github/workflows/security-audit.yml`
-
-### Déclenchement
-
-- Push vers `main`
-- Pull Request vers `main`
-- Quotidien à 6h UTC (cron: `0 6 * * *`)
-- Manuel (workflow_dispatch)
-
-### Permissions
-
-```yaml
-contents: read          # Lire le code
-security-events: write  # Uploader résultats SARIF
-pull-requests: write    # Commenter les PRs
-```
-
-### Jobs (7 jobs en parallèle)
-
-#### 3.1 npm-audit
-
-Détecte les CVE dans les dépendances npm.
-
-**Commande** : `npm audit --audit-level=moderate`
-
-**Seuil** : Moderate, High, Critical
-
-**Échec si** : Vulnérabilités >= moderate détectées
-
-**Artifacts** :
-- `npm-audit-results.json` (30 jours)
-
-#### 3.2 eslint-security
-
-Analyse statique de sécurité du code JavaScript.
-
-**Plugins installés** :
-- `eslint-plugin-security`
-- `eslint-plugin-no-unsanitized`
-
-**Règles activées** :
-- `security/detect-object-injection`: warn
-- `security/detect-non-literal-regexp`: warn
-- `security/detect-unsafe-regex`: error
-- `security/detect-buffer-noassert`: error
-- `security/detect-eval-with-expression`: error
-- `security/detect-no-csrf-before-method-override`: warn
-- `security/detect-possible-timing-attacks`: warn
-- `no-unsanitized/method`: error
-- `no-unsanitized/property`: error
-
-**Cibles** : `lib/`, `src/`, `games/`
-
-**Artifacts** :
-- `eslint-security-results.json` (30 jours)
-
-#### 3.3 trivy-scan
-
-Scanner de vulnérabilités Trivy (Aqua Security).
-
-**Scanners activés** :
-- `vuln` : Vulnérabilités dans dépendances
-- `secret` : Détection de secrets
-- `misconfig` : Mauvaises configurations
-
-**Sévérités** : CRITICAL, HIGH, MEDIUM
-
-**Format** : JSON + Table (console)
-
-**Artifacts** :
-- `trivy-results.json` (30 jours)
-
-#### 3.4 gitleaks
-
-Détection de secrets dans l'historique Git.
-
-**Action** : `gitleaks/gitleaks-action@v2`
-
-**Scope** : Historique Git complet (`fetch-depth: 0`)
-
-**Échec si** : Secrets détectés (tokens, API keys, passwords)
-
-#### 3.5 outdated-check
-
-Liste les packages obsolètes avec mises à jour disponibles.
-
-**Commandes** :
-- `npm outdated` : Packages avec nouvelles versions
-- `npm audit --parseable` : Packages avec CVE connues
-
-**Échec** : Non (informatif uniquement)
-
-#### 3.6 docker-security
-
-Analyse du Dockerfile avec Hadolint.
-
-**Action** : `hadolint/hadolint-action@v3.3.0`
-
-**Format** : SARIF (uploadé vers Security tab GitHub)
-
-**Déclenchement** : Uniquement sur push et workflow_dispatch (pas sur PR)
-
-**Règles** : Best practices Docker
-- Images de base sécurisées
-- Pas de secrets hardcodés
-- Layers optimisés
-- USER non-root
-
-**Artifacts** :
-- SARIF uploadé vers GitHub Security tab
-
-#### 3.7 security-report
-
-Génère un rapport consolidé de tous les scans.
-
-**Dépendances** : Attend la fin des 6 jobs précédents
-
-**Exécution** : Toujours (`if: always()`)
-
-**Étapes** :
-1. Download de tous les artifacts
-2. Parsing JSON (npm-audit, eslint, trivy)
-3. Génération markdown
-4. Upload du rapport (90 jours)
-5. Affichage console
-6. Commentaire PR (si applicable)
-
-**Format du rapport** :
-
-```markdown
-# 🔒 Rapport de Sécurité Consolidé
-
-**Date**: 2025-12-14 08:30:15 UTC
-**Commit**: abc123def456
-**Branch**: main
-
-## 📊 Résultats par outil
-
-### npm audit
-✅ Aucune vulnérabilité détectée
-
-### ESLint Security
-- Erreurs: 0
-- Warnings: 2
-
-### Trivy
-- Vulnérabilités: 3 (1 HIGH, 2 MEDIUM)
-```
-
-**Artifacts** :
-- `security-report.md` (90 jours)
-
-### Visualisation
-
-```
-┌──────────────────────────────────────┐
-│  Push/PR/Daily 6h UTC                │
-└──────────────┬───────────────────────┘
-               │
-      ┌────────┴────────┐
-      │   7 jobs //     │
-      └────────┬────────┘
-               │
-     ┌─────────┼─────────────────────┐
-     │         │                     │
-     ▼         ▼                     ▼
-[npm-audit] [eslint]  ...   [docker-security]
-     │         │                     │
-     └─────────┴──────┬──────────────┘
-                      ▼
-              [security-report]
-                      │
-                      ├─► Upload artifacts
-                      ├─► Console output
-                      └─► Comment PR
-```
-
-### Artifacts consolidés
-
-Tous les artifacts sont disponibles depuis l'interface GitHub Actions :
-
-```
-Actions > Security Audit > Run #123 > Artifacts
-├── npm-audit-results (30 jours)
-├── eslint-security-results (30 jours)
-├── trivy-results (30 jours)
-└── security-report (90 jours)
-```
-
-## Configuration : Dependabot
-
-**Fichier** : `.github/dependabot.yml`
-
-### Mises à jour automatiques
-
-| Écosystème | Fréquence | Limite PR | Groupement |
-|------------|-----------|-----------|------------|
-| npm | Lundi 6h (Europe/Paris) | 5 PR | dev vs prod dependencies |
-| GitHub Actions | Lundi 6h (Europe/Paris) | 3 PR | Toutes actions |
-| Docker | Lundi 6h (Europe/Paris) | 2 PR | Base images |
-
-### Groupes de dépendances
-
-**npm-dev-dependencies** :
-- Préfixe : `chore(deps-dev):`
-- Inclut : Toutes devDependencies
-
-**npm-prod-dependencies** :
-- Préfixe : `chore(deps):`
-- Inclut : Toutes dependencies
-
-### Labels automatiques
-
-- `dependencies` : Toutes PRs Dependabot
-- `javascript` : PRs npm
-- `github_actions` : PRs actions
-- `docker` : PRs images Docker
-
-### Reviewers
-
-Aucun reviewer configuré (à ajouter selon l'équipe)
-
-## Configuration : Code Coverage
-
-**Fichier** : `codecov.yml`
-
-### Paramètres globaux
-
-- **Precision** : 2 décimales
-- **Round** : Down
-- **Range** : 70-100%
-
-### Status checks
-
-**Project** :
-- Target : Auto (basé sur historique)
-- Threshold : 1%
-- Base : Auto
-
-**Patch** :
-- Target : 80%
-- Base : Auto
-
-### Commentaires PR
-
-- **Layout** : Diff (affiche uniquement les changements)
-- **Require changes** : false
-- **Behavior** : default
-
-### Fichiers ignorés
-
-```yaml
-ignore:
-  - "node_modules/**/*"
-  - "tests/**/*"
-  - "**/*.test.js"
-  - "**/*.spec.js"
-  - "jest.config.js"
-  - "eslint.config.js"
-```
-
-## Monitoring et dashboards
-
-### GitHub Actions
-
-- **Workflows** : https://github.com/z4ppy/playlab42/actions
-- **Security** : https://github.com/z4ppy/playlab42/security
-
-### Codecov
-
-- **Dashboard** : https://codecov.io/gh/z4ppy/playlab42
-- **Badge** : ![codecov](https://codecov.io/gh/z4ppy/playlab42/graph/badge.svg)
-
-### Status badges (README)
-
-```markdown
-[![CI](https://github.com/z4ppy/playlab42/actions/workflows/ci.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/ci.yml)
-[![Deploy](https://github.com/z4ppy/playlab42/actions/workflows/deploy.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/deploy.yml)
-[![codecov](https://codecov.io/gh/z4ppy/playlab42/graph/badge.svg)](https://codecov.io/gh/z4ppy/playlab42)
-```
-
-## Temps d'exécution estimés
-
-| Workflow | Durée moyenne | Cache hit | Cache miss |
-|----------|---------------|-----------|------------|
-| CI (lint) | 45s | 30s | 1m15s |
-| CI (tests) | 1m30s | 1m | 2m |
-| CI (build) | 1m | 45s | 1m45s |
-| **CI Total** | **2-3 min** | **2 min** | **4-5 min** |
-| Deploy | 1m30s | 1m | 2m30s |
-| Security Audit | 5-7 min | 4-5 min | 8-10 min |
-
-**Note** : Les durées dépendent de la charge GitHub Actions et de l'efficacité du cache npm.
-
-## Bonnes pratiques
-
-### Pour les contributeurs
-
-1. **Avant de pusher** :
-   ```bash
-   make lint        # Vérifie le code
-   make test        # Lance les tests
-   make build       # Vérifie le build
-   ```
-
-2. **Suivre les workflows** :
-   - Vérifier le statut des checks sur la PR
-   - Corriger les erreurs lint avant merge
-   - Maintenir coverage >= 80% sur nouveau code
-
-3. **Sécurité** :
-   - Ne jamais committer de secrets
-   - Lire le rapport de sécurité sur les PRs
-   - Corriger les vulnérabilités CRITICAL/HIGH avant merge
-
-### Pour les mainteneurs
-
-1. **Merge uniquement si** :
-   - ✅ Tous les checks CI sont verts
-   - ✅ Coverage >= seuils configurés
-   - ✅ Pas de vulnérabilités bloquantes
-   - ✅ Code review approuvée
-
-2. **Après merge vers main** :
-   - Le déploiement est automatique
-   - Vérifier le déploiement sur GitHub Pages
-   - Surveiller les erreurs dans les logs
-
-3. **Gestion des alertes** :
-   - Dependabot : Review hebdomadaire des PRs
-   - Security Audit : Review quotidienne du rapport (si échecs)
-   - Codecov : Investiguer les chutes de coverage
-
-## Dépannage
-
-Voir [docs/TROUBLESHOOTING.md](../../docs/TROUBLESHOOTING.md) pour les problèmes courants.
-
-### Liens rapides
-
-- **CI échoue** : Vérifier les logs dans Actions > CI
-- **Deploy échoue** : Vérifier les permissions GitHub Pages
-- **Coverage baisse** : Consulter Codecov dashboard
-- **Vulnérabilités** : Voir docs/SECURITY_AUDIT.md
-
-## Évolution des pipelines
-
-Pour proposer des modifications aux workflows :
-
-1. Créer une proposition OpenSpec : `/openspec:proposal`
-2. Documenter les changements dans la spec
-3. Tester localement avec Act (si applicable)
-4. Ouvrir une PR avec les modifications
-5. Mettre à jour cette documentation
-
-## Ressources
-
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Dependabot Documentation](https://docs.github.com/en/code-security/dependabot)
-- [Codecov Documentation](https://docs.codecov.com/)
-- [Trivy Documentation](https://aquasecurity.github.io/trivy/)
-- [GitLeaks Documentation](https://github.com/gitleaks/gitleaks)
-- [Hadolint Documentation](https://github.com/hadolint/hadolint)
-
----
-
-*Document maintenu par l'équipe Docaposte*
-*Dernière mise à jour : 2025-12-14*
+Pour un périmètre réduit, commencer par les sélecteurs pertinents de la
+[matrice de validation](../skills/playlab-release/references/release.md),
+sans les présenter comme une CI complète. Le build normal lit le snapshot OG ;
+`build:local` omet cet enrichissement. Seul `refresh:bookmarks` autorise la collecte.
+
+## Performance : mesurer avant de modifier les gates
+
+La baseline native du lot 2 (run `37132029357`) prend 5 min 40 s dans Build.
+Les métadonnées OG sont terminées à 15:06:46, mais le processus ne rend la main
+qu'à 15:11:28 : environ 282 s sans travail utile. Le fetcher borne désormais
+en-têtes **et corps** et libère les réponses abandonnées, notamment sur HTTP
+en erreur. Les fixtures HTTP réelles terminent naturellement sous trois secondes,
+sans `process.exit()` ni suppression d'analyse.
+
+La fabrication de production locale corrigée a pris 35 s, avec 115 pages
+enrichies, zéro entrée de cache et dix échecs explicitement signalés. Ce n'est
+pas à elle seule une mesure native avant/après.
+Le run natif `37134037265` confirme ensuite un job Build de **1 min 03 s**
+contre **5 min 40 s** (environ 81 % de réduction) ; la commande de fabrication
+passe de 315 s à 39 s. Tous les checks exécutés réussissent, navigateur inclus.
+Les variations de réseau et de charge runner restent possibles.
+Les installations isolées, le cache de téléchargement npm, les jobs parallèles,
+tous les gates et le test de la même archive restent inchangés. Ne pas partager
+`node_modules` entre Alpine et Ubuntu ; les modules natifs peuvent différer.
+Ces mesures décrivent le build réseau historique. Le lot 5 sépare désormais
+le refresh éditorial : la CI fixe SOURCE_DATE_EPOCH, compare deux manifestes,
+vérifie les fichiers et exerce une restauration tar locale. Le navigateur
+revérifie l'archive reçue sans la reconstruire. Mesurer le nouveau run, sans
+présenter ces anciens timings comme ceux du pipeline changé.
+
+La correction `close-ci-review-gaps` ajoute Trivy sur le chemin critique :
+Build et Browser attendent le plus lent des deux gates de sécurité.
+L'audit complémentaire conserve son invocation indépendante du même workflow ;
+cela partage la logique, pas l'exécution ni la base téléchargée entre runs.
+Installation et mise à jour CVE peuvent rallonger la CI ou échouer avec le réseau.
+Les tests locaux de contrat ne mesurent pas cette durée native. Sur la première
+CI de la PR #145 (head `a5598b2`, run `37148235271`), les jobs ont pris 14 s
+pour Trivy, 21 s pour Build et 101 s pour Browser, soit 149 s entre le premier
+départ et la dernière fin. C'est une seule observation, pas une comparaison
+contrôlée ou un budget garanti ; suivre les prochains runs sans réduire les
+seuils ni rendre le scanner consultatif.
+
+## Évolution
+
+Une nouvelle garantie de livraison se décrit avec le workflow
+[OPSX](../../docs/guides/openspec-workflow.md), les tests de contrat des workflows
+et une observation de la CI native après PR. Ne pas inventer un check réussi
+sur la seule présence d'une étape YAML.
+
+La [feuille de route de l'usine](../../docs/guides/software-factory.md#aller-plus-loin--ce-qui-manque-encore)
+sépare les améliorations proposées des garanties automatisées.
+
+Actualisé le 3 octobre 2026.

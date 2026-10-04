@@ -14,6 +14,9 @@ description: >-
 
 Lire [AGENTS.md](../../../AGENTS.md), `docs/guides/contributing.md`,
 `Makefile`, `package.json` et [la matrice de validation](references/release.md).
+Appliquer le [guide qualité](../../../docs/guides/software-quality.md).
+Le [skill de revue](../playlab-review/SKILL.md) complète cette préparation :
+revue de conception et de comportement, sans autorisation implicite de livraison.
 Les chemins en code sont relatifs à la racine du dépôt.
 
 1. Inspecter branche, état Git et diff. Ne pas réinitialiser les modifications
@@ -40,6 +43,20 @@ du même runner. Ajouter les builds/catalogues nécessaires et les parcours
 navigateur pour les interactions. Avant une livraison complète, appliquer aussi
 les exigences globales d'`AGENTS.md` et de CI, sans présenter une validation
 ciblée comme l'équivalent d'une CI complète.
+Pour le code et la chaîne de fabrication, contrôler aussi `test:coverage` et
+`audit:dependencies`. Une panne d'audit est un échec explicite ; ne pas baisser
+un seuil, ignorer une CVE ou lancer un fix forcé pour contourner le contrôle.
+Pour un changement d'action, image ou scanner, vérifier SHA/digest/checksum
+sur la source officielle, puis les contrats et l'exécution de l'outil.
+Suivre la politique d'exceptions du guide qualité : portée, preuve, suivi et
+date de réexamen. Une dépendance incompatible n'est pas installée avec force ;
+utiliser le lint `.ts` Biome puis tsc, sans annoncer une analyse typée ou les
+règles de sécurité ESLint sur TS. Pour les HTML, vérifier scripts et politique
+sans attributs événementiels ; le plugin ne contrôle pas le markup.
+Pour la fabrication, vérifier snapshot OG, manifeste/SBOM et comparaison des
+deux builds. `check:recovery` n'exerce qu'une archive locale ; le
+[runbook](../../../docs/guides/artifact-operations.md) ne donne aucune autorisation
+de restaurer la production. Ne pas confondre manifeste hashé et signature.
 
 Ne pas ignorer un code de sortie, supprimer un test, modifier les règles d'un jeu
 ou mettre à jour une dépendance sans rapport pour faire passer une release.

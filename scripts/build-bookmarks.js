@@ -4,12 +4,18 @@
  * Génère data/bookmarks.json à partir des fichiers bookmarks/ et des manifests
  */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { fetchOGMetadata, loadCache, saveCache } from './og-fetcher.js';
+import { publishCatalogue } from './lib/build-report.js';
+import { loadOGSnapshot, validateOGSnapshot, editorialMetadata } from './lib/bookmark-metadata.js';
 import {
   getRootDir,
   extractDomain,
+  readJSONSync,
+  writeJSONAtomicSync,
+  getBuildTimestamp,
+  printReport,
 } from './lib/build-utils.js';
 
 const ROOT = getRootDir(import.meta.url);
@@ -19,6 +25,7 @@ const GAMES_DIR = join(ROOT, 'games');
 const EPICS_DIR = join(ROOT, 'parcours', 'epics');
 const OUTPUT_FILE = join(ROOT, 'data', 'bookmarks.json');
 const CONFIG_FILE = join(BOOKMARKS_DIR, 'index.json');
+const SNAPSHOT_FILE = join(ROOT, 'metadata', 'bookmarks-og.json');
 
 // Statistiques
 const stats = {
@@ -33,18 +40,6 @@ const stats = {
   errors: [],
   warnings: [],
 };
-
-/**
- * Lit et parse un fichier JSON
- */
-function readJSON(path) {
-  try {
-    return JSON.parse(readFileSync(path, 'utf-8'));
-  } catch (err) {
-    stats.errors.push(`Erreur lecture ${path}: ${err.message}`);
-    return null;
-  }
-}
 
 /**
  * Valide un bookmark
@@ -65,6 +60,21 @@ function validateBookmark(bookmark, source) {
     return false;
   }
   return true;
+}
+
+/**
+ * Retourne la catégorie demandée, en la créant avec les valeurs par défaut si besoin
+ */
+function ensureCategory(categories, categoryId) {
+  if (!categories.has(categoryId)) {
+    categories.set(categoryId, {
+      id: categoryId,
+      label: categoryId,
+      order: 50,
+      bookmarks: [],
+    });
+  }
+  return categories.get(categoryId);
 }
 
 /**
@@ -92,22 +102,10 @@ function scanStandaloneBookmarks(config) {
 
   for (const file of files) {
     const filePath = join(BOOKMARKS_DIR, file);
-    const data = readJSON(filePath);
+    const data = readJSONSync(filePath, stats);
     if (!data) {continue;}
 
-    const categoryId = data.category || file.replace('.json', '');
-
-    // Créer la catégorie si elle n'existe pas
-    if (!categories.has(categoryId)) {
-      categories.set(categoryId, {
-        id: categoryId,
-        label: categoryId,
-        order: 50,
-        bookmarks: [],
-      });
-    }
-
-    const category = categories.get(categoryId);
+    const category = ensureCategory(categories, data.category || file.replace('.json', ''));
 
     for (const bookmark of data.bookmarks || []) {
       if (validateBookmark(bookmark, `standalone:${file}`)) {
@@ -125,6 +123,28 @@ function scanStandaloneBookmarks(config) {
 }
 
 /**
+ * Extrait les bookmarks valides d'un manifest de module (tool, game ou parcours)
+ * @param {object} manifest
+ * @param {'tool'|'game'|'parcours'} source
+ * @returns {object[]}
+ */
+function collectModuleBookmarks(manifest, source) {
+  const bookmarks = [];
+  for (const bookmark of manifest.bookmarks) {
+    if (validateBookmark(bookmark, `${source}:${manifest.id}`)) {
+      bookmarks.push({
+        ...bookmark,
+        source,
+        sourceId: manifest.id,
+        domain: extractDomain(bookmark.url),
+      });
+      stats.fromModules++;
+    }
+  }
+  return bookmarks;
+}
+
+/**
  * Scanne les manifests tools pour extraire les bookmarks
  */
 function scanToolsBookmarks() {
@@ -137,20 +157,10 @@ function scanToolsBookmarks() {
 
   for (const file of files) {
     const filePath = join(TOOLS_DIR, file);
-    const manifest = readJSON(filePath);
+    const manifest = readJSONSync(filePath, stats);
     if (!manifest?.bookmarks) {continue;}
 
-    for (const bookmark of manifest.bookmarks) {
-      if (validateBookmark(bookmark, `tool:${manifest.id}`)) {
-        bookmarks.push({
-          ...bookmark,
-          source: 'tool',
-          sourceId: manifest.id,
-          domain: extractDomain(bookmark.url),
-        });
-        stats.fromModules++;
-      }
-    }
+    bookmarks.push(...collectModuleBookmarks(manifest, 'tool'));
   }
 
   return bookmarks;
@@ -171,20 +181,10 @@ function scanGamesBookmarks() {
     const manifestPath = join(GAMES_DIR, dir, 'game.json');
     if (!existsSync(manifestPath)) {continue;}
 
-    const manifest = readJSON(manifestPath);
+    const manifest = readJSONSync(manifestPath, stats);
     if (!manifest?.bookmarks) {continue;}
 
-    for (const bookmark of manifest.bookmarks) {
-      if (validateBookmark(bookmark, `game:${manifest.id}`)) {
-        bookmarks.push({
-          ...bookmark,
-          source: 'game',
-          sourceId: manifest.id,
-          domain: extractDomain(bookmark.url),
-        });
-        stats.fromModules++;
-      }
-    }
+    bookmarks.push(...collectModuleBookmarks(manifest, 'game'));
   }
 
   return bookmarks;
@@ -205,20 +205,10 @@ function scanParcoursBookmarks() {
     const manifestPath = join(EPICS_DIR, dir, 'epic.json');
     if (!existsSync(manifestPath)) {continue;}
 
-    const manifest = readJSON(manifestPath);
+    const manifest = readJSONSync(manifestPath, stats);
     if (!manifest?.bookmarks || manifest.draft) {continue;}
 
-    for (const bookmark of manifest.bookmarks) {
-      if (validateBookmark(bookmark, `parcours:${manifest.id}`)) {
-        bookmarks.push({
-          ...bookmark,
-          source: 'parcours',
-          sourceId: manifest.id,
-          domain: extractDomain(bookmark.url),
-        });
-        stats.fromModules++;
-      }
-    }
+    bookmarks.push(...collectModuleBookmarks(manifest, 'parcours'));
   }
 
   return bookmarks;
@@ -276,6 +266,8 @@ function deduplicateBookmarks(categories, moduleBookmarks) {
  */
 async function enrichWithOGMetadata(categories) {
   const cache = loadCache();
+  const previous = loadOGSnapshot(SNAPSHOT_FILE, true);
+  const entries = {};
   const allBookmarks = [];
 
   // Collecter tous les bookmarks
@@ -295,12 +287,8 @@ async function enrichWithOGMetadata(categories) {
       if (result.fromCache) {
         stats.ogCached++;
       } else if (result.failed) {
-        // L'échec réseau reste un échec : le repli fournit l'image versionnée,
-        // pas le titre ni la description à jour.
+        // Les métadonnées précédentes restent utilisables, pas à jour pour autant.
         stats.ogFailed++;
-        if (result.meta?.fromVersionedImage) {
-          stats.ogImageRecovered++;
-        }
       } else if (result.meta) {
         stats.ogFetched++;
       } else {
@@ -308,19 +296,43 @@ async function enrichWithOGMetadata(categories) {
       }
 
       // Enrichir le bookmark (titre/description/image manuels prioritaires, OG en fallback)
-      bookmark.meta = result.meta || {};
+      entries[bookmark.url] = editorialMetadata(result, bookmark.url, previous);
+      bookmark.meta = { ...entries[bookmark.url] };
+      if (result.failed && bookmark.meta.ogImage?.startsWith('data/bookmarks-images/')) {
+        stats.ogImageRecovered++;
+      }
       // Si une image est spécifiée manuellement dans le bookmark, l'utiliser
       if (bookmark.image) {
         bookmark.meta.ogImage = bookmark.image;
       }
-      bookmark.displayTitle = bookmark.title || result.meta?.ogTitle;
-      bookmark.displayDescription = bookmark.description || result.meta?.ogDescription;
+      bookmark.displayTitle = bookmark.title || bookmark.meta.ogTitle;
+      bookmark.displayDescription = bookmark.description || bookmark.meta.ogDescription;
     }));
   }
 
   // Sauvegarder le cache
   saveCache(cache);
+  const snapshot = { version: 1, entries: Object.fromEntries(Object.keys(entries).sort().map(url => [url, entries[url]])) };
+  validateOGSnapshot(snapshot);
+  writeJSONAtomicSync(SNAPSHOT_FILE, snapshot);
+  console.log(`Snapshot OG actualisé : ${SNAPSHOT_FILE} ; relire le diff avant commit.`);
 
+  return categories;
+}
+
+function enrichFromSnapshot(categories) {
+  const entries = loadOGSnapshot(SNAPSHOT_FILE);
+  for (const category of categories.values()) {
+    for (const bookmark of category.bookmarks) {
+      const meta = entries[bookmark.url];
+      if (!meta || !Object.keys(meta).length) {stats.warnings.push(`Métadonnées OG absentes du snapshot : ${bookmark.url}`);}
+      bookmark.meta = { ...meta };
+      if (bookmark.image) {bookmark.meta.ogImage = bookmark.image;}
+      bookmark.displayTitle = bookmark.title || bookmark.meta.ogTitle;
+      bookmark.displayDescription = bookmark.description || bookmark.meta.ogDescription;
+    }
+  }
+  console.log('\nMétadonnées OG : snapshot éditorial, sans accès réseau.');
   return categories;
 }
 
@@ -344,6 +356,38 @@ function aggregateTags(categories) {
 }
 
 /**
+ * Choisit l'enrichissement selon les options : snapshot versionné par défaut,
+ * --skip-og sans métadonnées, --refresh-og pour le réseau éditorial.
+ */
+function enrichCategories(categories) {
+  const skipOG = process.argv.includes('--skip-og');
+  const refreshOG = process.argv.includes('--refresh-og');
+  if (skipOG && refreshOG) {
+    throw new Error('--skip-og et --refresh-og sont incompatibles.');
+  }
+  if (skipOG) {
+    console.log('\nEnrichissement Open Graph ignoré (--skip-og).');
+    return categories;
+  }
+  return refreshOG ? enrichWithOGMetadata(categories) : enrichFromSnapshot(categories);
+}
+
+/**
+ * Affiche les compteurs du rapport, avant avertissements et erreurs
+ */
+function printCounts(catalogue) {
+  const totalBookmarks = catalogue.categories.reduce((sum, c) => sum + c.bookmarks.length, 0);
+  console.log('\n--- Rapport ---');
+  console.log(`Catégories: ${catalogue.categories.length}`);
+  console.log(`Bookmarks total: ${totalBookmarks}`);
+  console.log(`Tags uniques: ${catalogue.tags.length}`);
+  const recovered = stats.ogImageRecovered
+    ? ` (dont ${stats.ogImageRecovered} avec image versionnée conservée)`
+    : '';
+  console.log(`Métadonnées OG: ${stats.ogFetched} fetchées, ${stats.ogCached} en cache, ${stats.ogFailed} échouées${recovered}`);
+}
+
+/**
  * Point d'entrée principal
  */
 async function main() {
@@ -351,7 +395,7 @@ async function main() {
   console.log('===============\n');
 
   // Charger la config
-  const config = readJSON(CONFIG_FILE) || { categories: [] };
+  const config = readJSONSync(CONFIG_FILE, stats) || { categories: [] };
   console.log('Config chargée:', CONFIG_FILE);
 
   // Scanner les sources
@@ -374,11 +418,12 @@ async function main() {
     console.log(`  ${stats.duplicates} doublons supprimés`);
   }
 
-  if (process.argv.includes('--skip-og')) {
-    console.log('\nEnrichissement Open Graph ignoré (--skip-og).');
-  } else {
-    categories = await enrichWithOGMetadata(categories);
+  if (stats.errors.length) {
+    printReport(stats);
+    process.exit(1);
   }
+
+  categories = await enrichCategories(categories);
 
   // Construire le catalogue
   console.log('\nConstruction du catalogue...');
@@ -386,41 +431,20 @@ async function main() {
     .filter(c => c.bookmarks.length > 0)
     .sort((a, b) => (a.order || 99) - (b.order || 99));
 
-  const totalBookmarks = sortedCategories.reduce((sum, c) => sum + c.bookmarks.length, 0);
-
   const catalogue = {
     version: '1.0',
-    generatedAt: new Date().toISOString(),
+    generatedAt: getBuildTimestamp(),
     categories: sortedCategories,
     tags: aggregateTags(categories),
   };
 
-  // Écrire le fichier
-  writeFileSync(OUTPUT_FILE, JSON.stringify(catalogue, null, 2));
-  console.log(`\nCatalogue généré: ${OUTPUT_FILE}`);
-
-  // Rapport
-  console.log('\n--- Rapport ---');
-  console.log(`Catégories: ${sortedCategories.length}`);
-  console.log(`Bookmarks total: ${totalBookmarks}`);
-  console.log(`Tags uniques: ${catalogue.tags.length}`);
-  const recovered = stats.ogImageRecovered
-    ? ` (dont ${stats.ogImageRecovered} avec image versionnée conservée)`
-    : '';
-  console.log(`Métadonnées OG: ${stats.ogFetched} fetchées, ${stats.ogCached} en cache, ${stats.ogFailed} échouées${recovered}`);
-
-  if (stats.warnings.length > 0) {
-    console.log(`\nWarnings (${stats.warnings.length}):`);
-    stats.warnings.forEach(w => console.log(`  ⚠️  ${w}`));
-  }
-
-  if (stats.errors.length > 0) {
-    console.log(`\nErreurs (${stats.errors.length}):`);
-    stats.errors.forEach(e => console.log(`  ❌ ${e}`));
+  printCounts(catalogue);
+  if (!publishCatalogue(OUTPUT_FILE, catalogue, stats)) {
     process.exit(1);
   }
-
-  console.log('\n✅ Build terminé avec succès');
 }
 
-main();
+main().catch(error => {
+  console.error(`Build Bookmarks impossible : ${error.message}`);
+  process.exitCode = 1;
+});

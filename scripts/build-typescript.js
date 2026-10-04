@@ -4,7 +4,7 @@
  * build-typescript.js - Transpile les fichiers TypeScript vers JavaScript
  *
  * Utilise esbuild pour une transpilation rapide.
- * Les fichiers .ts sont transpilés en .js dans un dossier dist/ adjacent.
+ * Les fichiers .ts sont transpilés en .js dans dist/, avec imports recalés.
  *
  * Usage:
  *   node scripts/build-typescript.js           # Build une fois
@@ -14,8 +14,9 @@
  */
 
 import * as esbuild from 'esbuild';
+import { existsSync } from 'fs';
 import { readdir, mkdir } from 'fs/promises';
-import { join, dirname, relative, basename } from 'path';
+import { join, dirname, relative, basename, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 // Obtenir le répertoire racine du projet
@@ -36,6 +37,21 @@ const colors = {
   dim: '\x1b[2m',
 };
 
+// Racines scannées par le build ponctuel comme par le mode watch
+const SCAN_DIRS = ['lib', 'tools', 'games', 'parcours'].map(name => join(ROOT_DIR, name));
+const IGNORED_DIRECTORIES = new Set(['node_modules', 'dist', '__tests__', '__mocks__']);
+
+function isIgnoredDirectory(name) {
+  return IGNORED_DIRECTORIES.has(name) || name.startsWith('.');
+}
+
+function isSourceFile(entry) {
+  return entry.isFile()
+    && entry.name.endsWith('.ts')
+    && !entry.name.endsWith('.d.ts')
+    && !entry.name.endsWith('.test.ts');
+}
+
 /**
  * Trouve tous les fichiers TypeScript dans un dossier
  * @param {string} dir - Dossier à scanner
@@ -49,24 +65,11 @@ async function findTsFiles(dir, files = []) {
     for (const entry of entries) {
       const fullPath = join(dir, entry.name);
 
-      // Ignorer les dossiers spéciaux
       if (entry.isDirectory()) {
-        if (
-          entry.name === 'node_modules' ||
-          entry.name === 'dist' ||
-          entry.name === '__tests__' ||
-          entry.name === '__mocks__' ||
-          entry.name.startsWith('.')
-        ) {
-          continue;
+        if (!isIgnoredDirectory(entry.name)) {
+          await findTsFiles(fullPath, files);
         }
-        await findTsFiles(fullPath, files);
-      } else if (
-        entry.isFile() &&
-        entry.name.endsWith('.ts') &&
-        !entry.name.endsWith('.d.ts') &&
-        !entry.name.endsWith('.test.ts')
-      ) {
+      } else if (isSourceFile(entry)) {
         files.push(fullPath);
       }
     }
@@ -78,8 +81,21 @@ async function findTsFiles(dir, files = []) {
 }
 
 /**
+ * Trouve les sources TypeScript de toutes les racines scannées
+ * @returns {Promise<string[]>}
+ */
+async function findAllTsFiles() {
+  const allFiles = [];
+  for (const dir of SCAN_DIRS) {
+    allFiles.push(...await findTsFiles(dir));
+  }
+  return allFiles;
+}
+
+/**
  * Détermine le dossier de sortie pour un fichier source
- * Les fichiers sont transpilés dans un dossier dist/ adjacent au fichier source
+ * src/ et les modules engine/ conservent leur arbre sous dist/.
+ * Les autres fichiers gardent leur dossier dist/ adjacent historique.
  *
  * @param {string} srcPath - Chemin du fichier source
  * @returns {string} - Chemin du fichier de sortie
@@ -87,6 +103,13 @@ async function findTsFiles(dir, files = []) {
 function getOutputPath(srcPath) {
   const dir = dirname(srcPath);
   const filename = `${basename(srcPath, '.ts')}.js`;
+
+  // Les responsabilités extraites d'un moteur partagent son arbre dist/engine/.
+  // Les bots conservent leur convention historique bots/dist/.
+  const engineModule = relative(ROOT_DIR, srcPath).match(/^(games\/[^/]+)\/engine\/(.+)\.ts$/);
+  if (engineModule) {
+    return join(ROOT_DIR, engineModule[1], 'dist', 'engine', `${engineModule[2]}.js`);
+  }
 
   // Si le fichier est dans un dossier src/, mettre le dist/ au même niveau
   if (dir.includes('/src')) {
@@ -97,6 +120,51 @@ function getOutputPath(srcPath) {
 
   // Sinon, mettre dist/ à côté du fichier
   return join(dir, 'dist', filename);
+}
+
+/**
+ * Recale les imports depuis leur source vers le fichier réellement publié.
+ * Les dépendances restent externes : ni copie du RNG, ni façade générée.
+ * @param {string} srcPath
+ * @returns {import('esbuild').BuildOptions}
+ */
+function getBuildOptions(srcPath) {
+  const outPath = getOutputPath(srcPath);
+  return {
+    entryPoints: [srcPath],
+    outfile: outPath,
+    format: 'esm',
+    target: 'es2022',
+    sourcemap: true,
+    bundle: true,
+    packages: 'external',
+    plugins: [{
+      name: 'published-imports',
+      setup(build) {
+        build.onResolve({ filter: /^(\.|@lib\/)/ }, args => {
+          if (args.kind === 'entry-point') {
+            return;
+          }
+          const sourceTarget = args.path.startsWith('@lib/')
+            ? join(ROOT_DIR, 'lib', args.path.slice('@lib/'.length))
+            : resolve(args.resolveDir, args.path);
+          const tsTarget = sourceTarget.replace(/\.js$/, '.ts');
+          const target = tsTarget.endsWith('.ts') && existsSync(tsTarget)
+            ? getOutputPath(tsTarget)
+            : existsSync(sourceTarget) ? sourceTarget : null;
+          // Certains imports historiques sont déjà exprimés depuis dist/.
+          if (!target) {
+            return { path: args.path, external: true };
+          }
+          const publishedPath = relative(dirname(outPath), target).replaceAll('\\', '/');
+          return {
+            path: publishedPath.startsWith('.') ? publishedPath : `./${publishedPath}`,
+            external: true,
+          };
+        });
+      },
+    }],
+  };
 }
 
 /**
@@ -111,15 +179,7 @@ async function buildFile(srcPath) {
   await mkdir(outDir, { recursive: true });
 
   try {
-    await esbuild.build({
-      entryPoints: [srcPath],
-      outfile: outPath,
-      format: 'esm',
-      target: 'es2022',
-      sourcemap: true,
-      // Garder les imports .js (le navigateur ne résout pas .ts)
-      // esbuild convertit automatiquement les imports .ts vers .js
-    });
+    await esbuild.build(getBuildOptions(srcPath));
 
     if (VERBOSE) {
       const relSrc = relative(ROOT_DIR, srcPath);
@@ -147,20 +207,7 @@ async function buildFile(srcPath) {
 async function buildAll() {
   console.log(`\n${colors.cyan}Building TypeScript files...${colors.reset}\n`);
 
-  // Dossiers à scanner
-  const scanDirs = [
-    join(ROOT_DIR, 'lib'),
-    join(ROOT_DIR, 'tools'),
-    join(ROOT_DIR, 'games'),
-    join(ROOT_DIR, 'parcours'),
-  ];
-
-  // Trouver tous les fichiers .ts
-  const allFiles = [];
-  for (const dir of scanDirs) {
-    const files = await findTsFiles(dir);
-    allFiles.push(...files);
-  }
+  const allFiles = await findAllTsFiles();
 
   if (allFiles.length === 0) {
     console.log(`${colors.yellow}  Aucun fichier TypeScript trouvé${colors.reset}`);
@@ -208,59 +255,25 @@ async function watch() {
   await buildAll();
 
   // Surveiller les changements avec esbuild context
-  const scanDirs = [
-    join(ROOT_DIR, 'lib'),
-    join(ROOT_DIR, 'tools'),
-    join(ROOT_DIR, 'games'),
-    join(ROOT_DIR, 'parcours'),
-  ];
-
-  // Trouver tous les fichiers .ts initiaux
-  const allFiles = [];
-  for (const dir of scanDirs) {
-    const files = await findTsFiles(dir);
-    allFiles.push(...files);
-  }
+  const allFiles = await findAllTsFiles();
 
   if (allFiles.length === 0) {
     console.log(`${colors.yellow}  Aucun fichier à surveiller${colors.reset}`);
     return;
   }
 
-  // Créer un context esbuild pour le watch
-  const ctx = await esbuild.context({
-    entryPoints: allFiles,
-    outdir: ROOT_DIR,
-    format: 'esm',
-    target: 'es2022',
-    sourcemap: true,
-    outbase: ROOT_DIR,
-    // Plugin pour transformer les chemins de sortie
-    plugins: [
-      {
-        name: 'custom-output',
-        setup(build) {
-          build.onEnd(result => {
-            if (result.errors.length > 0) {
-              console.log(`${colors.red}  Erreurs de build${colors.reset}`);
-            } else {
-              const now = new Date().toLocaleTimeString();
-              console.log(
-                `${colors.dim}[${now}]${colors.reset} ${colors.green}Rebuild terminé${colors.reset}`,
-              );
-            }
-          });
-        },
-      },
-    ],
-  });
-
-  await ctx.watch();
+  // Même sortie et même résolution que le build ponctuel, sans écrire sur les sources.
+  const contexts = [];
+  for (const file of allFiles) {
+    const ctx = await esbuild.context(getBuildOptions(file));
+    contexts.push(ctx);
+    await ctx.watch();
+  }
 
   // Garder le processus actif
   process.on('SIGINT', async () => {
     console.log(`\n${colors.dim}Arrêt du watch...${colors.reset}`);
-    await ctx.dispose();
+    await Promise.all(contexts.map(ctx => ctx.dispose()));
     process.exit(0);
   });
 }

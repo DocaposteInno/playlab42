@@ -76,7 +76,7 @@
 
     <div class="mode-card">
       <h4>Bloc de code</h4>
-      <p>Plusieurs lignes suggérées simultanément. Activé pour les structures logiques : <code>if/else</code>, boucles, <code>try/catch</code>, fonctions courtes. Les blocs sont cohérents et correctement indentés.</p>
+      <p>Plusieurs lignes suggérées simultanément, par exemple pour <code>if/else</code>, boucles ou fonctions courtes. Vérifiez leur cohérence, leur indentation et les cas limites.</p>
     </div>
 
     <div class="mode-card">
@@ -84,7 +84,7 @@
       <p>Génère une fonction complète à partir d'une signature ou d'un commentaire. Particulièrement efficace après un <strong>commentaire JSDoc, docstring Python, ou XML C#</strong>.</p>
     </div>
 
-    <h2>Next Edit Suggestions <span class="nes-feature">NEW</span></h2>
+    <h2>Next Edit Suggestions (NES)</h2>
 
     <p><strong>Next Edit Suggestions</strong> est une fonctionnalité avancée qui prédit le prochain endroit à éditer dans votre code.</p>
 
@@ -106,7 +106,7 @@
         </tr>
         <tr>
           <td><strong>Activation</strong></td>
-          <td>VS Code uniquement (pour l'instant)</td>
+          <td>Dans VS Code, via le réglage ci-dessous. Pour les autres IDE, consultez leur documentation et version du plugin.</td>
         </tr>
         <tr>
           <td><strong>Config</strong></td>
@@ -226,20 +226,13 @@ function validateEmail(email) {</code></pre>
 
     <h2>Fichiers à exclure</h2>
 
-    <p>Pour des raisons de sécurité, désactivez Copilot sur les fichiers sensibles :</p>
-
-    <pre><code>{
-  "github.copilot.enable": {
-    "*.env": false,
-    "*.secrets": false,
-    "*.pem": false,
-    "*.key": false
-  }
-}</code></pre>
+    <p><code>github.copilot.enable</code> prend des <strong>identifiants de langage</strong>, pas des globs comme <code>*.env</code>. Désactiver la complétion ne bloque pas la lecture d'un fichier par un agent ou un outil MCP.</p>
+    <p>Ne placez pas de secrets dans le contexte, les prompts ou les captures. Utilisez les exclusions de contenu proposées par votre offre et vérifiez leur périmètre : elles ne s'appliquent pas nécessairement aux agents CLI ou cloud. Une règle dans <code>.gitignore</code> n'est pas non plus une permission d'accès.</p>
 
     <blockquote>
       <strong>Rappel :</strong> Toujours relire et tester les suggestions. Copilot est un assistant, pas un remplaçant de votre jugement.
     </blockquote>
+    <p><strong>Source :</strong> <a href="https://code.visualstudio.com/docs/copilot/ai-powered-suggestions" target="_blank" rel="noopener noreferrer">Suggestions de code et NES dans VS Code</a>.</p>
   </article>
 </body>
 </html>

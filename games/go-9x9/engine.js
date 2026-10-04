@@ -1,6 +1,29 @@
 /**
  * Go 9x9 - Moteur isomorphe
  * Règles : plateau 9x9, ko simple, suicide interdit, scoring chinois avec komi 6.5.
+ * Validation et énumération partagent le même contrôle suicide/ko ; le score
+ * distingue le comptage des pierres et l'exploration des régions vides.
+ *
+ * @typedef {{type: 'place', x: number, y: number} | {type: 'pass' | 'resign'}} GoAction
+ * @typedef {{seed: number, playerIds: [string, string], manualScoring?: boolean}} GoConfig
+ * @typedef {Object} GoState
+ * @property {number} boardSize
+ * @property {number[][]} board
+ * @property {string | null} currentPlayerId
+ * @property {[string, string]} playerIds
+ * @property {boolean} gameOver
+ * @property {string[] | null} winners
+ * @property {number} turn
+ * @property {number} rngState
+ * @property {number} komi
+ * @property {Record<string, number>} captures
+ * @property {number} passesInARow
+ * @property {number[][] | null} previousBoard
+ * @property {GoAction | null} lastMove
+ * @property {{black: number, white: number} | null} scores
+ * @property {boolean} [manualScoring] Revue manuelle activée explicitement.
+ * @property {boolean} [scoring] Revue en cours, sans vainqueur ni score final.
+ * @property {number[]} [deadStones] Indices y * 9 + x des groupes marqués morts.
  */
 
 const EMPTY = 0;
@@ -60,34 +83,12 @@ function floodTerritory(board) {
     for (let x = 0; x < BOARD_SIZE; x++) {
       if (board[y][x] !== EMPTY || visited[y][x]) {continue;}
 
-      const queue = [[x, y]];
-      visited[y][x] = true;
-      const empties = [];
-      const borders = new Set();
-
-      while (queue.length) {
-        const [cx, cy] = queue.pop();
-        empties.push([cx, cy]);
-
-        for (const [nx, ny] of getNeighbors(cx, cy)) {
-          const cell = board[ny][nx];
-          if (cell === EMPTY && !visited[ny][nx]) {
-            visited[ny][nx] = true;
-            queue.push([nx, ny]);
-          } else if (cell === BLACK) {
-            borders.add(BLACK);
-          } else if (cell === WHITE) {
-            borders.add(WHITE);
-          }
-        }
-      }
-
+      const { size, borders } = collectTerritory(board, visited, x, y);
       if (borders.size === 1) {
-        const owner = borders.has(BLACK) ? BLACK : WHITE;
-        if (owner === BLACK) {
-          black += empties.length;
+        if (borders.has(BLACK)) {
+          black += size;
         } else {
-          white += empties.length;
+          white += size;
         }
       }
     }
@@ -96,16 +97,45 @@ function floodTerritory(board) {
   return { black, white };
 }
 
+/** Explore une région vide ; les frontières mixtes restent neutres. */
+function collectTerritory(board, visited, x, y) {
+  const queue = [[x, y]];
+  visited[y][x] = true;
+  let size = 0;
+  const borders = new Set();
+  while (queue.length) {
+    const [cx, cy] = queue.pop();
+    size++;
+    for (const [nx, ny] of getNeighbors(cx, cy)) {
+      const cell = board[ny][nx];
+      if (cell === EMPTY && !visited[ny][nx]) {
+        visited[ny][nx] = true;
+        queue.push([nx, ny]);
+      } else if (cell === BLACK || cell === WHITE) {
+        borders.add(cell);
+      }
+    }
+  }
+  return { size, borders };
+}
+
+function availableIntersection(board, x, y) {
+  return Number.isInteger(x) && Number.isInteger(y)
+    && inBounds(x, y) && board[y][x] === EMPTY;
+}
+
 function cloneState(state) {
   return {
     ...state,
     board: cloneBoard(state.board),
     captures: { ...state.captures },
     previousBoard: state.previousBoard ? cloneBoard(state.previousBoard) : null,
+    ...(state.manualScoring ? { deadStones: [...state.deadStones] } : {}),
   };
 }
 
 export class Go9x9Engine {
+  /** @param {GoConfig} config @returns {GoState} */
   init(config) {
     return {
       boardSize: BOARD_SIZE,
@@ -125,9 +155,16 @@ export class Go9x9Engine {
       previousBoard: null,
       lastMove: null,
       scores: null,
+      ...(config.manualScoring ? { manualScoring: true, scoring: false, deadStones: [] } : {}),
     };
   }
 
+  /**
+   * @param {GoState} state
+   * @param {GoAction} action
+   * @param {string} playerId
+   * @returns {GoState}
+   */
   applyAction(state, action, playerId) {
     if (!this.isValidAction(state, action, playerId)) {
       throw new Error('Invalid action');
@@ -142,7 +179,7 @@ export class Go9x9Engine {
       newState.passesInARow += 1;
       newState.currentPlayerId = this.#nextPlayer(state);
       if (newState.passesInARow >= 2) {
-        this.#finalizeScore(newState);
+        this.#endByPass(newState);
       }
       return newState;
     }
@@ -167,29 +204,28 @@ export class Go9x9Engine {
     return newState;
   }
 
+  /**
+   * @param {GoState} state
+   * @param {GoAction} action
+   * @param {string} playerId
+   * @returns {boolean}
+   */
   isValidAction(state, action, playerId) {
-    if (state.gameOver || state.currentPlayerId !== playerId) {return false;}
+    if (!this.#isPlayingTurn(state, playerId)) {return false;}
+    if (!action || typeof action !== 'object' || Array.isArray(action)) {return false;}
     if (action.type === 'pass' || action.type === 'resign') {return true;}
 
     if (action.type !== 'place') {return false;}
     const { x, y } = action;
-    if (!inBounds(x, y)) {return false;}
-    if (state.board[y][x] !== EMPTY) {return false;}
+    if (!availableIntersection(state.board, x, y)) {return false;}
 
     const color = this.#colorForPlayer(state, playerId);
-    const sim = this.#simulatePlacement(state, x, y, color);
-
-    // Suicide interdit
-    if (sim.suicide) {return false;}
-
-    // Ko simple : ne pas recréer le plateau précédent
-    if (state.previousBoard && boardsEqual(sim.board, state.previousBoard)) {return false;}
-
-    return true;
+    return this.#isLegalPlacement(state, x, y, color);
   }
 
+  /** @param {GoState} state @param {string} playerId @returns {GoAction[]} */
   getValidActions(state, playerId) {
-    if (state.gameOver || state.currentPlayerId !== playerId) {return [];}
+    if (!this.#isPlayingTurn(state, playerId)) {return [];}
 
     const actions = [];
     const color = this.#colorForPlayer(state, playerId);
@@ -197,9 +233,7 @@ export class Go9x9Engine {
     for (let y = 0; y < BOARD_SIZE; y++) {
       for (let x = 0; x < BOARD_SIZE; x++) {
         if (state.board[y][x] !== EMPTY) {continue;}
-        const sim = this.#simulatePlacement(state, x, y, color);
-        if (sim.suicide) {continue;}
-        if (state.previousBoard && boardsEqual(sim.board, state.previousBoard)) {continue;}
+        if (!this.#isLegalPlacement(state, x, y, color)) {continue;}
         actions.push({ type: 'place', x, y });
       }
     }
@@ -209,24 +243,103 @@ export class Go9x9Engine {
     return actions;
   }
 
+  /** @param {GoState} state @param {string} _playerId @returns {GoState} */
   getPlayerView(state, _playerId) {
     return state;
   }
 
+  /** @param {GoState} state @returns {boolean} */
   isGameOver(state) {
     return state.gameOver;
   }
 
+  /** @param {GoState} state @returns {string[] | null} */
   getWinners(state) {
     return state.winners;
   }
 
+  /** @param {GoState} state @returns {string | null} */
   getCurrentPlayer(state) {
     return state.currentPlayerId;
   }
 
+  /** @param {GoState} state @returns {Record<string, number> | null} */
   getScores(state) {
-    return state.scores;
+    return state.scores ? {
+      [state.playerIds[0]]: state.scores.black,
+      [state.playerIds[1]]: state.scores.white,
+    } : null;
+  }
+
+  /**
+   * Bascule un groupe connexe entier sans retirer les pierres du plateau joué.
+   * @param {GoState} state Revue en cours.
+   * @param {number} x Colonne d'une pierre, entier entre 0 et 8.
+   * @param {number} y Ligne d'une pierre, entier entre 0 et 8.
+   * @returns {GoState} Nouvelle revue, entrée inchangée.
+   * @throws {Error} Hors revue ou intersection vide/invalide.
+   */
+  toggleDeadGroup(state, x, y) {
+    this.#requireScoring(state);
+    if (!Number.isInteger(x) || !Number.isInteger(y) || !inBounds(x, y) || state.board[y][x] === EMPTY) {
+      throw new Error('Choisissez une pierre du plateau');
+    }
+    const next = cloneState(state);
+    const marked = new Set(state.deadStones);
+    const unmark = marked.has(y * BOARD_SIZE + x);
+    for (const [gx, gy] of this.#collectGroup(state.board, x, y).positions) {
+      const point = gy * BOARD_SIZE + gx;
+      if (unmark) { marked.delete(point); }
+      else { marked.add(point); }
+    }
+    next.deadStones = [...marked].sort((a, b) => a - b);
+    return next;
+  }
+
+  /**
+   * Confirme le score chinois sur une copie sans les groupes marqués morts.
+   * @param {GoState} state Revue en cours.
+   * @returns {GoState} État terminé, plateau joué et captures conservés.
+   * @throws {Error} Si le comptage n'est pas en cours.
+   */
+  confirmScore(state) {
+    this.#requireScoring(state);
+    const next = cloneState(state);
+    const scoringBoard = cloneBoard(state.board);
+    for (const point of state.deadStones) {
+      scoringBoard[Math.floor(point / BOARD_SIZE)][point % BOARD_SIZE] = EMPTY;
+    }
+    this.#finalizeScore(next, scoringBoard);
+    next.scoring = false;
+    return next;
+  }
+
+  /**
+   * Reprend au joueur suivant les deux passes, sans perte du plateau ou captures.
+   * @param {GoState} state Revue en cours.
+   * @returns {GoState} Partie jouable avec passes et marquages réinitialisés.
+   * @throws {Error} Si le comptage n'est pas en cours.
+   */
+  resumePlay(state) {
+    this.#requireScoring(state);
+    const next = cloneState(state);
+    next.scoring = false;
+    next.deadStones = [];
+    next.passesInARow = 0;
+    return next;
+  }
+
+  #requireScoring(state) {
+    if (!state.scoring || state.gameOver) { throw new Error('Le comptage n’est pas en cours'); }
+  }
+
+  #isPlayingTurn(state, playerId) {
+    return !state.gameOver && !state.scoring && state.currentPlayerId === playerId;
+  }
+
+  #endByPass(state) {
+    if (state.manualScoring) { state.scoring = true; }
+    else { this.#finalizeScore(state); }
   }
 
   #colorForPlayer(state, playerId) {
@@ -237,6 +350,12 @@ export class Go9x9Engine {
     return state.currentPlayerId === state.playerIds[0]
       ? state.playerIds[1]
       : state.playerIds[0];
+  }
+
+  /** Suicide et ko ont exactement les mêmes critères en validation et énumération. */
+  #isLegalPlacement(state, x, y, color) {
+    const sim = this.#simulatePlacement(state, x, y, color);
+    return !sim.suicide && !(state.previousBoard && boardsEqual(sim.board, state.previousBoard));
   }
 
   #simulatePlacement(state, x, y, color) {
@@ -291,9 +410,9 @@ export class Go9x9Engine {
     return { positions, liberties };
   }
 
-  #finalizeScore(state) {
-    const stones = countStones(state.board);
-    const territory = floodTerritory(state.board);
+  #finalizeScore(state, board = state.board) {
+    const stones = countStones(board);
+    const territory = floodTerritory(board);
 
     const blackScore = stones.black + territory.black;
     const whiteScore = stones.white + territory.white + state.komi;

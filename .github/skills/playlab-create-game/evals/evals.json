@@ -25,9 +25,24 @@
         "Les actions invalides sont rejetées et l'état entrant est comparé à une copie préalable.",
         "Le diff ne modifie ni le client index.html ni les règles du moteur."
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Ajoute un jeu solo de blocs tombants avec gravité, délai de pose et défi de 120 secondes. Je veux pouvoir rejouer une seed après sauvegarde JSON, maintenir une touche, changer d'onglet sans perdre la partie et conserver les meilleurs scores ou temps par mode. L'implémentation est autorisée : utilise le contrat et les tests existants de Playlab42.",
+      "expected_output": "Moteur pur avec temps explicite et délais sérialisés, client avec pause et nettoyage sûrs, records orientés selon l'objectif et parcours Playwright versionnés.",
+      "files": ["lib/seeded-random.js", "lib/gamekit.js", "docs/guides/create-game-client.md", "e2e/fixtures.js"],
+      "assertions": [
+        "Le moteur reçoit une durée explicite, valide ses bornes et ne lit aucune horloge du navigateur.",
+        "Les temporisateurs de règles sont inclus dans l'état JSON et les tests reprennent une partie sérialisée.",
+        "La pause ne consomme pas de temps simulé et la reprise ne rattrape pas le temps passé hors de l'onglet.",
+        "Les commandes maintenues sont libérées à la perte de focus et les ressources du client sont libérées au démontage.",
+        "Le classement minimise les temps et maximise les scores sans mélanger les modes.",
+        "Les parcours critiques sont ajoutés dans e2e avec les fixtures Playwright du projet."
+      ]
     }
   ],
   "trigger_cases": [
+    {"query": "Crée un jeu solo temps réel avec gravité, chronomètre et replay déterministe.", "should_trigger": true},
     {"query": "Le replay de mon jeu diverge après restauration JSON ; corrige la gestion du RNG.", "should_trigger": true},
     {"query": "Le bouton rejouer du morpion manque de contraste ; touche seulement au CSS.", "should_trigger": false}
   ]
