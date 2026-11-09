@@ -128,6 +128,7 @@ applicable) et une décision explicite ; ne jamais archiver pour simuler l'achè
 - **Nommage** : camelCase (variables), PascalCase (types), kebab-case (fichiers)
 - **Simplicité** : Préférer solutions simples, éviter over-engineering
 - **Isomorphisme** : Les moteurs de jeux sont compatibles navigateur et Node, sans DOM, réseau ou système de fichiers ; aucun serveur de jeu n'est déployé aujourd'hui
+- **Auteur** : Tout jeu (`game.json`), outil (`tool.json`) et parcours (`epic.json`, `metadata.author`) renseigne `author` avec le nom de la personne qui l'a réalisé, affiché sur sa carte (« Par … »). Ne jamais mettre « Playlab42 », « AI Assistant » ou « Anonyme » : utiliser le `git config user.name` de la personne, ou le lui demander. Les co-auteurs s'ajoutent dans le même champ, séparés par des virgules
 - **Docker-first** : Tout dans le container, rien sur le host
 
 ## Stack technique
@@ -419,12 +420,7 @@ git push -u origin feature/ma-feature
 ### Points d'attention
 
 - Les fichiers `data/*.json` sont générés au build et **non versionnés** (dans `.gitignore`)
-- Régénérer les catalogues dans Docker avec `make npm CMD="run build:local"` ; `make build` construit l'image Docker
+- Régénérer les catalogues dans Docker avec `make npm CMD="run build:dev"` (`build:local` prépare aussi `site/` et exige les poids GPT-2 : `prepare:gpt2`) ; `make build` construit l'image Docker
 - Les parcours utilisent un système de taxonomie avec threshold (min 3 epics par catégorie)
 - Les moteurs de jeux doivent être déterministes (utiliser SeededRandom)
 - Le projet est 100% statique, pas de backend requis
-
-## Contexte utilisateur
-
-- Prénom : Cyrille
-- Organisation : Docaposte

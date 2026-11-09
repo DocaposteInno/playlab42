@@ -1,204 +1,98 @@
 <div align="center">
 
-![Playlab42 — le laboratoire du développement assisté par IA](assets/banner.png)
+<sub>Français · [🇬🇧 English](README.en.md)</sub>
+
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="assets/banner.png">
+  <img src="assets/banner-animated.webp" alt="Playlab42 — le laboratoire du développement assisté par IA" width="1280">
+</picture>
 
 # Playlab42
 
 **Comprendre l’IA. Expérimenter en jouant. Construire ensemble.**
 
-Un laboratoire pédagogique ouvert, où les parcours de formation<br/>
-rencontrent les mini-jeux, les outils et le développement assisté par IA.
+Un laboratoire pédagogique ouvert, en français, qui tourne dans le navigateur : parcours interactifs, outils, simulations et jeux pour comprendre l’IA et apprendre à développer avec elle.
 
-[**Explorer la plateforme →**](https://z4ppy.github.io/playlab42/) · [Contribuer](docs/guides/contributing.md) · [Documentation](#documentation)
+[![Essayer la démo](https://img.shields.io/badge/Essayer_la_d%C3%A9mo-en_ligne_%E2%86%92-0891b2?style=for-the-badge)](https://z4ppy.github.io/playlab42/)
 
 [![CI](https://github.com/z4ppy/playlab42/actions/workflows/ci.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/ci.yml)
-[![Deploy](https://github.com/z4ppy/playlab42/actions/workflows/deploy.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/deploy.yml)
-[![Security Audit](https://github.com/z4ppy/playlab42/actions/workflows/security-audit.yml/badge.svg)](https://github.com/z4ppy/playlab42/actions/workflows/security-audit.yml)
-[![Couverture](https://codecov.io/gh/z4ppy/playlab42/graph/badge.svg)](https://codecov.io/gh/z4ppy/playlab42)
-[![Licence : CC BY-NC-SA 4.0](https://img.shields.io/badge/CC_BY--NC--SA-4.0-64748b.svg)](LICENSE)
+[![Licence : Apache 2.0](https://img.shields.io/badge/licence-Apache_2.0-64748b.svg)](LICENSE)
+[![PR bienvenues](https://img.shields.io/badge/PR-bienvenues-0891b2.svg)](CONTRIBUTING.md)
 
 </div>
 
-## Un terrain de jeu, un vrai projet
+## Ce qu’on y trouve
 
-**Playlab42 se découvre dans le navigateur et s’enrichit dans le dépôt.** Pas de compte à créer, pas de backend à déployer : la plateforme est entièrement statique.
+**Une dizaine de parcours, autant d’outils et de simulations, des jeux** et une bibliothèque de liens, sans compte ni installation.
 
-Pendant une formation, on explore un concept, on l’expérimente, puis on crée quelque chose avec l’aide d’un agent IA. Un outil, un jeu, un parcours ou une amélioration de la documentation : chaque contribution peut devenir une ressource pour les sessions suivantes.
+<table>
+<tr>
+<td width="33%"><a href="https://z4ppy.github.io/playlab42/#/parcours/anatomie-llm"><img src="docs/assets/readme/parcours-anatomie-llm.webp" alt="Parcours « Anatomie d’un LLM », étape 10 : grille d’attention interactive de Luciole, le petit modèle du cours, sur la phrase « la capitale de la france est », avec le plan du parcours à gauche."></a><br><b>Parcours</b> · un token dans un LLM</td>
+<td width="33%"><a href="https://z4ppy.github.io/playlab42/tools/l-systems/"><img src="docs/assets/readme/outil-l-systems.webp" alt="Outil L-systèmes : la courbe de Gosper en dégradé de couleurs, avec le panneau de grammaire (axiome, règles de réécriture) et les réglages de la tortue."></a><br><b>Outils</b> · grammaire → figure</td>
+<td width="33%"><a href="https://z4ppy.github.io/playlab42/games/tetris/"><img src="docs/assets/readme/jeu-neonstack.webp" alt="Jeu NeonStack, un Tetris néon, en pleine partie Marathon : pièces empilées, pièce en chute avec son ombre, score et file des cinq pièces suivantes."></a><br><b>Jeux</b> · règles testées, bots</td>
+</tr>
+<tr>
+<td colspan="2"><a href="https://z4ppy.github.io/playlab42/tools/particle-life/"><img src="docs/assets/readme/particle-life.webp" alt="Animation Particle Life : des centaines de particules colorées s’attirent et se repoussent, formant des amas bleus et des chaînes rouges et vertes qui se déplacent."></a><br><b>Simulations</b> · Particle Life, quelques règles et un monde émerge</td>
+<td align="center"><img src="docs/assets/readme/portail-mobile.webp" width="220" alt="Le portail Playlab42 sur mobile : accroche, onglets, recherche et première carte de parcours sur une colonne."><br><b>Mobile</b> · aussi sur téléphone</td>
+</tr>
+</table>
 
-Le code fait lui aussi partie du cours. Moteurs de jeux déterministes, tests automatisés, spécifications OpenSpec, instructions pour agents et CI/CD rendent les pratiques de développement visibles, pas seulement théoriques.
+**Première visite ?** Ouvrez [la démo](https://z4ppy.github.io/playlab42/) et commencez par le parcours [« PlayLab42 — Guide et usine logicielle »](https://z4ppy.github.io/playlab42/#/parcours/hello-playlab42).
 
-## Explorer
+## Jeux et IA
 
-| Univers | Ce qu’on y trouve | Quelques portes d’entrée |
-|---------|-------------------|--------------------------|
-| **Parcours** | Des contenus structurés en slides pour apprendre à son rythme. | [Agents de code](parcours/epics/coding-agents-2025/), [Deep learning](parcours/epics/deep-learning-intro/), [OpenSpec](parcours/epics/openspec-usage-guide/) |
-| **Outils & simulations** | Des utilitaires et des expériences interactives pour manipuler les concepts. | [JSON Formatter](https://z4ppy.github.io/playlab42/tools/json-formatter.html), [Particle Life](https://z4ppy.github.io/playlab42/tools/particle-life/), [Relativity Lab 3D](https://z4ppy.github.io/playlab42/tools/relativity-lab/) |
-| **Jeux** | Des jeux autonomes, avec des moteurs de règles et des bots pour expérimenter la logique et la stratégie. | [Morpion](https://z4ppy.github.io/playlab42/games/tictactoe/), [Mastermind](https://z4ppy.github.io/playlab42/games/mastermind/), [Go 9×9](https://z4ppy.github.io/playlab42/games/go-9x9/) |
-| **Bookmarks** | Une sélection de ressources externes sur l’écosystème IA et le développement. | [Modèles & API](bookmarks/models-apis.json), [MCP](bookmarks/mcp-protocols.json), [Prompt engineering](bookmarks/prompt-engineering.json) |
+Chaque jeu sépare un **moteur de règles pur** (déterministe, testé, sans DOM), la **vue du joueur** (qui ne laisse fuir aucune information cachée) et des **bots** qui ne voient que cette vue. L'IA ne se contente pas de jouer : elle **explique ses coups**.
 
-**Première visite ?** Ouvrez [la plateforme](https://z4ppy.github.io/playlab42/) et commencez par le parcours **« PlayLab42 — Guide et usine logicielle »**.
+<p align="center"><a href="https://z4ppy.github.io/playlab42/games/demineur/"><img src="docs/assets/readme/demineur-ia.webp" width="640" alt="Démineur : l'IA joue seule une grille intermédiaire, ouvre les cases sûres une à une et affiche à chaque coup son raisonnement, par exemple « Le 1 en (10, 3) touche déjà 1 mine certaine : ses autres voisines sont sûres »."></a></p>
 
-## Architecture
+| Jeu | Ce que fait l'IA | Comment |
+|---|---|---|
+| [Démineur](games/demineur/README.md) | Grilles « sans hasard », indice expliqué, carte des probabilités | Déductions locales et par paires de contraintes, puis probabilités exactes par énumération de la frontière |
+| [Puissance 4](games/puissance-4/README.md) | Adversaire fort, barre d'évaluation, « gagne en N coups » | Négamax alpha-bêta sur bitboards, approfondissement itératif, table de transposition, dans un Web Worker |
+| [Sudoku](games/sudoku/README.md) | Difficulté réelle, indice pédagogique en deux temps | Solveur « humain » (singletons, intersections, sous-ensembles, X-Wing, XY-Wing, Swordfish) et solveur exact à masques de bits |
+| [Solitaire](games/solitaire/README.md) | Donnes prouvées gagnables, indice expliqué | Recherche en profondeur avec états déjà vus et budget borné ; indices raisonnés sur les seules cartes visibles |
 
-**Un site statique, des contenus autonomes, un socle partagé.**
+Les README de chaque jeu détaillent les algorithmes, leurs mesures et leurs limites.
 
-```mermaid
-flowchart TB
-    subgraph preparation["À la construction"]
-        sources["Contenus & manifests<br/>tools · games · parcours · bookmarks"]
-        build["Scripts de build<br/>catalogues · guides · TypeScript"]
-        files["Site prêt à servir<br/>HTML · CSS · JavaScript · JSON"]
-        sources --> build --> files
-    end
+## Pourquoi Playlab42
 
-    subgraph browser["Dans le navigateur"]
-        portal["Portail Playlab42<br/>catalogue · recherche · bookmarks"]
-        apps["Outils & jeux<br/>applications autonomes"]
-        slides["Parcours pédagogiques<br/>viewer & slides HTML"]
-        storage[("localStorage<br/>préférences · scores · progression")]
-        portal -->|iframe| apps
-        portal -->|viewer & iframe| slides
-        portal <-->|persistance locale| storage
-    end
-
-    files -->|serveur statique / GitHub Pages| portal
-
-    classDef accent fill:#ecfeff,stroke:#0891b2,color:#164e63
-    classDef content fill:#f0fdf4,stroke:#16a34a,color:#14532d
-    classDef neutral fill:#f8fafc,stroke:#64748b,color:#1e293b
-    class portal accent
-    class apps,slides content
-    class sources,build,files,storage neutral
-```
-
-Les scripts préparent les catalogues, les guides et les dépendances destinées au navigateur, et transpilent les contenus TypeScript **avant** la mise en ligne. À l’usage, le navigateur charge les fichiers statiques ; aucune API applicative, base de données serveur ou authentification n’est nécessaire.
-
-Les outils et les jeux peuvent aussi être ouverts en dehors du portail. Les bibliothèques de `lib/` apportent les briques communes : thèmes, générateur aléatoire déterministe, viewer de parcours et **GameKit**, le SDK de communication entre les jeux et le portail. Les préférences, scores et progressions restent stockés localement dans le navigateur, sans synchronisation entre appareils.
-
-### Stack
-
-| Couche | Technologies |
-|--------|--------------|
-| Interface | HTML, CSS, JavaScript en modules ES ; TypeScript optionnel |
-| Construction | Node.js 26 dans Docker et la CI (minimum 24), esbuild, scripts de génération |
-| Qualité | Jest, Playwright, ESLint, vérification des types TypeScript |
-| Environnement | Docker, Docker Compose, Make |
-| Livraison | GitHub Actions → GitHub Pages |
-| Travail assisté par IA | [Instructions pour agents](AGENTS.md), [skills de projet](docs/guides/project-skills.md), [spécifications OpenSpec](openspec/specs/) |
+- **Zéro friction.** Un site statique : rien à installer, et vos préférences, scores et progression restent dans votre navigateur. Thèmes clair et sombre, navigation au clavier.
+- **On comprend en manipulant.** Les parcours embarquent de vraies démonstrations : grilles d’attention, tokenizers, réseaux de neurones, simulations.
+- **Un vrai projet, ouvert au regard.** Moteurs de jeux déterministes, tests Jest et Playwright, specs OpenSpec, CI/CD et audits de sécurité : les bonnes pratiques sont visibles, pas seulement racontées.
+- **Fait pour être étendu.** Un manifest, un dossier, une pull request : votre outil, jeu ou parcours rejoint le catalogue.
+- **Prêt pour les agents IA.** Les [instructions pour agents](AGENTS.md) et les [skills du projet](docs/guides/project-skills.md) sont versionnées avec le code.
 
 ## Démarrage rapide
 
-Pour consulter le projet, [la version en ligne](https://z4ppy.github.io/playlab42/) suffit. Pour développer, l’environnement est **Docker-first** : les dépendances et les commandes Node.js tournent dans le conteneur.
-
-**Prérequis :** Git, Docker avec Docker Compose et Make.
+Prérequis : Git et [Node.js](https://nodejs.org/) 24 ou plus. Comptez environ 2 minutes.
 
 ```bash
-git clone https://github.com/z4ppy/playlab42.git
-cd playlab42
-
-# Construire l’environnement, démarrer le conteneur et installer les dépendances
-make init
-
-# Préparer les contenus, catalogues et guides sans enrichissement réseau
-make npm CMD="run build:local"
-
-# Afficher l’URL locale, puis lancer le serveur
-make info
-make serve
+git clone https://github.com/z4ppy/playlab42.git && cd playlab42
+npm ci
+npm start        # puis ouvrir http://localhost:5242
 ```
 
-Ouvrez l’URL affichée par `make info`. Le port externe est calculé à partir du nom du dossier, dans la plage **5200–5299** ; `5242` est le port interne du conteneur.
-
-### Au quotidien
-
-| Commande | Usage |
-|----------|-------|
-| `make shell` | Ouvrir un shell dans le conteneur |
-| `make npm CMD="run build:local"` | Reconstruire les contenus et catalogues sans enrichissement réseau |
-| `make npm CMD="run build"` | Reconstruire avec enrichissement des métadonnées des bookmarks |
-| `make build-ts` | Transpiler les contenus TypeScript |
-| `make npm CMD="run build:ts:watch"` | Transpiler TypeScript en continu pendant le développement |
-| `make test` | Exécuter les tests Jest |
-| `make test-e2e` | Exécuter les parcours navigateur dans une image Docker dédiée |
-| `make lint` | Vérifier la qualité du code |
-| `make typecheck` | Vérifier les types |
-| `make openspec-validate` | Valider strictement les spécifications avec la CLI épinglée |
-| `make down` | Arrêter les conteneurs |
-
-<details>
-<summary><strong>Travailler sur plusieurs branches en parallèle</strong></summary>
-
-Chaque worktree utilise un nom de projet Docker et un port calculés à partir de son dossier. Initialisez l’environnement dans chaque worktree avec `make init`, puis consultez son URL avec `make info`.
-
-La plage de ports étant limitée, une collision reste possible. Pour choisir explicitement le port d’une instance, utilisez le même réglage pour ses commandes :
-
-```bash
-export PLAYLAB_PORT=5280
-make init
-make info
-make serve
-```
-
-</details>
+Vous préférez Docker, ou travaillez sur plusieurs branches en parallèle ? Le [guide de démarrage](docs/GETTING_STARTED.md) détaille l’environnement Docker, les commandes du quotidien et les éléments optionnels (laboratoire GPT-2, aperçus des liens).
 
 ## Contribuer
 
-**Une petite contribution peut devenir un excellent support de formation.** Vous pouvez créer un outil, ajouter un jeu ou un bot, écrire un parcours, proposer une ressource ou améliorer l’existant.
-
-1. Créez un fork si nécessaire, puis une branche dédiée.
-2. Ajoutez votre contenu et son manifest en suivant le guide correspondant.
-3. Régénérez les catalogues, essayez le résultat dans le navigateur et lancez les contrôles adaptés : tests, lint et types.
-4. Ouvrez une Pull Request : la contribution est relue avant intégration et publication.
-
-| Vous souhaitez… | Commencer ici |
-|-----------------|---------------|
-| Créer un outil | [Guide de création d’un outil](docs/guides/create-tool.md) |
-| Développer un jeu | [Moteur de règles](docs/guides/create-game-engine.md), [interface](docs/guides/create-game-client.md) et [bots](docs/guides/create-bot.md) |
-| Écrire un parcours | [Guide de création d’un epic](docs/guides/create-epic.md) |
-| Proposer une ressource | [Guide de contribution](docs/guides/contributing.md) |
-| Partir d’un gabarit | [Kit de contribution et galerie des composants](docs/guides/contribution-kit.md) |
-| Travailler avec un agent IA | [Instructions du projet](AGENTS.md) |
-
-### Se repérer dans le dépôt
-
-```text
-playlab42/
-├── index.html, app.js, style.css  # Entrée du portail
-├── app/                          # Modules du portail
-├── tools/                        # Outils HTML et mini-apps JS/TS
-├── games/                        # Interfaces, moteurs de règles et bots
-├── parcours/epics/               # Parcours, manifests et slides
-├── bookmarks/                    # Ressources externes classées par thème
-├── lib/                          # GameKit, thèmes, viewer et utilitaires
-├── scripts/                      # Génération des catalogues et build TS
-├── data/                         # Catalogues générés, non versionnés
-├── site/                         # Archive publique préparée, non versionnée
-├── docs/                         # Guides et documentation
-├── templates/                    # Gabarits de jeux, outils et parcours
-├── e2e/                          # Parcours navigateur Playwright
-├── openspec/                     # Spécifications et propositions de changement
-├── .github/skills/               # Skills de projet versionnés
-└── .github/workflows/            # CI, audits et déploiement
-```
+Une petite contribution peut devenir un excellent support de formation : un outil, un jeu, un bot, un parcours, une ressource, une correction. Tout est résumé dans [CONTRIBUTING.md](CONTRIBUTING.md). Une question, une idée ? Les [modèles d’issues](https://github.com/z4ppy/playlab42/issues/new/choose) vous guident.
 
 ## Documentation
 
-| Pour… | Référence |
-|-------|-----------|
-| Comprendre les notions du projet | [Concepts & glossaire](docs/CONCEPTS.md) |
-| Comprendre la génération des données | [Build des catalogues](docs/CATALOGUE-BUILD.md) |
-| Consulter les contrats techniques | [Spécifications OpenSpec](openspec/specs/) |
-| Appliquer le workflow de spécification | [Workflow OpenSpec](docs/guides/openspec-workflow.md) |
-| Utiliser les skills du projet | [Skills de projet](docs/guides/project-skills.md) |
-| Comprendre la stratégie de tests | [Stratégie de tests](docs/TESTING_STRATEGY.md) |
-| Comprendre l'usine et ses limites | [Usine logicielle et feuille de route](docs/guides/software-factory.md) |
-| Déployer la plateforme | [Guide de déploiement](docs/DEPLOYMENT.md) |
-| Résoudre un problème local | [Dépannage](docs/TROUBLESHOOTING.md) |
-| Consulter l’évolution du projet | [Changelog](CHANGELOG.md) |
+| Pour… | Lire |
+|-------|------|
+| Installer et travailler au quotidien | [Guide de démarrage](docs/GETTING_STARTED.md) |
+| Comprendre l’architecture et la stack | [Architecture](docs/ARCHITECTURE.md) |
+| Créer un outil, un jeu ou un parcours | [Index des guides](docs/guides/README.md) |
+| Notions, tests, déploiement, dépannage | [Concepts](docs/CONCEPTS.md) · [Tests](docs/TESTING_STRATEGY.md) · [Déploiement](docs/DEPLOYMENT.md) · [Dépannage](docs/TROUBLESHOOTING.md) |
+| Suivre l’évolution du projet | [Changelog](CHANGELOG.md) · [Spécifications OpenSpec](openspec/specs/) |
+
+Sécurité : [SECURITY.md](SECURITY.md), sans passer par une issue publique · Communauté : [code de conduite](CODE_OF_CONDUCT.md) · Merci aux [contributeurs](https://github.com/z4ppy/playlab42/graphs/contributors) !
 
 ## Licence
 
-Playlab42 est un projet collaboratif porté par **Docaposte**, distribué sous licence [**CC BY-NC-SA 4.0**](LICENSE) : attribution, usage non commercial et partage des adaptations sous la même licence.
+Projet personnel de Cyrille ([@z4ppy](https://github.com/z4ppy)), ouvert aux contributions et distribué sous licence [Apache 2.0](LICENSE) (voir la [notice](NOTICE)). Les composants tiers (`vendor/`, tokenizers et modèles du parcours « Anatomie d’un LLM », etc.) gardent leur propre licence, indiquée dans leur dossier.
 
 ---
 

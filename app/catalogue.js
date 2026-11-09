@@ -9,8 +9,10 @@ import { state, setState } from './state.js';
 import { el } from './dom-cache.js';
 import { cloneTemplate } from '../lib/dom.js';
 import {
-  appendThumbnailImage, matchesQuery, renderTagFilters, setDiscoveryCount, setDiscoveryMessage,
+  animatedThumbnailPath, appendThumbnailImage, authorName, matchesQuery, renderAuthor, renderTagFilters,
+  setDiscoveryCount, setDiscoveryMessage, thumbnailPath,
 } from '../lib/catalogue-ui.js';
+import { attachThumbnailMotion } from '../lib/thumbnail-motion.js';
 
 let catalogueError = null;
 
@@ -97,15 +99,15 @@ export function createCardElement(item, type) {
 
   // Thumbnail
   const defaultIcon = type === 'game' ? '🎮' : '🔧';
-  const thumbSrc = type === 'game'
-    ? item.path.replace('index.html', 'thumb.png')
-    : item.path.replace('.html', '-thumb.png');
-
-  appendThumbnailImage(thumb, { src: thumbSrc, alt: item.name, fallback: item.icon || defaultIcon });
+  const thumbSrc = thumbnailPath(type, item);
+  const img = appendThumbnailImage(thumb, { src: thumbSrc, alt: item.name, fallback: item.icon || defaultIcon });
+  // Le lien reçoit survol et focus : c'est lui qui pilote l'animation éventuelle
+  if (item.animatedThumbnail) {attachThumbnailMotion(link, img, animatedThumbnailPath(thumbSrc));}
 
   // Info
   title.textContent = (item.icon ? `${item.icon} ` : '') + item.name;
   desc.textContent = item.description;
+  renderAuthor(fragment.querySelector('.card-author'), item);
 
   // Tags
   if (item.tags?.length) {
@@ -138,7 +140,7 @@ export function filterItems(items) {
       return false;
     }
     // Filtre par recherche
-    return matchesQuery(search, item.name, item.description, ...(item.tags || []));
+    return matchesQuery(search, item.name, item.description, authorName(item), ...(item.tags || []));
   });
 }
 

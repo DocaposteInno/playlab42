@@ -12,8 +12,9 @@ import { getEpicProgress } from './storage.js';
 import { cloneTemplate } from '../lib/dom.js';
 import { ParcoursViewer } from '../lib/parcours-viewer.js';
 import {
-  appendThumbnailImage, matchesQuery, renderTagFilters, setDiscoveryCount, setDiscoveryMessage,
+  appendThumbnailImage, authorName, matchesQuery, renderAuthor, renderTagFilters, setDiscoveryCount, setDiscoveryMessage,
 } from '../lib/catalogue-ui.js';
+import { attachThumbnailMotion } from '../lib/thumbnail-motion.js';
 
 let returnFocus = null;
 let returnFocusEpicId = null;
@@ -52,14 +53,16 @@ function visitedStepCount(epicId) {
 }
 
 /**
- * Place la vignette de l'epic : image si fournie, sinon emoji.
+ * Place la vignette de l'epic : image si fournie, sinon emoji ; anime la carte si une variante existe.
  * @param {HTMLElement} thumb - Conteneur de la vignette
  * @param {Object} epic - Données de l'epic
+ * @param {HTMLElement} card - Carte (lien) qui reçoit survol et focus
  */
-function renderEpicThumbnail(thumb, epic) {
+function renderEpicThumbnail(thumb, epic, card) {
   const defaultIcon = epic.icon || '📚';
   if (epic.thumbnail) {
-    appendThumbnailImage(thumb, { src: epic.thumbnail, alt: '', fallback: defaultIcon });
+    const img = appendThumbnailImage(thumb, { src: epic.thumbnail, alt: '', fallback: defaultIcon });
+    if (epic.thumbnailAnimated) {attachThumbnailMotion(card, img, epic.thumbnailAnimated);}
   } else {
     thumb.textContent = defaultIcon;
   }
@@ -135,7 +138,7 @@ export function createEpicCardElement(epic) {
   card.dataset.epicId = epic.id;
   card.dataset.path = epic.path;
   card.href = `#/parcours/${epic.id}`;
-  renderEpicThumbnail(fragment.querySelector('.epic-thumb'), epic);
+  renderEpicThumbnail(fragment.querySelector('.epic-thumb'), epic, card);
 
   title.textContent = epic.title;
   const instance = ++cardSequence;
@@ -149,19 +152,11 @@ export function createEpicCardElement(epic) {
     fragment.querySelector('.epic-duration').textContent = epic.duration;
   }
   fragment.querySelector('.epic-slides').textContent = epicSlidesSummary(epic);
+  renderAuthor(fragment.querySelector('.epic-author'), epic);
   appendEpicTags(fragment.querySelector('.epic-tags'), epic.tags);
   renderEpicProgress(card, epic);
 
   return fragment;
-}
-
-/**
- * Nom d'auteur recherchable, que l'auteur soit un texte ou un objet.
- * @param {Object} epic - Données de l'epic
- * @returns {string|undefined} Nom de l'auteur
- */
-function epicAuthorName(epic) {
-  return typeof epic.author === 'object' ? epic.author?.name : epic.author;
 }
 
 /**
@@ -173,7 +168,7 @@ function epicAuthorName(epic) {
 function matchesParcoursSelection(epic, search) {
   if (state.parcoursCategory && epicCategory(epic) !== state.parcoursCategory) { return false; }
   if (state.activeFilter && !epic.tags?.includes(state.activeFilter)) { return false; }
-  return matchesQuery(search, epic.title, epic.description, epic.tags?.join(' '), epicAuthorName(epic));
+  return matchesQuery(search, epic.title, epic.description, epic.tags?.join(' '), authorName(epic));
 }
 
 /**

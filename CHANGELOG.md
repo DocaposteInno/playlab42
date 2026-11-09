@@ -7,7 +7,42 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-09
+
+Quatre nouveaux jeux à IA explicative, de nouveaux outils et parcours, un
+portail à l'identité animée et des thèmes qui suivent enfin le système partout.
+
 ### Added
+- Jeu « Démineur » (`games/demineur/`) : premier clic sûr, grilles « sans
+  hasard » garanties par un solveur, indice expliqué, carte des probabilités
+  exactes et IA qui joue en expliquant chaque coup.
+- Jeu « Sudoku » (`games/sudoku/`) : grilles à solution unique classées par la
+  technique humaine la plus avancée requise, indice pédagogique en deux temps,
+  notes automatiques et IA qui résout en nommant chaque technique.
+- Jeu « Tetris — Neon Stack » (`games/tetris/`) et ses trois modes de jeu.
+- Outils : explorateur de L-systèmes, automate cellulaire (Wolfram 1D et Life
+  2D), reconnaissance de chiffres manuscrits en local, éditeur Markdown et
+  Paint Studio.
+- Parcours « Anatomie d'un LLM » et son laboratoire GPT-2 local, « Histoire des
+  LLM : de Shannon aux agents » et « Coding Agents en 2026 ».
+- Portail : auteurs affichés sur les cartes, identité animée (titre décodé,
+  fiole), vignettes animées au survol ou au centre de l'écran sur mobile,
+  balises d'aperçu de partage et cartes de partage générées pour chaque jeu et
+  outil.
+- README refondu avec bannière animée et section « Jeux et IA », fichiers
+  communautaires et licence Apache 2.0.
+- Jeu « Solitaire » (`games/solitaire/`) : Klondike pioche 1 ou 3, donnes
+  numérotées et partageables, option « donnes gagnables » prouvée par un
+  solveur, glisser-déposer souris/tactile, clavier complet, annuler illimité,
+  fin automatique, indices expliqués et bots Aléatoire/Heuristique ne lisant
+  que la vue du joueur (44 % de victoires en pioche 1 sur 1 000 donnes).
+- Jeu « Puissance 4 » (`games/puissance-4/`) : moteur pur au contrat du lab,
+  IA négamax alpha-bêta sur bitboards (approfondissement itératif, table de
+  transposition, budget en positions reproductible) calculée dans un Web Worker,
+  barre d'évaluation, indice expliqué, annulation, mode à deux, clavier complet.
+- Jeu « Golf orbital » (`games/orbital-golf/`) : moteur physique pur à pas fixe,
+  9 trous d'initiation, trou du jour et parcours libre générés puis prouvés
+  jouables par un solveur, visée au doigt (lance-pierre) ou au clavier.
 - Snapshot OG éditorial et refresh explicite, SOURCE_DATE_EPOCH pour les
   catalogues, SBOM CycloneDX de fabrication, manifeste public SHA-256,
   vérification de l'archive et exercice local de reprise tar.
@@ -21,11 +56,26 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 - `package.json` : champ `engines` fixant Node >= 24, pour qu'un runtime trop
   ancien produise un avertissement npm au lieu d'échouer plus loin
 
+### Fixed
+- Thème automatique : titre, fiole, lecteur de parcours, coloration du code et
+  guide OpenSpec suivent désormais la préférence du système, et plus seulement
+  le thème choisi à la main.
+- Galerie UI et composants partagés : contours de champs au contraste WCAG,
+  statuts typés, sélecteur de thème resynchronisé, dialogue lisible à 320 px.
+- Jouabilité mobile des jeux existants, lignes du morpion et comptage des
+  groupes au Go ; CVE corrigées dans les dépendances et le Transformer Explainer
+  embarqué.
+
 ### Removed
 - Sept images OG orphelines de `data/bookmarks-images/` (228 Ko -> 76 Ko) :
   elles ne correspondaient plus à aucune URL du catalogue
 
 ### Changed
+- Neural Style : légende de la galerie sous la vignette au lieu de la masquer ;
+  réglages de taille du contenu, taille du style et intensité alignés sur la
+  démo d'origine (256 px par défaut au lieu de 512 px, qui affaiblissait le
+  rendu), images passées au modèle sans ré-encodage JPEG, statut près du
+  bouton et dernier style demandé prioritaire en cas de clics rapides.
 - Images OG : un téléchargement ignoré par Git n'est plus référencé comme image
   locale persistante ; URL distante d'origine utilisée, entités HTML décodées,
   images éditoriales locales conservées et vérifiées. Cache non référencé exclu
@@ -125,8 +175,8 @@ TypeScript optionnelle.
 - `escapeHtml()` centralisé dans `lib/dom.js`
 - Bookmarks : réorganisation des catégories, amélioration du fetch des
   métadonnées OpenGraph et du positionnement de la popup
-- Documentation : `AGENTS.md` agnostique remplace `CLAUDE.md`, organisation
-  renommée « Docaposte », badges Security Audit / License / Node.js au README
+- Documentation : `AGENTS.md` agnostique remplace `CLAUDE.md`, badges
+  Security Audit / License / Node.js au README
 - Image Docker : `node:25-alpine` → `node:26-alpine`
 - Mise à jour des dépendances de développement : ESLint 9 → 10, marked 17 → 18,
   Jest 30.5.2, `@types/node` 26, globals 17, Prettier 3.9.8
@@ -397,4 +447,4 @@ style: Formatage                     → (pas dans changelog)
 
 ---
 
-*Maintenu par l'équipe Docaposte*
+*Maintenu par les contributeurs de Playlab42*

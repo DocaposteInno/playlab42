@@ -5,7 +5,7 @@
  * @see openspec/changes/extend-hash-routing-games-tools/specs/router-games-tools/spec.md
  */
 
-import { jest, describe, it, expect } from '@jest/globals';
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 
 // Mock de cloneTemplate avant l'import de catalogue.js (ESM : unstable_mockModule
 // + import dynamique, cf. lib/parcours/__tests__/ParcoursNavigation.unit.test.js).
@@ -24,6 +24,7 @@ jest.unstable_mockModule('../lib/dom.js', () => ({
           <div class="card-thumb"></div>
           <h3></h3>
           <p></p>
+          <p class="card-author" hidden></p>
           <div class="card-tags"></div>
         </div>
       `;
@@ -89,6 +90,15 @@ describe('catalogue: createCardElement with hash links', () => {
       const desc = fragment.querySelector('p');
 
       expect(desc.textContent).toBe('The classic morpion');
+    });
+
+    it('displays the author, or hides the line when unknown', () => {
+      const withAuthor = createCardElement({ ...mockGame, author: 'Cyrille' }, 'game');
+      expect(withAuthor.querySelector('.card-author').textContent).toBe('Par Cyrille');
+      expect(withAuthor.querySelector('.card-author').hidden).toBe(false);
+
+      const without = createCardElement({ ...mockGame, author: undefined }, 'tool');
+      expect(without.querySelector('.card-author').hidden).toBe(true);
     });
 
     it('renders tags', () => {
@@ -180,6 +190,36 @@ describe('catalogue: createCardElement with hash links', () => {
       expect(img.decoding).toBe('async');
       expect(img.getAttribute('width')).toBe('380');
       expect(img.getAttribute('height')).toBe('180');
+    });
+  });
+
+  describe('Vignette animée', () => {
+    // Faux Image : jsdom ne charge pas les images, on déclenche onload à la main
+    const preloads = [];
+    class FakeImage { constructor() {preloads.push(this);} }
+    const realImage = window.Image;
+    beforeEach(() => { preloads.length = 0; window.Image = FakeImage; });
+    afterEach(() => { window.Image = realImage; });
+
+    it('précharge puis affiche la variante .anim.webp au focus de la carte', () => {
+      const fragment = createCardElement({ ...mockGame, animatedThumbnail: true }, 'game');
+      const link = fragment.querySelector('a.card-link');
+      const img = fragment.querySelector('.card-thumb img');
+
+      link.dispatchEvent(new FocusEvent('focusin'));
+      expect(preloads).toHaveLength(1);
+      expect(preloads[0].src).toBe('games/tictactoe/thumb.anim.webp');
+      preloads[0].onload();
+      expect(img.getAttribute('src')).toBe('games/tictactoe/thumb.anim.webp');
+
+      link.dispatchEvent(new FocusEvent('focusout'));
+      expect(img.getAttribute('src')).toBe('games/tictactoe/thumb.png');
+    });
+
+    it('ne demande aucune animation sans variante déclarée par le build', () => {
+      const fragment = createCardElement(mockTool, 'tool');
+      fragment.querySelector('a.card-link').dispatchEvent(new FocusEvent('focusin'));
+      expect(preloads).toHaveLength(0);
     });
   });
 

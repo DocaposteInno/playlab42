@@ -86,9 +86,14 @@ export default {
     'games/**/ui/**/*.{js,ts}',
     'games/diese-et-mat/src/**/*.js',
     'games/tetris/**/*.js',
+    'games/orbital-golf/**/*.js',
     'games/go-9x9/**/*.js',
+    'games/puissance-4/**/*.js',
+    'games/demineur/**/*.js',
     'games/checkers/bots/**/*.js',
     'games/tictactoe/bots/blocker.js',
+    'games/solitaire/{ai,bots}/**/*.js',
+    'games/sudoku/bots/**/*.js',
     'games/dialog-accessibility.js',
     'tools/**/src/**/*.{js,ts}',
     'tools/relativity-lab/ui/**/*.js',
@@ -172,6 +177,36 @@ export default {
     './games/diese-et-mat/src/core/init-once.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './games/tictactoe/engine/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './games/tictactoe/bots/blocker.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/orbital-golf/engine.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/orbital-golf/engine/*.js': { statements: 98, branches: 98, functions: 100, lines: 98 },
+    './games/orbital-golf/{renderer,renderer-effects,records,input,audio}.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/orbital-golf/controller.js': { statements: 98, branches: 95, functions: 98, lines: 100 },
+    // Moteur, règles et IA du Solitaire : contrats purs, entièrement testés.
+    './games/solitaire/engine.js': { statements: 100, branches: 95, functions: 100, lines: 100 },
+    './games/solitaire/{engine,ai,bots}/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Client sans DOM du Solitaire ; contrôleur, gestes et animations sont couverts par e2e/solitaire.spec.js.
+    './games/solitaire/ui/{announce,board-view,card-view,destinations,session,shortcuts,timers}.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/solitaire/ui/{keyboard,progress}.js': { statements: 100, branches: 85, functions: 100, lines: 100 },
+    // Sudoku : moteur, solveurs, générateur et bots entièrement couverts.
+    './games/sudoku/engine.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/sudoku/engine/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/sudoku/engine/techniques/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/sudoku/bots/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/sudoku/ui/{board-view,pad-view,keyboard,clock,share,hint-coach,auto-player,progress-store,generation,generation-worker}.js':
+      { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Contrôleur DOM : Worker, reprise au chargement et erreurs de génération restent hors jsdom (e2e).
+    './games/sudoku/ui/app.js': { statements: 95, branches: 84, functions: 93, lines: 96 },
+    // Puissance 4 : moteur, IA (bitboards, recherche, protocole du worker), bots et vues testables.
+    './games/puissance-4/engine.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/puissance-4/engine/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/puissance-4/ai/{bitboard,search,transposition-table,advisor,protocol,client}.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/puissance-4/bots/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/puissance-4/ui/{session,text,board-view,panels}.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/demineur/engine.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/demineur/{engine,bots}/*.js': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './games/demineur/solver/*.js': { statements: 100, branches: 94, functions: 100, lines: 100 },
+    './games/demineur/ui/*.js': { statements: 100, branches: 95, functions: 100, lines: 100 },
+    './games/demineur/controller.js': { statements: 96, branches: 92, functions: 95, lines: 98 },
   },
 
   // Mapping de modules pour les imports spéciaux (ex: CDN -> mock)
