@@ -13,7 +13,7 @@
 
 Un laboratoire pédagogique ouvert, porté par **Docaposte**, en français, qui tourne dans le navigateur : parcours interactifs, outils, simulations et jeux pour comprendre l’IA et apprendre à développer avec elle.
 
-[![Essayer la démo](https://img.shields.io/badge/Explorer_la_plateforme-en_ligne_%E2%86%92-0891b2?style=for-the-badge)](https://docaposteinno.github.io/playlab42/)
+[![Explorer la plateforme](https://img.shields.io/badge/Explorer_la_plateforme-en_ligne_%E2%86%92-0891b2?style=for-the-badge)](https://docaposteinno.github.io/playlab42/)
 
 [![CI](https://github.com/DocaposteInno/playlab42/actions/workflows/ci.yml/badge.svg)](https://github.com/DocaposteInno/playlab42/actions/workflows/ci.yml)
 [![Licence : Apache 2.0](https://img.shields.io/badge/licence-Apache_2.0-64748b.svg)](../LICENSE)
