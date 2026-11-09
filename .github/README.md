@@ -1,102 +1,106 @@
 <div align="center">
 
-![Playlab42 — le laboratoire du développement assisté par IA](../assets/banner.png)
+<sub>Français · [🇬🇧 English](../README.en.md)</sub>
+
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="../assets/banner.png">
+  <img src="../assets/banner-animated.webp" alt="Playlab42 — le laboratoire du développement assisté par IA" width="1280">
+</picture>
 
 # Playlab42
 
 **Comprendre l’IA. Expérimenter en jouant. Construire ensemble.**
 
-Un laboratoire pédagogique ouvert, porté par **Docaposte**, où les parcours de formation<br/>
-rencontrent les mini-jeux, les outils et le développement assisté par IA.
+Un laboratoire pédagogique ouvert, porté par **Docaposte**, en français, qui tourne dans le navigateur : parcours interactifs, outils, simulations et jeux pour comprendre l’IA et apprendre à développer avec elle.
 
-[**Explorer la plateforme →**](https://docaposteinno.github.io/playlab42/) · [Contribuer](../docs/guides/contributing.md) · [Documentation](#documentation)
+[![Explorer la plateforme](https://img.shields.io/badge/Explorer_la_plateforme-en_ligne_%E2%86%92-0891b2?style=for-the-badge)](https://docaposteinno.github.io/playlab42/)
 
 [![CI](https://github.com/DocaposteInno/playlab42/actions/workflows/ci.yml/badge.svg)](https://github.com/DocaposteInno/playlab42/actions/workflows/ci.yml)
-[![Deploy](https://github.com/DocaposteInno/playlab42/actions/workflows/deploy.yml/badge.svg)](https://github.com/DocaposteInno/playlab42/actions/workflows/deploy.yml)
-[![Security Audit](https://github.com/DocaposteInno/playlab42/actions/workflows/security-audit.yml/badge.svg)](https://github.com/DocaposteInno/playlab42/actions/workflows/security-audit.yml)
-[![Licence : CC BY-NC-SA 4.0](https://img.shields.io/badge/CC_BY--NC--SA-4.0-64748b.svg)](../LICENSE)
+[![Licence : Apache 2.0](https://img.shields.io/badge/licence-Apache_2.0-64748b.svg)](../LICENSE)
+[![PR bienvenues](https://img.shields.io/badge/PR-bienvenues-0891b2.svg)](../CONTRIBUTING.md)
 
 </div>
 
-## Un terrain de jeu, un vrai projet
+## Ce qu’on y trouve
 
-**Playlab42 se découvre dans le navigateur et s’enrichit dans le dépôt.** Pas de compte à créer, pas de backend à déployer : la plateforme est entièrement statique. Les préférences, scores et progressions restent dans le navigateur, sans synchronisation entre appareils.
+**Une dizaine de parcours, autant d’outils et de simulations, des jeux** et une bibliothèque de liens, sans compte ni installation.
 
-Pendant une formation, on explore un concept, on l’expérimente, puis on crée quelque chose avec l’aide d’un agent IA. Un outil, un jeu, un parcours ou une amélioration de la documentation : chaque contribution peut devenir une ressource pour les sessions suivantes.
+<table>
+<tr>
+<td width="33%"><a href="https://docaposteinno.github.io/playlab42/#/parcours/anatomie-llm"><img src="../docs/assets/readme/parcours-anatomie-llm.webp" alt="Parcours « Anatomie d’un LLM », étape 10 : grille d’attention interactive de Luciole, le petit modèle du cours, sur la phrase « la capitale de la france est », avec le plan du parcours à gauche."></a><br><b>Parcours</b> · un token dans un LLM</td>
+<td width="33%"><a href="https://docaposteinno.github.io/playlab42/tools/l-systems/"><img src="../docs/assets/readme/outil-l-systems.webp" alt="Outil L-systèmes : la courbe de Gosper en dégradé de couleurs, avec le panneau de grammaire (axiome, règles de réécriture) et les réglages de la tortue."></a><br><b>Outils</b> · grammaire → figure</td>
+<td width="33%"><a href="https://docaposteinno.github.io/playlab42/games/tetris/"><img src="../docs/assets/readme/jeu-neonstack.webp" alt="Jeu NeonStack, un Tetris néon, en pleine partie Marathon : pièces empilées, pièce en chute avec son ombre, score et file des cinq pièces suivantes."></a><br><b>Jeux</b> · règles testées, bots</td>
+</tr>
+<tr>
+<td colspan="2"><a href="https://docaposteinno.github.io/playlab42/tools/particle-life/"><img src="../docs/assets/readme/particle-life.webp" alt="Animation Particle Life : des centaines de particules colorées s’attirent et se repoussent, formant des amas bleus et des chaînes rouges et vertes qui se déplacent."></a><br><b>Simulations</b> · Particle Life, quelques règles et un monde émerge</td>
+<td align="center"><img src="../docs/assets/readme/portail-mobile.webp" width="220" alt="Le portail Playlab42 sur mobile : accroche, onglets, recherche et première carte de parcours sur une colonne."><br><b>Mobile</b> · aussi sur téléphone</td>
+</tr>
+</table>
 
-## Explorer
+**Première visite ?** Ouvrez [la plateforme Docaposte](https://docaposteinno.github.io/playlab42/) et commencez par le parcours [« PlayLab42 — Guide et usine logicielle »](https://docaposteinno.github.io/playlab42/#/parcours/hello-playlab42).
 
-| Univers | Ce qu’on y trouve | Quelques portes d’entrée |
-|---------|-------------------|--------------------------|
-| **Parcours** | Des slides structurées pour apprendre à son rythme. | [Agents de code](../parcours/epics/coding-agents-2025/), [Deep learning](../parcours/epics/deep-learning-intro/), [OpenSpec](../parcours/epics/openspec-usage-guide/) |
-| **Outils & simulations** | Des expériences interactives pour manipuler les concepts. | [JSON Formatter](https://docaposteinno.github.io/playlab42/tools/json-formatter.html), [Particle Life](https://docaposteinno.github.io/playlab42/tools/particle-life/), [Relativity Lab 3D](https://docaposteinno.github.io/playlab42/tools/relativity-lab/) |
-| **Jeux** | Des moteurs de règles et des bots pour explorer la logique et la stratégie. | [Morpion](https://docaposteinno.github.io/playlab42/games/tictactoe/), [Mastermind](https://docaposteinno.github.io/playlab42/games/mastermind/), [Go 9×9](https://docaposteinno.github.io/playlab42/games/go-9x9/) |
-| **Bookmarks** | Des ressources sélectionnées sur l’écosystème IA et le développement. | [Modèles & API](../bookmarks/models-apis.json), [MCP](../bookmarks/mcp-protocols.json), [Prompt engineering](../bookmarks/prompt-engineering.json) |
+## Jeux et IA
 
-**Première visite ?** Ouvrez [la plateforme Docaposte](https://docaposteinno.github.io/playlab42/) et commencez par le parcours **« PlayLab42 — Guide et usine logicielle »**.
+Chaque jeu sépare un **moteur de règles pur** (déterministe, testé, sans DOM), la **vue du joueur** (qui ne laisse fuir aucune information cachée) et des **bots** qui ne voient que cette vue. L'IA ne se contente pas de jouer : elle **explique ses coups**.
 
-## Apprendre aussi par le code
+<p align="center"><a href="https://docaposteinno.github.io/playlab42/games/demineur/"><img src="../docs/assets/readme/demineur-ia.webp" width="640" alt="Démineur : l'IA joue seule une grille intermédiaire, ouvre les cases sûres une à une et affiche à chaque coup son raisonnement, par exemple « Le 1 en (10, 3) touche déjà 1 mine certaine : ses autres voisines sont sûres »."></a></p>
 
-Le dépôt est un support de formation à part entière : applications autonomes, moteurs de jeux déterministes, tests de comportement et contrats partagés avec **GameKit**.
+| Jeu | Ce que fait l'IA | Comment |
+|---|---|---|
+| [Démineur](../games/demineur/README.md) | Grilles « sans hasard », indice expliqué, carte des probabilités | Déductions locales et par paires de contraintes, puis probabilités exactes par énumération de la frontière |
+| [Puissance 4](../games/puissance-4/README.md) | Adversaire fort, barre d'évaluation, « gagne en N coups » | Négamax alpha-bêta sur bitboards, approfondissement itératif, table de transposition, dans un Web Worker |
+| [Sudoku](../games/sudoku/README.md) | Difficulté réelle, indice pédagogique en deux temps | Solveur « humain » (singletons, intersections, sous-ensembles, X-Wing, XY-Wing, Swordfish) et solveur exact à masques de bits |
+| [Solitaire](../games/solitaire/README.md) | Donnes prouvées gagnables, indice expliqué | Recherche en profondeur avec états déjà vus et budget borné ; indices raisonnés sur les seules cartes visibles |
 
-| Pratique | Mise en œuvre |
-|----------|---------------|
-| Développement assisté par IA | [Instructions communes](../AGENTS.md) et [skills de projet](../docs/guides/project-skills.md) |
-| Spécification des changements | [OpenSpec / OPSX](../docs/guides/openspec-workflow.md), avec une CLI locale épinglée |
-| Qualité du code | Jest, Playwright, ESLint, Biome, TypeScript ; suivi de la couverture, de la duplication et de la complexité |
-| Fabrication reproductible | Node.js **26** dans Docker et la CI (minimum **24**), esbuild, comparaison de deux builds et vérification de l’archive |
-| Livraison | CI sélective selon l’impact, preuves originales vérifiées pour les entrées inchangées, tests de l’archive puis publication de cette même archive sur GitHub Pages |
+Les README de chaque jeu détaillent les algorithmes, leurs mesures et leurs limites.
 
-La sélection CI reste conservative : documentation avec HTML, chemins inconnus ou empreintes différentes peuvent imposer une nouvelle analyse complète. Les audits de vulnérabilités restent frais. Voir [l’usine logicielle et ses limites](../docs/guides/software-factory.md) : aucun indicateur vert ne garantit l’absence de défauts.
+## Pourquoi Playlab42
 
-## Développer et contribuer
+- **Zéro friction.** Un site statique : rien à installer, et vos préférences, scores et progression restent dans votre navigateur. Thèmes clair et sombre, navigation au clavier.
+- **On comprend en manipulant.** Les parcours embarquent de vraies démonstrations : grilles d’attention, tokenizers, réseaux de neurones, simulations.
+- **Un vrai projet, ouvert au regard.** Moteurs de jeux déterministes, tests Jest et Playwright, specs OpenSpec, CI/CD et audits de sécurité : les bonnes pratiques sont visibles, pas seulement racontées.
+- **Fait pour être étendu.** Un manifest, un dossier, une pull request : votre outil, jeu ou parcours rejoint le catalogue.
+- **Prêt pour les agents IA.** Les [instructions pour agents](../AGENTS.md) et les [skills du projet](../docs/guides/project-skills.md) sont versionnées avec le code.
 
-**Prérequis :** Git, Docker avec Docker Compose et Make. L’environnement est **Docker-first** : les dépendances et commandes Node.js s’exécutent dans le conteneur.
+## Démarrage rapide
+
+Prérequis : Git et [Node.js](https://nodejs.org/) 24 ou plus. Comptez environ 2 minutes.
 
 ```bash
-git clone https://github.com/DocaposteInno/playlab42.git
-cd playlab42
-
-make init
-make npm CMD="run build:local"
-make info
-make serve
+git clone https://github.com/DocaposteInno/playlab42.git && cd playlab42
+npm ci
+npm start        # puis ouvrir http://localhost:5242
 ```
 
-Ouvrez l’URL affichée par `make info` ; le port local varie selon le dossier. `build:local` prépare les contenus sans enrichissement des bookmarks.
+Vous préférez Docker, ou travaillez sur plusieurs branches en parallèle ? Le [guide de démarrage](../docs/GETTING_STARTED.md) détaille l’environnement Docker, les commandes du quotidien et les éléments optionnels (laboratoire GPT-2, aperçus des liens).
 
-Créez une branche ou un fork, suivez le guide adapté, puis ouvrez une Pull Request. Pour vérifier votre contribution : `make test`, `make lint`, `make typecheck` et, selon le périmètre, `make test-e2e` ou `make openspec-validate`.
+## Contribuer
 
-| Vous souhaitez… | Commencer ici |
-|-----------------|---------------|
-| Créer un outil | [Guide de création d’un outil](../docs/guides/create-tool.md) |
-| Développer un jeu ou un bot | [Moteur de règles](../docs/guides/create-game-engine.md), [interface](../docs/guides/create-game-client.md) et [bots](../docs/guides/create-bot.md) |
-| Écrire un parcours | [Guide de création d’un epic](../docs/guides/create-epic.md) |
-| Partir d’un gabarit | [Kit de contribution et galerie des composants](../docs/guides/contribution-kit.md) |
+Une petite contribution peut devenir un excellent support de formation : un outil, un jeu, un bot, un parcours, une ressource, une correction. Tout est résumé dans [CONTRIBUTING.md](../CONTRIBUTING.md). Une question, une idée ? Les [modèles d’issues](https://github.com/DocaposteInno/playlab42/issues/new/choose) vous guident.
 
 ## Documentation
 
-| Pour… | Référence |
-|-------|-----------|
-| Comprendre l’architecture et se repérer dans le dépôt | [README complet partagé avec le dépôt source](../README.md) |
-| Comprendre les notions du projet | [Concepts & glossaire](../docs/CONCEPTS.md) |
-| Consulter les contrats techniques | [Spécifications OpenSpec](../openspec/specs/) |
-| Comprendre la stratégie de tests | [Stratégie de tests](../docs/TESTING_STRATEGY.md) |
-| Comprendre la qualité et la chaîne de livraison | [Guide qualité](../docs/guides/software-quality.md) et [usine logicielle](../docs/guides/software-factory.md) |
-| Déployer ou dépanner | [Déploiement](../docs/DEPLOYMENT.md) et [dépannage](../docs/TROUBLESHOOTING.md) |
-| Consulter l’évolution du projet | [Changelog](../CHANGELOG.md) |
+| Pour… | Lire |
+|-------|------|
+| Installer et travailler au quotidien | [Guide de démarrage](../docs/GETTING_STARTED.md) |
+| Comprendre l’architecture et la stack | [Architecture](../docs/ARCHITECTURE.md) |
+| Créer un outil, un jeu ou un parcours | [Index des guides](../docs/guides/README.md) |
+| Notions, tests, déploiement, dépannage | [Concepts](../docs/CONCEPTS.md) · [Tests](../docs/TESTING_STRATEGY.md) · [Déploiement](../docs/DEPLOYMENT.md) · [Dépannage](../docs/TROUBLESHOOTING.md) |
+| Suivre l’évolution du projet | [Changelog](../CHANGELOG.md) · [Spécifications OpenSpec](../openspec/specs/) |
+
+Sécurité : [SECURITY.md](../SECURITY.md), sans passer par une issue publique · Communauté : [code de conduite](../CODE_OF_CONDUCT.md) · Merci aux [contributeurs](https://github.com/z4ppy/playlab42/graphs/contributors) !
 
 ## Le fork Docaposte et la synchronisation
 
 Ce dépôt est le fork de [z4ppy/playlab42](https://github.com/z4ppy/playlab42). Les contenus, le code et le **README racine** sont partagés avec le dépôt source.
 
-**Cet accueil est volontairement propre à Docaposte.** GitHub affiche `.github/README.md` en priorité : sa bannière, ses badges et ses liens dirigent vers cette instance, sans modifier le README racine. Cette séparation a été établie dans la [PR #1](https://github.com/DocaposteInno/playlab42/pull/1).
+**Cet accueil est volontairement propre à Docaposte.** GitHub affiche `.github/README.md` en priorité : ses liens et ses badges dirigent vers cette instance, sans modifier le README racine. Cette séparation a été établie dans la [PR #1](https://github.com/DocaposteInno/playlab42/pull/1).
 
-Lors d’une synchronisation, **conservez `.github/README.md` et ses liens Docaposte** ; ne le remplacez pas par le README du dépôt source. La synchronisation par fusion préserve ce fichier tant que la source ne crée pas un fichier au même emplacement. Une remise à zéro forcée sur la source ne le préserverait pas.
+Lors d’une synchronisation, **conservez `.github/README.md` et ses liens Docaposte** ; ne le remplacez pas par le README du dépôt source, mais reportez-y ses évolutions. La synchronisation par fusion préserve ce fichier tant que la source ne crée pas un fichier au même emplacement. Une remise à zéro forcée sur la source (`gh repo sync --force`, bouton « Discard commits ») ne le préserverait pas.
 
 ## Licence
 
-Playlab42 est un projet collaboratif porté par **Docaposte**, distribué sous licence [**CC BY-NC-SA 4.0**](../LICENSE) : attribution, usage non commercial et partage des adaptations sous la même licence.
+Playlab42 est créé par Cyrille ([@z4ppy](https://github.com/z4ppy)) et porté au sein de **Docaposte** par cette instance. Il est distribué sous licence [Apache 2.0](../LICENSE) (voir la [notice](../NOTICE)). Les composants tiers (`vendor/`, tokenizers et modèles du parcours « Anatomie d’un LLM », etc.) gardent leur propre licence, indiquée dans leur dossier.
 
 ---
 
